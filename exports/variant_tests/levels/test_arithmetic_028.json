@@ -1,0 +1,115 @@
+{
+  "id": "test_arithmetic_028",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 2,
+      "x": 1,
+      "y": 3
+    },
+    {
+      "n": 3,
+      "x": 0,
+      "y": 3
+    },
+    {
+      "n": 4,
+      "x": 1,
+      "y": 0
+    },
+    {
+      "n": 5,
+      "x": 5,
+      "y": 1
+    },
+    {
+      "n": 6,
+      "x": 5,
+      "y": 5
+    },
+    {
+      "n": 7,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 8,
+      "x": 4,
+      "y": 1
+    },
+    {
+      "n": 9,
+      "x": 3,
+      "y": 4
+    }
+  ],
+  "walls": {
+    "h": [],
+    "v": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 4
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "len": 2
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "len": 2
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "len": 4
+      }
+    ]
+  },
+  "meta": {
+    "variant": "arithmetic",
+    "sequence_rule": "simple arithmetic expressions",
+    "difficulty_target": "medium",
+    "representation": "arithmetic",
+    "display_labels": {
+      "1": "1+0",
+      "2": "2+0",
+      "3": "6-3",
+      "4": "8-4",
+      "5": "3+2",
+      "6": "6+0",
+      "7": "9-2",
+      "8": "11-3",
+      "9": "5+4"
+    },
+    "source_level_id": "all-86",
+    "arithmetic_mode": "mixed"
+  },
+  "metrics": {
+    "variant": "arithmetic",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 9,
+    "clue_density": 0.25,
+    "sequence_length": 9,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "arithmetic",
+    "difficulty_estimate": "medium",
+    "turns": 13,
+    "max_straight": 5,
+    "avg_straight": 2.5,
+    "corners": 1,
+    "borders": 3,
+    "inners": 5,
+    "num_walls": 12,
+    "arithmetic_mode": "mixed"
+  }
+}

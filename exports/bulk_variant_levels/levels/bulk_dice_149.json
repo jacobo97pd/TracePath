@@ -1,0 +1,158 @@
+{
+  "id": "bulk_dice_149",
+  "size": 7,
+  "clues": [
+    {
+      "n": 1,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 2,
+      "x": 2,
+      "y": 0
+    },
+    {
+      "n": 3,
+      "x": 0,
+      "y": 1
+    },
+    {
+      "n": 4,
+      "x": 0,
+      "y": 3
+    },
+    {
+      "n": 5,
+      "x": 0,
+      "y": 5
+    },
+    {
+      "n": 6,
+      "x": 1,
+      "y": 5
+    },
+    {
+      "n": 7,
+      "x": 3,
+      "y": 5
+    },
+    {
+      "n": 8,
+      "x": 4,
+      "y": 6
+    },
+    {
+      "n": 9,
+      "x": 5,
+      "y": 5
+    },
+    {
+      "n": 10,
+      "x": 6,
+      "y": 3
+    },
+    {
+      "n": 11,
+      "x": 5,
+      "y": 0
+    },
+    {
+      "n": 12,
+      "x": 3,
+      "y": 2
+    },
+    {
+      "n": 13,
+      "x": 5,
+      "y": 1
+    },
+    {
+      "n": 14,
+      "x": 3,
+      "y": 3
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 3,
+        "y": 3,
+        "len": 2
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "len": 3
+      }
+    ],
+    "v": [
+      {
+        "x": 2,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "len": 1
+      }
+    ]
+  },
+  "meta": {
+    "variant": "dice",
+    "sequence_rule": "dice faces / dice sums",
+    "difficulty_target": "medium",
+    "representation": "dice",
+    "display_labels": {
+      "1": "1+1",
+      "2": "2+1",
+      "3": "1+3",
+      "4": "3+2",
+      "5": "3+3",
+      "6": "2+5",
+      "7": "2+6",
+      "8": "6+3",
+      "9": "4+6",
+      "10": "5+6",
+      "11": "6+6",
+      "12": "1+1",
+      "13": "1+2",
+      "14": "1+3"
+    },
+    "source_level_id": "all-33",
+    "dice_mode": "sum",
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 149
+  },
+  "metrics": {
+    "variant": "dice",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 14,
+    "clue_density": 0.2857,
+    "sequence_length": 14,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "dice",
+    "difficulty_estimate": "medium",
+    "turns": 31,
+    "max_straight": 4,
+    "avg_straight": 1.5,
+    "corners": 0,
+    "borders": 7,
+    "inners": 7,
+    "num_walls": 9,
+    "dice_mode": "sum"
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "id": "bulk_alphabet_131",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 2,
+      "x": 0,
+      "y": 4
+    },
+    {
+      "n": 3,
+      "x": 2,
+      "y": 5
+    },
+    {
+      "n": 4,
+      "x": 5,
+      "y": 5
+    },
+    {
+      "n": 5,
+      "x": 5,
+      "y": 1
+    },
+    {
+      "n": 6,
+      "x": 2,
+      "y": 0
+    },
+    {
+      "n": 7,
+      "x": 0,
+      "y": 1
+    },
+    {
+      "n": 8,
+      "x": 3,
+      "y": 1
+    },
+    {
+      "n": 9,
+      "x": 1,
+      "y": 3
+    },
+    {
+      "n": 10,
+      "x": 4,
+      "y": 4
+    },
+    {
+      "n": 11,
+      "x": 4,
+      "y": 1
+    }
+  ],
+  "walls": {
+    "h": [],
+    "v": []
+  },
+  "meta": {
+    "variant": "alphabet",
+    "sequence_rule": "A, B, C...",
+    "difficulty_target": "easy",
+    "representation": "alphabet",
+    "display_labels": {
+      "1": "A",
+      "2": "B",
+      "3": "C",
+      "4": "D",
+      "5": "E",
+      "6": "F",
+      "7": "G",
+      "8": "H",
+      "9": "I",
+      "10": "J",
+      "11": "K"
+    },
+    "source_level_id": "all-250",
+    "alphabet_start_char": "A",
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 131
+  },
+  "metrics": {
+    "variant": "alphabet",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 11,
+    "clue_density": 0.3056,
+    "sequence_length": 11,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "alphabet",
+    "difficulty_estimate": "easy",
+    "turns": 11,
+    "max_straight": 5,
+    "avg_straight": 2.92,
+    "corners": 1,
+    "borders": 5,
+    "inners": 5,
+    "num_walls": 0,
+    "alphabet_start_char": "A"
+  }
+}

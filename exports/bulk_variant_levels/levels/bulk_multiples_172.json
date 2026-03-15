@@ -1,0 +1,119 @@
+{
+  "id": "bulk_multiples_172",
+  "size": 5,
+  "clues": [
+    {
+      "n": 1,
+      "x": 0,
+      "y": 4
+    },
+    {
+      "n": 2,
+      "x": 1,
+      "y": 3
+    },
+    {
+      "n": 3,
+      "x": 2,
+      "y": 3
+    },
+    {
+      "n": 4,
+      "x": 3,
+      "y": 4
+    },
+    {
+      "n": 5,
+      "x": 4,
+      "y": 2
+    },
+    {
+      "n": 6,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 7,
+      "x": 3,
+      "y": 1
+    },
+    {
+      "n": 8,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 9,
+      "x": 1,
+      "y": 0
+    },
+    {
+      "n": 10,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "n": 11,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 0,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "len": 2
+      }
+    ],
+    "v": []
+  },
+  "meta": {
+    "variant": "multiples",
+    "sequence_rule": "multiples of 3",
+    "difficulty_target": "easy",
+    "representation": "multiple",
+    "display_labels": {
+      "1": "3",
+      "2": "6",
+      "3": "9",
+      "4": "12",
+      "5": "15",
+      "6": "18",
+      "7": "21",
+      "8": "24",
+      "9": "27",
+      "10": "30",
+      "11": "33"
+    },
+    "source_level_id": "all-12",
+    "multiple_base": 3,
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 172
+  },
+  "metrics": {
+    "variant": "multiples",
+    "grid_size": 5,
+    "path_length": 25,
+    "num_clues": 11,
+    "clue_density": 0.44,
+    "sequence_length": 11,
+    "sequence_start": 3,
+    "sequence_step": 3,
+    "representation": "multiple",
+    "difficulty_estimate": "easy",
+    "turns": 16,
+    "max_straight": 3,
+    "avg_straight": 1.41,
+    "corners": 2,
+    "borders": 5,
+    "inners": 4,
+    "num_walls": 3,
+    "multiple_base": 3
+  }
+}

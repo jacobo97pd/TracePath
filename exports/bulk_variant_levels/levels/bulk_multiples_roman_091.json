@@ -1,0 +1,116 @@
+{
+  "id": "bulk_multiples_roman_091",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 1,
+      "y": 0
+    },
+    {
+      "n": 2,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "n": 3,
+      "x": 0,
+      "y": 5
+    },
+    {
+      "n": 4,
+      "x": 2,
+      "y": 3
+    },
+    {
+      "n": 5,
+      "x": 3,
+      "y": 5
+    },
+    {
+      "n": 6,
+      "x": 5,
+      "y": 4
+    },
+    {
+      "n": 7,
+      "x": 4,
+      "y": 2
+    },
+    {
+      "n": 8,
+      "x": 5,
+      "y": 0
+    },
+    {
+      "n": 9,
+      "x": 3,
+      "y": 1
+    },
+    {
+      "n": 10,
+      "x": 1,
+      "y": 1
+    },
+    {
+      "n": 11,
+      "x": 3,
+      "y": 2
+    },
+    {
+      "n": 12,
+      "x": 4,
+      "y": 4
+    }
+  ],
+  "walls": {
+    "h": [],
+    "v": []
+  },
+  "meta": {
+    "variant": "multiples_roman",
+    "sequence_rule": "roman multiples of 3",
+    "difficulty_target": "easy",
+    "representation": "multiple_roman",
+    "display_labels": {
+      "1": "III",
+      "2": "VI",
+      "3": "IX",
+      "4": "XII",
+      "5": "XV",
+      "6": "XVIII",
+      "7": "XXI",
+      "8": "XXIV",
+      "9": "XXVII",
+      "10": "XXX",
+      "11": "XXXIII",
+      "12": "XXXVI"
+    },
+    "source_level_id": "all-177",
+    "multiple_base": 3,
+    "roman_max_value": 36,
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 91
+  },
+  "metrics": {
+    "variant": "multiples_roman",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 12,
+    "clue_density": 0.3333,
+    "sequence_length": 12,
+    "sequence_start": 3,
+    "sequence_step": 3,
+    "representation": "multiple_roman",
+    "difficulty_estimate": "easy",
+    "turns": 22,
+    "max_straight": 5,
+    "avg_straight": 1.52,
+    "corners": 2,
+    "borders": 4,
+    "inners": 6,
+    "num_walls": 0,
+    "multiple_base": 3,
+    "roman_max_value": 36
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "id": "bulk_multiples_roman_070",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 1,
+      "y": 4
+    },
+    {
+      "n": 2,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 3,
+      "x": 4,
+      "y": 1
+    },
+    {
+      "n": 4,
+      "x": 5,
+      "y": 5
+    },
+    {
+      "n": 5,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 6,
+      "x": 1,
+      "y": 3
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 4,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "len": 1
+      }
+    ],
+    "v": [
+      {
+        "x": 3,
+        "y": 2,
+        "len": 2
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "len": 2
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "len": 3
+      }
+    ]
+  },
+  "meta": {
+    "variant": "multiples_roman",
+    "sequence_rule": "roman multiples of 2",
+    "difficulty_target": "hard",
+    "representation": "multiple_roman",
+    "display_labels": {
+      "1": "II",
+      "2": "IV",
+      "3": "VI",
+      "4": "VIII",
+      "5": "X",
+      "6": "XII"
+    },
+    "source_level_id": "all-189",
+    "multiple_base": 2,
+    "roman_max_value": 12,
+    "generation_batch": "bulk_variant_pack_100_each",
+    "generation_index": 70
+  },
+  "metrics": {
+    "variant": "multiples_roman",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 6,
+    "clue_density": 0.1667,
+    "sequence_length": 6,
+    "sequence_start": 2,
+    "sequence_step": 2,
+    "representation": "multiple_roman",
+    "difficulty_estimate": "hard",
+    "turns": 18,
+    "max_straight": 5,
+    "avg_straight": 1.84,
+    "corners": 1,
+    "borders": 1,
+    "inners": 4,
+    "num_walls": 13,
+    "multiple_base": 2,
+    "roman_max_value": 12
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "id": "bulk_multiples_126",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 2,
+      "y": 1
+    },
+    {
+      "n": 2,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 3,
+      "x": 5,
+      "y": 1
+    },
+    {
+      "n": 4,
+      "x": 5,
+      "y": 4
+    },
+    {
+      "n": 5,
+      "x": 4,
+      "y": 5
+    },
+    {
+      "n": 6,
+      "x": 2,
+      "y": 5
+    },
+    {
+      "n": 7,
+      "x": 4,
+      "y": 4
+    },
+    {
+      "n": 8,
+      "x": 2,
+      "y": 3
+    },
+    {
+      "n": 9,
+      "x": 1,
+      "y": 4
+    },
+    {
+      "n": 10,
+      "x": 0,
+      "y": 5
+    },
+    {
+      "n": 11,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "n": 12,
+      "x": 1,
+      "y": 0
+    },
+    {
+      "n": 13,
+      "x": 1,
+      "y": 2
+    },
+    {
+      "n": 14,
+      "x": 3,
+      "y": 2
+    },
+    {
+      "n": 15,
+      "x": 3,
+      "y": 1
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 1,
+        "y": 3,
+        "len": 4
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 2,
+        "len": 2
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "len": 2
+      }
+    ]
+  },
+  "meta": {
+    "variant": "multiples",
+    "sequence_rule": "multiples of 2",
+    "difficulty_target": "easy",
+    "representation": "multiple",
+    "display_labels": {
+      "1": "2",
+      "2": "4",
+      "3": "6",
+      "4": "8",
+      "5": "10",
+      "6": "12",
+      "7": "14",
+      "8": "16",
+      "9": "18",
+      "10": "20",
+      "11": "22",
+      "12": "24",
+      "13": "26",
+      "14": "28",
+      "15": "30"
+    },
+    "source_level_id": "all-186",
+    "multiple_base": 2,
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 126
+  },
+  "metrics": {
+    "variant": "multiples",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 15,
+    "clue_density": 0.4167,
+    "sequence_length": 15,
+    "sequence_start": 2,
+    "sequence_step": 2,
+    "representation": "multiple",
+    "difficulty_estimate": "easy",
+    "turns": 15,
+    "max_straight": 5,
+    "avg_straight": 2.19,
+    "corners": 1,
+    "borders": 7,
+    "inners": 7,
+    "num_walls": 8,
+    "multiple_base": 2
+  }
+}

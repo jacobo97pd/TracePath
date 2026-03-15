@@ -1,0 +1,140 @@
+{
+  "id": "bulk_dice_185",
+  "size": 7,
+  "clues": [
+    {
+      "n": 1,
+      "x": 5,
+      "y": 5
+    },
+    {
+      "n": 2,
+      "x": 6,
+      "y": 4
+    },
+    {
+      "n": 3,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 4,
+      "x": 1,
+      "y": 6
+    },
+    {
+      "n": 5,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 6,
+      "x": 3,
+      "y": 1
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "len": 1
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "len": 1
+      }
+    ]
+  },
+  "meta": {
+    "variant": "dice",
+    "sequence_rule": "dice faces / dice sums",
+    "difficulty_target": "hard",
+    "representation": "dice",
+    "display_labels": {
+      "1": "d1",
+      "2": "d2",
+      "3": "d3",
+      "4": "d4",
+      "5": "d5",
+      "6": "d6"
+    },
+    "source_level_id": "all-300",
+    "dice_mode": "face",
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 185
+  },
+  "metrics": {
+    "variant": "dice",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 6,
+    "clue_density": 0.1224,
+    "sequence_length": 6,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "dice",
+    "difficulty_estimate": "hard",
+    "turns": 28,
+    "max_straight": 6,
+    "avg_straight": 1.66,
+    "corners": 0,
+    "borders": 3,
+    "inners": 3,
+    "num_walls": 12,
+    "dice_mode": "face"
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "id": "bulk_roman_073",
+  "size": 7,
+  "clues": [
+    {
+      "n": 1,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 2,
+      "x": 1,
+      "y": 3
+    },
+    {
+      "n": 3,
+      "x": 5,
+      "y": 4
+    },
+    {
+      "n": 4,
+      "x": 2,
+      "y": 5
+    },
+    {
+      "n": 5,
+      "x": 0,
+      "y": 5
+    },
+    {
+      "n": 6,
+      "x": 4,
+      "y": 6
+    },
+    {
+      "n": 7,
+      "x": 6,
+      "y": 4
+    },
+    {
+      "n": 8,
+      "x": 4,
+      "y": 1
+    },
+    {
+      "n": 9,
+      "x": 6,
+      "y": 1
+    },
+    {
+      "n": 10,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 11,
+      "x": 1,
+      "y": 1
+    },
+    {
+      "n": 12,
+      "x": 3,
+      "y": 3
+    }
+  ],
+  "walls": {
+    "h": [],
+    "v": []
+  },
+  "meta": {
+    "variant": "roman",
+    "sequence_rule": "I, II, III...",
+    "difficulty_target": "medium",
+    "representation": "roman",
+    "display_labels": {
+      "1": "I",
+      "2": "II",
+      "3": "III",
+      "4": "IV",
+      "5": "V",
+      "6": "VI",
+      "7": "VII",
+      "8": "VIII",
+      "9": "IX",
+      "10": "X",
+      "11": "XI",
+      "12": "XII"
+    },
+    "source_level_id": "all-126",
+    "roman_max_value": 12,
+    "generation_batch": "bulk_variant_pack_100_each",
+    "generation_index": 73
+  },
+  "metrics": {
+    "variant": "roman",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 12,
+    "clue_density": 0.2449,
+    "sequence_length": 12,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "roman",
+    "difficulty_estimate": "medium",
+    "turns": 21,
+    "max_straight": 6,
+    "avg_straight": 2.18,
+    "corners": 0,
+    "borders": 5,
+    "inners": 7,
+    "num_walls": 0,
+    "roman_max_value": 12
+  }
+}

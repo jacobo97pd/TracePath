@@ -1,0 +1,132 @@
+{
+  "id": "bulk_dice_050",
+  "size": 7,
+  "clues": [
+    {
+      "n": 1,
+      "x": 0,
+      "y": 6
+    },
+    {
+      "n": 2,
+      "x": 2,
+      "y": 3
+    },
+    {
+      "n": 3,
+      "x": 4,
+      "y": 6
+    },
+    {
+      "n": 4,
+      "x": 2,
+      "y": 5
+    },
+    {
+      "n": 5,
+      "x": 2,
+      "y": 1
+    },
+    {
+      "n": 6,
+      "x": 4,
+      "y": 0
+    },
+    {
+      "n": 7,
+      "x": 5,
+      "y": 4
+    },
+    {
+      "n": 8,
+      "x": 4,
+      "y": 4
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 4
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "len": 4
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 3,
+        "len": 3
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "len": 3
+      }
+    ]
+  },
+  "meta": {
+    "variant": "dice",
+    "sequence_rule": "dice faces / dice sums",
+    "difficulty_target": "hard",
+    "representation": "dice",
+    "display_labels": {
+      "1": "d1",
+      "2": "d2",
+      "3": "d3",
+      "4": "d4",
+      "5": "d5",
+      "6": "d6",
+      "7": "d1",
+      "8": "d2"
+    },
+    "source_level_id": "all-204",
+    "dice_mode": "face",
+    "generation_batch": "bulk_variant_pack_100_each",
+    "generation_index": 50
+  },
+  "metrics": {
+    "variant": "dice",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 8,
+    "clue_density": 0.1633,
+    "sequence_length": 8,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "dice",
+    "difficulty_estimate": "hard",
+    "turns": 18,
+    "max_straight": 6,
+    "avg_straight": 2.53,
+    "corners": 1,
+    "borders": 2,
+    "inners": 5,
+    "num_walls": 18,
+    "dice_mode": "face"
+  }
+}

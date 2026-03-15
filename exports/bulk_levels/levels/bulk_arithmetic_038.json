@@ -1,0 +1,158 @@
+{
+  "id": "bulk_arithmetic_038",
+  "size": 7,
+  "clues": [
+    {
+      "n": 1,
+      "x": 3,
+      "y": 5
+    },
+    {
+      "n": 2,
+      "x": 0,
+      "y": 6
+    },
+    {
+      "n": 3,
+      "x": 3,
+      "y": 6
+    },
+    {
+      "n": 4,
+      "x": 5,
+      "y": 6
+    },
+    {
+      "n": 5,
+      "x": 5,
+      "y": 4
+    },
+    {
+      "n": 6,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 7,
+      "x": 1,
+      "y": 3
+    },
+    {
+      "n": 8,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "n": 9,
+      "x": 1,
+      "y": 1
+    },
+    {
+      "n": 10,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 11,
+      "x": 5,
+      "y": 2
+    },
+    {
+      "n": 12,
+      "x": 5,
+      "y": 0
+    },
+    {
+      "n": 13,
+      "x": 6,
+      "y": 2
+    },
+    {
+      "n": 14,
+      "x": 3,
+      "y": 3
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 3,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 0,
+        "y": 5,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "len": 2
+      }
+    ],
+    "v": [
+      {
+        "x": 3,
+        "y": 3,
+        "len": 1
+      }
+    ]
+  },
+  "meta": {
+    "variant": "arithmetic",
+    "sequence_rule": "simple arithmetic expressions",
+    "difficulty_target": "medium",
+    "representation": "arithmetic",
+    "display_labels": {
+      "1": "1+0",
+      "2": "2+0",
+      "3": "1+2",
+      "4": "4+0",
+      "5": "3+2",
+      "6": "5+1",
+      "7": "9-2",
+      "8": "10-2",
+      "9": "6+3",
+      "10": "13-3",
+      "11": "13-2",
+      "12": "12+0",
+      "13": "17-4",
+      "14": "4+10"
+    },
+    "source_level_id": "all-34",
+    "arithmetic_mode": "mixed",
+    "generation_batch": "bulk_variant_pack_100_each",
+    "generation_index": 38
+  },
+  "metrics": {
+    "variant": "arithmetic",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 14,
+    "clue_density": 0.2857,
+    "sequence_length": 14,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "arithmetic",
+    "difficulty_estimate": "medium",
+    "turns": 26,
+    "max_straight": 4,
+    "avg_straight": 1.78,
+    "corners": 1,
+    "borders": 6,
+    "inners": 7,
+    "num_walls": 7,
+    "arithmetic_mode": "mixed"
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "id": "bulk_multiples_039",
+  "size": 7,
+  "clues": [
+    {
+      "n": 1,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 2,
+      "x": 2,
+      "y": 0
+    },
+    {
+      "n": 3,
+      "x": 1,
+      "y": 2
+    },
+    {
+      "n": 4,
+      "x": 1,
+      "y": 4
+    },
+    {
+      "n": 5,
+      "x": 1,
+      "y": 6
+    },
+    {
+      "n": 6,
+      "x": 3,
+      "y": 5
+    },
+    {
+      "n": 7,
+      "x": 4,
+      "y": 6
+    },
+    {
+      "n": 8,
+      "x": 5,
+      "y": 4
+    },
+    {
+      "n": 9,
+      "x": 6,
+      "y": 1
+    },
+    {
+      "n": 10,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 11,
+      "x": 5,
+      "y": 1
+    },
+    {
+      "n": 12,
+      "x": 3,
+      "y": 3
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 3,
+        "y": 3,
+        "len": 2
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "len": 3
+      }
+    ],
+    "v": [
+      {
+        "x": 2,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "len": 1
+      }
+    ]
+  },
+  "meta": {
+    "variant": "multiples",
+    "sequence_rule": "multiples of 5",
+    "difficulty_target": "medium",
+    "representation": "multiple",
+    "display_labels": {
+      "1": "5",
+      "2": "10",
+      "3": "15",
+      "4": "20",
+      "5": "25",
+      "6": "30",
+      "7": "35",
+      "8": "40",
+      "9": "45",
+      "10": "50",
+      "11": "55",
+      "12": "60"
+    },
+    "source_level_id": "all-33",
+    "multiple_base": 5,
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 39
+  },
+  "metrics": {
+    "variant": "multiples",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 12,
+    "clue_density": 0.2449,
+    "sequence_length": 12,
+    "sequence_start": 5,
+    "sequence_step": 5,
+    "representation": "multiple",
+    "difficulty_estimate": "medium",
+    "turns": 31,
+    "max_straight": 4,
+    "avg_straight": 1.5,
+    "corners": 0,
+    "borders": 5,
+    "inners": 7,
+    "num_walls": 9,
+    "multiple_base": 5
+  }
+}

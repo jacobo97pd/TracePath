@@ -1,0 +1,248 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "pointer_default",
+      "name": "Default",
+      "imagePath": "",
+      "costCoins": 0,
+      "order": 0,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "axolotl_default",
+      "name": "Axolotl Default",
+      "imagePath": "assets/skins/axolotl-default.png",
+      "costCoins": 300,
+      "order": 1,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "axolotl_logan",
+      "name": "Axolotl Logan",
+      "imagePath": "assets/skins/axolotl-logan.png",
+      "costCoins": 300,
+      "order": 2,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "axolotl_metalero",
+      "name": "Axolotl Metalero",
+      "imagePath": "assets/skins/axolotl-metalero.png",
+      "costCoins": 300,
+      "order": 3,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "axolotl_squirtel",
+      "name": "Axolotl Squirtel",
+      "imagePath": "assets/skins/axolotl-squirtel.png",
+      "costCoins": 300,
+      "order": 4,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "cerdo_charizard",
+      "name": "Cerdo Charizard",
+      "imagePath": "assets/skins/cerdo-charizard.png",
+      "costCoins": 300,
+      "order": 5,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "cerdo_cyborg",
+      "name": "Cerdo Cyborg",
+      "imagePath": "assets/skins/cerdo-cyborg.png",
+      "costCoins": 300,
+      "order": 6,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "cerdo_dark_lord",
+      "name": "Cerdo Dark Lord",
+      "imagePath": "assets/skins/cerdo-dark-lord.png",
+      "costCoins": 300,
+      "order": 7,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "cerdo_dustin",
+      "name": "Cerdo Dustin",
+      "imagePath": "assets/skins/cerdo-dustin.png",
+      "costCoins": 300,
+      "order": 8,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "cerdo_eleven",
+      "name": "Cerdo Eleven",
+      "imagePath": "assets/skins/cerdo-eleven.png",
+      "costCoins": 300,
+      "order": 9,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "cerdo_gigachad",
+      "name": "Cerdo Gigachad",
+      "imagePath": "assets/skins/cerdo-gigachad.png",
+      "costCoins": 300,
+      "order": 10,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "cerdo_hobbit",
+      "name": "Cerdo Hobbit",
+      "imagePath": "assets/skins/cerdo-hobbit.png",
+      "costCoins": 300,
+      "order": 11,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "cerdo_leia",
+      "name": "Cerdo Leia",
+      "imagePath": "assets/skins/cerdo-leia.png",
+      "costCoins": 300,
+      "order": 12,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "cerdo_luke",
+      "name": "Cerdo Luke",
+      "imagePath": "assets/skins/cerdo-luke.png",
+      "costCoins": 300,
+      "order": 13,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "cerdo_mago",
+      "name": "Cerdo Mago",
+      "imagePath": "assets/skins/cerdo-mago.png",
+      "costCoins": 300,
+      "order": 14,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "cerdo_oro",
+      "name": "Cerdo Oro",
+      "imagePath": "assets/skins/cerdo-oro.png",
+      "costCoins": 300,
+      "order": 15,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "cerdo_pirata",
+      "name": "Cerdo Pirata",
+      "imagePath": "assets/skins/cerdo-pirata.png",
+      "costCoins": 300,
+      "order": 16,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "cerdo_punk",
+      "name": "Cerdo Punk",
+      "imagePath": "assets/skins/cerdo-punk.png",
+      "costCoins": 300,
+      "order": 17,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "cerdo_santa",
+      "name": "Cerdo Santa",
+      "imagePath": "assets/skins/cerdo-santa.png",
+      "costCoins": 300,
+      "order": 18,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "cerdo_vecna",
+      "name": "Cerdo Vecna",
+      "imagePath": "assets/skins/cerdo-vecna.png",
+      "costCoins": 300,
+      "order": 19,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "chatgpt_image_7_mar_2026_17_53_40_1",
+      "name": "Chatgpt Image 7 Mar 2026, 17 53 40 (1)",
+      "imagePath": "assets/skins/ChatGPT Image 7 mar 2026, 17_53_40 (1).png",
+      "costCoins": 300,
+      "order": 20,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "chatgpt_image_7_mar_2026_19_49_36_1",
+      "name": "Chatgpt Image 7 Mar 2026, 19 49 36 (1)",
+      "imagePath": "assets/skins/ChatGPT Image 7 mar 2026, 19_49_36 (1).png",
+      "costCoins": 300,
+      "order": 21,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "claseg",
+      "name": "Claseg",
+      "imagePath": "assets/skins/claseg.png",
+      "costCoins": 300,
+      "order": 22,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "crx",
+      "name": "Crx",
+      "imagePath": "assets/skins/crx.png",
+      "costCoins": 300,
+      "order": 23,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "heisenberg_cerdo",
+      "name": "Heisenberg Cerdo",
+      "imagePath": "assets/skins/heisenberg-cerdo.png",
+      "costCoins": 300,
+      "order": 24,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "jesse_cerdo",
+      "name": "Jesse Cerdo",
+      "imagePath": "assets/skins/jesse-cerdo.png",
+      "costCoins": 300,
+      "order": 25,
+      "posX": 0,
+      "posY": 0
+    },
+    {
+      "id": "pointer_pig_vader",
+      "name": "Dark Pig Lord",
+      "imagePath": "assets/skins/pointer_pig_vader.png",
+      "costCoins": 300,
+      "order": 26,
+      "posX": 0,
+      "posY": 0
+    }
+  ]
+}

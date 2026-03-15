@@ -1,0 +1,82 @@
+{
+  "id": "bulk_multiples_043",
+  "size": 7,
+  "clues": [],
+  "walls": {
+    "h": [
+      {
+        "x": 5,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 1,
+        "y": 6,
+        "len": 1
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 5,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "len": 1
+      }
+    ]
+  },
+  "meta": {
+    "variant": "multiples",
+    "sequence_rule": "multiples of 4",
+    "difficulty_target": "medium",
+    "representation": "multiple",
+    "display_labels": {},
+    "source_level_id": "all-399",
+    "multiple_base": 4,
+    "generation_batch": "bulk_variant_pack_100_each",
+    "generation_index": 43
+  },
+  "metrics": {
+    "variant": "multiples",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 0,
+    "clue_density": 0.0,
+    "sequence_length": 0,
+    "sequence_start": 4,
+    "sequence_step": 4,
+    "representation": "multiple",
+    "difficulty_estimate": "medium",
+    "turns": 0,
+    "max_straight": 0,
+    "avg_straight": 0.0,
+    "corners": 0,
+    "borders": 0,
+    "inners": 0,
+    "num_walls": 8,
+    "multiple_base": 4
+  }
+}

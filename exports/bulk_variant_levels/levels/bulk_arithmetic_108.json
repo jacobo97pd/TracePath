@@ -1,0 +1,102 @@
+{
+  "id": "bulk_arithmetic_108",
+  "size": 7,
+  "clues": [
+    {
+      "n": 1,
+      "x": 1,
+      "y": 5
+    },
+    {
+      "n": 2,
+      "x": 3,
+      "y": 4
+    },
+    {
+      "n": 3,
+      "x": 6,
+      "y": 1
+    },
+    {
+      "n": 4,
+      "x": 2,
+      "y": 0
+    },
+    {
+      "n": 5,
+      "x": 5,
+      "y": 2
+    },
+    {
+      "n": 6,
+      "x": 1,
+      "y": 2
+    },
+    {
+      "n": 7,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "n": 8,
+      "x": 1,
+      "y": 6
+    },
+    {
+      "n": 9,
+      "x": 6,
+      "y": 5
+    },
+    {
+      "n": 10,
+      "x": 2,
+      "y": 4
+    }
+  ],
+  "walls": {
+    "h": [],
+    "v": []
+  },
+  "meta": {
+    "variant": "arithmetic",
+    "sequence_rule": "simple arithmetic expressions",
+    "difficulty_target": "medium",
+    "representation": "arithmetic",
+    "display_labels": {
+      "1": "1+0",
+      "2": "2+0",
+      "3": "1+2",
+      "4": "7-3",
+      "5": "8-3",
+      "6": "3+3",
+      "7": "3+4",
+      "8": "9-1",
+      "9": "13-4",
+      "10": "9+1"
+    },
+    "source_level_id": "all-115",
+    "arithmetic_mode": "mixed",
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 108
+  },
+  "metrics": {
+    "variant": "arithmetic",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 10,
+    "clue_density": 0.2041,
+    "sequence_length": 10,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "arithmetic",
+    "difficulty_estimate": "medium",
+    "turns": 18,
+    "max_straight": 6,
+    "avg_straight": 2.53,
+    "corners": 0,
+    "borders": 5,
+    "inners": 5,
+    "num_walls": 0,
+    "arithmetic_mode": "mixed"
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "id": "bulk_multiples_199",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "n": 2,
+      "x": 5,
+      "y": 3
+    },
+    {
+      "n": 3,
+      "x": 2,
+      "y": 5
+    },
+    {
+      "n": 4,
+      "x": 1,
+      "y": 4
+    },
+    {
+      "n": 5,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "n": 6,
+      "x": 2,
+      "y": 0
+    },
+    {
+      "n": 7,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 8,
+      "x": 5,
+      "y": 2
+    },
+    {
+      "n": 9,
+      "x": 3,
+      "y": 0
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 3,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "len": 2
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "len": 1
+      }
+    ]
+  },
+  "meta": {
+    "variant": "multiples",
+    "sequence_rule": "multiples of 5",
+    "difficulty_target": "medium",
+    "representation": "multiple",
+    "display_labels": {
+      "1": "5",
+      "2": "10",
+      "3": "15",
+      "4": "20",
+      "5": "25",
+      "6": "30",
+      "7": "35",
+      "8": "40",
+      "9": "45"
+    },
+    "source_level_id": "all-26",
+    "multiple_base": 5,
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 199
+  },
+  "metrics": {
+    "variant": "multiples",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 9,
+    "clue_density": 0.25,
+    "sequence_length": 9,
+    "sequence_start": 5,
+    "sequence_step": 5,
+    "representation": "multiple",
+    "difficulty_estimate": "medium",
+    "turns": 21,
+    "max_straight": 5,
+    "avg_straight": 1.59,
+    "corners": 0,
+    "borders": 6,
+    "inners": 3,
+    "num_walls": 7,
+    "multiple_base": 5
+  }
+}

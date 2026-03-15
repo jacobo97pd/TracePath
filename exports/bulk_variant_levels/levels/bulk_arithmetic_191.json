@@ -1,0 +1,126 @@
+{
+  "id": "bulk_arithmetic_191",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 5,
+      "y": 4
+    },
+    {
+      "n": 2,
+      "x": 3,
+      "y": 5
+    },
+    {
+      "n": 3,
+      "x": 1,
+      "y": 5
+    },
+    {
+      "n": 4,
+      "x": 0,
+      "y": 3
+    },
+    {
+      "n": 5,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 6,
+      "x": 1,
+      "y": 1
+    },
+    {
+      "n": 7,
+      "x": 1,
+      "y": 0
+    },
+    {
+      "n": 8,
+      "x": 4,
+      "y": 0
+    },
+    {
+      "n": 9,
+      "x": 5,
+      "y": 2
+    },
+    {
+      "n": 10,
+      "x": 4,
+      "y": 3
+    },
+    {
+      "n": 11,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 12,
+      "x": 2,
+      "y": 3
+    },
+    {
+      "n": 13,
+      "x": 3,
+      "y": 2
+    },
+    {
+      "n": 14,
+      "x": 3,
+      "y": 1
+    }
+  ],
+  "walls": {
+    "h": [],
+    "v": []
+  },
+  "meta": {
+    "variant": "arithmetic",
+    "sequence_rule": "simple arithmetic expressions",
+    "difficulty_target": "easy",
+    "representation": "arithmetic",
+    "display_labels": {
+      "1": "1+0",
+      "2": "2+0",
+      "3": "3+0",
+      "4": "4+0",
+      "5": "4+1",
+      "6": "6+0",
+      "7": "3+4",
+      "8": "7+1",
+      "9": "1+8",
+      "10": "10+0",
+      "11": "11+0",
+      "12": "12+0",
+      "13": "10+3",
+      "14": "8+6"
+    },
+    "source_level_id": "all-175",
+    "arithmetic_mode": "sum",
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 191
+  },
+  "metrics": {
+    "variant": "arithmetic",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 14,
+    "clue_density": 0.3889,
+    "sequence_length": 14,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "arithmetic",
+    "difficulty_estimate": "easy",
+    "turns": 17,
+    "max_straight": 5,
+    "avg_straight": 1.94,
+    "corners": 0,
+    "borders": 7,
+    "inners": 7,
+    "num_walls": 0,
+    "arithmetic_mode": "sum"
+  }
+}

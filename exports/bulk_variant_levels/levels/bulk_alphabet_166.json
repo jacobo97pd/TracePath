@@ -1,0 +1,174 @@
+{
+  "id": "bulk_alphabet_166",
+  "size": 8,
+  "clues": [
+    {
+      "n": 1,
+      "x": 6,
+      "y": 6
+    },
+    {
+      "n": 2,
+      "x": 7,
+      "y": 6
+    },
+    {
+      "n": 3,
+      "x": 5,
+      "y": 7
+    },
+    {
+      "n": 4,
+      "x": 2,
+      "y": 7
+    },
+    {
+      "n": 5,
+      "x": 0,
+      "y": 6
+    },
+    {
+      "n": 6,
+      "x": 0,
+      "y": 3
+    },
+    {
+      "n": 7,
+      "x": 1,
+      "y": 1
+    },
+    {
+      "n": 8,
+      "x": 1,
+      "y": 0
+    },
+    {
+      "n": 9,
+      "x": 4,
+      "y": 0
+    },
+    {
+      "n": 10,
+      "x": 5,
+      "y": 0
+    },
+    {
+      "n": 11,
+      "x": 7,
+      "y": 1
+    },
+    {
+      "n": 12,
+      "x": 7,
+      "y": 2
+    },
+    {
+      "n": 13,
+      "x": 6,
+      "y": 4
+    },
+    {
+      "n": 14,
+      "x": 5,
+      "y": 2
+    },
+    {
+      "n": 15,
+      "x": 4,
+      "y": 4
+    },
+    {
+      "n": 16,
+      "x": 5,
+      "y": 6
+    },
+    {
+      "n": 17,
+      "x": 3,
+      "y": 5
+    },
+    {
+      "n": 18,
+      "x": 3,
+      "y": 4
+    },
+    {
+      "n": 19,
+      "x": 3,
+      "y": 1
+    },
+    {
+      "n": 20,
+      "x": 2,
+      "y": 3
+    },
+    {
+      "n": 21,
+      "x": 1,
+      "y": 5
+    },
+    {
+      "n": 22,
+      "x": 3,
+      "y": 6
+    }
+  ],
+  "walls": {
+    "h": [],
+    "v": []
+  },
+  "meta": {
+    "variant": "alphabet",
+    "sequence_rule": "A, B, C...",
+    "difficulty_target": "easy",
+    "representation": "alphabet",
+    "display_labels": {
+      "1": "A",
+      "2": "B",
+      "3": "C",
+      "4": "D",
+      "5": "E",
+      "6": "F",
+      "7": "G",
+      "8": "H",
+      "9": "I",
+      "10": "J",
+      "11": "K",
+      "12": "L",
+      "13": "M",
+      "14": "N",
+      "15": "O",
+      "16": "P",
+      "17": "Q",
+      "18": "R",
+      "19": "S",
+      "20": "T",
+      "21": "U",
+      "22": "V"
+    },
+    "source_level_id": "all-135",
+    "alphabet_start_char": "A",
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 166
+  },
+  "metrics": {
+    "variant": "alphabet",
+    "grid_size": 8,
+    "path_length": 64,
+    "num_clues": 22,
+    "clue_density": 0.3438,
+    "sequence_length": 22,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "alphabet",
+    "difficulty_estimate": "easy",
+    "turns": 37,
+    "max_straight": 7,
+    "avg_straight": 1.66,
+    "corners": 0,
+    "borders": 10,
+    "inners": 12,
+    "num_walls": 0,
+    "alphabet_start_char": "A"
+  }
+}

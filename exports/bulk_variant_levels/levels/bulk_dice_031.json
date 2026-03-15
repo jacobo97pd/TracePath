@@ -1,0 +1,120 @@
+{
+  "id": "bulk_dice_031",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 2,
+      "x": 0,
+      "y": 3
+    },
+    {
+      "n": 3,
+      "x": 1,
+      "y": 5
+    },
+    {
+      "n": 4,
+      "x": 4,
+      "y": 5
+    },
+    {
+      "n": 5,
+      "x": 5,
+      "y": 3
+    },
+    {
+      "n": 6,
+      "x": 5,
+      "y": 0
+    },
+    {
+      "n": 7,
+      "x": 2,
+      "y": 0
+    },
+    {
+      "n": 8,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "n": 9,
+      "x": 2,
+      "y": 1
+    },
+    {
+      "n": 10,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "n": 11,
+      "x": 1,
+      "y": 4
+    },
+    {
+      "n": 12,
+      "x": 4,
+      "y": 4
+    },
+    {
+      "n": 13,
+      "x": 4,
+      "y": 1
+    }
+  ],
+  "walls": {
+    "h": [],
+    "v": []
+  },
+  "meta": {
+    "variant": "dice",
+    "sequence_rule": "dice faces / dice sums",
+    "difficulty_target": "easy",
+    "representation": "dice",
+    "display_labels": {
+      "1": "d1",
+      "2": "d2",
+      "3": "d3",
+      "4": "d4",
+      "5": "d5",
+      "6": "d6",
+      "7": "d1",
+      "8": "d2",
+      "9": "d3",
+      "10": "d4",
+      "11": "d5",
+      "12": "d6",
+      "13": "d1"
+    },
+    "source_level_id": "all-250",
+    "dice_mode": "face",
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 31
+  },
+  "metrics": {
+    "variant": "dice",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 13,
+    "clue_density": 0.3611,
+    "sequence_length": 13,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "dice",
+    "difficulty_estimate": "easy",
+    "turns": 11,
+    "max_straight": 5,
+    "avg_straight": 2.92,
+    "corners": 2,
+    "borders": 5,
+    "inners": 6,
+    "num_walls": 0,
+    "dice_mode": "face"
+  }
+}

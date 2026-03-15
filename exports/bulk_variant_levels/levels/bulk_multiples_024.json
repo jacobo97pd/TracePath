@@ -1,0 +1,122 @@
+{
+  "id": "bulk_multiples_024",
+  "size": 8,
+  "clues": [],
+  "walls": {
+    "h": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "len": 2
+      },
+      {
+        "x": 1,
+        "y": 7,
+        "len": 2
+      },
+      {
+        "x": 6,
+        "y": 7,
+        "len": 1
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 2
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 1,
+        "y": 6,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "len": 2
+      },
+      {
+        "x": 3,
+        "y": 6,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "len": 2
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "len": 1
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 7,
+        "y": 5,
+        "len": 2
+      }
+    ]
+  },
+  "meta": {
+    "variant": "multiples",
+    "sequence_rule": "multiples of 5",
+    "difficulty_target": "medium",
+    "representation": "multiple",
+    "display_labels": {},
+    "source_level_id": "all-398",
+    "multiple_base": 5,
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 24
+  },
+  "metrics": {
+    "variant": "multiples",
+    "grid_size": 8,
+    "path_length": 64,
+    "num_clues": 0,
+    "clue_density": 0.0,
+    "sequence_length": 0,
+    "sequence_start": 5,
+    "sequence_step": 5,
+    "representation": "multiple",
+    "difficulty_estimate": "medium",
+    "turns": 0,
+    "max_straight": 0,
+    "avg_straight": 0.0,
+    "corners": 0,
+    "borders": 0,
+    "inners": 0,
+    "num_walls": 22,
+    "multiple_base": 5
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "id": "bulk_multiples_roman_017",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "n": 2,
+      "x": 4,
+      "y": 0
+    },
+    {
+      "n": 3,
+      "x": 5,
+      "y": 2
+    },
+    {
+      "n": 4,
+      "x": 5,
+      "y": 5
+    },
+    {
+      "n": 5,
+      "x": 1,
+      "y": 5
+    },
+    {
+      "n": 6,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "n": 7,
+      "x": 1,
+      "y": 2
+    },
+    {
+      "n": 8,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 9,
+      "x": 4,
+      "y": 2
+    },
+    {
+      "n": 10,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 11,
+      "x": 3,
+      "y": 2
+    }
+  ],
+  "walls": {
+    "h": [],
+    "v": []
+  },
+  "meta": {
+    "variant": "multiples_roman",
+    "sequence_rule": "roman multiples of 4",
+    "difficulty_target": "easy",
+    "representation": "multiple_roman",
+    "display_labels": {
+      "1": "IV",
+      "2": "VIII",
+      "3": "XII",
+      "4": "XVI",
+      "5": "XX",
+      "6": "XXIV",
+      "7": "XXVIII",
+      "8": "XXXII",
+      "9": "XXXVI",
+      "10": "XL",
+      "11": "XLIV"
+    },
+    "source_level_id": "all-244",
+    "multiple_base": 4,
+    "roman_max_value": 44,
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 17
+  },
+  "metrics": {
+    "variant": "multiples_roman",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 11,
+    "clue_density": 0.3056,
+    "sequence_length": 11,
+    "sequence_start": 4,
+    "sequence_step": 4,
+    "representation": "multiple_roman",
+    "difficulty_estimate": "easy",
+    "turns": 11,
+    "max_straight": 5,
+    "avg_straight": 2.92,
+    "corners": 2,
+    "borders": 4,
+    "inners": 5,
+    "num_walls": 0,
+    "multiple_base": 4,
+    "roman_max_value": 44
+  }
+}

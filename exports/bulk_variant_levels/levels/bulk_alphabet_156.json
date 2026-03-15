@@ -1,0 +1,203 @@
+{
+  "id": "bulk_alphabet_156",
+  "size": 7,
+  "clues": [
+    {
+      "n": 1,
+      "x": 0,
+      "y": 6
+    },
+    {
+      "n": 2,
+      "x": 0,
+      "y": 3
+    },
+    {
+      "n": 3,
+      "x": 1,
+      "y": 2
+    },
+    {
+      "n": 4,
+      "x": 1,
+      "y": 3
+    },
+    {
+      "n": 5,
+      "x": 1,
+      "y": 6
+    },
+    {
+      "n": 6,
+      "x": 3,
+      "y": 6
+    },
+    {
+      "n": 7,
+      "x": 6,
+      "y": 6
+    },
+    {
+      "n": 8,
+      "x": 4,
+      "y": 5
+    },
+    {
+      "n": 9,
+      "x": 2,
+      "y": 5
+    },
+    {
+      "n": 10,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "n": 11,
+      "x": 2,
+      "y": 1
+    },
+    {
+      "n": 12,
+      "x": 0,
+      "y": 1
+    },
+    {
+      "n": 13,
+      "x": 2,
+      "y": 0
+    },
+    {
+      "n": 14,
+      "x": 5,
+      "y": 0
+    },
+    {
+      "n": 15,
+      "x": 6,
+      "y": 1
+    },
+    {
+      "n": 16,
+      "x": 6,
+      "y": 4
+    },
+    {
+      "n": 17,
+      "x": 4,
+      "y": 3
+    },
+    {
+      "n": 18,
+      "x": 5,
+      "y": 2
+    },
+    {
+      "n": 19,
+      "x": 4,
+      "y": 2
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 3
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 6,
+        "len": 3
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 3,
+        "len": 3
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "len": 3
+      }
+    ]
+  },
+  "meta": {
+    "variant": "alphabet",
+    "sequence_rule": "A, B, C...",
+    "difficulty_target": "easy",
+    "representation": "alphabet",
+    "display_labels": {
+      "1": "A",
+      "2": "B",
+      "3": "C",
+      "4": "D",
+      "5": "E",
+      "6": "F",
+      "7": "G",
+      "8": "H",
+      "9": "I",
+      "10": "J",
+      "11": "K",
+      "12": "L",
+      "13": "M",
+      "14": "N",
+      "15": "O",
+      "16": "P",
+      "17": "Q",
+      "18": "R",
+      "19": "S"
+    },
+    "source_level_id": "all-266",
+    "alphabet_start_char": "A",
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 156
+  },
+  "metrics": {
+    "variant": "alphabet",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 19,
+    "clue_density": 0.3878,
+    "sequence_length": 19,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "alphabet",
+    "difficulty_estimate": "easy",
+    "turns": 20,
+    "max_straight": 6,
+    "avg_straight": 2.29,
+    "corners": 2,
+    "borders": 8,
+    "inners": 9,
+    "num_walls": 17,
+    "alphabet_start_char": "A"
+  }
+}

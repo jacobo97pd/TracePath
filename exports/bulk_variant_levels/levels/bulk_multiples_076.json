@@ -1,0 +1,40 @@
+{
+  "id": "bulk_multiples_076",
+  "size": 6,
+  "clues": [],
+  "walls": {
+    "h": [],
+    "v": []
+  },
+  "meta": {
+    "variant": "multiples",
+    "sequence_rule": "multiples of 2",
+    "difficulty_target": "easy",
+    "representation": "multiple",
+    "display_labels": {},
+    "source_level_id": "all-396",
+    "multiple_base": 2,
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 76
+  },
+  "metrics": {
+    "variant": "multiples",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 0,
+    "clue_density": 0.0,
+    "sequence_length": 0,
+    "sequence_start": 2,
+    "sequence_step": 2,
+    "representation": "multiple",
+    "difficulty_estimate": "easy",
+    "turns": 0,
+    "max_straight": 0,
+    "avg_straight": 0.0,
+    "corners": 0,
+    "borders": 0,
+    "inners": 0,
+    "num_walls": 0,
+    "multiple_base": 2
+  }
+}

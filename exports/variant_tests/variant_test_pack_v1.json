@@ -1,0 +1,3948 @@
+{
+  "packId": "variant_ab_tests",
+  "version": "variant_test_pack_v1",
+  "count": 30,
+  "levels": [
+    {
+      "id": "test_roman_001",
+      "size": 5,
+      "clues": [
+        {
+          "n": 1,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 2,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 3,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 4,
+          "x": 0,
+          "y": 1
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 6,
+          "x": 4,
+          "y": 3
+        },
+        {
+          "n": 7,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 8,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 9,
+          "x": 0,
+          "y": 4
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 1,
+            "y": 2,
+            "len": 2
+          },
+          {
+            "x": 4,
+            "y": 2,
+            "len": 1
+          }
+        ],
+        "v": []
+      },
+      "meta": {
+        "variant": "roman",
+        "sequence_rule": "I, II, III...",
+        "difficulty_target": "easy",
+        "representation": "roman",
+        "display_labels": {
+          "1": "I",
+          "2": "II",
+          "3": "III",
+          "4": "IV",
+          "5": "V",
+          "6": "VI",
+          "7": "VII",
+          "8": "VIII",
+          "9": "IX"
+        },
+        "source_level_id": "all-1",
+        "roman_max_value": 9
+      },
+      "metrics": {
+        "variant": "roman",
+        "grid_size": 5,
+        "path_length": 25,
+        "num_clues": 9,
+        "clue_density": 0.36,
+        "sequence_length": 9,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "roman",
+        "difficulty_estimate": "easy",
+        "turns": 17,
+        "max_straight": 4,
+        "avg_straight": 1.33,
+        "corners": 1,
+        "borders": 4,
+        "inners": 4,
+        "num_walls": 3,
+        "roman_max_value": 9
+      }
+    },
+    {
+      "id": "test_roman_002",
+      "size": 5,
+      "clues": [
+        {
+          "n": 1,
+          "x": 0,
+          "y": 4
+        },
+        {
+          "n": 2,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 3,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 4,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 5,
+          "x": 3,
+          "y": 2
+        },
+        {
+          "n": 6,
+          "x": 2,
+          "y": 1
+        },
+        {
+          "n": 7,
+          "x": 4,
+          "y": 0
+        },
+        {
+          "n": 8,
+          "x": 1,
+          "y": 0
+        },
+        {
+          "n": 9,
+          "x": 1,
+          "y": 2
+        },
+        {
+          "n": 10,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 0,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 3,
+            "len": 2
+          }
+        ],
+        "v": []
+      },
+      "meta": {
+        "variant": "roman",
+        "sequence_rule": "I, II, III...",
+        "difficulty_target": "easy",
+        "representation": "roman",
+        "display_labels": {
+          "1": "I",
+          "2": "II",
+          "3": "III",
+          "4": "IV",
+          "5": "V",
+          "6": "VI",
+          "7": "VII",
+          "8": "VIII",
+          "9": "IX",
+          "10": "X"
+        },
+        "source_level_id": "all-12",
+        "roman_max_value": 10
+      },
+      "metrics": {
+        "variant": "roman",
+        "grid_size": 5,
+        "path_length": 25,
+        "num_clues": 10,
+        "clue_density": 0.4,
+        "sequence_length": 10,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "roman",
+        "difficulty_estimate": "easy",
+        "turns": 16,
+        "max_straight": 3,
+        "avg_straight": 1.41,
+        "corners": 4,
+        "borders": 2,
+        "inners": 4,
+        "num_walls": 3,
+        "roman_max_value": 10
+      }
+    },
+    {
+      "id": "test_roman_003",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 0,
+          "y": 4
+        },
+        {
+          "n": 3,
+          "x": 1,
+          "y": 2
+        },
+        {
+          "n": 4,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 6,
+          "x": 3,
+          "y": 5
+        },
+        {
+          "n": 7,
+          "x": 5,
+          "y": 4
+        },
+        {
+          "n": 8,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 9,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 10,
+          "x": 4,
+          "y": 0
+        },
+        {
+          "n": 11,
+          "x": 5,
+          "y": 0
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 4,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 3,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 4,
+            "len": 1
+          }
+        ],
+        "v": [
+          {
+            "x": 2,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 4,
+            "len": 1
+          },
+          {
+            "x": 3,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 1,
+            "len": 1
+          }
+        ]
+      },
+      "meta": {
+        "variant": "roman",
+        "sequence_rule": "I, II, III...",
+        "difficulty_target": "medium",
+        "representation": "roman",
+        "display_labels": {
+          "1": "I",
+          "2": "II",
+          "3": "III",
+          "4": "IV",
+          "5": "V",
+          "6": "VI",
+          "7": "VII",
+          "8": "VIII",
+          "9": "IX",
+          "10": "X",
+          "11": "XI"
+        },
+        "source_level_id": "all-46",
+        "roman_max_value": 11
+      },
+      "metrics": {
+        "variant": "roman",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 11,
+        "clue_density": 0.3056,
+        "sequence_length": 11,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "roman",
+        "difficulty_estimate": "medium",
+        "turns": 20,
+        "max_straight": 5,
+        "avg_straight": 1.67,
+        "corners": 2,
+        "borders": 4,
+        "inners": 5,
+        "num_walls": 7,
+        "roman_max_value": 11
+      }
+    },
+    {
+      "id": "test_roman_004",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 2,
+          "y": 1
+        },
+        {
+          "n": 2,
+          "x": 1,
+          "y": 0
+        },
+        {
+          "n": 3,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 4,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 5,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 6,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "n": 7,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 8,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 9,
+          "x": 0,
+          "y": 4
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 3,
+            "y": 1,
+            "len": 2
+          },
+          {
+            "x": 0,
+            "y": 2,
+            "len": 3
+          }
+        ],
+        "v": [
+          {
+            "x": 2,
+            "y": 4,
+            "len": 2
+          },
+          {
+            "x": 3,
+            "y": 1,
+            "len": 2
+          },
+          {
+            "x": 4,
+            "y": 4,
+            "len": 2
+          },
+          {
+            "x": 5,
+            "y": 1,
+            "len": 1
+          }
+        ]
+      },
+      "meta": {
+        "variant": "roman",
+        "sequence_rule": "I, II, III...",
+        "difficulty_target": "medium",
+        "representation": "roman",
+        "display_labels": {
+          "1": "I",
+          "2": "II",
+          "3": "III",
+          "4": "IV",
+          "5": "V",
+          "6": "VI",
+          "7": "VII",
+          "8": "VIII",
+          "9": "IX"
+        },
+        "source_level_id": "all-61",
+        "roman_max_value": 9
+      },
+      "metrics": {
+        "variant": "roman",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 9,
+        "clue_density": 0.25,
+        "sequence_length": 9,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "roman",
+        "difficulty_estimate": "medium",
+        "turns": 15,
+        "max_straight": 5,
+        "avg_straight": 2.19,
+        "corners": 1,
+        "borders": 3,
+        "inners": 5,
+        "num_walls": 12,
+        "roman_max_value": 9
+      }
+    },
+    {
+      "id": "test_roman_005",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 0
+        },
+        {
+          "n": 2,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 3,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 4,
+          "x": 4,
+          "y": 5
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 0
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 3,
+            "y": 1,
+            "len": 2
+          },
+          {
+            "x": 0,
+            "y": 2,
+            "len": 3
+          },
+          {
+            "x": 1,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 0,
+            "y": 4,
+            "len": 1
+          },
+          {
+            "x": 1,
+            "y": 5,
+            "len": 3
+          }
+        ],
+        "v": [
+          {
+            "x": 2,
+            "y": 4,
+            "len": 1
+          },
+          {
+            "x": 3,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 5,
+            "y": 1,
+            "len": 2
+          }
+        ]
+      },
+      "meta": {
+        "variant": "roman",
+        "sequence_rule": "I, II, III...",
+        "difficulty_target": "hard",
+        "representation": "roman",
+        "display_labels": {
+          "1": "I",
+          "2": "II",
+          "3": "III",
+          "4": "IV",
+          "5": "V"
+        },
+        "source_level_id": "all-194",
+        "roman_max_value": 5
+      },
+      "metrics": {
+        "variant": "roman",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 5,
+        "clue_density": 0.1389,
+        "sequence_length": 5,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "roman",
+        "difficulty_estimate": "hard",
+        "turns": 18,
+        "max_straight": 5,
+        "avg_straight": 1.84,
+        "corners": 0,
+        "borders": 4,
+        "inners": 1,
+        "num_walls": 15,
+        "roman_max_value": 5
+      }
+    },
+    {
+      "id": "test_alphabet_006",
+      "size": 8,
+      "clues": [
+        {
+          "n": 1,
+          "x": 6,
+          "y": 6
+        },
+        {
+          "n": 2,
+          "x": 7,
+          "y": 6
+        },
+        {
+          "n": 3,
+          "x": 5,
+          "y": 7
+        },
+        {
+          "n": 4,
+          "x": 2,
+          "y": 7
+        },
+        {
+          "n": 5,
+          "x": 0,
+          "y": 7
+        },
+        {
+          "n": 6,
+          "x": 0,
+          "y": 4
+        },
+        {
+          "n": 7,
+          "x": 1,
+          "y": 2
+        },
+        {
+          "n": 8,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "n": 9,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 10,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 11,
+          "x": 7,
+          "y": 0
+        },
+        {
+          "n": 12,
+          "x": 6,
+          "y": 2
+        },
+        {
+          "n": 13,
+          "x": 7,
+          "y": 3
+        },
+        {
+          "n": 14,
+          "x": 6,
+          "y": 3
+        },
+        {
+          "n": 15,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 16,
+          "x": 5,
+          "y": 4
+        },
+        {
+          "n": 17,
+          "x": 4,
+          "y": 6
+        },
+        {
+          "n": 18,
+          "x": 2,
+          "y": 5
+        },
+        {
+          "n": 19,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 20,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 21,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 22,
+          "x": 1,
+          "y": 5
+        },
+        {
+          "n": 23,
+          "x": 3,
+          "y": 6
+        }
+      ],
+      "walls": {
+        "h": [],
+        "v": []
+      },
+      "meta": {
+        "variant": "alphabet",
+        "sequence_rule": "A, B, C...",
+        "difficulty_target": "easy",
+        "representation": "alphabet",
+        "display_labels": {
+          "1": "A",
+          "2": "B",
+          "3": "C",
+          "4": "D",
+          "5": "E",
+          "6": "F",
+          "7": "G",
+          "8": "H",
+          "9": "I",
+          "10": "J",
+          "11": "K",
+          "12": "L",
+          "13": "M",
+          "14": "N",
+          "15": "O",
+          "16": "P",
+          "17": "Q",
+          "18": "R",
+          "19": "S",
+          "20": "T",
+          "21": "U",
+          "22": "V",
+          "23": "W"
+        },
+        "source_level_id": "all-135",
+        "alphabet_start_char": "A"
+      },
+      "metrics": {
+        "variant": "alphabet",
+        "grid_size": 8,
+        "path_length": 64,
+        "num_clues": 23,
+        "clue_density": 0.3594,
+        "sequence_length": 23,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "alphabet",
+        "difficulty_estimate": "easy",
+        "turns": 37,
+        "max_straight": 7,
+        "avg_straight": 1.66,
+        "corners": 3,
+        "borders": 6,
+        "inners": 14,
+        "num_walls": 0,
+        "alphabet_start_char": "A"
+      }
+    },
+    {
+      "id": "test_alphabet_007",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 0
+        },
+        {
+          "n": 2,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 4,
+          "y": 0
+        },
+        {
+          "n": 4,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 5,
+          "x": 5,
+          "y": 3
+        },
+        {
+          "n": 6,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 7,
+          "x": 4,
+          "y": 5
+        },
+        {
+          "n": 8,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 9,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 10,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 11,
+          "x": 1,
+          "y": 5
+        },
+        {
+          "n": 12,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 13,
+          "x": 1,
+          "y": 2
+        },
+        {
+          "n": 14,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 5,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 4,
+            "len": 1
+          },
+          {
+            "x": 5,
+            "y": 4,
+            "len": 1
+          },
+          {
+            "x": 1,
+            "y": 5,
+            "len": 1
+          }
+        ],
+        "v": [
+          {
+            "x": 1,
+            "y": 0,
+            "len": 1
+          },
+          {
+            "x": 1,
+            "y": 3,
+            "len": 2
+          },
+          {
+            "x": 2,
+            "y": 1,
+            "len": 2
+          },
+          {
+            "x": 3,
+            "y": 0,
+            "len": 1
+          },
+          {
+            "x": 3,
+            "y": 5,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 2,
+            "len": 2
+          }
+        ]
+      },
+      "meta": {
+        "variant": "alphabet",
+        "sequence_rule": "J, K, L...",
+        "difficulty_target": "easy",
+        "representation": "alphabet",
+        "display_labels": {
+          "1": "J",
+          "2": "K",
+          "3": "L",
+          "4": "M",
+          "5": "N",
+          "6": "O",
+          "7": "P",
+          "8": "Q",
+          "9": "R",
+          "10": "S",
+          "11": "T",
+          "12": "U",
+          "13": "V",
+          "14": "W"
+        },
+        "source_level_id": "all-158",
+        "alphabet_start_char": "J"
+      },
+      "metrics": {
+        "variant": "alphabet",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 14,
+        "clue_density": 0.3889,
+        "sequence_length": 14,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "alphabet",
+        "difficulty_estimate": "easy",
+        "turns": 27,
+        "max_straight": 3,
+        "avg_straight": 1.25,
+        "corners": 1,
+        "borders": 6,
+        "inners": 7,
+        "num_walls": 15,
+        "alphabet_start_char": "J"
+      }
+    },
+    {
+      "id": "test_alphabet_008",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 2,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 3,
+          "x": 0,
+          "y": 1
+        },
+        {
+          "n": 4,
+          "x": 4,
+          "y": 0
+        },
+        {
+          "n": 5,
+          "x": 5,
+          "y": 4
+        },
+        {
+          "n": 6,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 7,
+          "x": 2,
+          "y": 1
+        },
+        {
+          "n": 8,
+          "x": 4,
+          "y": 4
+        }
+      ],
+      "walls": {
+        "h": [],
+        "v": []
+      },
+      "meta": {
+        "variant": "alphabet",
+        "sequence_rule": "M, N, O...",
+        "difficulty_target": "medium",
+        "representation": "alphabet",
+        "display_labels": {
+          "1": "M",
+          "2": "N",
+          "3": "O",
+          "4": "P",
+          "5": "Q",
+          "6": "R",
+          "7": "S",
+          "8": "T"
+        },
+        "source_level_id": "all-130",
+        "alphabet_start_char": "M"
+      },
+      "metrics": {
+        "variant": "alphabet",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 8,
+        "clue_density": 0.2222,
+        "sequence_length": 8,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "alphabet",
+        "difficulty_estimate": "medium",
+        "turns": 13,
+        "max_straight": 5,
+        "avg_straight": 2.5,
+        "corners": 0,
+        "borders": 3,
+        "inners": 5,
+        "num_walls": 0,
+        "alphabet_start_char": "M"
+      }
+    },
+    {
+      "id": "test_alphabet_009",
+      "size": 7,
+      "clues": [
+        {
+          "n": 1,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 2,
+          "x": 5,
+          "y": 3
+        },
+        {
+          "n": 3,
+          "x": 6,
+          "y": 1
+        },
+        {
+          "n": 4,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 5,
+          "x": 1,
+          "y": 2
+        },
+        {
+          "n": 6,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "n": 7,
+          "x": 0,
+          "y": 4
+        },
+        {
+          "n": 8,
+          "x": 1,
+          "y": 5
+        },
+        {
+          "n": 9,
+          "x": 4,
+          "y": 6
+        },
+        {
+          "n": 10,
+          "x": 6,
+          "y": 5
+        },
+        {
+          "n": 11,
+          "x": 4,
+          "y": 3
+        },
+        {
+          "n": 12,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 13,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 14,
+          "x": 5,
+          "y": 5
+        }
+      ],
+      "walls": {
+        "h": [],
+        "v": []
+      },
+      "meta": {
+        "variant": "alphabet",
+        "sequence_rule": "Q, R, S...",
+        "difficulty_target": "medium",
+        "representation": "alphabet",
+        "display_labels": {
+          "1": "Q",
+          "2": "R",
+          "3": "S",
+          "4": "T",
+          "5": "U",
+          "6": "V",
+          "7": "W",
+          "8": "X",
+          "9": "Y",
+          "10": "Z",
+          "11": "[",
+          "12": "\\",
+          "13": "]",
+          "14": "^"
+        },
+        "source_level_id": "all-88",
+        "alphabet_start_char": "Q"
+      },
+      "metrics": {
+        "variant": "alphabet",
+        "grid_size": 7,
+        "path_length": 49,
+        "num_clues": 14,
+        "clue_density": 0.2857,
+        "sequence_length": 14,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "alphabet",
+        "difficulty_estimate": "medium",
+        "turns": 24,
+        "max_straight": 6,
+        "avg_straight": 1.92,
+        "corners": 1,
+        "borders": 5,
+        "inners": 8,
+        "num_walls": 0,
+        "alphabet_start_char": "Q"
+      }
+    },
+    {
+      "id": "test_alphabet_010",
+      "size": 8,
+      "clues": [
+        {
+          "n": 1,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "n": 2,
+          "x": 7,
+          "y": 0
+        },
+        {
+          "n": 3,
+          "x": 7,
+          "y": 7
+        },
+        {
+          "n": 4,
+          "x": 0,
+          "y": 7
+        },
+        {
+          "n": 5,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 6,
+          "x": 1,
+          "y": 6
+        },
+        {
+          "n": 7,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 8,
+          "x": 3,
+          "y": 6
+        },
+        {
+          "n": 9,
+          "x": 6,
+          "y": 4
+        },
+        {
+          "n": 10,
+          "x": 3,
+          "y": 2
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 6
+          },
+          {
+            "x": 1,
+            "y": 7,
+            "len": 6
+          }
+        ],
+        "v": [
+          {
+            "x": 1,
+            "y": 2,
+            "len": 5
+          },
+          {
+            "x": 7,
+            "y": 1,
+            "len": 6
+          }
+        ]
+      },
+      "meta": {
+        "variant": "alphabet",
+        "sequence_rule": "C, D, E...",
+        "difficulty_target": "hard",
+        "representation": "alphabet",
+        "display_labels": {
+          "1": "C",
+          "2": "D",
+          "3": "E",
+          "4": "F",
+          "5": "G",
+          "6": "H",
+          "7": "I",
+          "8": "J",
+          "9": "K",
+          "10": "L"
+        },
+        "source_level_id": "all-203",
+        "alphabet_start_char": "C"
+      },
+      "metrics": {
+        "variant": "alphabet",
+        "grid_size": 8,
+        "path_length": 64,
+        "num_clues": 10,
+        "clue_density": 0.1562,
+        "sequence_length": 10,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "alphabet",
+        "difficulty_estimate": "hard",
+        "turns": 23,
+        "max_straight": 7,
+        "avg_straight": 2.62,
+        "corners": 4,
+        "borders": 0,
+        "inners": 6,
+        "num_walls": 23,
+        "alphabet_start_char": "C"
+      }
+    },
+    {
+      "id": "test_multiples_011",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 2,
+          "y": 1
+        },
+        {
+          "n": 2,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "n": 3,
+          "x": 1,
+          "y": 2
+        },
+        {
+          "n": 4,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 5,
+          "x": 0,
+          "y": 5
+        },
+        {
+          "n": 6,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 7,
+          "x": 3,
+          "y": 2
+        },
+        {
+          "n": 8,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 9,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 10,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 11,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 12,
+          "x": 4,
+          "y": 5
+        },
+        {
+          "n": 13,
+          "x": 3,
+          "y": 3
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 1,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 3,
+            "len": 1
+          }
+        ],
+        "v": [
+          {
+            "x": 2,
+            "y": 1,
+            "len": 4
+          },
+          {
+            "x": 4,
+            "y": 1,
+            "len": 4
+          }
+        ]
+      },
+      "meta": {
+        "variant": "multiples",
+        "sequence_rule": "multiples of 2",
+        "difficulty_target": "easy",
+        "representation": "multiple",
+        "display_labels": {
+          "1": "2",
+          "2": "4",
+          "3": "6",
+          "4": "8",
+          "5": "10",
+          "6": "12",
+          "7": "14",
+          "8": "16",
+          "9": "18",
+          "10": "20",
+          "11": "22",
+          "12": "24",
+          "13": "26"
+        },
+        "source_level_id": "all-166",
+        "multiple_base": 2
+      },
+      "metrics": {
+        "variant": "multiples",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 13,
+        "clue_density": 0.3611,
+        "sequence_length": 13,
+        "sequence_start": 2,
+        "sequence_step": 2,
+        "representation": "multiple",
+        "difficulty_estimate": "easy",
+        "turns": 26,
+        "max_straight": 3,
+        "avg_straight": 1.3,
+        "corners": 2,
+        "borders": 4,
+        "inners": 7,
+        "num_walls": 10,
+        "multiple_base": 2
+      }
+    },
+    {
+      "id": "test_multiples_012",
+      "size": 7,
+      "clues": [
+        {
+          "n": 1,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 2,
+          "x": 5,
+          "y": 0
+        },
+        {
+          "n": 3,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 4,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 5,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "n": 6,
+          "x": 1,
+          "y": 2
+        },
+        {
+          "n": 7,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 8,
+          "x": 5,
+          "y": 3
+        },
+        {
+          "n": 9,
+          "x": 6,
+          "y": 3
+        },
+        {
+          "n": 10,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "n": 11,
+          "x": 0,
+          "y": 4
+        },
+        {
+          "n": 12,
+          "x": 2,
+          "y": 6
+        },
+        {
+          "n": 13,
+          "x": 5,
+          "y": 6
+        },
+        {
+          "n": 14,
+          "x": 4,
+          "y": 5
+        },
+        {
+          "n": 15,
+          "x": 1,
+          "y": 5
+        }
+      ],
+      "walls": {
+        "h": [],
+        "v": []
+      },
+      "meta": {
+        "variant": "multiples",
+        "sequence_rule": "multiples of 3",
+        "difficulty_target": "easy",
+        "representation": "multiple",
+        "display_labels": {
+          "1": "3",
+          "2": "6",
+          "3": "9",
+          "4": "12",
+          "5": "15",
+          "6": "18",
+          "7": "21",
+          "8": "24",
+          "9": "27",
+          "10": "30",
+          "11": "33",
+          "12": "36",
+          "13": "39",
+          "14": "42",
+          "15": "45"
+        },
+        "source_level_id": "all-161",
+        "multiple_base": 3
+      },
+      "metrics": {
+        "variant": "multiples",
+        "grid_size": 7,
+        "path_length": 49,
+        "num_clues": 15,
+        "clue_density": 0.3061,
+        "sequence_length": 15,
+        "sequence_start": 3,
+        "sequence_step": 3,
+        "representation": "multiple",
+        "difficulty_estimate": "easy",
+        "turns": 21,
+        "max_straight": 6,
+        "avg_straight": 2.18,
+        "corners": 1,
+        "borders": 5,
+        "inners": 9,
+        "num_walls": 0,
+        "multiple_base": 3
+      }
+    },
+    {
+      "id": "test_multiples_013",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 2,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 2,
+          "y": 0
+        },
+        {
+          "n": 4,
+          "x": 0,
+          "y": 2
+        },
+        {
+          "n": 5,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 6,
+          "x": 4,
+          "y": 3
+        },
+        {
+          "n": 7,
+          "x": 4,
+          "y": 5
+        },
+        {
+          "n": 8,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 9,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 10,
+          "x": 3,
+          "y": 4
+        }
+      ],
+      "walls": {
+        "h": [],
+        "v": []
+      },
+      "meta": {
+        "variant": "multiples",
+        "sequence_rule": "multiples of 4",
+        "difficulty_target": "medium",
+        "representation": "multiple",
+        "display_labels": {
+          "1": "4",
+          "2": "8",
+          "3": "12",
+          "4": "16",
+          "5": "20",
+          "6": "24",
+          "7": "28",
+          "8": "32",
+          "9": "36",
+          "10": "40"
+        },
+        "source_level_id": "all-111",
+        "multiple_base": 4
+      },
+      "metrics": {
+        "variant": "multiples",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 10,
+        "clue_density": 0.2778,
+        "sequence_length": 10,
+        "sequence_start": 4,
+        "sequence_step": 4,
+        "representation": "multiple",
+        "difficulty_estimate": "medium",
+        "turns": 17,
+        "max_straight": 5,
+        "avg_straight": 1.94,
+        "corners": 0,
+        "borders": 5,
+        "inners": 5,
+        "num_walls": 0,
+        "multiple_base": 4
+      }
+    },
+    {
+      "id": "test_multiples_014",
+      "size": 7,
+      "clues": [
+        {
+          "n": 1,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 2,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 3,
+          "x": 5,
+          "y": 6
+        },
+        {
+          "n": 4,
+          "x": 6,
+          "y": 3
+        },
+        {
+          "n": 5,
+          "x": 5,
+          "y": 0
+        },
+        {
+          "n": 6,
+          "x": 2,
+          "y": 0
+        },
+        {
+          "n": 7,
+          "x": 0,
+          "y": 2
+        },
+        {
+          "n": 8,
+          "x": 0,
+          "y": 6
+        },
+        {
+          "n": 9,
+          "x": 3,
+          "y": 5
+        },
+        {
+          "n": 10,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 11,
+          "x": 4,
+          "y": 3
+        },
+        {
+          "n": 12,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 13,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 14,
+          "x": 4,
+          "y": 2
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 2,
+            "y": 2,
+            "len": 3
+          },
+          {
+            "x": 2,
+            "y": 3,
+            "len": 3
+          },
+          {
+            "x": 2,
+            "y": 4,
+            "len": 3
+          },
+          {
+            "x": 2,
+            "y": 5,
+            "len": 3
+          }
+        ],
+        "v": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 1,
+            "y": 5,
+            "len": 1
+          },
+          {
+            "x": 6,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 6,
+            "y": 5,
+            "len": 1
+          }
+        ]
+      },
+      "meta": {
+        "variant": "multiples",
+        "sequence_rule": "multiples of 5",
+        "difficulty_target": "medium",
+        "representation": "multiple",
+        "display_labels": {
+          "1": "5",
+          "2": "10",
+          "3": "15",
+          "4": "20",
+          "5": "25",
+          "6": "30",
+          "7": "35",
+          "8": "40",
+          "9": "45",
+          "10": "50",
+          "11": "55",
+          "12": "60",
+          "13": "65",
+          "14": "70"
+        },
+        "source_level_id": "all-87",
+        "multiple_base": 5
+      },
+      "metrics": {
+        "variant": "multiples",
+        "grid_size": 7,
+        "path_length": 49,
+        "num_clues": 14,
+        "clue_density": 0.2857,
+        "sequence_length": 14,
+        "sequence_start": 5,
+        "sequence_step": 5,
+        "representation": "multiple",
+        "difficulty_estimate": "medium",
+        "turns": 16,
+        "max_straight": 6,
+        "avg_straight": 2.82,
+        "corners": 1,
+        "borders": 5,
+        "inners": 8,
+        "num_walls": 16,
+        "multiple_base": 5
+      }
+    },
+    {
+      "id": "test_multiples_015",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 2,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 3,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 4,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 5,
+          "x": 1,
+          "y": 2
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 1,
+            "y": 3,
+            "len": 2
+          }
+        ],
+        "v": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 4
+          },
+          {
+            "x": 3,
+            "y": 1,
+            "len": 4
+          },
+          {
+            "x": 5,
+            "y": 1,
+            "len": 4
+          }
+        ]
+      },
+      "meta": {
+        "variant": "multiples",
+        "sequence_rule": "multiples of 3",
+        "difficulty_target": "hard",
+        "representation": "multiple",
+        "display_labels": {
+          "1": "3",
+          "2": "6",
+          "3": "9",
+          "4": "12",
+          "5": "15"
+        },
+        "source_level_id": "all-200",
+        "multiple_base": 3
+      },
+      "metrics": {
+        "variant": "multiples",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 5,
+        "clue_density": 0.1389,
+        "sequence_length": 5,
+        "sequence_start": 3,
+        "sequence_step": 3,
+        "representation": "multiple",
+        "difficulty_estimate": "hard",
+        "turns": 19,
+        "max_straight": 5,
+        "avg_straight": 1.75,
+        "corners": 1,
+        "borders": 0,
+        "inners": 4,
+        "num_walls": 14,
+        "multiple_base": 3
+      }
+    },
+    {
+      "id": "test_multiples_roman_016",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 2,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 3,
+          "x": 1,
+          "y": 0
+        },
+        {
+          "n": 4,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 5,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 6,
+          "x": 4,
+          "y": 3
+        },
+        {
+          "n": 7,
+          "x": 4,
+          "y": 0
+        },
+        {
+          "n": 8,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 9,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 10,
+          "x": 1,
+          "y": 5
+        },
+        {
+          "n": 11,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 12,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 2,
+            "y": 3,
+            "len": 2
+          },
+          {
+            "x": 1,
+            "y": 5,
+            "len": 4
+          }
+        ],
+        "v": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 4
+          },
+          {
+            "x": 2,
+            "y": 1,
+            "len": 2
+          },
+          {
+            "x": 3,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 1,
+            "len": 2
+          },
+          {
+            "x": 5,
+            "y": 1,
+            "len": 4
+          }
+        ]
+      },
+      "meta": {
+        "variant": "multiples_roman",
+        "sequence_rule": "roman multiples of 3",
+        "difficulty_target": "easy",
+        "representation": "multiple_roman",
+        "display_labels": {
+          "1": "III",
+          "2": "VI",
+          "3": "IX",
+          "4": "XII",
+          "5": "XV",
+          "6": "XVIII",
+          "7": "XXI",
+          "8": "XXIV",
+          "9": "XXVII",
+          "10": "XXX",
+          "11": "XXXIII",
+          "12": "XXXVI"
+        },
+        "source_level_id": "all-183",
+        "multiple_base": 3,
+        "roman_max_value": 36
+      },
+      "metrics": {
+        "variant": "multiples_roman",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 12,
+        "clue_density": 0.3333,
+        "sequence_length": 12,
+        "sequence_start": 3,
+        "sequence_step": 3,
+        "representation": "multiple_roman",
+        "difficulty_estimate": "easy",
+        "turns": 14,
+        "max_straight": 5,
+        "avg_straight": 2.33,
+        "corners": 2,
+        "borders": 6,
+        "inners": 4,
+        "num_walls": 19,
+        "multiple_base": 3,
+        "roman_max_value": 36
+      }
+    },
+    {
+      "id": "test_multiples_roman_017",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 2,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 3,
+          "x": 5,
+          "y": 4
+        },
+        {
+          "n": 4,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 0
+        },
+        {
+          "n": 6,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 7,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 8,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 9,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 10,
+          "x": 0,
+          "y": 4
+        },
+        {
+          "n": 11,
+          "x": 2,
+          "y": 5
+        }
+      ],
+      "walls": {
+        "h": [],
+        "v": []
+      },
+      "meta": {
+        "variant": "multiples_roman",
+        "sequence_rule": "roman multiples of 4",
+        "difficulty_target": "easy",
+        "representation": "multiple_roman",
+        "display_labels": {
+          "1": "IV",
+          "2": "VIII",
+          "3": "XII",
+          "4": "XVI",
+          "5": "XX",
+          "6": "XXIV",
+          "7": "XXVIII",
+          "8": "XXXII",
+          "9": "XXXVI",
+          "10": "XL",
+          "11": "XLIV"
+        },
+        "source_level_id": "all-171",
+        "multiple_base": 4,
+        "roman_max_value": 44
+      },
+      "metrics": {
+        "variant": "multiples_roman",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 11,
+        "clue_density": 0.3056,
+        "sequence_length": 11,
+        "sequence_start": 4,
+        "sequence_step": 4,
+        "representation": "multiple_roman",
+        "difficulty_estimate": "easy",
+        "turns": 16,
+        "max_straight": 5,
+        "avg_straight": 2.06,
+        "corners": 1,
+        "borders": 5,
+        "inners": 5,
+        "num_walls": 0,
+        "multiple_base": 4,
+        "roman_max_value": 44
+      }
+    },
+    {
+      "id": "test_multiples_roman_018",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 4,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 5,
+          "y": 0
+        },
+        {
+          "n": 3,
+          "x": 3,
+          "y": 2
+        },
+        {
+          "n": 4,
+          "x": 2,
+          "y": 1
+        },
+        {
+          "n": 5,
+          "x": 1,
+          "y": 0
+        },
+        {
+          "n": 6,
+          "x": 0,
+          "y": 2
+        },
+        {
+          "n": 7,
+          "x": 1,
+          "y": 5
+        },
+        {
+          "n": 8,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 9,
+          "x": 3,
+          "y": 5
+        },
+        {
+          "n": 10,
+          "x": 5,
+          "y": 5
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 3,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 4,
+            "len": 1
+          },
+          {
+            "x": 3,
+            "y": 5,
+            "len": 1
+          }
+        ],
+        "v": [
+          {
+            "x": 2,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 4,
+            "len": 1
+          },
+          {
+            "x": 3,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 4,
+            "len": 1
+          }
+        ]
+      },
+      "meta": {
+        "variant": "multiples_roman",
+        "sequence_rule": "roman multiples of 5",
+        "difficulty_target": "medium",
+        "representation": "multiple_roman",
+        "display_labels": {
+          "1": "V",
+          "2": "X",
+          "3": "XV",
+          "4": "XX",
+          "5": "XXV",
+          "6": "XXX",
+          "7": "XXXV",
+          "8": "XL",
+          "9": "XLV",
+          "10": "L"
+        },
+        "source_level_id": "all-60",
+        "multiple_base": 5,
+        "roman_max_value": 50
+      },
+      "metrics": {
+        "variant": "multiples_roman",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 10,
+        "clue_density": 0.2778,
+        "sequence_length": 10,
+        "sequence_start": 5,
+        "sequence_step": 5,
+        "representation": "multiple_roman",
+        "difficulty_estimate": "medium",
+        "turns": 21,
+        "max_straight": 5,
+        "avg_straight": 1.59,
+        "corners": 2,
+        "borders": 4,
+        "inners": 4,
+        "num_walls": 8,
+        "multiple_base": 5,
+        "roman_max_value": 50
+      }
+    },
+    {
+      "id": "test_multiples_roman_019",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 3,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 4,
+          "x": 1,
+          "y": 2
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 0
+        },
+        {
+          "n": 6,
+          "x": 4,
+          "y": 0
+        },
+        {
+          "n": 7,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 8,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "n": 9,
+          "x": 5,
+          "y": 4
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 2,
+            "y": 2,
+            "len": 2
+          },
+          {
+            "x": 3,
+            "y": 4,
+            "len": 1
+          }
+        ],
+        "v": [
+          {
+            "x": 2,
+            "y": 2,
+            "len": 3
+          },
+          {
+            "x": 3,
+            "y": 4,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 2,
+            "len": 2
+          }
+        ]
+      },
+      "meta": {
+        "variant": "multiples_roman",
+        "sequence_rule": "roman multiples of 3",
+        "difficulty_target": "medium",
+        "representation": "multiple_roman",
+        "display_labels": {
+          "1": "III",
+          "2": "VI",
+          "3": "IX",
+          "4": "XII",
+          "5": "XV",
+          "6": "XVIII",
+          "7": "XXI",
+          "8": "XXIV",
+          "9": "XXVII"
+        },
+        "source_level_id": "all-116",
+        "multiple_base": 3,
+        "roman_max_value": 27
+      },
+      "metrics": {
+        "variant": "multiples_roman",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 9,
+        "clue_density": 0.25,
+        "sequence_length": 9,
+        "sequence_start": 3,
+        "sequence_step": 3,
+        "representation": "multiple_roman",
+        "difficulty_estimate": "medium",
+        "turns": 28,
+        "max_straight": 3,
+        "avg_straight": 1.21,
+        "corners": 0,
+        "borders": 3,
+        "inners": 6,
+        "num_walls": 9,
+        "multiple_base": 3,
+        "roman_max_value": 27
+      }
+    },
+    {
+      "id": "test_multiples_roman_020",
+      "size": 7,
+      "clues": [
+        {
+          "n": 1,
+          "x": 3,
+          "y": 5
+        },
+        {
+          "n": 2,
+          "x": 1,
+          "y": 5
+        },
+        {
+          "n": 3,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 4,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "n": 5,
+          "x": 6,
+          "y": 0
+        },
+        {
+          "n": 6,
+          "x": 6,
+          "y": 4
+        },
+        {
+          "n": 7,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 8,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 9,
+          "x": 5,
+          "y": 1
+        }
+      ],
+      "walls": {
+        "h": [],
+        "v": []
+      },
+      "meta": {
+        "variant": "multiples_roman",
+        "sequence_rule": "roman multiples of 2",
+        "difficulty_target": "hard",
+        "representation": "multiple_roman",
+        "display_labels": {
+          "1": "II",
+          "2": "IV",
+          "3": "VI",
+          "4": "VIII",
+          "5": "X",
+          "6": "XII",
+          "7": "XIV",
+          "8": "XVI",
+          "9": "XVIII"
+        },
+        "source_level_id": "all-188",
+        "multiple_base": 2,
+        "roman_max_value": 18
+      },
+      "metrics": {
+        "variant": "multiples_roman",
+        "grid_size": 7,
+        "path_length": 49,
+        "num_clues": 9,
+        "clue_density": 0.1837,
+        "sequence_length": 9,
+        "sequence_start": 2,
+        "sequence_step": 2,
+        "representation": "multiple_roman",
+        "difficulty_estimate": "hard",
+        "turns": 25,
+        "max_straight": 6,
+        "avg_straight": 1.85,
+        "corners": 2,
+        "borders": 1,
+        "inners": 6,
+        "num_walls": 0,
+        "multiple_base": 2,
+        "roman_max_value": 18
+      }
+    },
+    {
+      "id": "test_dice_021",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 0
+        },
+        {
+          "n": 2,
+          "x": 2,
+          "y": 0
+        },
+        {
+          "n": 3,
+          "x": 3,
+          "y": 2
+        },
+        {
+          "n": 4,
+          "x": 4,
+          "y": 0
+        },
+        {
+          "n": 5,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 6,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 7,
+          "x": 4,
+          "y": 3
+        },
+        {
+          "n": 8,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 9,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 10,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "n": 11,
+          "x": 1,
+          "y": 5
+        },
+        {
+          "n": 12,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 13,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 1,
+            "y": 2,
+            "len": 2
+          },
+          {
+            "x": 3,
+            "y": 3,
+            "len": 2
+          },
+          {
+            "x": 2,
+            "y": 4,
+            "len": 2
+          },
+          {
+            "x": 2,
+            "y": 5,
+            "len": 1
+          }
+        ],
+        "v": [
+          {
+            "x": 1,
+            "y": 3,
+            "len": 2
+          },
+          {
+            "x": 2,
+            "y": 0,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 3,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 0,
+            "len": 2
+          },
+          {
+            "x": 4,
+            "y": 4,
+            "len": 2
+          },
+          {
+            "x": 5,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 5,
+            "y": 3,
+            "len": 2
+          }
+        ]
+      },
+      "meta": {
+        "variant": "dice",
+        "sequence_rule": "dice faces / dice sums",
+        "difficulty_target": "easy",
+        "representation": "dice",
+        "display_labels": {
+          "1": "d1",
+          "2": "d2",
+          "3": "d3",
+          "4": "d4",
+          "5": "d5",
+          "6": "d6",
+          "7": "d1",
+          "8": "d2",
+          "9": "d3",
+          "10": "d4",
+          "11": "d5",
+          "12": "d6",
+          "13": "d1"
+        },
+        "source_level_id": "all-147",
+        "dice_mode": "face"
+      },
+      "metrics": {
+        "variant": "dice",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 13,
+        "clue_density": 0.3611,
+        "sequence_length": 13,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "dice",
+        "difficulty_estimate": "easy",
+        "turns": 18,
+        "max_straight": 5,
+        "avg_straight": 1.84,
+        "corners": 2,
+        "borders": 6,
+        "inners": 5,
+        "num_walls": 19,
+        "dice_mode": "face"
+      }
+    },
+    {
+      "id": "test_dice_022",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 2,
+          "x": 0,
+          "y": 4
+        },
+        {
+          "n": 3,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 4,
+          "x": 2,
+          "y": 5
+        },
+        {
+          "n": 5,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 6,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 7,
+          "x": 5,
+          "y": 4
+        },
+        {
+          "n": 8,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 9,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 10,
+          "x": 5,
+          "y": 0
+        },
+        {
+          "n": 11,
+          "x": 2,
+          "y": 0
+        },
+        {
+          "n": 12,
+          "x": 1,
+          "y": 2
+        },
+        {
+          "n": 13,
+          "x": 0,
+          "y": 1
+        },
+        {
+          "n": 14,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 0,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 3,
+            "len": 1
+          }
+        ],
+        "v": [
+          {
+            "x": 3,
+            "y": 2,
+            "len": 2
+          }
+        ]
+      },
+      "meta": {
+        "variant": "dice",
+        "sequence_rule": "dice faces / dice sums",
+        "difficulty_target": "easy",
+        "representation": "dice",
+        "display_labels": {
+          "1": "d1",
+          "2": "d2",
+          "3": "d3",
+          "4": "d4",
+          "5": "d5",
+          "6": "d6",
+          "7": "d1",
+          "8": "d2",
+          "9": "d3",
+          "10": "d4",
+          "11": "d5",
+          "12": "d6",
+          "13": "d1",
+          "14": "d2"
+        },
+        "source_level_id": "all-9",
+        "dice_mode": "face"
+      },
+      "metrics": {
+        "variant": "dice",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 14,
+        "clue_density": 0.3889,
+        "sequence_length": 14,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "dice",
+        "difficulty_estimate": "easy",
+        "turns": 21,
+        "max_straight": 3,
+        "avg_straight": 1.59,
+        "corners": 2,
+        "borders": 5,
+        "inners": 7,
+        "num_walls": 5,
+        "dice_mode": "face"
+      }
+    },
+    {
+      "id": "test_dice_023",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 3,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 4,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 6,
+          "x": 4,
+          "y": 5
+        },
+        {
+          "n": 7,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 8,
+          "x": 5,
+          "y": 0
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 1,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 3,
+            "y": 4,
+            "len": 2
+          }
+        ],
+        "v": [
+          {
+            "x": 2,
+            "y": 4,
+            "len": 1
+          },
+          {
+            "x": 3,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 1,
+            "len": 1
+          }
+        ]
+      },
+      "meta": {
+        "variant": "dice",
+        "sequence_rule": "dice faces / dice sums",
+        "difficulty_target": "medium",
+        "representation": "dice",
+        "display_labels": {
+          "1": "1+1",
+          "2": "2+1",
+          "3": "2+2",
+          "4": "2+3",
+          "5": "1+5",
+          "6": "4+3",
+          "7": "4+4",
+          "8": "3+6"
+        },
+        "source_level_id": "all-71",
+        "dice_mode": "sum"
+      },
+      "metrics": {
+        "variant": "dice",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 8,
+        "clue_density": 0.2222,
+        "sequence_length": 8,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "dice",
+        "difficulty_estimate": "medium",
+        "turns": 23,
+        "max_straight": 3,
+        "avg_straight": 1.46,
+        "corners": 1,
+        "borders": 3,
+        "inners": 4,
+        "num_walls": 7,
+        "dice_mode": "sum"
+      }
+    },
+    {
+      "id": "test_dice_024",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 0,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 2,
+          "y": 0
+        },
+        {
+          "n": 4,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 5,
+          "x": 0,
+          "y": 5
+        },
+        {
+          "n": 6,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "n": 7,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 8,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 9,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 10,
+          "x": 5,
+          "y": 4
+        },
+        {
+          "n": 11,
+          "x": 3,
+          "y": 5
+        }
+      ],
+      "walls": {
+        "h": [],
+        "v": [
+          {
+            "x": 3,
+            "y": 0,
+            "len": 1
+          },
+          {
+            "x": 3,
+            "y": 2,
+            "len": 2
+          },
+          {
+            "x": 3,
+            "y": 5,
+            "len": 1
+          }
+        ]
+      },
+      "meta": {
+        "variant": "dice",
+        "sequence_rule": "dice faces / dice sums",
+        "difficulty_target": "medium",
+        "representation": "dice",
+        "display_labels": {
+          "1": "1+1",
+          "2": "2+1",
+          "3": "3+1",
+          "4": "1+4",
+          "5": "4+2",
+          "6": "1+6",
+          "7": "2+6",
+          "8": "4+5",
+          "9": "6+4",
+          "10": "5+6",
+          "11": "6+6"
+        },
+        "source_level_id": "all-122",
+        "dice_mode": "sum"
+      },
+      "metrics": {
+        "variant": "dice",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 11,
+        "clue_density": 0.3056,
+        "sequence_length": 11,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "dice",
+        "difficulty_estimate": "medium",
+        "turns": 25,
+        "max_straight": 3,
+        "avg_straight": 1.35,
+        "corners": 1,
+        "borders": 7,
+        "inners": 3,
+        "num_walls": 4,
+        "dice_mode": "sum"
+      }
+    },
+    {
+      "id": "test_dice_025",
+      "size": 7,
+      "clues": [
+        {
+          "n": 1,
+          "x": 2,
+          "y": 0
+        },
+        {
+          "n": 2,
+          "x": 6,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 6,
+          "y": 5
+        },
+        {
+          "n": 4,
+          "x": 2,
+          "y": 6
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 5
+        },
+        {
+          "n": 6,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 7,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 8,
+          "x": 0,
+          "y": 1
+        },
+        {
+          "n": 9,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 10,
+          "x": 5,
+          "y": 1
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 3,
+            "y": 2,
+            "len": 2
+          },
+          {
+            "x": 4,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 4,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 5,
+            "len": 2
+          }
+        ],
+        "v": [
+          {
+            "x": 3,
+            "y": 2,
+            "len": 2
+          },
+          {
+            "x": 4,
+            "y": 3,
+            "len": 2
+          }
+        ]
+      },
+      "meta": {
+        "variant": "dice",
+        "sequence_rule": "dice faces / dice sums",
+        "difficulty_target": "hard",
+        "representation": "dice",
+        "display_labels": {
+          "1": "d1",
+          "2": "d2",
+          "3": "d3",
+          "4": "d4",
+          "5": "d5",
+          "6": "d6",
+          "7": "d1",
+          "8": "d2",
+          "9": "d3",
+          "10": "d4"
+        },
+        "source_level_id": "all-207",
+        "dice_mode": "face"
+      },
+      "metrics": {
+        "variant": "dice",
+        "grid_size": 7,
+        "path_length": 49,
+        "num_clues": 10,
+        "clue_density": 0.2041,
+        "sequence_length": 10,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "dice",
+        "difficulty_estimate": "hard",
+        "turns": 20,
+        "max_straight": 6,
+        "avg_straight": 2.29,
+        "corners": 0,
+        "borders": 5,
+        "inners": 5,
+        "num_walls": 10,
+        "dice_mode": "face"
+      }
+    },
+    {
+      "id": "test_arithmetic_026",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 4,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 3,
+          "y": 5
+        },
+        {
+          "n": 3,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 4,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 6,
+          "x": 0,
+          "y": 1
+        },
+        {
+          "n": 7,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 8,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 9,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 10,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 11,
+          "x": 5,
+          "y": 4
+        },
+        {
+          "n": 12,
+          "x": 5,
+          "y": 5
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 1,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 0,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 3,
+            "y": 3,
+            "len": 1
+          }
+        ],
+        "v": [
+          {
+            "x": 3,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 4,
+            "len": 1
+          }
+        ]
+      },
+      "meta": {
+        "variant": "arithmetic",
+        "sequence_rule": "simple arithmetic expressions",
+        "difficulty_target": "easy",
+        "representation": "arithmetic",
+        "display_labels": {
+          "1": "1+0",
+          "2": "2+0",
+          "3": "3+0",
+          "4": "3+1",
+          "5": "4+1",
+          "6": "5+1",
+          "7": "3+4",
+          "8": "4+4",
+          "9": "1+8",
+          "10": "3+7",
+          "11": "8+3",
+          "12": "5+7"
+        },
+        "source_level_id": "all-5",
+        "arithmetic_mode": "sum"
+      },
+      "metrics": {
+        "variant": "arithmetic",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 12,
+        "clue_density": 0.3333,
+        "sequence_length": 12,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "arithmetic",
+        "difficulty_estimate": "easy",
+        "turns": 24,
+        "max_straight": 4,
+        "avg_straight": 1.4,
+        "corners": 1,
+        "borders": 6,
+        "inners": 5,
+        "num_walls": 5,
+        "arithmetic_mode": "sum"
+      }
+    },
+    {
+      "id": "test_arithmetic_027",
+      "size": 7,
+      "clues": [
+        {
+          "n": 1,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 2,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 3,
+          "x": 1,
+          "y": 0
+        },
+        {
+          "n": 4,
+          "x": 0,
+          "y": 2
+        },
+        {
+          "n": 5,
+          "x": 0,
+          "y": 4
+        },
+        {
+          "n": 6,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 7,
+          "x": 4,
+          "y": 5
+        },
+        {
+          "n": 8,
+          "x": 1,
+          "y": 5
+        },
+        {
+          "n": 9,
+          "x": 1,
+          "y": 6
+        },
+        {
+          "n": 10,
+          "x": 5,
+          "y": 6
+        },
+        {
+          "n": 11,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 12,
+          "x": 6,
+          "y": 2
+        },
+        {
+          "n": 13,
+          "x": 4,
+          "y": 3
+        },
+        {
+          "n": 14,
+          "x": 5,
+          "y": 0
+        },
+        {
+          "n": 15,
+          "x": 6,
+          "y": 0
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 1,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 5,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 5,
+            "y": 4,
+            "len": 1
+          },
+          {
+            "x": 1,
+            "y": 5,
+            "len": 2
+          }
+        ],
+        "v": [
+          {
+            "x": 4,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 5,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 5,
+            "y": 5,
+            "len": 1
+          }
+        ]
+      },
+      "meta": {
+        "variant": "arithmetic",
+        "sequence_rule": "simple arithmetic expressions",
+        "difficulty_target": "easy",
+        "representation": "arithmetic",
+        "display_labels": {
+          "1": "1+0",
+          "2": "1+1",
+          "3": "3+0",
+          "4": "4+0",
+          "5": "3+2",
+          "6": "6+0",
+          "7": "7+0",
+          "8": "8+0",
+          "9": "8+1",
+          "10": "6+4",
+          "11": "4+7",
+          "12": "8+4",
+          "13": "2+11",
+          "14": "4+10",
+          "15": "11+4"
+        },
+        "source_level_id": "all-37",
+        "arithmetic_mode": "sum"
+      },
+      "metrics": {
+        "variant": "arithmetic",
+        "grid_size": 7,
+        "path_length": 49,
+        "num_clues": 15,
+        "clue_density": 0.3061,
+        "sequence_length": 15,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "arithmetic",
+        "difficulty_estimate": "easy",
+        "turns": 33,
+        "max_straight": 6,
+        "avg_straight": 1.41,
+        "corners": 1,
+        "borders": 8,
+        "inners": 6,
+        "num_walls": 8,
+        "arithmetic_mode": "sum"
+      }
+    },
+    {
+      "id": "test_arithmetic_028",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 2,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 3,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 4,
+          "x": 1,
+          "y": 0
+        },
+        {
+          "n": 5,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 6,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 7,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 8,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 9,
+          "x": 3,
+          "y": 4
+        }
+      ],
+      "walls": {
+        "h": [],
+        "v": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 4
+          },
+          {
+            "x": 2,
+            "y": 2,
+            "len": 2
+          },
+          {
+            "x": 4,
+            "y": 2,
+            "len": 2
+          },
+          {
+            "x": 5,
+            "y": 1,
+            "len": 4
+          }
+        ]
+      },
+      "meta": {
+        "variant": "arithmetic",
+        "sequence_rule": "simple arithmetic expressions",
+        "difficulty_target": "medium",
+        "representation": "arithmetic",
+        "display_labels": {
+          "1": "1+0",
+          "2": "2+0",
+          "3": "6-3",
+          "4": "8-4",
+          "5": "3+2",
+          "6": "6+0",
+          "7": "9-2",
+          "8": "11-3",
+          "9": "5+4"
+        },
+        "source_level_id": "all-86",
+        "arithmetic_mode": "mixed"
+      },
+      "metrics": {
+        "variant": "arithmetic",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 9,
+        "clue_density": 0.25,
+        "sequence_length": 9,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "arithmetic",
+        "difficulty_estimate": "medium",
+        "turns": 13,
+        "max_straight": 5,
+        "avg_straight": 2.5,
+        "corners": 1,
+        "borders": 3,
+        "inners": 5,
+        "num_walls": 12,
+        "arithmetic_mode": "mixed"
+      }
+    },
+    {
+      "id": "test_arithmetic_029",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 2,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 3,
+          "x": 0,
+          "y": 2
+        },
+        {
+          "n": 4,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 6,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "n": 7,
+          "x": 5,
+          "y": 3
+        },
+        {
+          "n": 8,
+          "x": 4,
+          "y": 5
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 2
+          },
+          {
+            "x": 3,
+            "y": 2,
+            "len": 3
+          }
+        ],
+        "v": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 4,
+            "len": 2
+          },
+          {
+            "x": 3,
+            "y": 1,
+            "len": 3
+          },
+          {
+            "x": 4,
+            "y": 3,
+            "len": 3
+          }
+        ]
+      },
+      "meta": {
+        "variant": "arithmetic",
+        "sequence_rule": "simple arithmetic expressions",
+        "difficulty_target": "medium",
+        "representation": "arithmetic",
+        "display_labels": {
+          "1": "1+0",
+          "2": "1+1",
+          "3": "4-1",
+          "4": "1+3",
+          "5": "3+2",
+          "6": "4+2",
+          "7": "9-2",
+          "8": "9-1"
+        },
+        "source_level_id": "all-65",
+        "arithmetic_mode": "mixed"
+      },
+      "metrics": {
+        "variant": "arithmetic",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 8,
+        "clue_density": 0.2222,
+        "sequence_length": 8,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "arithmetic",
+        "difficulty_estimate": "medium",
+        "turns": 16,
+        "max_straight": 5,
+        "avg_straight": 2.06,
+        "corners": 0,
+        "borders": 4,
+        "inners": 4,
+        "num_walls": 14,
+        "arithmetic_mode": "mixed"
+      }
+    },
+    {
+      "id": "test_arithmetic_030",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 3,
+          "x": 3,
+          "y": 2
+        },
+        {
+          "n": 4,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 5,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "n": 6,
+          "x": 5,
+          "y": 3
+        },
+        {
+          "n": 7,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 8,
+          "x": 0,
+          "y": 2
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 3,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 0,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 3,
+            "y": 4,
+            "len": 1
+          }
+        ],
+        "v": [
+          {
+            "x": 1,
+            "y": 4,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 4,
+            "len": 2
+          },
+          {
+            "x": 3,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 5,
+            "len": 1
+          },
+          {
+            "x": 5,
+            "y": 1,
+            "len": 4
+          }
+        ]
+      },
+      "meta": {
+        "variant": "arithmetic",
+        "sequence_rule": "simple arithmetic expressions",
+        "difficulty_target": "hard",
+        "representation": "arithmetic",
+        "display_labels": {
+          "1": "1+0",
+          "2": "2+0",
+          "3": "5-2",
+          "4": "5-1",
+          "5": "4+1",
+          "6": "10-4",
+          "7": "11-4",
+          "8": "6+2"
+        },
+        "source_level_id": "all-196",
+        "arithmetic_mode": "mixed"
+      },
+      "metrics": {
+        "variant": "arithmetic",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 8,
+        "clue_density": 0.2222,
+        "sequence_length": 8,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "arithmetic",
+        "difficulty_estimate": "hard",
+        "turns": 18,
+        "max_straight": 5,
+        "avg_straight": 1.84,
+        "corners": 0,
+        "borders": 4,
+        "inners": 4,
+        "num_walls": 16,
+        "arithmetic_mode": "mixed"
+      }
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+{
+  "id": "bulk_alphabet_099",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "n": 2,
+      "x": 5,
+      "y": 3
+    },
+    {
+      "n": 3,
+      "x": 4,
+      "y": 5
+    },
+    {
+      "n": 4,
+      "x": 1,
+      "y": 5
+    },
+    {
+      "n": 5,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 6,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "n": 7,
+      "x": 1,
+      "y": 0
+    },
+    {
+      "n": 8,
+      "x": 1,
+      "y": 1
+    },
+    {
+      "n": 9,
+      "x": 3,
+      "y": 1
+    },
+    {
+      "n": 10,
+      "x": 5,
+      "y": 1
+    },
+    {
+      "n": 11,
+      "x": 3,
+      "y": 0
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 3,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "len": 2
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "len": 1
+      }
+    ]
+  },
+  "meta": {
+    "variant": "alphabet",
+    "sequence_rule": "Q, R, S...",
+    "difficulty_target": "medium",
+    "representation": "alphabet",
+    "display_labels": {
+      "1": "Q",
+      "2": "R",
+      "3": "S",
+      "4": "T",
+      "5": "U",
+      "6": "V",
+      "7": "W",
+      "8": "X",
+      "9": "Y",
+      "10": "Z",
+      "11": "["
+    },
+    "source_level_id": "all-26",
+    "alphabet_start_char": "Q",
+    "generation_batch": "bulk_variant_pack_100_each",
+    "generation_index": 99
+  },
+  "metrics": {
+    "variant": "alphabet",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 11,
+    "clue_density": 0.3056,
+    "sequence_length": 11,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "alphabet",
+    "difficulty_estimate": "medium",
+    "turns": 21,
+    "max_straight": 5,
+    "avg_straight": 1.59,
+    "corners": 0,
+    "borders": 7,
+    "inners": 4,
+    "num_walls": 7,
+    "alphabet_start_char": "Q"
+  }
+}

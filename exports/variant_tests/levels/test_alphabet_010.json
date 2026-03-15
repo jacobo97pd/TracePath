@@ -1,0 +1,122 @@
+{
+  "id": "test_alphabet_010",
+  "size": 8,
+  "clues": [
+    {
+      "n": 1,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "n": 2,
+      "x": 7,
+      "y": 0
+    },
+    {
+      "n": 3,
+      "x": 7,
+      "y": 7
+    },
+    {
+      "n": 4,
+      "x": 0,
+      "y": 7
+    },
+    {
+      "n": 5,
+      "x": 1,
+      "y": 1
+    },
+    {
+      "n": 6,
+      "x": 1,
+      "y": 6
+    },
+    {
+      "n": 7,
+      "x": 4,
+      "y": 2
+    },
+    {
+      "n": 8,
+      "x": 3,
+      "y": 6
+    },
+    {
+      "n": 9,
+      "x": 6,
+      "y": 4
+    },
+    {
+      "n": 10,
+      "x": 3,
+      "y": 2
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 6
+      },
+      {
+        "x": 1,
+        "y": 7,
+        "len": 6
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 2,
+        "len": 5
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "len": 6
+      }
+    ]
+  },
+  "meta": {
+    "variant": "alphabet",
+    "sequence_rule": "C, D, E...",
+    "difficulty_target": "hard",
+    "representation": "alphabet",
+    "display_labels": {
+      "1": "C",
+      "2": "D",
+      "3": "E",
+      "4": "F",
+      "5": "G",
+      "6": "H",
+      "7": "I",
+      "8": "J",
+      "9": "K",
+      "10": "L"
+    },
+    "source_level_id": "all-203",
+    "alphabet_start_char": "C"
+  },
+  "metrics": {
+    "variant": "alphabet",
+    "grid_size": 8,
+    "path_length": 64,
+    "num_clues": 10,
+    "clue_density": 0.1562,
+    "sequence_length": 10,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "alphabet",
+    "difficulty_estimate": "hard",
+    "turns": 23,
+    "max_straight": 7,
+    "avg_straight": 2.62,
+    "corners": 4,
+    "borders": 0,
+    "inners": 6,
+    "num_walls": 23,
+    "alphabet_start_char": "C"
+  }
+}

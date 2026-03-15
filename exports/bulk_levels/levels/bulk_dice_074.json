@@ -1,0 +1,134 @@
+{
+  "id": "bulk_dice_074",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 1,
+      "y": 3
+    },
+    {
+      "n": 2,
+      "x": 0,
+      "y": 4
+    },
+    {
+      "n": 3,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 4,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "n": 5,
+      "x": 3,
+      "y": 1
+    },
+    {
+      "n": 6,
+      "x": 2,
+      "y": 3
+    },
+    {
+      "n": 7,
+      "x": 3,
+      "y": 4
+    },
+    {
+      "n": 8,
+      "x": 5,
+      "y": 4
+    },
+    {
+      "n": 9,
+      "x": 5,
+      "y": 2
+    },
+    {
+      "n": 10,
+      "x": 5,
+      "y": 0
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 1,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "len": 2
+      }
+    ],
+    "v": [
+      {
+        "x": 2,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "len": 1
+      }
+    ]
+  },
+  "meta": {
+    "variant": "dice",
+    "sequence_rule": "dice faces / dice sums",
+    "difficulty_target": "medium",
+    "representation": "dice",
+    "display_labels": {
+      "1": "1+1",
+      "2": "1+2",
+      "3": "2+2",
+      "4": "2+3",
+      "5": "3+3",
+      "6": "6+1",
+      "7": "2+6",
+      "8": "3+6",
+      "9": "4+6",
+      "10": "5+6"
+    },
+    "source_level_id": "all-71",
+    "dice_mode": "sum",
+    "generation_batch": "bulk_variant_pack_100_each",
+    "generation_index": 74
+  },
+  "metrics": {
+    "variant": "dice",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 10,
+    "clue_density": 0.2778,
+    "sequence_length": 10,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "dice",
+    "difficulty_estimate": "medium",
+    "turns": 23,
+    "max_straight": 3,
+    "avg_straight": 1.46,
+    "corners": 2,
+    "borders": 3,
+    "inners": 5,
+    "num_walls": 7,
+    "dice_mode": "sum"
+  }
+}

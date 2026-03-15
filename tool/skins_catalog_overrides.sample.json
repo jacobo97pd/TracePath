@@ -1,0 +1,22 @@
+{
+  "default": {
+    "name": "Default",
+    "price": 0,
+    "rarity": "Classic",
+    "enabled": true,
+    "order": 1,
+    "cardPath": "cards/default-card.png"
+  },
+  "cerdo-dark-lord": {
+    "name": "Dark Pig Lord",
+    "price": 300,
+    "rarity": "Common",
+    "enabled": true
+  },
+  "super-cerdo": {
+    "name": "Super Cerdo",
+    "price": 900,
+    "rarity": "Legendary",
+    "enabled": true
+  }
+}

@@ -1,0 +1,151 @@
+{
+  "id": "test_multiples_roman_016",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 2,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 3,
+      "x": 1,
+      "y": 0
+    },
+    {
+      "n": 4,
+      "x": 1,
+      "y": 4
+    },
+    {
+      "n": 5,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "n": 6,
+      "x": 4,
+      "y": 3
+    },
+    {
+      "n": 7,
+      "x": 4,
+      "y": 0
+    },
+    {
+      "n": 8,
+      "x": 5,
+      "y": 2
+    },
+    {
+      "n": 9,
+      "x": 5,
+      "y": 5
+    },
+    {
+      "n": 10,
+      "x": 1,
+      "y": 5
+    },
+    {
+      "n": 11,
+      "x": 0,
+      "y": 3
+    },
+    {
+      "n": 12,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 2,
+        "y": 3,
+        "len": 2
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "len": 4
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 4
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "len": 2
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "len": 2
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "len": 4
+      }
+    ]
+  },
+  "meta": {
+    "variant": "multiples_roman",
+    "sequence_rule": "roman multiples of 3",
+    "difficulty_target": "easy",
+    "representation": "multiple_roman",
+    "display_labels": {
+      "1": "III",
+      "2": "VI",
+      "3": "IX",
+      "4": "XII",
+      "5": "XV",
+      "6": "XVIII",
+      "7": "XXI",
+      "8": "XXIV",
+      "9": "XXVII",
+      "10": "XXX",
+      "11": "XXXIII",
+      "12": "XXXVI"
+    },
+    "source_level_id": "all-183",
+    "multiple_base": 3,
+    "roman_max_value": 36
+  },
+  "metrics": {
+    "variant": "multiples_roman",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 12,
+    "clue_density": 0.3333,
+    "sequence_length": 12,
+    "sequence_start": 3,
+    "sequence_step": 3,
+    "representation": "multiple_roman",
+    "difficulty_estimate": "easy",
+    "turns": 14,
+    "max_straight": 5,
+    "avg_straight": 2.33,
+    "corners": 2,
+    "borders": 6,
+    "inners": 4,
+    "num_walls": 19,
+    "multiple_base": 3,
+    "roman_max_value": 36
+  }
+}

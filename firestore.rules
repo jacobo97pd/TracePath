@@ -1,0 +1,85 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /skins_catalog/{skinId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+
+      match /friends/{friendUid} {
+        allow read, delete: if request.auth != null && request.auth.uid == uid;
+        allow create, update: if request.auth != null && (
+          request.auth.uid == uid ||
+          (
+            request.auth.uid == friendUid &&
+            request.resource.data.uid == friendUid
+          )
+        );
+      }
+
+      match /sent_friend_requests/{targetUid} {
+        allow create: if request.auth != null &&
+          request.auth.uid == uid &&
+          request.resource.data.fromUid == uid &&
+          request.resource.data.targetUid == targetUid;
+        allow read, update, delete: if request.auth != null &&
+          (request.auth.uid == uid || request.auth.uid == targetUid);
+      }
+
+      match /incoming_requests/{fromUid} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+
+      match /sent_requests/{targetUid} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+
+      match /inbox/{messageId} {
+        allow read, update, delete: if request.auth != null && request.auth.uid == uid;
+        allow create: if request.auth != null && (
+          request.auth.uid == uid ||
+          (
+            request.resource.data.fromUid == request.auth.uid &&
+            (
+              request.resource.data.type == 'friend_request' ||
+              request.resource.data.type == 'friend_accept'
+            )
+          )
+        );
+      }
+
+      match /owned_skins/{skinId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+
+      match /owned_trails/{trailId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+
+      match /wallet_transactions/{transactionId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+
+      match /purchases/{purchaseId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+
+    match /leaderboards/{levelId}/scores/{uid} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /usernames/{username} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

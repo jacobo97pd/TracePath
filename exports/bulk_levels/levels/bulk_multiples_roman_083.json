@@ -1,0 +1,104 @@
+{
+  "id": "bulk_multiples_roman_083",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 2,
+      "x": 3,
+      "y": 2
+    },
+    {
+      "n": 3,
+      "x": 5,
+      "y": 1
+    },
+    {
+      "n": 4,
+      "x": 3,
+      "y": 4
+    },
+    {
+      "n": 5,
+      "x": 3,
+      "y": 5
+    },
+    {
+      "n": 6,
+      "x": 1,
+      "y": 4
+    },
+    {
+      "n": 7,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "n": 8,
+      "x": 0,
+      "y": 1
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 1,
+        "y": 3,
+        "len": 4
+      }
+    ],
+    "v": [
+      {
+        "x": 3,
+        "y": 1,
+        "len": 4
+      }
+    ]
+  },
+  "meta": {
+    "variant": "multiples_roman",
+    "sequence_rule": "roman multiples of 5",
+    "difficulty_target": "medium",
+    "representation": "multiple_roman",
+    "display_labels": {
+      "1": "V",
+      "2": "X",
+      "3": "XV",
+      "4": "XX",
+      "5": "XXV",
+      "6": "XXX",
+      "7": "XXXV",
+      "8": "XL"
+    },
+    "source_level_id": "all-114",
+    "multiple_base": 5,
+    "roman_max_value": 40,
+    "generation_batch": "bulk_variant_pack_100_each",
+    "generation_index": 83
+  },
+  "metrics": {
+    "variant": "multiples_roman",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 8,
+    "clue_density": 0.2222,
+    "sequence_length": 8,
+    "sequence_start": 5,
+    "sequence_step": 5,
+    "representation": "multiple_roman",
+    "difficulty_estimate": "medium",
+    "turns": 20,
+    "max_straight": 5,
+    "avg_straight": 1.67,
+    "corners": 0,
+    "borders": 4,
+    "inners": 4,
+    "num_walls": 8,
+    "multiple_base": 5,
+    "roman_max_value": 40
+  }
+}

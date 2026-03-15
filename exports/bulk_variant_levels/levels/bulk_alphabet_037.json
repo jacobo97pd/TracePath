@@ -1,0 +1,186 @@
+{
+  "id": "bulk_alphabet_037",
+  "size": 7,
+  "clues": [
+    {
+      "n": 1,
+      "x": 5,
+      "y": 5
+    },
+    {
+      "n": 2,
+      "x": 3,
+      "y": 4
+    },
+    {
+      "n": 3,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 4,
+      "x": 0,
+      "y": 5
+    },
+    {
+      "n": 5,
+      "x": 2,
+      "y": 6
+    },
+    {
+      "n": 6,
+      "x": 4,
+      "y": 5
+    },
+    {
+      "n": 7,
+      "x": 6,
+      "y": 6
+    },
+    {
+      "n": 8,
+      "x": 6,
+      "y": 3
+    },
+    {
+      "n": 9,
+      "x": 5,
+      "y": 3
+    },
+    {
+      "n": 10,
+      "x": 4,
+      "y": 1
+    },
+    {
+      "n": 11,
+      "x": 6,
+      "y": 0
+    },
+    {
+      "n": 12,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 13,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 14,
+      "x": 1,
+      "y": 4
+    },
+    {
+      "n": 15,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "n": 16,
+      "x": 1,
+      "y": 0
+    },
+    {
+      "n": 17,
+      "x": 1,
+      "y": 1
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 4,
+        "y": 1,
+        "len": 2
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "len": 1
+      },
+      {
+        "x": 1,
+        "y": 6,
+        "len": 2
+      }
+    ],
+    "v": [
+      {
+        "x": 2,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "len": 2
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "len": 2
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "len": 1
+      }
+    ]
+  },
+  "meta": {
+    "variant": "alphabet",
+    "sequence_rule": "J, K, L...",
+    "difficulty_target": "easy",
+    "representation": "alphabet",
+    "display_labels": {
+      "1": "J",
+      "2": "K",
+      "3": "L",
+      "4": "M",
+      "5": "N",
+      "6": "O",
+      "7": "P",
+      "8": "Q",
+      "9": "R",
+      "10": "S",
+      "11": "T",
+      "12": "U",
+      "13": "V",
+      "14": "W",
+      "15": "X",
+      "16": "Y",
+      "17": "Z"
+    },
+    "source_level_id": "all-233",
+    "alphabet_start_char": "J",
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 37
+  },
+  "metrics": {
+    "variant": "alphabet",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 17,
+    "clue_density": 0.3469,
+    "sequence_length": 17,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "alphabet",
+    "difficulty_estimate": "easy",
+    "turns": 27,
+    "max_straight": 4,
+    "avg_straight": 1.71,
+    "corners": 2,
+    "borders": 6,
+    "inners": 9,
+    "num_walls": 12,
+    "alphabet_start_char": "J"
+  }
+}

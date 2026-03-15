@@ -1,0 +1,182 @@
+{
+  "id": "bulk_multiples_roman_032",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 1,
+      "y": 0
+    },
+    {
+      "n": 2,
+      "x": 1,
+      "y": 2
+    },
+    {
+      "n": 3,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 4,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 5,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "n": 6,
+      "x": 4,
+      "y": 3
+    },
+    {
+      "n": 7,
+      "x": 4,
+      "y": 1
+    },
+    {
+      "n": 8,
+      "x": 2,
+      "y": 1
+    },
+    {
+      "n": 9,
+      "x": 4,
+      "y": 0
+    },
+    {
+      "n": 10,
+      "x": 5,
+      "y": 1
+    },
+    {
+      "n": 11,
+      "x": 5,
+      "y": 3
+    },
+    {
+      "n": 12,
+      "x": 4,
+      "y": 5
+    },
+    {
+      "n": 13,
+      "x": 2,
+      "y": 5
+    },
+    {
+      "n": 14,
+      "x": 0,
+      "y": 5
+    },
+    {
+      "n": 15,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "n": 16,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 2,
+        "y": 2,
+        "len": 2
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "len": 2
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 0,
+        "len": 5
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "len": 3
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "len": 4
+      }
+    ]
+  },
+  "meta": {
+    "variant": "multiples_roman",
+    "sequence_rule": "roman multiples of 4",
+    "difficulty_target": "easy",
+    "representation": "multiple_roman",
+    "display_labels": {
+      "1": "IV",
+      "2": "VIII",
+      "3": "XII",
+      "4": "XVI",
+      "5": "XX",
+      "6": "XXIV",
+      "7": "XXVIII",
+      "8": "XXXII",
+      "9": "XXXVI",
+      "10": "XL",
+      "11": "XLIV",
+      "12": "XLVIII",
+      "13": "LII",
+      "14": "LVI",
+      "15": "LX",
+      "16": "LXIV"
+    },
+    "source_level_id": "all-154",
+    "multiple_base": 4,
+    "roman_max_value": 64,
+    "generation_batch": "bulk_variant_pack_100_each",
+    "generation_index": 32
+  },
+  "metrics": {
+    "variant": "multiples_roman",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 16,
+    "clue_density": 0.4444,
+    "sequence_length": 16,
+    "sequence_start": 4,
+    "sequence_step": 4,
+    "representation": "multiple_roman",
+    "difficulty_estimate": "easy",
+    "turns": 12,
+    "max_straight": 5,
+    "avg_straight": 2.69,
+    "corners": 2,
+    "borders": 7,
+    "inners": 7,
+    "num_walls": 19,
+    "multiple_base": 4,
+    "roman_max_value": 64
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "id": "bulk_alphabet_137",
+  "size": 5,
+  "clues": [
+    {
+      "n": 1,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 2,
+      "x": 1,
+      "y": 2
+    },
+    {
+      "n": 3,
+      "x": 0,
+      "y": 3
+    },
+    {
+      "n": 4,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "n": 5,
+      "x": 2,
+      "y": 0
+    },
+    {
+      "n": 6,
+      "x": 4,
+      "y": 1
+    },
+    {
+      "n": 7,
+      "x": 4,
+      "y": 3
+    },
+    {
+      "n": 8,
+      "x": 4,
+      "y": 4
+    }
+  ],
+  "walls": {
+    "h": [],
+    "v": [
+      {
+        "x": 2,
+        "y": 0,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "len": 1
+      }
+    ]
+  },
+  "meta": {
+    "variant": "alphabet",
+    "sequence_rule": "J, K, L...",
+    "difficulty_target": "easy",
+    "representation": "alphabet",
+    "display_labels": {
+      "1": "J",
+      "2": "K",
+      "3": "L",
+      "4": "M",
+      "5": "N",
+      "6": "O",
+      "7": "P",
+      "8": "Q"
+    },
+    "source_level_id": "all-3",
+    "alphabet_start_char": "J",
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 137
+  },
+  "metrics": {
+    "variant": "alphabet",
+    "grid_size": 5,
+    "path_length": 25,
+    "num_clues": 8,
+    "clue_density": 0.32,
+    "sequence_length": 8,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "alphabet",
+    "difficulty_estimate": "easy",
+    "turns": 17,
+    "max_straight": 4,
+    "avg_straight": 1.33,
+    "corners": 2,
+    "borders": 5,
+    "inners": 1,
+    "num_walls": 3,
+    "alphabet_start_char": "J"
+  }
+}

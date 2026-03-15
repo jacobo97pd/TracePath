@@ -1,0 +1,122 @@
+{
+  "id": "bulk_multiples_roman_046",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 4,
+      "y": 1
+    },
+    {
+      "n": 2,
+      "x": 4,
+      "y": 4
+    },
+    {
+      "n": 3,
+      "x": 1,
+      "y": 4
+    },
+    {
+      "n": 4,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "n": 5,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 6,
+      "x": 5,
+      "y": 1
+    },
+    {
+      "n": 7,
+      "x": 5,
+      "y": 4
+    },
+    {
+      "n": 8,
+      "x": 4,
+      "y": 5
+    },
+    {
+      "n": 9,
+      "x": 1,
+      "y": 5
+    },
+    {
+      "n": 10,
+      "x": 0,
+      "y": 3
+    },
+    {
+      "n": 11,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "n": 12,
+      "x": 2,
+      "y": 1
+    },
+    {
+      "n": 13,
+      "x": 1,
+      "y": 1
+    }
+  ],
+  "walls": {
+    "h": [],
+    "v": []
+  },
+  "meta": {
+    "variant": "multiples_roman",
+    "sequence_rule": "roman multiples of 3",
+    "difficulty_target": "easy",
+    "representation": "multiple_roman",
+    "display_labels": {
+      "1": "III",
+      "2": "VI",
+      "3": "IX",
+      "4": "XII",
+      "5": "XV",
+      "6": "XVIII",
+      "7": "XXI",
+      "8": "XXIV",
+      "9": "XXVII",
+      "10": "XXX",
+      "11": "XXXIII",
+      "12": "XXXVI",
+      "13": "XXXIX"
+    },
+    "source_level_id": "all-142",
+    "multiple_base": 3,
+    "roman_max_value": 39,
+    "generation_batch": "bulk_variant_pack_100_each",
+    "generation_index": 46
+  },
+  "metrics": {
+    "variant": "multiples_roman",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 13,
+    "clue_density": 0.3611,
+    "sequence_length": 13,
+    "sequence_start": 3,
+    "sequence_step": 3,
+    "representation": "multiple_roman",
+    "difficulty_estimate": "easy",
+    "turns": 12,
+    "max_straight": 5,
+    "avg_straight": 2.69,
+    "corners": 1,
+    "borders": 6,
+    "inners": 6,
+    "num_walls": 0,
+    "multiple_base": 3,
+    "roman_max_value": 39
+  }
+}

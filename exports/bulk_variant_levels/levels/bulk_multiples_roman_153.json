@@ -1,0 +1,185 @@
+{
+  "id": "bulk_multiples_roman_153",
+  "size": 7,
+  "clues": [
+    {
+      "n": 1,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "n": 2,
+      "x": 4,
+      "y": 4
+    },
+    {
+      "n": 3,
+      "x": 6,
+      "y": 5
+    },
+    {
+      "n": 4,
+      "x": 4,
+      "y": 5
+    },
+    {
+      "n": 5,
+      "x": 2,
+      "y": 5
+    },
+    {
+      "n": 6,
+      "x": 1,
+      "y": 5
+    },
+    {
+      "n": 7,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 8,
+      "x": 4,
+      "y": 2
+    },
+    {
+      "n": 9,
+      "x": 6,
+      "y": 2
+    },
+    {
+      "n": 10,
+      "x": 6,
+      "y": 1
+    },
+    {
+      "n": 11,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 12,
+      "x": 1,
+      "y": 0
+    },
+    {
+      "n": 13,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "n": 14,
+      "x": 0,
+      "y": 6
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 4,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "len": 3
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "len": 3
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 6,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 0,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "len": 1
+      }
+    ]
+  },
+  "meta": {
+    "variant": "multiples_roman",
+    "sequence_rule": "roman multiples of 5",
+    "difficulty_target": "medium",
+    "representation": "multiple_roman",
+    "display_labels": {
+      "1": "V",
+      "2": "X",
+      "3": "XV",
+      "4": "XX",
+      "5": "XXV",
+      "6": "XXX",
+      "7": "XXXV",
+      "8": "XL",
+      "9": "XLV",
+      "10": "L",
+      "11": "LV",
+      "12": "LX",
+      "13": "LXV",
+      "14": "LXX"
+    },
+    "source_level_id": "all-94",
+    "multiple_base": 5,
+    "roman_max_value": 70,
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 153
+  },
+  "metrics": {
+    "variant": "multiples_roman",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 14,
+    "clue_density": 0.2857,
+    "sequence_length": 14,
+    "sequence_start": 5,
+    "sequence_step": 5,
+    "representation": "multiple_roman",
+    "difficulty_estimate": "medium",
+    "turns": 29,
+    "max_straight": 6,
+    "avg_straight": 1.6,
+    "corners": 1,
+    "borders": 6,
+    "inners": 7,
+    "num_walls": 15,
+    "multiple_base": 5,
+    "roman_max_value": 70
+  }
+}

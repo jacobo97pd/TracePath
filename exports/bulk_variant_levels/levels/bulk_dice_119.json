@@ -1,0 +1,102 @@
+{
+  "id": "bulk_dice_119",
+  "size": 7,
+  "clues": [
+    {
+      "n": 1,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 2,
+      "x": 4,
+      "y": 3
+    },
+    {
+      "n": 3,
+      "x": 6,
+      "y": 5
+    },
+    {
+      "n": 4,
+      "x": 5,
+      "y": 1
+    },
+    {
+      "n": 5,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 6,
+      "x": 2,
+      "y": 1
+    },
+    {
+      "n": 7,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 8,
+      "x": 0,
+      "y": 5
+    },
+    {
+      "n": 9,
+      "x": 4,
+      "y": 5
+    },
+    {
+      "n": 10,
+      "x": 0,
+      "y": 6
+    }
+  ],
+  "walls": {
+    "h": [],
+    "v": []
+  },
+  "meta": {
+    "variant": "dice",
+    "sequence_rule": "dice faces / dice sums",
+    "difficulty_target": "medium",
+    "representation": "dice",
+    "display_labels": {
+      "1": "1+1",
+      "2": "1+2",
+      "3": "3+1",
+      "4": "3+2",
+      "5": "2+4",
+      "6": "1+6",
+      "7": "6+2",
+      "8": "3+6",
+      "9": "5+5",
+      "10": "5+6"
+    },
+    "source_level_id": "all-113",
+    "dice_mode": "sum",
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 119
+  },
+  "metrics": {
+    "variant": "dice",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 10,
+    "clue_density": 0.2041,
+    "sequence_length": 10,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "dice",
+    "difficulty_estimate": "medium",
+    "turns": 20,
+    "max_straight": 6,
+    "avg_straight": 2.29,
+    "corners": 1,
+    "borders": 3,
+    "inners": 6,
+    "num_walls": 0,
+    "dice_mode": "sum"
+  }
+}

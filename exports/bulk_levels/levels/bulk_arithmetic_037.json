@@ -1,0 +1,132 @@
+{
+  "id": "bulk_arithmetic_037",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 2,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 3,
+      "x": 4,
+      "y": 2
+    },
+    {
+      "n": 4,
+      "x": 5,
+      "y": 0
+    },
+    {
+      "n": 5,
+      "x": 5,
+      "y": 3
+    },
+    {
+      "n": 6,
+      "x": 3,
+      "y": 4
+    },
+    {
+      "n": 7,
+      "x": 5,
+      "y": 5
+    },
+    {
+      "n": 8,
+      "x": 3,
+      "y": 5
+    },
+    {
+      "n": 9,
+      "x": 0,
+      "y": 5
+    },
+    {
+      "n": 10,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 11,
+      "x": 0,
+      "y": 3
+    },
+    {
+      "n": 12,
+      "x": 1,
+      "y": 1
+    },
+    {
+      "n": 13,
+      "x": 0,
+      "y": 1
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 1,
+        "y": 3,
+        "len": 4
+      }
+    ],
+    "v": [
+      {
+        "x": 3,
+        "y": 1,
+        "len": 4
+      }
+    ]
+  },
+  "meta": {
+    "variant": "arithmetic",
+    "sequence_rule": "simple arithmetic expressions",
+    "difficulty_target": "easy",
+    "representation": "arithmetic",
+    "display_labels": {
+      "1": "1+0",
+      "2": "2+0",
+      "3": "3+0",
+      "4": "3+1",
+      "5": "4+1",
+      "6": "4+2",
+      "7": "2+5",
+      "8": "4+4",
+      "9": "8+1",
+      "10": "10+0",
+      "11": "6+5",
+      "12": "7+5",
+      "13": "9+4"
+    },
+    "source_level_id": "all-261",
+    "arithmetic_mode": "sum",
+    "generation_batch": "bulk_variant_pack_100_each",
+    "generation_index": 37
+  },
+  "metrics": {
+    "variant": "arithmetic",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 13,
+    "clue_density": 0.3611,
+    "sequence_length": 13,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "arithmetic",
+    "difficulty_estimate": "easy",
+    "turns": 20,
+    "max_straight": 5,
+    "avg_straight": 1.67,
+    "corners": 3,
+    "borders": 5,
+    "inners": 5,
+    "num_walls": 8,
+    "arithmetic_mode": "sum"
+  }
+}

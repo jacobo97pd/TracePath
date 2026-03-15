@@ -1,0 +1,96 @@
+{
+  "id": "test_multiples_roman_020",
+  "size": 7,
+  "clues": [
+    {
+      "n": 1,
+      "x": 3,
+      "y": 5
+    },
+    {
+      "n": 2,
+      "x": 1,
+      "y": 5
+    },
+    {
+      "n": 3,
+      "x": 1,
+      "y": 3
+    },
+    {
+      "n": 4,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "n": 5,
+      "x": 6,
+      "y": 0
+    },
+    {
+      "n": 6,
+      "x": 6,
+      "y": 4
+    },
+    {
+      "n": 7,
+      "x": 5,
+      "y": 5
+    },
+    {
+      "n": 8,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 9,
+      "x": 5,
+      "y": 1
+    }
+  ],
+  "walls": {
+    "h": [],
+    "v": []
+  },
+  "meta": {
+    "variant": "multiples_roman",
+    "sequence_rule": "roman multiples of 2",
+    "difficulty_target": "hard",
+    "representation": "multiple_roman",
+    "display_labels": {
+      "1": "II",
+      "2": "IV",
+      "3": "VI",
+      "4": "VIII",
+      "5": "X",
+      "6": "XII",
+      "7": "XIV",
+      "8": "XVI",
+      "9": "XVIII"
+    },
+    "source_level_id": "all-188",
+    "multiple_base": 2,
+    "roman_max_value": 18
+  },
+  "metrics": {
+    "variant": "multiples_roman",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 9,
+    "clue_density": 0.1837,
+    "sequence_length": 9,
+    "sequence_start": 2,
+    "sequence_step": 2,
+    "representation": "multiple_roman",
+    "difficulty_estimate": "hard",
+    "turns": 25,
+    "max_straight": 6,
+    "avg_straight": 1.85,
+    "corners": 2,
+    "borders": 1,
+    "inners": 6,
+    "num_walls": 0,
+    "multiple_base": 2,
+    "roman_max_value": 18
+  }
+}

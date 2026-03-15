@@ -1,0 +1,724 @@
+import 'package:flutter/material.dart';
+
+import 'trail_skin.dart';
+
+class TrailCatalog {
+  const TrailCatalog._();
+
+  static const TrailSkinConfig classic = TrailSkinConfig(
+    id: 'trail_classic',
+    name: 'Classic',
+    renderType: TrailRenderType.basic,
+    primaryColor: Color(0xFF6EA0FF),
+    secondaryColor: Color(0xFF4E79D8),
+    thickness: 1.0,
+    opacity: 0.95,
+    glow: false,
+  );
+
+  static const TrailSkinConfig fire = TrailSkinConfig(
+    id: 'trail_fire',
+    name: 'Fire',
+    renderType: TrailRenderType.fire,
+    primaryColor: Color(0xFFFF7A2F),
+    secondaryColor: Color(0xFFFFC54A),
+    thickness: 1.06,
+    opacity: 0.92,
+    glow: true,
+    effectIntensity: 1.0,
+    particle: TrailParticleConfig(
+      enabled: true,
+      count: 24,
+      minRadius: 1.8,
+      maxRadius: 5.6,
+      lifetimeSeconds: 0.9,
+      spread: 15,
+      jitter: 0.9,
+      speed: 1.2,
+    ),
+  );
+
+  static const TrailSkinConfig smokeTrail = TrailSkinConfig(
+    id: 'trail_smoke',
+    name: 'SmokeTrail',
+    renderType: TrailRenderType.smoke,
+    primaryColor: Color(0xFFE2E6EA),
+    secondaryColor: Color(0xFFA0A8B0),
+    thickness: 0.8,
+    opacity: 0.9,
+    glow: false,
+    effectIntensity: 1.0,
+    smoke: SmokeTrailConfig(
+      spawnRate: 17.0,
+      minSize: 0.22,
+      maxSize: 0.5,
+      minLifetime: 0.65,
+      maxLifetime: 1.5,
+      upwardDrift: 0.22,
+      sidewaysJitter: 0.16,
+      opacityStart: 0.62,
+      opacityEnd: 0.02,
+      emissionOffsetBehindHead: 0.26,
+    ),
+  );
+
+  static const TrailSkinConfig laser = TrailSkinConfig(
+    id: 'trail_laser',
+    name: 'Laser',
+    renderType: TrailRenderType.laser,
+    primaryColor: Color(0xFF72D6FF),
+    secondaryColor: Color(0xFF3D79FF),
+    thickness: 0.86,
+    opacity: 1.0,
+    glow: true,
+    effectIntensity: 1.15,
+    particle: TrailParticleConfig(
+      enabled: true,
+      count: 10,
+      minRadius: 1.2,
+      maxRadius: 2.8,
+      lifetimeSeconds: 0.55,
+      spread: 7,
+      jitter: 0.4,
+      speed: 1.4,
+    ),
+  );
+
+  static const TrailSkinConfig plasma = TrailSkinConfig(
+    id: 'trail_plasma',
+    name: 'PlasmaTrail',
+    renderType: TrailRenderType.plasma,
+    primaryColor: Color(0xFF61C7FF),
+    secondaryColor: Color(0xFF7B57FF),
+    thickness: 0.94,
+    opacity: 0.98,
+    glow: true,
+    effectIntensity: 1.12,
+    plasma: PlasmaTrailConfig(
+      coreWidth: 0.6,
+      plasmaWidth: 1.02,
+      glowWidth: 1.62,
+      pulseStrength: 0.13,
+      pulseSpeed: 1.7,
+      innerFlowSpeed: 1.85,
+      sparkFrequency: 0.3,
+      sparkLifetime: 0.6,
+      coreColor: Color(0xFFF3FBFF),
+      plasmaColor: Color(0xFF64D9FF),
+      glowColor: Color(0xFF7B57FF),
+    ),
+    particle: TrailParticleConfig(
+      enabled: true,
+      count: 12,
+      minRadius: 1.0,
+      maxRadius: 2.6,
+      lifetimeSeconds: 0.6,
+      spread: 8,
+      jitter: 0.5,
+      speed: 1.2,
+    ),
+  );
+
+  static const TrailSkinConfig glitch = TrailSkinConfig(
+    id: 'trail_glitch',
+    name: 'GlitchTrail',
+    renderType: TrailRenderType.glitch,
+    primaryColor: Color(0xFFE2E8F0),
+    secondaryColor: Color(0xFF94A3B8),
+    thickness: 0.88,
+    opacity: 0.96,
+    glow: true,
+    effectIntensity: 1.0,
+    glitch: GlitchTrailConfig(
+      coreWidth: 0.74,
+      chromaticOffset: 0.08,
+      glitchFrequency: 0.34,
+      fragmentSize: 0.11,
+      fragmentLifetime: 0.4,
+      flickerStrength: 0.2,
+      stepVisualFps: 14,
+      coreColor: Color(0xFFE2E8F0),
+      offsetColorA: Color(0xFF22D3EE),
+      offsetColorB: Color(0xFFF472B6),
+    ),
+  );
+
+  static const TrailSkinConfig inkLiquid = TrailSkinConfig(
+    id: 'trail_ink',
+    name: 'InkTrail',
+    renderType: TrailRenderType.ink,
+    primaryColor: Color(0xFF0F172A),
+    secondaryColor: Color(0xFF334155),
+    thickness: 0.94,
+    opacity: 0.96,
+    glow: false,
+    effectIntensity: 1.0,
+    inkLiquid: InkTrailConfig(
+      baseWidth: 0.94,
+      widthVariation: 0.22,
+      edgeNoiseAmount: 0.05,
+      dropletFrequency: 0.2,
+      dropletSize: 0.05,
+      glossStrength: 0.22,
+      coreColor: Color(0xFF0F172A),
+      highlightColor: Color(0xFF334155),
+    ),
+  );
+
+  static const TrailSkinConfig magma = TrailSkinConfig(
+    id: 'trail_magma',
+    name: 'MagmaTrail',
+    renderType: TrailRenderType.magma,
+    primaryColor: Color(0xFFFF5B1F),
+    secondaryColor: Color(0xFF3A0F08),
+    thickness: 0.98,
+    opacity: 0.97,
+    glow: true,
+    effectIntensity: 1.12,
+    magma: MagmaTrailConfig(
+      coreWidth: 0.5,
+      magmaWidth: 0.94,
+      crustWidth: 1.3,
+      heatPulseStrength: 0.15,
+      heatPulseSpeed: 1.5,
+      emberFrequency: 0.3,
+      emberLifetime: 0.62,
+      coreColor: Color(0xFFFFF08A),
+      magmaColor: Color(0xFFFF5B1F),
+      crustColor: Color(0xFF3A0F08),
+      glowColor: Color(0xFFFF8B3D),
+    ),
+  );
+
+  static const TrailSkinConfig ice = TrailSkinConfig(
+    id: 'trail_ice',
+    name: 'IceTrail',
+    renderType: TrailRenderType.ice,
+    primaryColor: Color(0xFFBFE9FF),
+    secondaryColor: Color(0xFF7DD3FC),
+    thickness: 0.9,
+    opacity: 0.96,
+    glow: true,
+    effectIntensity: 0.98,
+    ice: IceTrailConfig(
+      coreWidth: 0.62,
+      frostWidth: 1.02,
+      glowStrength: 0.24,
+      sparkleFrequency: 0.2,
+      sparkleLifetime: 0.52,
+      crystalDetailAmount: 0.12,
+      coreColor: Color(0xFFF1F8FF),
+      frostColor: Color(0xFFBFE9FF),
+      glowColor: Color(0xFF7DD3FC),
+    ),
+  );
+
+  static const TrailSkinConfig galaxy = TrailSkinConfig(
+    id: 'trail_galaxy',
+    name: 'GalaxyTrail',
+    renderType: TrailRenderType.galaxy,
+    primaryColor: Color(0xFF7C3AED),
+    secondaryColor: Color(0xFF22D3EE),
+    thickness: 1.0,
+    opacity: 0.96,
+    glow: true,
+    effectIntensity: 1.05,
+    galaxy: GalaxyTrailConfig(
+      coreWidth: 0.66,
+      nebulaWidth: 1.24,
+      glowWidth: 1.92,
+      pulseStrength: 0.1,
+      pulseSpeed: 1.1,
+      innerDriftSpeed: 1.4,
+      starDustFrequency: 0.26,
+      starDustLifetime: 0.7,
+      sparkleFrequency: 0.16,
+      sparkleLifetime: 0.44,
+      coreColor: Color(0xFF15122B),
+      nebulaColorA: Color(0xFF7C3AED),
+      nebulaColorB: Color(0xFF22D3EE),
+      glowColor: Color(0xFFC084FC),
+    ),
+  );
+
+  static const TrailSkinConfig speedForce = TrailSkinConfig(
+    id: 'trail_speed_force',
+    name: 'SpeedForceTrail',
+    renderType: TrailRenderType.speedForce,
+    primaryColor: Color(0xFFFFF7CC),
+    secondaryColor: Color(0xFFFF8A00),
+    thickness: 0.94,
+    opacity: 0.98,
+    glow: true,
+    effectIntensity: 1.15,
+    speedForce: SpeedForceTrailConfig(
+      coreWidth: 0.72,
+      glowWidth: 1.42,
+      pulseStrength: 0.17,
+      pulseSpeed: 2.2,
+      streakFrequency: 0.34,
+      streakLength: 0.2,
+      streakOpacity: 0.34,
+      sparkFrequency: 0.24,
+      sparkLifetime: 0.42,
+      echoTrailCount: 2,
+      echoTrailOpacity: 0.16,
+      turnBurstStrength: 0.3,
+      coreColor: Color(0xFFFFF7CC),
+      glowColor: Color(0xFFFFC53A),
+      streakColor: Color(0xFFFF8A00),
+      sparkColor: Color(0xFFFFE066),
+    ),
+  );
+
+  static const TrailSkinConfig sith = TrailSkinConfig(
+    id: 'trail_sith',
+    name: 'Sith',
+    renderType: TrailRenderType.laser,
+    primaryColor: Color(0xFFFF2A2A),
+    secondaryColor: Color(0xFF8F0000),
+    thickness: 0.92,
+    opacity: 1.0,
+    glow: true,
+    effectIntensity: 1.2,
+    particle: TrailParticleConfig(
+      enabled: true,
+      count: 10,
+      minRadius: 1.2,
+      maxRadius: 3.2,
+      lifetimeSeconds: 0.55,
+      spread: 8,
+      jitter: 0.45,
+      speed: 1.45,
+    ),
+  );
+
+  static const TrailSkinConfig comic = TrailSkinConfig(
+    id: 'trail_comic',
+    name: 'ComicTrail',
+    renderType: TrailRenderType.comic,
+    primaryColor: Color(0xFF0E162A),
+    secondaryColor: Color(0xFFFFFFFF),
+    thickness: 0.94,
+    opacity: 0.96,
+    glow: true,
+    effectIntensity: 1.0,
+    visualStepFps: 12,
+    snapshotCount: 6,
+    chromaOffsetPx: 2.0,
+    particle: TrailParticleConfig(
+      enabled: true,
+      count: 12,
+      minRadius: 1.1,
+      maxRadius: 2.9,
+      lifetimeSeconds: 0.55,
+      spread: 8,
+      jitter: 0.42,
+      speed: 1.2,
+    ),
+  );
+
+  static const TrailSkinConfig punkRiff = TrailSkinConfig(
+    id: 'trail_punk_riff',
+    name: 'PunkRiffTrail',
+    renderType: TrailRenderType.punkRiff,
+    primaryColor: Color(0xFFED2ECF),
+    secondaryColor: Color(0xFFFFDD35),
+    thickness: 1.0,
+    opacity: 0.98,
+    glow: true,
+    effectIntensity: 1.14,
+    visualStepFps: 12,
+    particle: TrailParticleConfig(
+      enabled: false,
+    ),
+    punkRiff: PunkRiffTrailConfig(
+      coreWidth: 0.88,
+      pinkMassOpacity: 0.82,
+      yellowBoltFrequency: 0.42,
+      paperFragmentFrequency: 0.33,
+      inkSplashFrequency: 0.26,
+      iconStampFrequency: 0.28,
+      iconStampSpacing: 0.6,
+      iconStampLifetime: 1.05,
+      iconStampScaleMin: 0.2,
+      iconStampScaleMax: 0.34,
+      iconStampOpacity: 0.95,
+      iconStampRotationJitter: 0.22,
+      glitchStrength: 0.2,
+      glitchOffset: 0.09,
+      halftoneOpacity: 0.22,
+      pulseStrength: 0.14,
+      pulseSpeed: 1.9,
+      visualFps: 12,
+    ),
+  );
+
+  static const TrailSkinConfig graffiti = TrailSkinConfig(
+    id: 'trail_graffiti',
+    name: 'GraffitiTrail',
+    renderType: TrailRenderType.graffiti,
+    primaryColor: Color(0xFFFF2EC9),
+    secondaryColor: Color(0xFF22D3EE),
+    thickness: 1.02,
+    opacity: 0.97,
+    glow: true,
+    effectIntensity: 1.12,
+    graffiti: GraffitiTrailConfig(
+      coreWidth: 0.9,
+      sprayParticleFrequency: 0.36,
+      sprayParticleLifetime: 0.64,
+      splashFrequency: 0.26,
+      dripFrequency: 0.18,
+      colorPalette: <Color>[
+        Color(0xFFFF2EC9),
+        Color(0xFF22D3EE),
+        Color(0xFFFFE84A),
+        Color(0xFFA3FF12),
+        Color(0xFFF8FAFC),
+      ],
+    ),
+  );
+
+  static const TrailSkinConfig halftoneExplosion = TrailSkinConfig(
+    id: 'trail_halftone_explosion',
+    name: 'HalftoneExplosionTrail',
+    renderType: TrailRenderType.halftoneExplosion,
+    primaryColor: Color(0xFFFFE84A),
+    secondaryColor: Color(0xFFFF3B30),
+    thickness: 1.0,
+    opacity: 0.98,
+    glow: true,
+    effectIntensity: 1.1,
+    halftoneExplosion: HalftoneExplosionTrailConfig(
+      coreWidth: 0.9,
+      halftoneSize: 0.042,
+      burstFrequency: 0.25,
+      burstLifetime: 0.6,
+      impactFlashFrequency: 0.22,
+    ),
+  );
+
+  static const TrailSkinConfig stickerBomb = TrailSkinConfig(
+    id: 'trail_sticker_bomb',
+    name: 'StickerBombTrail',
+    renderType: TrailRenderType.stickerBomb,
+    primaryColor: Color(0xFFFF4FD8),
+    secondaryColor: Color(0xFF22D3EE),
+    thickness: 0.98,
+    opacity: 0.98,
+    glow: true,
+    effectIntensity: 1.1,
+    stickerBomb: StickerBombTrailConfig(
+      coreWidth: 0.88,
+      stickerFrequency: 0.3,
+      stickerLifetime: 0.76,
+      rotationVariance: 0.45,
+      scaleVariance: 0.28,
+    ),
+  );
+
+  static const TrailSkinConfig glitchPrint = TrailSkinConfig(
+    id: 'trail_glitch_print',
+    name: 'GlitchPrintTrail',
+    renderType: TrailRenderType.glitchPrint,
+    primaryColor: Color(0xFFF8FAFC),
+    secondaryColor: Color(0xFF0F172A),
+    thickness: 0.92,
+    opacity: 0.98,
+    glow: true,
+    effectIntensity: 1.08,
+    visualStepFps: 14,
+    glitchPrint: GlitchPrintTrailConfig(
+      coreWidth: 0.84,
+      glitchOffset: 0.09,
+      rgbShift: 0.065,
+      fragmentFrequency: 0.36,
+      fragmentSize: 0.085,
+      noiseIntensity: 0.24,
+    ),
+  );
+
+  static const TrailSkinConfig web = TrailSkinConfig(
+    id: 'trail_web',
+    name: 'WebTrail',
+    renderType: TrailRenderType.web,
+    primaryColor: Color(0xFFEAF3FF),
+    secondaryColor: Color(0xFFBFD4EE),
+    thickness: 0.88,
+    opacity: 0.9,
+    glow: true,
+    effectIntensity: 0.95,
+    web: WebTrailConfig(
+      mainStrandWidth: 0.19,
+      strandGap: 0.19,
+      bridgeSpacing: 0.33,
+      bridgeJitter: 0.11,
+      bridgeOpacity: 0.52,
+      strandOpacity: 0.88,
+      highlightStrength: 0.32,
+    ),
+  );
+
+  static const TrailSkinConfig inkBrush = TrailSkinConfig(
+    id: 'trail_ink_brush',
+    name: 'InkBrushTrail',
+    renderType: TrailRenderType.inkBrush,
+    primaryColor: Color(0xFF121218),
+    secondaryColor: Color(0xFF2C2F39),
+    thickness: 1.02,
+    opacity: 0.95,
+    glow: false,
+    effectIntensity: 1.0,
+    ink: InkBrushTrailConfig(
+      baseWidth: 0.96,
+      widthVariance: 0.28,
+      edgeRoughness: 0.08,
+      splatterRate: 0.2,
+    ),
+  );
+
+  static const TrailSkinConfig inkBrushCrimson = TrailSkinConfig(
+    id: 'trail_ink_brush_crimson',
+    name: 'InkBrush Crimson',
+    renderType: TrailRenderType.inkBrush,
+    primaryColor: Color(0xFF3B0C14),
+    secondaryColor: Color(0xFF7A1025),
+    thickness: 1.02,
+    opacity: 0.95,
+    glow: false,
+    effectIntensity: 1.0,
+    ink: InkBrushTrailConfig(
+      baseWidth: 0.96,
+      widthVariance: 0.28,
+      edgeRoughness: 0.08,
+      splatterRate: 0.2,
+    ),
+  );
+
+  static const TrailSkinConfig electricArc = TrailSkinConfig(
+    id: 'trail_electric_arc',
+    name: 'ElectricArcTrail',
+    renderType: TrailRenderType.electricArc,
+    primaryColor: Color(0xFFA6B8FF),
+    secondaryColor: Color(0xFF5D7DFF),
+    thickness: 0.9,
+    opacity: 1.0,
+    glow: true,
+    effectIntensity: 1.18,
+    arc: ElectricArcTrailConfig(
+      mainWidth: 0.76,
+      glowStrength: 0.64,
+      branchFrequency: 0.36,
+      branchLength: 0.22,
+      sparkFrequency: 0.33,
+    ),
+    particle: TrailParticleConfig(
+      enabled: true,
+      count: 12,
+      minRadius: 1.0,
+      maxRadius: 2.4,
+      lifetimeSeconds: 0.45,
+      spread: 7,
+      jitter: 0.45,
+      speed: 1.45,
+    ),
+  );
+
+  static const TrailSkinConfig goldenThread = TrailSkinConfig(
+    id: 'trail_golden_thread',
+    name: 'GoldenThreadTrail',
+    renderType: TrailRenderType.goldenThread,
+    primaryColor: Color(0xFFFFC94A),
+    secondaryColor: Color(0xFF9D6A00),
+    thickness: 0.82,
+    opacity: 0.98,
+    glow: true,
+    effectIntensity: 1.0,
+    golden: GoldenThreadTrailConfig(
+      threadWidth: 0.74,
+      highlightStrength: 0.44,
+      glowOpacity: 0.24,
+      sparkleFrequency: 0.16,
+    ),
+    particle: TrailParticleConfig(
+      enabled: true,
+      count: 8,
+      minRadius: 0.9,
+      maxRadius: 2.0,
+      lifetimeSeconds: 0.7,
+      spread: 5,
+      jitter: 0.3,
+      speed: 0.7,
+    ),
+  );
+
+  static const TrailSkinConfig goldenAura = TrailSkinConfig(
+    id: 'trail_golden_aura',
+    name: 'GoldenAuraTrail',
+    renderType: TrailRenderType.goldenAura,
+    primaryColor: Color(0xFFFFD84F),
+    secondaryColor: Color(0xFFFFB300),
+    thickness: 0.94,
+    opacity: 0.98,
+    glow: true,
+    effectIntensity: 1.15,
+    aura: GoldenAuraTrailConfig(
+      coreWidth: 0.7,
+      auraWidth: 1.22,
+      glowWidth: 1.95,
+      pulseStrength: 0.2,
+      pulseSpeed: 1.95,
+      edgeNoiseAmount: 0.12,
+      edgeNoiseSpeed: 1.7,
+      sparkFrequency: 0.3,
+      sparkLifetime: 0.75,
+      sparkRiseSpeed: 0.82,
+      coreColor: Color(0xFFFFF9DE),
+      auraColor: Color(0xFFFFD84F),
+      glowColor: Color(0xFFFFB300),
+    ),
+    particle: TrailParticleConfig(
+      enabled: true,
+      count: 14,
+      minRadius: 1.1,
+      maxRadius: 2.8,
+      lifetimeSeconds: 0.8,
+      spread: 8,
+      jitter: 0.46,
+      speed: 0.92,
+    ),
+  );
+
+  static const TrailSkinConfig holidaySpark = TrailSkinConfig(
+    id: 'trail_holiday_spark',
+    name: 'HolidaySparkTrail',
+    renderType: TrailRenderType.holidaySpark,
+    primaryColor: Color(0xFFC1121F),
+    secondaryColor: Color(0xFF2E7D32),
+    thickness: 0.92,
+    opacity: 0.97,
+    glow: true,
+    effectIntensity: 1.08,
+    holidaySpark: HolidaySparkTrailConfig(
+      coreWidth: 0.74,
+      glowWidth: 1.54,
+      sparkleFrequency: 0.22,
+      sparkleLifetime: 0.58,
+      ornamentDotFrequency: 0.14,
+      pulseStrength: 0.12,
+      pulseSpeed: 1.68,
+      coreColor: Color(0xFFC1121F),
+      glowColor: Color(0xFFFFE6A0),
+      sparkleColors: <Color>[
+        Color(0xFFFFF4D2),
+        Color(0xFFFFD166),
+        Color(0xFFDA1E37),
+        Color(0xFF2E7D32),
+      ],
+    ),
+  );
+
+  static const TrailSkinConfig upside = TrailSkinConfig(
+    id: 'trail_upside',
+    name: 'UpsideTrail',
+    renderType: TrailRenderType.upside,
+    primaryColor: Color(0xFF16070A),
+    secondaryColor: Color(0xFF9D1121),
+    thickness: 0.94,
+    opacity: 0.97,
+    glow: true,
+    effectIntensity: 1.1,
+    upside: UpsideTrailConfig(
+      coreWidth: 0.72,
+      auraWidth: 1.2,
+      glowWidth: 1.86,
+      pulseStrength: 0.14,
+      pulseSpeed: 1.45,
+      redBoltFrequency: 0.28,
+      redBoltLength: 0.21,
+      sporeFrequency: 0.22,
+      sporeLifetime: 0.92,
+      coreColor: Color(0xFF16070A),
+      auraColor: Color(0xFF4A0C16),
+      glowColor: Color(0xFF9D1121),
+      boltColor: Color(0xFFFF3B4D),
+    ),
+  );
+
+  static const TrailSkinConfig binaryRain = TrailSkinConfig(
+    id: 'trail_binary_rain',
+    name: 'BinaryRainTrail',
+    renderType: TrailRenderType.binaryRain,
+    primaryColor: Color(0xFF031B12),
+    secondaryColor: Color(0xFF22C55E),
+    thickness: 0.9,
+    opacity: 0.98,
+    glow: true,
+    effectIntensity: 1.06,
+    binaryRain: BinaryRainTrailConfig(
+      coreWidth: 0.74,
+      glowWidth: 1.44,
+      binaryDensity: 0.34,
+      binarySpeed: 2.0,
+      binaryOpacity: 0.74,
+      digitalFragmentFrequency: 0.25,
+      fragmentLifetime: 0.56,
+      pulseStrength: 0.11,
+      pulseSpeed: 1.72,
+      coreColor: Color(0xFF031B12),
+      glowColor: Color(0xFF22C55E),
+      binaryColor: Color(0xFF7DFFB3),
+    ),
+  );
+
+  static const List<TrailSkinConfig> all = <TrailSkinConfig>[
+    classic,
+    smokeTrail,
+    fire,
+    laser,
+    plasma,
+    glitch,
+    inkLiquid,
+    magma,
+    ice,
+    galaxy,
+    speedForce,
+    sith,
+    comic,
+    punkRiff,
+    graffiti,
+    halftoneExplosion,
+    stickerBomb,
+    glitchPrint,
+    web,
+    inkBrush,
+    inkBrushCrimson,
+    electricArc,
+    goldenThread,
+    goldenAura,
+    holidaySpark,
+    upside,
+    binaryRain,
+  ];
+
+  static TrailSkinConfig resolveByTrailId(String trailId) {
+    for (final trail in all) {
+      if (trail.id == trailId) return trail;
+    }
+    return classic;
+  }
+
+  static TrailSkinConfig resolveForCosmeticId(String cosmeticId) {
+    switch (cosmeticId) {
+      case 'pointer_pig_vader':
+        return fire;
+      case 'pointer_neon':
+      case 'pointer_comet':
+      case 'pointer_crystal':
+        return laser;
+      default:
+        return classic;
+    }
+  }
+}

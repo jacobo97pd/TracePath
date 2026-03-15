@@ -1,0 +1,122 @@
+{
+  "id": "bulk_roman_169",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 2,
+      "y": 3
+    },
+    {
+      "n": 2,
+      "x": 5,
+      "y": 5
+    },
+    {
+      "n": 3,
+      "x": 5,
+      "y": 0
+    },
+    {
+      "n": 4,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "n": 5,
+      "x": 0,
+      "y": 5
+    },
+    {
+      "n": 6,
+      "x": 1,
+      "y": 3
+    },
+    {
+      "n": 7,
+      "x": 3,
+      "y": 2
+    },
+    {
+      "n": 8,
+      "x": 4,
+      "y": 4
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "len": 1
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 4
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "len": 4
+      }
+    ]
+  },
+  "meta": {
+    "variant": "roman",
+    "sequence_rule": "I, II, III...",
+    "difficulty_target": "medium",
+    "representation": "roman",
+    "display_labels": {
+      "1": "I",
+      "2": "II",
+      "3": "III",
+      "4": "IV",
+      "5": "V",
+      "6": "VI",
+      "7": "VII",
+      "8": "VIII"
+    },
+    "source_level_id": "all-127",
+    "roman_max_value": 8,
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 169
+  },
+  "metrics": {
+    "variant": "roman",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 8,
+    "clue_density": 0.2222,
+    "sequence_length": 8,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "roman",
+    "difficulty_estimate": "medium",
+    "turns": 15,
+    "max_straight": 5,
+    "avg_straight": 2.19,
+    "corners": 4,
+    "borders": 0,
+    "inners": 4,
+    "num_walls": 12,
+    "roman_max_value": 8
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "id": "bulk_roman_056",
+  "size": 7,
+  "clues": [],
+  "walls": {
+    "h": [],
+    "v": []
+  },
+  "meta": {
+    "variant": "roman",
+    "sequence_rule": "I, II, III...",
+    "difficulty_target": "easy",
+    "representation": "roman",
+    "display_labels": {},
+    "source_level_id": "all-404",
+    "roman_max_value": 0,
+    "generation_batch": "bulk_variant_pack_100_each",
+    "generation_index": 56
+  },
+  "metrics": {
+    "variant": "roman",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 0,
+    "clue_density": 0.0,
+    "sequence_length": 0,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "roman",
+    "difficulty_estimate": "easy",
+    "turns": 0,
+    "max_straight": 0,
+    "avg_straight": 0.0,
+    "corners": 0,
+    "borders": 0,
+    "inners": 0,
+    "num_walls": 0,
+    "roman_max_value": 0
+  }
+}

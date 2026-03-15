@@ -1,0 +1,146 @@
+{
+  "id": "bulk_multiples_roman_047",
+  "size": 7,
+  "clues": [
+    {
+      "n": 1,
+      "x": 5,
+      "y": 5
+    },
+    {
+      "n": 2,
+      "x": 5,
+      "y": 6
+    },
+    {
+      "n": 3,
+      "x": 2,
+      "y": 6
+    },
+    {
+      "n": 4,
+      "x": 0,
+      "y": 5
+    },
+    {
+      "n": 5,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "n": 6,
+      "x": 0,
+      "y": 1
+    },
+    {
+      "n": 7,
+      "x": 2,
+      "y": 0
+    },
+    {
+      "n": 8,
+      "x": 5,
+      "y": 0
+    },
+    {
+      "n": 9,
+      "x": 6,
+      "y": 2
+    },
+    {
+      "n": 10,
+      "x": 5,
+      "y": 4
+    },
+    {
+      "n": 11,
+      "x": 5,
+      "y": 1
+    },
+    {
+      "n": 12,
+      "x": 2,
+      "y": 1
+    },
+    {
+      "n": 13,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "n": 14,
+      "x": 2,
+      "y": 3
+    },
+    {
+      "n": 15,
+      "x": 1,
+      "y": 5
+    },
+    {
+      "n": 16,
+      "x": 4,
+      "y": 5
+    },
+    {
+      "n": 17,
+      "x": 4,
+      "y": 2
+    }
+  ],
+  "walls": {
+    "h": [],
+    "v": []
+  },
+  "meta": {
+    "variant": "multiples_roman",
+    "sequence_rule": "roman multiples of 4",
+    "difficulty_target": "easy",
+    "representation": "multiple_roman",
+    "display_labels": {
+      "1": "IV",
+      "2": "VIII",
+      "3": "XII",
+      "4": "XVI",
+      "5": "XX",
+      "6": "XXIV",
+      "7": "XXVIII",
+      "8": "XXXII",
+      "9": "XXXVI",
+      "10": "XL",
+      "11": "XLIV",
+      "12": "XLVIII",
+      "13": "LII",
+      "14": "LVI",
+      "15": "LX",
+      "16": "LXIV",
+      "17": "LXVIII"
+    },
+    "source_level_id": "all-228",
+    "multiple_base": 4,
+    "roman_max_value": 68,
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 47
+  },
+  "metrics": {
+    "variant": "multiples_roman",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 17,
+    "clue_density": 0.3469,
+    "sequence_length": 17,
+    "sequence_start": 4,
+    "sequence_step": 4,
+    "representation": "multiple_roman",
+    "difficulty_estimate": "easy",
+    "turns": 21,
+    "max_straight": 6,
+    "avg_straight": 2.18,
+    "corners": 0,
+    "borders": 8,
+    "inners": 9,
+    "num_walls": 0,
+    "multiple_base": 4,
+    "roman_max_value": 68
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "id": "bulk_multiples_050",
+  "size": 7,
+  "clues": [
+    {
+      "n": 1,
+      "x": 0,
+      "y": 6
+    },
+    {
+      "n": 2,
+      "x": 2,
+      "y": 3
+    },
+    {
+      "n": 3,
+      "x": 4,
+      "y": 6
+    },
+    {
+      "n": 4,
+      "x": 2,
+      "y": 5
+    },
+    {
+      "n": 5,
+      "x": 2,
+      "y": 1
+    },
+    {
+      "n": 6,
+      "x": 4,
+      "y": 0
+    },
+    {
+      "n": 7,
+      "x": 5,
+      "y": 4
+    },
+    {
+      "n": 8,
+      "x": 4,
+      "y": 4
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 4
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "len": 4
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 3,
+        "len": 3
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "len": 3
+      }
+    ]
+  },
+  "meta": {
+    "variant": "multiples",
+    "sequence_rule": "multiples of 3",
+    "difficulty_target": "hard",
+    "representation": "multiple",
+    "display_labels": {
+      "1": "3",
+      "2": "6",
+      "3": "9",
+      "4": "12",
+      "5": "15",
+      "6": "18",
+      "7": "21",
+      "8": "24"
+    },
+    "source_level_id": "all-204",
+    "multiple_base": 3,
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 50
+  },
+  "metrics": {
+    "variant": "multiples",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 8,
+    "clue_density": 0.1633,
+    "sequence_length": 8,
+    "sequence_start": 3,
+    "sequence_step": 3,
+    "representation": "multiple",
+    "difficulty_estimate": "hard",
+    "turns": 18,
+    "max_straight": 6,
+    "avg_straight": 2.53,
+    "corners": 1,
+    "borders": 2,
+    "inners": 5,
+    "num_walls": 18,
+    "multiple_base": 3
+  }
+}

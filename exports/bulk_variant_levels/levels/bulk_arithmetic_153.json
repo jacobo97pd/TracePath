@@ -1,0 +1,139 @@
+{
+  "id": "bulk_arithmetic_153",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 4,
+      "y": 2
+    },
+    {
+      "n": 2,
+      "x": 5,
+      "y": 1
+    },
+    {
+      "n": 3,
+      "x": 5,
+      "y": 5
+    },
+    {
+      "n": 4,
+      "x": 1,
+      "y": 5
+    },
+    {
+      "n": 5,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 6,
+      "x": 4,
+      "y": 3
+    },
+    {
+      "n": 7,
+      "x": 0,
+      "y": 3
+    },
+    {
+      "n": 8,
+      "x": 1,
+      "y": 0
+    },
+    {
+      "n": 9,
+      "x": 3,
+      "y": 2
+    },
+    {
+      "n": 10,
+      "x": 2,
+      "y": 1
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 2,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "len": 4
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "len": 2
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 2
+      },
+      {
+        "x": 4,
+        "y": 0,
+        "len": 3
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "len": 2
+      }
+    ]
+  },
+  "meta": {
+    "variant": "arithmetic",
+    "sequence_rule": "simple arithmetic expressions",
+    "difficulty_target": "medium",
+    "representation": "arithmetic",
+    "display_labels": {
+      "1": "1+0",
+      "2": "2+0",
+      "3": "3+0",
+      "4": "7-3",
+      "5": "2+3",
+      "6": "8-2",
+      "7": "6+1",
+      "8": "10-2",
+      "9": "6+3",
+      "10": "6+4"
+    },
+    "source_level_id": "all-50",
+    "arithmetic_mode": "mixed",
+    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_index": 153
+  },
+  "metrics": {
+    "variant": "arithmetic",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 10,
+    "clue_density": 0.2778,
+    "sequence_length": 10,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "arithmetic",
+    "difficulty_estimate": "medium",
+    "turns": 13,
+    "max_straight": 5,
+    "avg_straight": 2.5,
+    "corners": 1,
+    "borders": 4,
+    "inners": 5,
+    "num_walls": 15,
+    "arithmetic_mode": "mixed"
+  }
+}
