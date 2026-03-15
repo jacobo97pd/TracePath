@@ -45,3 +45,17 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Secrets / local config
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+.env
+.env.*
+key.properties
+android/key.properties
+*.jks
+*.keystore
+build/
+.dart_tool/
+ios/Pods/
+android/.gradle/
