@@ -1,76 +1,50 @@
 {
   "id": "bulk_alphabet_010",
-  "size": 6,
+  "size": 7,
   "clues": [
     {
       "n": 1,
-      "x": 4,
-      "y": 2
+      "x": 3,
+      "y": 3
     },
     {
       "n": 2,
+      "x": 0,
+      "y": 5
+    },
+    {
+      "n": 3,
+      "x": 3,
+      "y": 1
+    },
+    {
+      "n": 4,
+      "x": 4,
+      "y": 5
+    },
+    {
+      "n": 5,
       "x": 5,
       "y": 4
     },
     {
-      "n": 3,
-      "x": 0,
-      "y": 4
-    },
-    {
-      "n": 4,
-      "x": 1,
-      "y": 2
-    },
-    {
-      "n": 5,
-      "x": 0,
-      "y": 0
-    },
-    {
       "n": 6,
-      "x": 4,
+      "x": 5,
+      "y": 1
+    },
+    {
+      "n": 7,
+      "x": 0,
+      "y": 1
+    },
+    {
+      "n": 8,
+      "x": 1,
       "y": 1
     }
   ],
   "walls": {
-    "h": [
-      {
-        "x": 1,
-        "y": 1,
-        "len": 4
-      },
-      {
-        "x": 1,
-        "y": 2,
-        "len": 1
-      },
-      {
-        "x": 4,
-        "y": 2,
-        "len": 1
-      },
-      {
-        "x": 1,
-        "y": 3,
-        "len": 4
-      },
-      {
-        "x": 1,
-        "y": 4,
-        "len": 1
-      },
-      {
-        "x": 4,
-        "y": 4,
-        "len": 1
-      },
-      {
-        "x": 1,
-        "y": 5,
-        "len": 4
-      }
-    ],
+    "h": [],
     "v": []
   },
   "meta": {
@@ -84,31 +58,33 @@
       "3": "E",
       "4": "F",
       "5": "G",
-      "6": "H"
+      "6": "H",
+      "7": "I",
+      "8": "J"
     },
-    "source_level_id": "all-369",
+    "source_level_id": "all-384",
     "alphabet_start_char": "C",
-    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_batch": "bulk_variant_pack_100_each",
     "generation_index": 10
   },
   "metrics": {
     "variant": "alphabet",
-    "grid_size": 6,
-    "path_length": 36,
-    "num_clues": 6,
-    "clue_density": 0.1667,
-    "sequence_length": 6,
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 8,
+    "clue_density": 0.1633,
+    "sequence_length": 8,
     "sequence_start": 1,
     "sequence_step": 1,
     "representation": "alphabet",
     "difficulty_estimate": "hard",
-    "turns": 18,
-    "max_straight": 5,
-    "avg_straight": 1.84,
-    "corners": 1,
+    "turns": 24,
+    "max_straight": 4,
+    "avg_straight": 1.92,
+    "corners": 0,
     "borders": 2,
-    "inners": 3,
-    "num_walls": 16,
+    "inners": 6,
+    "num_walls": 0,
     "alphabet_start_char": "C"
   }
 }

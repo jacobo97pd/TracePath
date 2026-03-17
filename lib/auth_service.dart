@@ -68,11 +68,13 @@ class AuthService extends ChangeNotifier {
 
   Future<String?> signInWithGoogle() async {
     try {
+      debugPrint('TRACE google sign in start');
       if (kIsWeb) {
         final provider = GoogleAuthProvider()
           ..setCustomParameters({'prompt': 'select_account'});
         final credential = await _firebaseAuth.signInWithPopup(provider);
         final user = credential.user;
+        debugPrint('TRACE web popup user: ${user?.uid}');
         if (user == null) return 'Google login failed';
         _mode = AuthMode.google;
         _displayName = user.displayName ?? user.email?.split('@').first ?? 'Player';
@@ -80,14 +82,21 @@ class AuthService extends ChangeNotifier {
         _avatarUrl = user.photoURL;
       } else {
         final account = await _googleSignIn.signIn();
-        if (account == null) return 'Login canceled';
+        debugPrint('TRACE googleUser: $account');
+        if (account == null) {
+          debugPrint('TRACE google sign in cancelled by user');
+          return 'Login canceled';
+        }
         final auth = await account.authentication;
+        debugPrint('TRACE accessToken: ${auth.accessToken != null}');
+        debugPrint('TRACE idToken: ${auth.idToken != null}');
         final credential = GoogleAuthProvider.credential(
           accessToken: auth.accessToken,
           idToken: auth.idToken,
         );
         final result = await _firebaseAuth.signInWithCredential(credential);
         final user = result.user;
+        debugPrint('TRACE firebase sign in OK: ${user?.uid}');
         _mode = AuthMode.google;
         _displayName = user?.displayName ?? account.displayName ?? account.email.split('@').first;
         _email = user?.email ?? account.email;
@@ -96,7 +105,9 @@ class AuthService extends ChangeNotifier {
       await _persist();
       notifyListeners();
       return null;
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('TRACE google sign in ERROR: $e');
+      debugPrint('TRACE google sign in STACK: $st');
       return 'Google login failed: $e';
     }
   }

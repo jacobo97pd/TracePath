@@ -52,6 +52,14 @@ class InboxService {
         );
   }
 
+  Stream<int> watchUnreadCount({String? uid}) async* {
+    final targetUid = (uid ?? '').trim().isEmpty ? await _requireUid() : uid!.trim();
+    yield* _inboxRef(targetUid)
+        .where('read', isEqualTo: false)
+        .snapshots()
+        .map((snap) => snap.docs.length);
+  }
+
   Future<void> markAsRead({
     required String uid,
     required String messageId,
@@ -97,6 +105,7 @@ class InboxService {
     switch (value) {
       case 'friend_request':
       case 'friend_accept':
+      case 'level_challenge':
       case 'system_news':
         return value;
       default:

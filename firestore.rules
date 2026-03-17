@@ -45,7 +45,8 @@ service cloud.firestore {
             request.resource.data.fromUid == request.auth.uid &&
             (
               request.resource.data.type == 'friend_request' ||
-              request.resource.data.type == 'friend_accept'
+              request.resource.data.type == 'friend_accept' ||
+              request.resource.data.type == 'level_challenge'
             )
           )
         );

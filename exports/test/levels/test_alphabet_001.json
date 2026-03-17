@@ -1,0 +1,144 @@
+{
+  "id": "test_alphabet_001",
+  "size": 5,
+  "clues": [
+    {
+      "n": 1,
+      "x": 4,
+      "y": 4
+    },
+    {
+      "n": 2,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "n": 3,
+      "x": 2,
+      "y": 3
+    },
+    {
+      "n": 4,
+      "x": 0,
+      "y": 3
+    },
+    {
+      "n": 5,
+      "x": 3,
+      "y": 2
+    },
+    {
+      "n": 6,
+      "x": 3,
+      "y": 1
+    },
+    {
+      "n": 7,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "n": 8,
+      "x": 4,
+      "y": 0
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 2,
+        "y": 1,
+        "len": 2
+      },
+      {
+        "x": 0,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "len": 1
+      }
+    ],
+    "v": [
+      {
+        "x": 2,
+        "y": 4,
+        "len": 1
+      }
+    ]
+  },
+  "solution": [
+    24,
+    19,
+    18,
+    23,
+    22,
+    17,
+    16,
+    21,
+    20,
+    15,
+    10,
+    11,
+    12,
+    13,
+    14,
+    9,
+    8,
+    7,
+    6,
+    5,
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "meta": {
+    "variant": "alphabet",
+    "sequence_rule": "A, B, C...",
+    "difficulty_target": "easy",
+    "representation": "alphabet",
+    "display_labels": {
+      "1": "A",
+      "2": "B",
+      "3": "C",
+      "4": "D",
+      "5": "E",
+      "6": "F",
+      "7": "G",
+      "8": "H"
+    },
+    "source_level_id": "generated_alphabet_001",
+    "alphabet_start_char": "A",
+    "generation_batch": "test_variant_pack_5_each",
+    "generation_index": 1
+  },
+  "metrics": {
+    "variant": "alphabet",
+    "grid_size": 5,
+    "path_length": 25,
+    "num_clues": 8,
+    "clue_density": 0.32,
+    "sequence_length": 8,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "alphabet",
+    "difficulty_estimate": "easy",
+    "turns": 13,
+    "max_straight": 4,
+    "avg_straight": 1.71,
+    "corners": 3,
+    "borders": 1,
+    "inners": 4,
+    "num_walls": 6,
+    "alphabet_start_char": "A"
+  }
+}

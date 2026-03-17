@@ -1,0 +1,2001 @@
+{
+  "packId": "world_17",
+  "version": "pack_world_17_v1",
+  "count": 17,
+  "world": 17,
+  "levels": [
+    {
+      "id": "linkedin-editor-103",
+      "size": {
+        "w": 7,
+        "h": 7
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 2,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 3,
+          "x": 6,
+          "y": 2
+        },
+        {
+          "n": 4,
+          "x": 4,
+          "y": 0
+        },
+        {
+          "n": 5,
+          "x": 0,
+          "y": 4
+        },
+        {
+          "n": 6,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 7,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 8,
+          "x": 1,
+          "y": 5
+        },
+        {
+          "n": 9,
+          "x": 2,
+          "y": 6
+        },
+        {
+          "n": 10,
+          "x": 4,
+          "y": 4
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d2",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "dabca79006073b5440de76b42db941afa5b91add09c23ce78d8ae29087568136",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "dabca79006073b5440de76b42db941afa5b91add09c23ce78d8ae29087568136",
+        "difficulty_rebalanced_from": "d2",
+        "difficulty_score": 4.5465
+      },
+      "solution": [
+        40,
+        39,
+        38,
+        31,
+        24,
+        25,
+        26,
+        27,
+        20,
+        13,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1,
+        0,
+        7,
+        14,
+        21,
+        28,
+        29,
+        22,
+        15,
+        8,
+        9,
+        10,
+        11,
+        12,
+        19,
+        18,
+        17,
+        16,
+        23,
+        30,
+        37,
+        36,
+        35,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        41,
+        34,
+        33,
+        32
+      ]
+    },
+    {
+      "id": "linkedin-editor-13",
+      "size": {
+        "w": 7,
+        "h": 7
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 3,
+          "y": 5
+        },
+        {
+          "n": 2,
+          "x": 4,
+          "y": 5
+        },
+        {
+          "n": 3,
+          "x": 5,
+          "y": 3
+        },
+        {
+          "n": 4,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 5,
+          "x": 5,
+          "y": 4
+        },
+        {
+          "n": 6,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 7,
+          "x": 2,
+          "y": 5
+        },
+        {
+          "n": 8,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 9,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 10,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 11,
+          "x": 1,
+          "y": 2
+        },
+        {
+          "n": 12,
+          "x": 1,
+          "y": 5
+        },
+        {
+          "n": 13,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 14,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 15,
+          "x": 2,
+          "y": 1
+        },
+        {
+          "n": 16,
+          "x": 3,
+          "y": 1
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d2",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "65a772d2e57a6b2bf944f1c131459d6bc9099e69b66b65715c025d0670adc52f",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "65a772d2e57a6b2bf944f1c131459d6bc9099e69b66b65715c025d0670adc52f",
+        "difficulty_rebalanced_from": "d2",
+        "difficulty_score": 2.3424
+      },
+      "solution": [
+        38,
+        39,
+        32,
+        25,
+        26,
+        19,
+        20,
+        27,
+        34,
+        33,
+        40,
+        41,
+        48,
+        47,
+        46,
+        45,
+        44,
+        37,
+        30,
+        31,
+        24,
+        17,
+        18,
+        11,
+        12,
+        13,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1,
+        0,
+        7,
+        8,
+        15,
+        14,
+        21,
+        28,
+        35,
+        42,
+        43,
+        36,
+        29,
+        22,
+        23,
+        16,
+        9,
+        10
+      ]
+    },
+    {
+      "id": "linkedin-editor-57",
+      "size": {
+        "w": 8,
+        "h": 8
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 0
+        },
+        {
+          "n": 2,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 3,
+          "x": 4,
+          "y": 6
+        },
+        {
+          "n": 4,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 5,
+          "x": 6,
+          "y": 4
+        },
+        {
+          "n": 6,
+          "x": 6,
+          "y": 7
+        },
+        {
+          "n": 7,
+          "x": 2,
+          "y": 5
+        },
+        {
+          "n": 8,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 9,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 10,
+          "x": 2,
+          "y": 2
+        }
+      ],
+      "walls": [
+        {
+          "cell1": 13,
+          "cell2": 21
+        },
+        {
+          "cell1": 14,
+          "cell2": 15
+        },
+        {
+          "cell1": 14,
+          "cell2": 22
+        },
+        {
+          "cell1": 20,
+          "cell2": 21
+        },
+        {
+          "cell1": 27,
+          "cell2": 35
+        },
+        {
+          "cell1": 28,
+          "cell2": 29
+        },
+        {
+          "cell1": 28,
+          "cell2": 36
+        },
+        {
+          "cell1": 34,
+          "cell2": 35
+        },
+        {
+          "cell1": 41,
+          "cell2": 49
+        },
+        {
+          "cell1": 42,
+          "cell2": 43
+        },
+        {
+          "cell1": 42,
+          "cell2": 50
+        },
+        {
+          "cell1": 48,
+          "cell2": 49
+        }
+      ],
+      "difficultyTag": "d4",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "98a609ad72da18d47f38425b6d30a56088d27f8c04a17cb32e960b9016b497b1",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "98a609ad72da18d47f38425b6d30a56088d27f8c04a17cb32e960b9016b497b1",
+        "difficulty_rebalanced_from": "d4",
+        "difficulty_score": 8.4504
+      },
+      "solution": [
+        1,
+        0,
+        8,
+        16,
+        24,
+        32,
+        40,
+        48,
+        56,
+        57,
+        49,
+        50,
+        58,
+        59,
+        60,
+        61,
+        53,
+        45,
+        44,
+        52,
+        51,
+        43,
+        35,
+        36,
+        37,
+        29,
+        21,
+        22,
+        30,
+        38,
+        46,
+        54,
+        62,
+        63,
+        55,
+        47,
+        39,
+        31,
+        23,
+        15,
+        7,
+        6,
+        14,
+        13,
+        5,
+        4,
+        12,
+        20,
+        28,
+        27,
+        26,
+        34,
+        42,
+        41,
+        33,
+        25,
+        17,
+        9,
+        10,
+        2,
+        3,
+        11,
+        19,
+        18
+      ]
+    },
+    {
+      "id": "linkedin-editor-334",
+      "size": {
+        "w": 7,
+        "h": 7
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 6,
+          "y": 6
+        },
+        {
+          "n": 3,
+          "x": 1,
+          "y": 5
+        },
+        {
+          "n": 4,
+          "x": 5,
+          "y": 3
+        },
+        {
+          "n": 5,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "n": 6,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 7,
+          "x": 1,
+          "y": 3
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d3",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "19d4915d4c7ab91e30d8b6da356129e0399ce239edd87dcd48704f13f6e18580",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "19d4915d4c7ab91e30d8b6da356129e0399ce239edd87dcd48704f13f6e18580",
+        "difficulty_rebalanced_from": "d3",
+        "difficulty_score": 5.6486
+      }
+    },
+    {
+      "id": "linkedin-editor-349",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 2,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 4,
+          "x": 3,
+          "y": 4
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d3",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "cb52905d5552187e104c0e76953ae6aee1c7a78b67b94e62910c42ff2af8d2a7",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "cb52905d5552187e104c0e76953ae6aee1c7a78b67b94e62910c42ff2af8d2a7",
+        "difficulty_rebalanced_from": "d3",
+        "difficulty_score": 5.32
+      }
+    },
+    {
+      "id": "all-131",
+      "size": {
+        "w": 7,
+        "h": 7
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 4,
+          "y": 0
+        },
+        {
+          "n": 2,
+          "x": 2,
+          "y": 0
+        },
+        {
+          "n": 3,
+          "x": 6,
+          "y": 0
+        },
+        {
+          "n": 4,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d3",
+      "source": "unified",
+      "source_pack": "pack_all_v1",
+      "source_origin": "unified",
+      "variant": "classic",
+      "canonical_hash": "5ac6c02b1f1b6200ed9867051b2b9a098eff327bd3ba3c60701392cf8af47039",
+      "meta": {
+        "source_pack": "pack_all_v1",
+        "source_origin": "unified",
+        "variant": "classic",
+        "canonical_hash": "5ac6c02b1f1b6200ed9867051b2b9a098eff327bd3ba3c60701392cf8af47039",
+        "difficulty_rebalanced_from": "d3",
+        "difficulty_score": 6.5506
+      },
+      "solution": [
+        4,
+        3,
+        2,
+        1,
+        8,
+        9,
+        10,
+        11,
+        12,
+        5,
+        6,
+        13,
+        20,
+        19,
+        18,
+        17,
+        16,
+        15,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        34,
+        33,
+        32,
+        31,
+        30,
+        29,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        48,
+        47,
+        46,
+        45,
+        44,
+        43,
+        42,
+        35,
+        28,
+        21,
+        14,
+        7,
+        0
+      ]
+    },
+    {
+      "id": "linkedin-editor-302",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 2,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 3,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 4,
+          "x": 5,
+          "y": 3
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d3",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "00434cb2ace6b0a22ab80139339ecd413aee884c0cb895999ef6b3edfbd27dd6",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "00434cb2ace6b0a22ab80139339ecd413aee884c0cb895999ef6b3edfbd27dd6",
+        "difficulty_rebalanced_from": "d3",
+        "difficulty_score": 5.32
+      }
+    },
+    {
+      "id": "linkedin-editor-70",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 2,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 3,
+          "x": 5,
+          "y": 0
+        },
+        {
+          "n": 4,
+          "x": 0,
+          "y": 5
+        },
+        {
+          "n": 5,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 6,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 7,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 8,
+          "x": 4,
+          "y": 1
+        }
+      ],
+      "walls": [
+        {
+          "cell1": 1,
+          "cell2": 7
+        },
+        {
+          "cell1": 4,
+          "cell2": 10
+        },
+        {
+          "cell1": 6,
+          "cell2": 7
+        },
+        {
+          "cell1": 7,
+          "cell2": 8
+        },
+        {
+          "cell1": 9,
+          "cell2": 10
+        },
+        {
+          "cell1": 10,
+          "cell2": 11
+        },
+        {
+          "cell1": 24,
+          "cell2": 25
+        },
+        {
+          "cell1": 25,
+          "cell2": 31
+        },
+        {
+          "cell1": 26,
+          "cell2": 32
+        },
+        {
+          "cell1": 27,
+          "cell2": 33
+        },
+        {
+          "cell1": 28,
+          "cell2": 29
+        },
+        {
+          "cell1": 28,
+          "cell2": 34
+        }
+      ],
+      "difficultyTag": "d4",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "208ea6dc9e203cb301c233a90e33854774f6ff5d5889930db0682e752be3fc31",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "208ea6dc9e203cb301c233a90e33854774f6ff5d5889930db0682e752be3fc31",
+        "difficulty_rebalanced_from": "d4",
+        "difficulty_score": 7.32
+      },
+      "solution": [
+        7,
+        13,
+        12,
+        6,
+        0,
+        1,
+        2,
+        8,
+        14,
+        15,
+        9,
+        3,
+        4,
+        5,
+        11,
+        17,
+        23,
+        29,
+        35,
+        34,
+        33,
+        32,
+        31,
+        30,
+        24,
+        18,
+        19,
+        25,
+        26,
+        20,
+        21,
+        27,
+        28,
+        22,
+        16,
+        10
+      ]
+    },
+    {
+      "id": "linkedin-editor-231",
+      "size": {
+        "w": 7,
+        "h": 7
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 5
+        },
+        {
+          "n": 2,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 3,
+          "x": 5,
+          "y": 4
+        },
+        {
+          "n": 4,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 5,
+          "x": 3,
+          "y": 2
+        },
+        {
+          "n": 6,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 7,
+          "x": 5,
+          "y": 5
+        }
+      ],
+      "walls": [
+        {
+          "cell1": 1,
+          "cell2": 8
+        },
+        {
+          "cell1": 5,
+          "cell2": 12
+        },
+        {
+          "cell1": 7,
+          "cell2": 8
+        },
+        {
+          "cell1": 11,
+          "cell2": 12
+        },
+        {
+          "cell1": 14,
+          "cell2": 15
+        },
+        {
+          "cell1": 15,
+          "cell2": 22
+        },
+        {
+          "cell1": 18,
+          "cell2": 19
+        },
+        {
+          "cell1": 19,
+          "cell2": 26
+        },
+        {
+          "cell1": 24,
+          "cell2": 31
+        },
+        {
+          "cell1": 30,
+          "cell2": 31
+        },
+        {
+          "cell1": 37,
+          "cell2": 38
+        },
+        {
+          "cell1": 38,
+          "cell2": 45
+        }
+      ],
+      "difficultyTag": "d4",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "13407505c81435f190148df2c45fe4063d803cfd5d4bd748b8472aef27a1cf62",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "13407505c81435f190148df2c45fe4063d803cfd5d4bd748b8472aef27a1cf62",
+        "difficulty_rebalanced_from": "d4",
+        "difficulty_score": 8.5057
+      },
+      "solution": [
+        36,
+        43,
+        42,
+        35,
+        28,
+        21,
+        14,
+        7,
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        13,
+        12,
+        19,
+        20,
+        27,
+        26,
+        33,
+        34,
+        41,
+        48,
+        47,
+        46,
+        45,
+        44,
+        37,
+        30,
+        29,
+        22,
+        23,
+        24,
+        17,
+        16,
+        15,
+        8,
+        9,
+        10,
+        11,
+        18,
+        25,
+        32,
+        31,
+        38,
+        39,
+        40
+      ]
+    },
+    {
+      "id": "linkedin-editor-307",
+      "size": {
+        "w": 7,
+        "h": 7
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 2,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 1,
+          "y": 5
+        },
+        {
+          "n": 4,
+          "x": 4,
+          "y": 0
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 6
+        },
+        {
+          "n": 6,
+          "x": 2,
+          "y": 4
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d3",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "773e8316147e2e166531f2118982ab43c64f8358d451cbea281a5d4e867886c0",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "773e8316147e2e166531f2118982ab43c64f8358d451cbea281a5d4e867886c0",
+        "difficulty_rebalanced_from": "d3",
+        "difficulty_score": 6.0159
+      }
+    },
+    {
+      "id": "linkedin-editor-102",
+      "size": {
+        "w": 7,
+        "h": 7
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 0,
+          "y": 6
+        },
+        {
+          "n": 2,
+          "x": 6,
+          "y": 5
+        },
+        {
+          "n": 3,
+          "x": 6,
+          "y": 3
+        },
+        {
+          "n": 4,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 5,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 6,
+          "x": 0,
+          "y": 1
+        },
+        {
+          "n": 7,
+          "x": 6,
+          "y": 0
+        },
+        {
+          "n": 8,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 9,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 10,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 11,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 12,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 13,
+          "x": 3,
+          "y": 3
+        }
+      ],
+      "walls": [
+        {
+          "cell1": 2,
+          "cell2": 9
+        },
+        {
+          "cell1": 3,
+          "cell2": 10
+        },
+        {
+          "cell1": 4,
+          "cell2": 11
+        },
+        {
+          "cell1": 9,
+          "cell2": 16
+        },
+        {
+          "cell1": 10,
+          "cell2": 17
+        },
+        {
+          "cell1": 11,
+          "cell2": 18
+        },
+        {
+          "cell1": 17,
+          "cell2": 24
+        },
+        {
+          "cell1": 24,
+          "cell2": 31
+        },
+        {
+          "cell1": 30,
+          "cell2": 37
+        },
+        {
+          "cell1": 31,
+          "cell2": 38
+        },
+        {
+          "cell1": 32,
+          "cell2": 39
+        },
+        {
+          "cell1": 37,
+          "cell2": 44
+        },
+        {
+          "cell1": 38,
+          "cell2": 45
+        },
+        {
+          "cell1": 39,
+          "cell2": 46
+        }
+      ],
+      "difficultyTag": "d3",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "0a858efecc9751c9b713c84e30bcaff3f5d3a78f177da2ddae767386b2b0e482",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "0a858efecc9751c9b713c84e30bcaff3f5d3a78f177da2ddae767386b2b0e482",
+        "difficulty_rebalanced_from": "d3",
+        "difficulty_score": 6.7778
+      },
+      "solution": [
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        41,
+        34,
+        27,
+        26,
+        33,
+        40,
+        39,
+        38,
+        37,
+        36,
+        35,
+        28,
+        29,
+        22,
+        21,
+        14,
+        7,
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        13,
+        20,
+        19,
+        12,
+        11,
+        10,
+        9,
+        8,
+        15,
+        16,
+        17,
+        18,
+        25,
+        32,
+        31,
+        30,
+        23,
+        24
+      ]
+    },
+    {
+      "id": "linkedin-editor-330",
+      "size": {
+        "w": 7,
+        "h": 7
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 2,
+          "x": 3,
+          "y": 5
+        },
+        {
+          "n": 3,
+          "x": 0,
+          "y": 6
+        },
+        {
+          "n": 4,
+          "x": 6,
+          "y": 3
+        },
+        {
+          "n": 5,
+          "x": 6,
+          "y": 0
+        },
+        {
+          "n": 6,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 7,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 8,
+          "x": 4,
+          "y": 4
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d3",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "f8811a84c79b276927f0d6b3542a245ba60a4cdf593d6aceae48d2ff347e1f99",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "f8811a84c79b276927f0d6b3542a245ba60a4cdf593d6aceae48d2ff347e1f99",
+        "difficulty_rebalanced_from": "d3",
+        "difficulty_score": 5.2812
+      }
+    },
+    {
+      "id": "all-14",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 3,
+          "y": 5
+        },
+        {
+          "n": 3,
+          "x": 5,
+          "y": 0
+        },
+        {
+          "n": 4,
+          "x": 3,
+          "y": 2
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 6,
+          "x": 0,
+          "y": 5
+        },
+        {
+          "n": 7,
+          "x": 2,
+          "y": 1
+        }
+      ],
+      "walls": [
+        {
+          "cell1": 7,
+          "cell2": 8
+        },
+        {
+          "cell1": 8,
+          "cell2": 9
+        },
+        {
+          "cell1": 8,
+          "cell2": 14
+        },
+        {
+          "cell1": 9,
+          "cell2": 10
+        },
+        {
+          "cell1": 25,
+          "cell2": 26
+        }
+      ],
+      "difficultyTag": "d3",
+      "source": "unified",
+      "source_pack": "pack_all_v1",
+      "source_origin": "unified",
+      "variant": "classic",
+      "canonical_hash": "1d00c9d17c3ca8ac8b0f970be7dba9e8d2a03fa8d98830e4b198dde446081147",
+      "meta": {
+        "source_pack": "pack_all_v1",
+        "source_origin": "unified",
+        "variant": "classic",
+        "canonical_hash": "1d00c9d17c3ca8ac8b0f970be7dba9e8d2a03fa8d98830e4b198dde446081147",
+        "difficulty_rebalanced_from": "d3",
+        "difficulty_score": 5.2867
+      },
+      "solution": [
+        21,
+        27,
+        33,
+        34,
+        35,
+        29,
+        28,
+        22,
+        23,
+        17,
+        16,
+        10,
+        11,
+        5,
+        4,
+        3,
+        9,
+        15,
+        14,
+        20,
+        26,
+        32,
+        31,
+        30,
+        24,
+        25,
+        19,
+        18,
+        12,
+        13,
+        7,
+        6,
+        0,
+        1,
+        2,
+        8
+      ]
+    },
+    {
+      "id": "linkedin-editor-19",
+      "size": {
+        "w": 8,
+        "h": 8
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 4,
+          "y": 5
+        },
+        {
+          "n": 2,
+          "x": 4,
+          "y": 6
+        },
+        {
+          "n": 3,
+          "x": 6,
+          "y": 5
+        },
+        {
+          "n": 4,
+          "x": 6,
+          "y": 4
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 1
+        },
+        {
+          "n": 6,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 7,
+          "x": 2,
+          "y": 5
+        },
+        {
+          "n": 8,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 9,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 10,
+          "x": 1,
+          "y": 2
+        },
+        {
+          "n": 11,
+          "x": 3,
+          "y": 2
+        },
+        {
+          "n": 12,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 13,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 14,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 15,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 16,
+          "x": 5,
+          "y": 4
+        },
+        {
+          "n": 17,
+          "x": 5,
+          "y": 6
+        },
+        {
+          "n": 18,
+          "x": 6,
+          "y": 6
+        }
+      ],
+      "walls": [
+        {
+          "cell1": 5,
+          "cell2": 13
+        },
+        {
+          "cell1": 6,
+          "cell2": 14
+        },
+        {
+          "cell1": 19,
+          "cell2": 20
+        },
+        {
+          "cell1": 21,
+          "cell2": 22
+        },
+        {
+          "cell1": 21,
+          "cell2": 29
+        },
+        {
+          "cell1": 22,
+          "cell2": 23
+        },
+        {
+          "cell1": 30,
+          "cell2": 31
+        },
+        {
+          "cell1": 32,
+          "cell2": 33
+        },
+        {
+          "cell1": 34,
+          "cell2": 42
+        },
+        {
+          "cell1": 40,
+          "cell2": 41
+        },
+        {
+          "cell1": 41,
+          "cell2": 42
+        },
+        {
+          "cell1": 43,
+          "cell2": 44
+        },
+        {
+          "cell1": 49,
+          "cell2": 57
+        },
+        {
+          "cell1": 50,
+          "cell2": 58
+        }
+      ],
+      "difficultyTag": "d3",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "68af7cfc41c96b4adbe9027396e294561ed46646b754facd516e92b5de738040",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "68af7cfc41c96b4adbe9027396e294561ed46646b754facd516e92b5de738040",
+        "difficulty_rebalanced_from": "d3",
+        "difficulty_score": 6.5575
+      },
+      "solution": [
+        44,
+        52,
+        60,
+        61,
+        62,
+        63,
+        55,
+        47,
+        46,
+        38,
+        39,
+        31,
+        23,
+        15,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2,
+        10,
+        9,
+        1,
+        0,
+        8,
+        16,
+        24,
+        32,
+        40,
+        48,
+        56,
+        57,
+        58,
+        59,
+        51,
+        43,
+        42,
+        50,
+        49,
+        41,
+        33,
+        34,
+        26,
+        25,
+        17,
+        18,
+        19,
+        11,
+        12,
+        20,
+        21,
+        13,
+        14,
+        22,
+        30,
+        29,
+        28,
+        27,
+        35,
+        36,
+        37,
+        45,
+        53,
+        54
+      ]
+    },
+    {
+      "id": "linkedin-editor-5",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 2,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 3,
+          "x": 5,
+          "y": 3
+        },
+        {
+          "n": 4,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 5,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 6,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 7,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 8,
+          "x": 0,
+          "y": 2
+        }
+      ],
+      "walls": [
+        {
+          "cell1": 1,
+          "cell2": 7
+        },
+        {
+          "cell1": 2,
+          "cell2": 8
+        },
+        {
+          "cell1": 3,
+          "cell2": 9
+        },
+        {
+          "cell1": 4,
+          "cell2": 10
+        },
+        {
+          "cell1": 8,
+          "cell2": 9
+        },
+        {
+          "cell1": 14,
+          "cell2": 15
+        },
+        {
+          "cell1": 20,
+          "cell2": 21
+        },
+        {
+          "cell1": 25,
+          "cell2": 31
+        },
+        {
+          "cell1": 26,
+          "cell2": 27
+        },
+        {
+          "cell1": 26,
+          "cell2": 32
+        },
+        {
+          "cell1": 27,
+          "cell2": 33
+        },
+        {
+          "cell1": 28,
+          "cell2": 34
+        }
+      ],
+      "difficultyTag": "d4",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "db5bcfa13f161d8316484602ad7f555d25ebd085392b413bd67870a1c75a4396",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "db5bcfa13f161d8316484602ad7f555d25ebd085392b413bd67870a1c75a4396",
+        "difficulty_rebalanced_from": "d4",
+        "difficulty_score": 7.32
+      },
+      "solution": [
+        25,
+        26,
+        20,
+        14,
+        8,
+        7,
+        6,
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        11,
+        17,
+        23,
+        22,
+        16,
+        10,
+        9,
+        15,
+        21,
+        27,
+        28,
+        29,
+        35,
+        34,
+        33,
+        32,
+        31,
+        30,
+        24,
+        18,
+        19,
+        13,
+        12
+      ]
+    },
+    {
+      "id": "linkedin-editor-355",
+      "size": {
+        "w": 8,
+        "h": 8
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 3,
+          "x": 4,
+          "y": 3
+        },
+        {
+          "n": 4,
+          "x": 6,
+          "y": 6
+        },
+        {
+          "n": 5,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "n": 6,
+          "x": 1,
+          "y": 5
+        },
+        {
+          "n": 7,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 8,
+          "x": 6,
+          "y": 1
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d4",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "e84ab8c639c41555020ced0665cf1d6c69c7b2913794e1e4733ec9b174c162c6",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "e84ab8c639c41555020ced0665cf1d6c69c7b2913794e1e4733ec9b174c162c6",
+        "difficulty_rebalanced_from": "d4",
+        "difficulty_score": 6.87
+      }
+    },
+    {
+      "id": "classic-import-editor-153",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 2,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 1,
+          "y": 0
+        },
+        {
+          "n": 4,
+          "x": 4,
+          "y": 5
+        },
+        {
+          "n": 5,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 6,
+          "x": 4,
+          "y": 4
+        }
+      ],
+      "walls": [
+        {
+          "cell1": 7,
+          "cell2": 13
+        },
+        {
+          "cell1": 8,
+          "cell2": 14
+        },
+        {
+          "cell1": 12,
+          "cell2": 13
+        },
+        {
+          "cell1": 16,
+          "cell2": 17
+        },
+        {
+          "cell1": 18,
+          "cell2": 19
+        },
+        {
+          "cell1": 21,
+          "cell2": 27
+        },
+        {
+          "cell1": 22,
+          "cell2": 23
+        },
+        {
+          "cell1": 22,
+          "cell2": 28
+        }
+      ],
+      "difficultyTag": "d4",
+      "source": "linkedin_editor_external",
+      "source_pack": "external_editor_import",
+      "source_origin": "linkedin_editor_external",
+      "variant": "classic",
+      "canonical_hash": "a8bc79111125e816ab1a9bef2a77acc11abcdd283a10fa43c4bd91a572042284",
+      "meta": {
+        "variant": "classic",
+        "source_pack": "external_editor_import",
+        "source_origin": "linkedin_editor_external",
+        "canonical_hash": "a8bc79111125e816ab1a9bef2a77acc11abcdd283a10fa43c4bd91a572042284",
+        "difficulty_rebalanced_from": "d4",
+        "difficulty_score": 6.9867
+      }
+    }
+  ]
+}

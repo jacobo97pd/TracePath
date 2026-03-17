@@ -11,7 +11,6 @@ import 'celebration_overlay.dart';
 import 'engine/level.dart';
 import 'engine/seed_random.dart';
 import 'game_board.dart';
-import 'game_header.dart';
 import 'game_theme.dart';
 import 'progress_service.dart';
 import 'score_calculator.dart';
@@ -59,6 +58,7 @@ class _DailyScreenState extends State<DailyScreen> {
   GameTheme? _cachedTheme;
   Timer? _clockTimer;
   DailyLeaderboardUpdate? _lastLeaderboardUpdate;
+  static const int _autoRetryAttempts = 2;
 
   @override
   void initState() {
@@ -80,38 +80,48 @@ class _DailyScreenState extends State<DailyScreen> {
       _isLoading = true;
       _loadError = null;
     });
-    try {
-      final level = await loadDailyLevelAsync(
-        retryNonce: _retryNonce,
-      ).timeout(
-        const Duration(seconds: 12),
-      );
-      if (!mounted) {
+    Object? lastError;
+    for (var attempt = 0; attempt < _autoRetryAttempts; attempt++) {
+      try {
+        final level = await loadDailyLevelAsync(
+          retryNonce: _retryNonce + attempt,
+        ).timeout(
+          Duration(seconds: 12 + (attempt * 4)),
+        );
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _level = level;
+          _status = GameBoardStatus.fromPath(level, const []);
+          _runStartedAt = DateTime.now();
+          _elapsedAtSolve = null;
+          _completionHandled = false;
+          _rewindsUsed = 0;
+          _isLoading = false;
+        });
+        _clockTimer?.cancel();
+        _clockTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+          if (!mounted) return;
+          setState(() {});
+        });
         return;
+      } catch (error) {
+        lastError = error;
+        if (attempt < _autoRetryAttempts - 1) {
+          await Future<void>.delayed(const Duration(milliseconds: 450));
+        }
       }
-      setState(() {
-        _level = level;
-        _status = GameBoardStatus.fromPath(level, const []);
-        _runStartedAt = DateTime.now();
-        _elapsedAtSolve = null;
-        _completionHandled = false;
-        _rewindsUsed = 0;
-        _isLoading = false;
-      });
-      _clockTimer?.cancel();
-      _clockTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-        if (!mounted) return;
-        setState(() {});
-      });
-    } catch (error) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _isLoading = false;
-        _loadError = error;
-      });
     }
+    try {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _isLoading = false;
+        _loadError = lastError ?? 'Unknown daily load error';
+      });
+    } catch (_) {}
   }
 
   @override
@@ -171,110 +181,259 @@ class _DailyScreenState extends State<DailyScreen> {
 
         return Scaffold(
           body: SafeArea(
-            child: Stack(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final nextPuzzleIn = _timeUntilNextDailyPuzzle();
+                final formattedDate = _formatDailyDate(DateTime.now());
+
+                return Stack(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                      child: GameHeader(
-                        timerText:
-                            _formatMs(_currentElapsedDuration.inMilliseconds),
-                        chipText: 'D1',
-                        nextText: _status.nextRequiredNumber.toString(),
-                        starsText: '★★★',
-                        onBack: () {
-                          if (context.canPop()) {
-                            context.pop();
-                          } else {
-                            context.go('/');
-                          }
-                        },
-                        onHome: () => context.go('/'),
-                        onClear: _handleReset,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text('Streak: $streak'),
-                    ),
-                    if (completedToday || _status.solved)
-                      const Text('Completed Today'),
-                    Text(
-                      bestAttempt == null
-                          ? "Today's best: --"
-                          : "Today's best: ${bestAttempt.score} (${_formatMs(bestAttempt.timeMs)})",
-                    ),
-                    if (_lastLeaderboardUpdate?.isPersonalBest == true)
-                      const Text('Personal best!'),
-                    if (_status.path.length == level.width * level.height &&
-                        !_status.solved)
-                      const Text('Not solved yet'),
-                    Row(
-                      children: [
-                        TextButton(
-                          onPressed: _handleUndo,
-                          child: const Text('Undo'),
-                        ),
-                      ],
-                    ),
-                    if (leaderboard.isNotEmpty)
-                      SizedBox(
-                        height: 150,
-                        child: ListView.builder(
-                          itemCount: leaderboard.length,
-                          itemBuilder: (context, index) {
-                            final attempt = leaderboard[index];
-                            final isBest = index == 0;
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              child: Text(
-                                '#${index + 1} ${attempt.score} pts  '
-                                '${_formatMs(attempt.timeMs)}  '
-                                'h:${attempt.hintsUsed} r:${attempt.rewindsUsed}'
-                                '${isBest ? "  (PB)" : ""}',
-                              ),
-                            );
-                          },
+                    Container(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFF0B1430),
+                            Color(0xFF0A1B3C),
+                            Color(0xFF071128),
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
                         ),
                       ),
-                    const SizedBox(height: 12),
-                    Expanded(
-                      child: Center(
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 520),
-                          child: AspectRatio(
-                            aspectRatio: 1,
-                            child: GameBoard(
-                              controller: _boardController,
-                              level: level,
-                              gameTheme: gameTheme,
-                              onStatusChanged: _handleStatusChanged,
-                              onChange: _handleBoardChange,
-                              onInvalidMove: (_) =>
-                                  HapticFeedback.mediumImpact(),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
+                            children: [
+                              IconButton(
+                                style: IconButton.styleFrom(
+                                  backgroundColor: const Color(0xFF14284D),
+                                  foregroundColor: Colors.white,
+                                ),
+                                onPressed: () {
+                                  if (context.canPop()) {
+                                    context.pop();
+                                  } else {
+                                    context.go('/');
+                                  }
+                                },
+                                icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Daily Challenge',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                    Text(
+                                      formattedDate,
+                                      style: const TextStyle(
+                                        color: Color(0xFF9EB2D9),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF14274A),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: const Color(0xFF335B9B),
+                                width: 1,
+                              ),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x2A4B8FFF),
+                                  blurRadius: 18,
+                                  offset: Offset(0, 8),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              'Next puzzle in ${_formatCountdown(nextPuzzleIn)}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _DailyInfoCard(
+                                  label: 'Reward',
+                                  value: '\u2B50\u2B50\u2B50',
+                                  accent: const Color(0xFF4E8CFF),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _DailyInfoCard(
+                                  label: 'Streak',
+                                  value: '$streak',
+                                  accent: const Color(0xFF4AE0C5),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _DailyInfoCard(
+                                  label: 'Best Time',
+                                  value: _formatMs(bestAttempt?.timeMs),
+                                  accent: const Color(0xFF6E8BFF),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+                          Expanded(
+                            child: Center(
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(maxWidth: 620),
+                                child: AspectRatio(
+                                  aspectRatio: 1,
+                                  child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF0E1D3A),
+                                      borderRadius: BorderRadius.circular(24),
+                                      border: Border.all(
+                                        color: const Color(0xFF2F4E80),
+                                        width: 1.2,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: gameTheme.pathColor.withOpacity(0.2),
+                                          blurRadius: 26,
+                                          offset: const Offset(0, 12),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10),
+                                      child: GameBoard(
+                                        controller: _boardController,
+                                        level: level,
+                                        gameTheme: gameTheme,
+                                        onStatusChanged: _handleStatusChanged,
+                                        onChange: _handleBoardChange,
+                                        onInvalidMove: (_) =>
+                                            HapticFeedback.mediumImpact(),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: FilledButton.icon(
+                                  style: FilledButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    backgroundColor: const Color(0xFF4E8CFF),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(18),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    HapticFeedback.selectionClick();
+                                    if (completedToday || _status.solved) {
+                                      _handleReset();
+                                    }
+                                  },
+                                  icon: const Icon(Icons.play_arrow_rounded),
+                                  label: Text(
+                                    completedToday || _status.solved
+                                        ? 'Play Again'
+                                        : 'Play Daily',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 18,
+                                    vertical: 16,
+                                  ),
+                                  side: const BorderSide(color: Color(0xFF3E5A87)),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                onPressed: _handleUndo,
+                                child: const Icon(
+                                  Icons.undo_rounded,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Attempts today: ${leaderboard.length} - Best score: ${bestAttempt?.score ?? '--'}',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Color(0xFF9EB2D9),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          if (_lastLeaderboardUpdate?.isPersonalBest == true)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 4),
+                              child: Text(
+                                'New personal best today',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Color(0xFF89E2C8),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: CelebrationOverlay(
+                        visible: _showCelebration,
+                        duration: const Duration(milliseconds: 1150),
+                        accentColor: gameTheme.pathColor,
+                        isDark: isDark,
+                        loop: true,
                       ),
                     ),
                   ],
-                ),
-                Positioned.fill(
-                  child: CelebrationOverlay(
-                    visible: _showCelebration,
-                    duration: const Duration(milliseconds: 1150),
-                    accentColor: gameTheme.pathColor,
-                    isDark: isDark,
-                    loop: true,
-                  ),
-                ),
-              ],
+                );
+              },
             ),
           ),
         );
@@ -504,6 +663,38 @@ class _DailyScreenState extends State<DailyScreen> {
     return '$mm:$ss';
   }
 
+  Duration _timeUntilNextDailyPuzzle() {
+    final now = DateTime.now();
+    final next = DateTime(now.year, now.month, now.day + 1);
+    return next.difference(now);
+  }
+
+  String _formatCountdown(Duration duration) {
+    final totalSeconds = duration.inSeconds < 0 ? 0 : duration.inSeconds;
+    final hh = (totalSeconds ~/ 3600).toString().padLeft(2, '0');
+    final mm = ((totalSeconds % 3600) ~/ 60).toString().padLeft(2, '0');
+    final ss = (totalSeconds % 60).toString().padLeft(2, '0');
+    return '$hh:$mm:$ss';
+  }
+
+  String _formatDailyDate(DateTime date) {
+    const months = <String>[
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  }
+
   GameTheme _resolveTheme(BuildContext context) {
     final brightness = Theme.of(context).brightness;
     if (_cachedTheme != null && _cachedBrightness == brightness) {
@@ -516,5 +707,53 @@ class _DailyScreenState extends State<DailyScreen> {
     _cachedBrightness = brightness;
     _cachedTheme = next;
     return next;
+  }
+}
+
+class _DailyInfoCard extends StatelessWidget {
+  const _DailyInfoCard({
+    required this.label,
+    required this.value,
+    required this.accent,
+  });
+
+  final String label;
+  final String value;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF152746),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF2E4973), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFFA7B9DA),
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: accent,
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

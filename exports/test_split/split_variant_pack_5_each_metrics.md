@@ -1,0 +1,27 @@
+| id | variant | difficulty_estimate | grid_size | path_length | num_clues | clue_density | sequence_length | sequence_start | sequence_step | representation | turns | max_straight | avg_straight | corners | borders | inners | num_walls | alphabet_start_char | multiple_base | roman_max_value | dice_mode | arithmetic_mode | source_level_id |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| split_alphabet_001 | alphabet | easy | 5 | 25 | 6 | 0.24 | 6 | 1 | 1 | alphabet | 14 | 4 | 1.6 | 1 | 3 | 2 | 4 | A |  |  |  |  | generated_alphabet_001 |
+| split_alphabet_002 | alphabet | easy | 5 | 25 | 11 | 0.44 | 11 | 1 | 1 | alphabet | 12 | 4 | 1.85 | 2 | 4 | 5 | 4 | A |  |  |  |  | generated_alphabet_002 |
+| split_alphabet_003 | alphabet | medium | 5 | 25 | 5 | 0.2 | 5 | 1 | 1 | alphabet | 10 | 4 | 2.18 | 1 | 2 | 2 | 9 | A |  |  |  |  | generated_alphabet_003 |
+| split_alphabet_004 | alphabet | medium | 5 | 25 | 5 | 0.2 | 5 | 1 | 1 | alphabet | 10 | 4 | 2.18 | 1 | 2 | 2 | 9 | A |  |  |  |  | generated_alphabet_004 |
+| split_alphabet_005 | alphabet | hard | 5 | 25 | 8 | 0.32 | 8 | 1 | 1 | alphabet | 14 | 4 | 1.6 | 0 | 5 | 3 | 10 | A |  |  |  |  | generated_alphabet_005 |
+| split_alphabet_reverse_001 | alphabet_reverse | easy | 5 | 25 | 7 | 0.28 | 7 | 1 | 1 | alphabet_reverse | 10 | 4 | 2.18 | 2 | 3 | 2 | 8 | Z |  |  |  |  | generated_alphabet_reverse_001 |
+| split_alphabet_reverse_002 | alphabet_reverse | easy | 5 | 25 | 7 | 0.28 | 7 | 1 | 1 | alphabet_reverse | 16 | 4 | 1.41 | 0 | 3 | 4 | 5 | Z |  |  |  |  | generated_alphabet_reverse_002 |
+| split_alphabet_reverse_003 | alphabet_reverse | medium | 5 | 25 | 12 | 0.48 | 12 | 1 | 1 | alphabet_reverse | 11 | 4 | 2.0 | 3 | 5 | 4 | 8 | Z |  |  |  |  | generated_alphabet_reverse_003 |
+| split_alphabet_reverse_004 | alphabet_reverse | medium | 5 | 25 | 5 | 0.2 | 5 | 1 | 1 | alphabet_reverse | 12 | 4 | 1.85 | 1 | 1 | 3 | 9 | Z |  |  |  |  | generated_alphabet_reverse_004 |
+| split_alphabet_reverse_005 | alphabet_reverse | hard | 5 | 25 | 8 | 0.32 | 8 | 1 | 1 | alphabet_reverse | 18 | 2 | 1.26 | 1 | 4 | 3 | 10 | Z |  |  |  |  | generated_alphabet_reverse_005 |
+| split_multiples_001 | multiples | easy | 7 | 49 | 15 | 0.3061 | 15 | 2 | 2 | multiple | 17 | 6 | 2.67 | 1 | 7 | 7 | 7 |  | 2 |  |  |  | generated_multiples_001 |
+| split_multiples_002 | multiples | easy | 6 | 36 | 12 | 0.3333 | 12 | 3 | 3 | multiple | 21 | 5 | 1.59 | 1 | 6 | 5 | 6 |  | 3 |  |  |  | generated_multiples_002 |
+| split_multiples_003 | multiples | medium | 7 | 49 | 14 | 0.2857 | 14 | 4 | 4 | multiple | 27 | 6 | 1.71 | 2 | 3 | 9 | 9 |  | 4 |  |  |  | generated_multiples_003 |
+| split_multiples_004 | multiples | medium | 7 | 49 | 13 | 0.2653 | 13 | 5 | 5 | multiple | 28 | 6 | 1.66 | 1 | 4 | 8 | 11 |  | 5 |  |  |  | generated_multiples_004 |
+| split_multiples_005 | multiples | hard | 7 | 49 | 10 | 0.2041 | 10 | 3 | 3 | multiple | 20 | 4 | 2.29 | 0 | 4 | 6 | 12 |  | 3 |  |  |  | generated_multiples_005 |
+| split_roman_001 | roman | easy | 6 | 36 | 15 | 0.4167 | 15 | 1 | 1 | roman | 14 | 5 | 2.33 | 1 | 6 | 8 | 6 |  |  | 15 |  |  | generated_roman_001 |
+| split_roman_002 | roman | easy | 6 | 36 | 9 | 0.25 | 9 | 1 | 1 | roman | 15 | 5 | 2.19 | 2 | 4 | 3 | 8 |  |  | 9 |  |  | generated_roman_002 |
+| split_roman_003 | roman | medium | 7 | 49 | 19 | 0.3878 | 19 | 1 | 1 | roman | 27 | 6 | 1.71 | 1 | 9 | 9 | 11 |  |  | 19 |  |  | generated_roman_003 |
+| split_roman_004 | roman | medium | 7 | 49 | 17 | 0.3469 | 17 | 1 | 1 | roman | 30 | 4 | 1.55 | 0 | 7 | 10 | 12 |  |  | 17 |  |  | generated_roman_004 |
+| split_roman_005 | roman | hard | 7 | 49 | 11 | 0.2245 | 11 | 1 | 1 | roman | 19 | 6 | 2.4 | 1 | 5 | 5 | 12 |  |  | 22 |  |  | generated_roman_005 |
+| split_multiples_roman_001 | multiples_roman | easy | 5 | 25 | 9 | 0.36 | 9 | 3 | 3 | multiple_roman | 17 | 4 | 1.33 | 2 | 4 | 3 | 3 |  | 3 | 27 |  |  | all-3 |
+| split_multiples_roman_002 | multiples_roman | easy | 6 | 36 | 15 | 0.4167 | 15 | 4 | 4 | multiple_roman | 16 | 5 | 2.06 | 1 | 8 | 6 | 20 |  | 4 | 60 |  |  | all-153 |
+| split_multiples_roman_003 | multiples_roman | medium | 6 | 36 | 11 | 0.3056 | 11 | 5 | 5 | multiple_roman | 27 | 2 | 1.25 | 2 | 3 | 6 | 7 |  | 5 | 55 |  |  | all-39 |
+| split_multiples_roman_004 | multiples_roman | medium | 6 | 36 | 9 | 0.25 | 9 | 3 | 3 | multiple_roman | 25 | 3 | 1.35 | 1 | 4 | 4 | 4 |  | 3 | 27 |  |  | all-122 |
+| split_multiples_roman_005 | multiples_roman | hard | 7 | 49 | 7 | 0.1429 | 7 | 2 | 2 | multiple_roman | 16 | 6 | 2.82 | 1 | 2 | 4 | 0 |  | 2 | 14 |  |  | all-333 |

@@ -58,7 +58,11 @@ class _PuzzleLeaderboardScreenState extends State<PuzzleLeaderboardScreen> {
             separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
               final attempt = attempts[index];
-              final isTop1 = index == 0;
+              final rank = _rankAtIndexByTime(
+                attempts.map((a) => a.timeMs).toList(growable: false),
+                index,
+              );
+              final isTop1 = rank == 1;
               final isPersonalBest =
                   personalBestRunId != null && attempt.runId == personalBestRunId;
               return Card(
@@ -69,7 +73,7 @@ class _PuzzleLeaderboardScreenState extends State<PuzzleLeaderboardScreen> {
                         : null,
                 child: ListTile(
                   leading: Text(
-                    '#${index + 1}',
+                    '#$rank',
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                   title: Text(_formatMs(attempt.timeMs)),
@@ -108,5 +112,18 @@ class _PuzzleLeaderboardScreenState extends State<PuzzleLeaderboardScreen> {
     final m = dt.month.toString().padLeft(2, '0');
     final d = dt.day.toString().padLeft(2, '0');
     return '$y-$m-$d';
+  }
+
+  int _rankAtIndexByTime(List<int> timesMs, int index) {
+    if (index <= 0) return 1;
+    var rank = index + 1;
+    for (var j = index - 1; j >= 0; j--) {
+      if (timesMs[j] == timesMs[index]) {
+        rank = j + 1;
+      } else {
+        break;
+      }
+    }
+    return rank;
   }
 }

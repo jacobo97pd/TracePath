@@ -1,0 +1,220 @@
+{
+  "id": "split_multiples_001",
+  "size": 7,
+  "clues": [
+    {
+      "n": 1,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "n": 2,
+      "x": 1,
+      "y": 3
+    },
+    {
+      "n": 3,
+      "x": 2,
+      "y": 3
+    },
+    {
+      "n": 4,
+      "x": 0,
+      "y": 4
+    },
+    {
+      "n": 5,
+      "x": 2,
+      "y": 5
+    },
+    {
+      "n": 6,
+      "x": 4,
+      "y": 2
+    },
+    {
+      "n": 7,
+      "x": 4,
+      "y": 5
+    },
+    {
+      "n": 8,
+      "x": 5,
+      "y": 3
+    },
+    {
+      "n": 9,
+      "x": 4,
+      "y": 1
+    },
+    {
+      "n": 10,
+      "x": 0,
+      "y": 1
+    },
+    {
+      "n": 11,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 12,
+      "x": 6,
+      "y": 1
+    },
+    {
+      "n": 13,
+      "x": 6,
+      "y": 5
+    },
+    {
+      "n": 14,
+      "x": 4,
+      "y": 6
+    },
+    {
+      "n": 15,
+      "x": 0,
+      "y": 6
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 5,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 6,
+        "len": 1
+      }
+    ],
+    "v": [
+      {
+        "x": 3,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "len": 1
+      }
+    ]
+  },
+  "solution": [
+    14,
+    21,
+    22,
+    15,
+    16,
+    23,
+    30,
+    29,
+    28,
+    35,
+    36,
+    37,
+    38,
+    31,
+    24,
+    17,
+    18,
+    25,
+    32,
+    39,
+    40,
+    33,
+    26,
+    19,
+    12,
+    11,
+    10,
+    9,
+    8,
+    7,
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    13,
+    20,
+    27,
+    34,
+    41,
+    48,
+    47,
+    46,
+    45,
+    44,
+    43,
+    42
+  ],
+  "meta": {
+    "variant": "multiples",
+    "sequence_rule": "multiples of 2",
+    "difficulty_target": "easy",
+    "representation": "multiple",
+    "display_labels": {
+      "1": "2",
+      "2": "4",
+      "3": "6",
+      "4": "8",
+      "5": "10",
+      "6": "12",
+      "7": "14",
+      "8": "16",
+      "9": "18",
+      "10": "20",
+      "11": "22",
+      "12": "24",
+      "13": "26",
+      "14": "28",
+      "15": "30"
+    },
+    "source_level_id": "generated_multiples_001",
+    "multiple_base": 2,
+    "generation_batch": "split_variant_pack_5_each",
+    "generation_index": 1
+  },
+  "metrics": {
+    "variant": "multiples",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 15,
+    "clue_density": 0.3061,
+    "sequence_length": 15,
+    "sequence_start": 2,
+    "sequence_step": 2,
+    "representation": "multiple",
+    "difficulty_estimate": "easy",
+    "turns": 17,
+    "max_straight": 6,
+    "avg_straight": 2.67,
+    "corners": 1,
+    "borders": 7,
+    "inners": 7,
+    "num_walls": 7,
+    "multiple_base": 2
+  }
+}

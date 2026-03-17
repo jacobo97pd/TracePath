@@ -1,0 +1,199 @@
+{
+  "id": "test_multiples_004",
+  "size": 7,
+  "clues": [
+    {
+      "n": 1,
+      "x": 6,
+      "y": 6
+    },
+    {
+      "n": 2,
+      "x": 6,
+      "y": 2
+    },
+    {
+      "n": 3,
+      "x": 5,
+      "y": 2
+    },
+    {
+      "n": 4,
+      "x": 5,
+      "y": 5
+    },
+    {
+      "n": 5,
+      "x": 4,
+      "y": 4
+    },
+    {
+      "n": 6,
+      "x": 3,
+      "y": 1
+    },
+    {
+      "n": 7,
+      "x": 2,
+      "y": 5
+    },
+    {
+      "n": 8,
+      "x": 1,
+      "y": 0
+    },
+    {
+      "n": 9,
+      "x": 0,
+      "y": 6
+    },
+    {
+      "n": 10,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "walls": {
+    "h": [],
+    "v": [
+      {
+        "x": 1,
+        "y": 4,
+        "len": 2
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "len": 2
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "len": 1
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "len": 2
+      }
+    ]
+  },
+  "solution": [
+    48,
+    41,
+    34,
+    27,
+    20,
+    13,
+    6,
+    5,
+    12,
+    19,
+    26,
+    33,
+    40,
+    47,
+    46,
+    39,
+    32,
+    25,
+    18,
+    11,
+    4,
+    3,
+    10,
+    17,
+    24,
+    31,
+    38,
+    45,
+    44,
+    37,
+    30,
+    23,
+    16,
+    9,
+    2,
+    1,
+    8,
+    15,
+    22,
+    29,
+    36,
+    43,
+    42,
+    35,
+    28,
+    21,
+    14,
+    7,
+    0
+  ],
+  "meta": {
+    "variant": "multiples",
+    "sequence_rule": "multiples of 5",
+    "difficulty_target": "medium",
+    "representation": "multiple",
+    "display_labels": {
+      "1": "5",
+      "2": "10",
+      "3": "15",
+      "4": "20",
+      "5": "25",
+      "6": "30",
+      "7": "35",
+      "8": "40",
+      "9": "45",
+      "10": "50"
+    },
+    "source_level_id": "generated_multiples_004",
+    "multiple_base": 5,
+    "generation_batch": "test_variant_pack_5_each",
+    "generation_index": 4
+  },
+  "metrics": {
+    "variant": "multiples",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 10,
+    "clue_density": 0.2041,
+    "sequence_length": 10,
+    "sequence_start": 5,
+    "sequence_step": 5,
+    "representation": "multiple",
+    "difficulty_estimate": "medium",
+    "turns": 12,
+    "max_straight": 6,
+    "avg_straight": 3.69,
+    "corners": 3,
+    "borders": 2,
+    "inners": 5,
+    "num_walls": 12,
+    "multiple_base": 5
+  }
+}

@@ -29,7 +29,6 @@ class SocialScreen extends StatefulWidget {
 
 class _SocialScreenState extends State<SocialScreen> {
   static const String _firestoreDatabaseId = 'tracepath-database';
-  static const String _socialPreviewLevelId = 'all_1';
 
   final FriendsService _friendsService = FriendsService();
   final SocialLeaderboardService _leaderboardService =
@@ -56,7 +55,7 @@ class _SocialScreenState extends State<SocialScreen> {
   void initState() {
     super.initState();
     _friendsFuture = _friendsService.getFriends();
-    _leaderboardFuture = _leaderboardService.getTopScores(_socialPreviewLevelId);
+    _leaderboardFuture = _leaderboardService.getGlobalTopScores(limit: 10);
   }
 
   @override
@@ -114,16 +113,14 @@ class _SocialScreenState extends State<SocialScreen> {
       builder: (context, friendSnapshot) {
         final friendCount = friendSnapshot.data?.length ?? 0;
         return StreamBuilder<List<LeaderboardEntry>>(
-          stream: _leaderboardService.watchTopScores(_socialPreviewLevelId),
+          stream: _leaderboardService.watchGlobalTopScores(limit: 10),
           builder: (context, rankSnapshot) {
             final entries = rankSnapshot.data ?? const <LeaderboardEntry>[];
             final bestTime = entries.isEmpty ? '--:--' : _formatMs(entries.first.bestTimeMs);
             final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
-            int myRank = 0;
-            if (currentUid.isNotEmpty) {
-              final idx = entries.indexWhere((e) => e.uid == currentUid);
-              if (idx >= 0) myRank = idx + 1;
-            }
+            final myRank = currentUid.isEmpty
+                ? 0
+                : _rankForUidByTime(entries, currentUid);
             return Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -299,12 +296,12 @@ class _SocialScreenState extends State<SocialScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const _SectionTitle(
-          title: 'Global Ranking Preview',
-          subtitle: 'Preview level: all_1',
+          title: 'Global Top 10',
+          subtitle: 'Best players in the world',
         ),
         const SizedBox(height: 10),
         StreamBuilder<List<LeaderboardEntry>>(
-          stream: _leaderboardService.watchTopScores(_socialPreviewLevelId),
+          stream: _leaderboardService.watchGlobalTopScores(limit: 10),
           builder: (context, snapshot) {
             final entries = snapshot.data;
             if (entries == null) {
@@ -315,8 +312,8 @@ class _SocialScreenState extends State<SocialScreen> {
                   if (items.isEmpty) {
                     return const _EmptyHint(
                       icon: Icons.bar_chart_rounded,
-                      title: 'No scores yet for this level',
-                      text: 'Complete the level to appear in the ranking.',
+                      title: 'No global scores yet',
+                      text: 'Complete levels to appear in the world ranking.',
                     );
                   }
                   return _buildLeaderboardCard(items);
@@ -326,8 +323,8 @@ class _SocialScreenState extends State<SocialScreen> {
             if (entries.isEmpty) {
               return const _EmptyHint(
                 icon: Icons.bar_chart_rounded,
-                title: 'No scores yet for this level',
-                text: 'Complete the level to appear in the ranking.',
+                title: 'No global scores yet',
+                text: 'Complete levels to appear in the world ranking.',
               );
             }
             return _buildLeaderboardCard(entries);
@@ -339,6 +336,9 @@ class _SocialScreenState extends State<SocialScreen> {
 
   Widget _buildLeaderboardCard(List<LeaderboardEntry> entries) {
     final uid = FirebaseAuth.instance.currentUser?.uid;
+    final ranks = _computeRanksByTime(
+      entries.map((e) => e.bestTimeMs).toList(growable: false),
+    );
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF1C283E),
@@ -358,7 +358,7 @@ class _SocialScreenState extends State<SocialScreen> {
           children: [
             for (var i = 0; i < entries.length; i++) ...[
               _RankRow(
-                index: i + 1,
+                rank: ranks[i],
                 presentationFuture: _presentationForEntry(entries[i]),
                 bestTimeMs: entries[i].bestTimeMs,
                 moves: entries[i].moves,
@@ -404,17 +404,7 @@ class _SocialScreenState extends State<SocialScreen> {
                 icon: Icons.sports_esports_rounded,
                 expanded: true,
                 prominent: true,
-                onTap: () {
-                  unawaited(
-                    GameToast.show(
-                      context,
-                      type: GameToastType.social,
-                      title: 'Challenges',
-                      message: 'Challenge system coming soon',
-                      duration: const Duration(milliseconds: 1500),
-                    ),
-                  );
-                },
+                onTap: _challengeFriendInGame,
               ),
               const SizedBox(height: 10),
               GameButton(
@@ -532,6 +522,183 @@ class _SocialScreenState extends State<SocialScreen> {
           title: 'Social',
           message: message,
           duration: const Duration(milliseconds: 1700),
+        ),
+      );
+    }
+  }
+
+  Future<void> _challengeFriendInGame() async {
+    List<FriendProfile> friends = const <FriendProfile>[];
+    try {
+      friends = await _friendsService.getFriends();
+    } catch (_) {}
+    if (!mounted) return;
+    if (friends.isEmpty) {
+      unawaited(
+        GameToast.show(
+          context,
+          type: GameToastType.social,
+          title: 'Challenges',
+          message: 'Add friends first to send challenges.',
+          duration: const Duration(milliseconds: 1500),
+        ),
+      );
+      return;
+    }
+
+    final friend = await showModalBottomSheet<FriendProfile>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF1A2A45), Color(0xFF121D34)],
+              ),
+              border: Border.all(color: const Color(0xFF355687)),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x55102138),
+                  blurRadius: 18,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Challenge a friend',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Send an in-game reminder to play now',
+                  style: TextStyle(color: Color(0xFF9EB0D2), fontSize: 12),
+                ),
+                const SizedBox(height: 10),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 340),
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: friends.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      final f = friends[index];
+                      return Material(
+                        color: const Color(0xFF1A2A43),
+                        borderRadius: BorderRadius.circular(14),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(14),
+                          onTap: () => Navigator.of(context).pop(f),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 16,
+                                  backgroundColor: const Color(0xFF2A3E63),
+                                  child: Text(
+                                    f.displayName.isNotEmpty
+                                        ? f.displayName.substring(0, 1).toUpperCase()
+                                        : 'P',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        f.displayName,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      const Text(
+                                        'Send level challenge',
+                                        style: TextStyle(
+                                          color: Color(0xFF9EB0D2),
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const Icon(
+                                  Icons.send_rounded,
+                                  color: Color(0xFFA9C4FF),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+    if (!mounted || friend == null) return;
+
+    try {
+      await _friendsService.sendLevelChallenge(
+        toUid: friend.uid,
+        levelId: 'all_1',
+      );
+      if (!mounted) return;
+      unawaited(
+        GameToast.show(
+          context,
+          type: GameToastType.social,
+          title: 'Challenge Sent',
+          message: 'Challenge sent to ${friend.displayName}.',
+          duration: const Duration(milliseconds: 1600),
+        ),
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[social] sendLevelChallenge failed toUid=${friend.uid} levelId=all_1 error=$e');
+      }
+      if (!mounted) return;
+      var message = 'Could not send challenge right now.';
+      if (e is FirebaseException && e.code == 'permission-denied') {
+        message = 'Challenge blocked by Firestore rules.';
+      } else if (e.toString().contains('AUTH_REQUIRED')) {
+        message = 'You need to be signed in.';
+      }
+      unawaited(
+        GameToast.show(
+          context,
+          type: GameToastType.info,
+          title: 'Challenges',
+          message: message,
+          duration: const Duration(milliseconds: 1600),
         ),
       );
     }
@@ -851,6 +1018,32 @@ class _SocialScreenState extends State<SocialScreen> {
     } catch (_) {
       return FirebaseFirestore.instance;
     }
+  }
+
+  List<int> _computeRanksByTime(List<int> bestTimesMs) {
+    final ranks = List<int>.filled(bestTimesMs.length, 0);
+    var currentRank = 0;
+    var lastTime = -1;
+    for (var i = 0; i < bestTimesMs.length; i++) {
+      final t = bestTimesMs[i];
+      if (i == 0 || t != lastTime) {
+        currentRank = i + 1;
+        lastTime = t;
+      }
+      ranks[i] = currentRank;
+    }
+    return ranks;
+  }
+
+  int _rankForUidByTime(List<LeaderboardEntry> entries, String uid) {
+    if (uid.trim().isEmpty || entries.isEmpty) return 0;
+    final ranks = _computeRanksByTime(
+      entries.map((e) => e.bestTimeMs).toList(growable: false),
+    );
+    for (var i = 0; i < entries.length; i++) {
+      if (entries[i].uid == uid) return ranks[i];
+    }
+    return 0;
   }
 
   String? _readString(Object? value) {
@@ -1180,7 +1373,7 @@ class _FriendCard extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              _TinyInfoChip(
+              const _TinyInfoChip(
                 icon: Icons.flag_rounded,
                 label: 'Status',
                 value: 'Friend',
@@ -1252,7 +1445,7 @@ class _TinyInfoChip extends StatelessWidget {
 
 class _RankRow extends StatelessWidget {
   const _RankRow({
-    required this.index,
+    required this.rank,
     required this.presentationFuture,
     required this.bestTimeMs,
     required this.moves,
@@ -1260,7 +1453,7 @@ class _RankRow extends StatelessWidget {
     required this.isCurrentUser,
   });
 
-  final int index;
+  final int rank;
   final Future<_LeaderboardPresentationData> presentationFuture;
   final int bestTimeMs;
   final int moves;
@@ -1269,7 +1462,7 @@ class _RankRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final medal = _medalForIndex(index);
+    final medal = _medalForIndex(rank);
     return FutureBuilder<_LeaderboardPresentationData>(
       future: presentationFuture,
       builder: (context, snapshot) {
@@ -1307,7 +1500,7 @@ class _RankRow extends StatelessWidget {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  '#$index',
+                  '#$rank',
                   style: TextStyle(
                     color: medal.text,
                     fontWeight: FontWeight.w900,

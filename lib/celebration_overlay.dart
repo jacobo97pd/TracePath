@@ -258,7 +258,12 @@ class _CompletedBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final glowStrength = 0.28 + (glowPulse * 0.22);
+    final maxBadgeWidth = (MediaQuery.sizeOf(context).width - 28).clamp(
+      220.0,
+      520.0,
+    );
     return Container(
+      constraints: BoxConstraints(maxWidth: maxBadgeWidth),
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
@@ -291,32 +296,42 @@ class _CompletedBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _StarGlyph(rotation: -0.22),
-          const SizedBox(width: 10),
-          Text(
-            'COMPLETED!',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: const Color(0xFFF6FAFF),
-              fontSize: 42,
-              fontWeight: FontWeight.w900,
-              height: 1.0,
-              letterSpacing: 2.7,
-              shadows: [
-                const Shadow(
-                  color: Color(0xE60C152A),
-                  blurRadius: 12,
-                  offset: Offset(0, 3),
-                ),
-                Shadow(
-                  color: accentColor.withOpacity(0.35 + glowPulse * 0.22),
-                  blurRadius: 22 + glowPulse * 8,
-                ),
-              ],
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _StarGlyph(rotation: -0.22),
+                  const SizedBox(width: 10),
+                  Text(
+                    'COMPLETED!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: const Color(0xFFF6FAFF),
+                      fontSize: 42,
+                      fontWeight: FontWeight.w900,
+                      height: 1.0,
+                      letterSpacing: 2.7,
+                      shadows: [
+                        const Shadow(
+                          color: Color(0xE60C152A),
+                          blurRadius: 12,
+                          offset: Offset(0, 3),
+                        ),
+                        Shadow(
+                          color: accentColor.withOpacity(0.35 + glowPulse * 0.22),
+                          blurRadius: 22 + glowPulse * 8,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  _StarGlyph(rotation: 0.22),
+                ],
+              ),
             ),
           ),
-          const SizedBox(width: 10),
-          _StarGlyph(rotation: 0.22),
         ],
       ),
     );

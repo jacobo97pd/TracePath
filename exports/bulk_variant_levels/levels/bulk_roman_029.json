@@ -4,78 +4,57 @@
   "clues": [
     {
       "n": 1,
-      "x": 3,
-      "y": 4
+      "x": 2,
+      "y": 2
     },
     {
       "n": 2,
-      "x": 3,
-      "y": 5
+      "x": 1,
+      "y": 0
     },
     {
       "n": 3,
-      "x": 0,
+      "x": 1,
       "y": 3
     },
     {
       "n": 4,
       "x": 2,
-      "y": 2
+      "y": 5
     },
     {
       "n": 5,
-      "x": 1,
-      "y": 2
+      "x": 4,
+      "y": 4
     },
     {
       "n": 6,
-      "x": 2,
-      "y": 0
+      "x": 5,
+      "y": 4
     },
     {
       "n": 7,
-      "x": 4,
+      "x": 3,
       "y": 1
     },
     {
       "n": 8,
-      "x": 5,
-      "y": 5
+      "x": 4,
+      "y": 1
     }
   ],
   "walls": {
-    "h": [
-      {
-        "x": 0,
-        "y": 3,
-        "len": 1
-      },
-      {
-        "x": 3,
-        "y": 3,
-        "len": 1
-      },
-      {
-        "x": 1,
-        "y": 5,
-        "len": 1
-      },
-      {
-        "x": 3,
-        "y": 5,
-        "len": 1
-      }
-    ],
+    "h": [],
     "v": [
       {
         "x": 3,
-        "y": 3,
-        "len": 1
+        "y": 0,
+        "len": 3
       },
       {
-        "x": 4,
-        "y": 1,
-        "len": 1
+        "x": 3,
+        "y": 4,
+        "len": 2
       }
     ]
   },
@@ -94,9 +73,10 @@
       "7": "VII",
       "8": "VIII"
     },
-    "source_level_id": "all-59",
+    "source_level_id": "all-107",
     "roman_max_value": 8,
-    "generation_batch": "bulk_variant_pack_200_each",
+    "roman_step": 1,
+    "generation_batch": "bulk_variant_pack_100_each",
     "generation_index": 29
   },
   "metrics": {
@@ -110,13 +90,14 @@
     "sequence_step": 1,
     "representation": "roman",
     "difficulty_estimate": "medium",
-    "turns": 20,
-    "max_straight": 5,
-    "avg_straight": 1.67,
-    "corners": 1,
+    "turns": 22,
+    "max_straight": 3,
+    "avg_straight": 1.52,
+    "corners": 0,
     "borders": 3,
-    "inners": 4,
-    "num_walls": 6,
-    "roman_max_value": 8
+    "inners": 5,
+    "num_walls": 5,
+    "roman_max_value": 8,
+    "roman_step": 1
   }
 }

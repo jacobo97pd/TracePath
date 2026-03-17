@@ -1,0 +1,102 @@
+| id | variant | difficulty_estimate | grid_size | path_length | num_clues | clue_density | sequence_length | sequence_start | sequence_step | representation | turns | max_straight | avg_straight | corners | borders | inners | num_walls | alphabet_start_char | multiple_base | roman_max_value | dice_mode | arithmetic_mode | source_level_id |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| world_alphabet_001 | alphabet | easy | 5 | 25 | 10 | 0.4 | 10 | 1 | 1 | alphabet | 18 | 2 | 1.26 | 1 | 5 | 4 | 5 | A |  |  |  |  | generated_alphabet_001 |
+| world_alphabet_002 | alphabet | easy | 5 | 25 | 10 | 0.4 | 10 | 1 | 1 | alphabet | 19 | 2 | 1.2 | 2 | 3 | 5 | 6 | A |  |  |  |  | generated_alphabet_002 |
+| world_alphabet_003 | alphabet | medium | 5 | 25 | 5 | 0.2 | 5 | 1 | 1 | alphabet | 8 | 4 | 2.67 | 2 | 1 | 2 | 7 | A |  |  |  |  | generated_alphabet_003 |
+| world_alphabet_004 | alphabet | medium | 5 | 25 | 9 | 0.36 | 9 | 1 | 1 | alphabet | 18 | 2 | 1.26 | 2 | 3 | 4 | 6 | A |  |  |  |  | generated_alphabet_004 |
+| world_alphabet_005 | alphabet | hard | 5 | 25 | 7 | 0.28 | 7 | 1 | 1 | alphabet | 18 | 2 | 1.26 | 1 | 2 | 4 | 7 | A |  |  |  |  | generated_alphabet_005 |
+| world_alphabet_006 | alphabet | easy | 5 | 25 | 15 | 0.6 | 15 | 1 | 1 | alphabet | 11 | 4 | 2.0 | 2 | 7 | 6 | 6 | A |  |  |  |  | generated_alphabet_006 |
+| world_alphabet_007 | alphabet | easy | 5 | 25 | 6 | 0.24 | 6 | 1 | 1 | alphabet | 12 | 4 | 1.85 | 2 | 2 | 2 | 8 | A |  |  |  |  | generated_alphabet_007 |
+| world_alphabet_008 | alphabet | medium | 5 | 25 | 5 | 0.2 | 5 | 1 | 1 | alphabet | 12 | 4 | 1.85 | 0 | 2 | 3 | 11 | A |  |  |  |  | generated_alphabet_008 |
+| world_alphabet_009 | alphabet | medium | 5 | 25 | 11 | 0.44 | 11 | 1 | 1 | alphabet | 9 | 4 | 2.4 | 2 | 5 | 4 | 6 | A |  |  |  |  | generated_alphabet_009 |
+| world_alphabet_010 | alphabet | hard | 5 | 25 | 6 | 0.24 | 6 | 1 | 1 | alphabet | 17 | 2 | 1.33 | 0 | 1 | 5 | 10 | A |  |  |  |  | generated_alphabet_010 |
+| world_alphabet_011 | alphabet | easy | 5 | 25 | 6 | 0.24 | 6 | 1 | 1 | alphabet | 12 | 4 | 1.85 | 2 | 3 | 1 | 8 | A |  |  |  |  | generated_alphabet_011 |
+| world_alphabet_012 | alphabet | easy | 5 | 25 | 10 | 0.4 | 10 | 1 | 1 | alphabet | 19 | 2 | 1.2 | 2 | 4 | 4 | 5 | A |  |  |  |  | generated_alphabet_012 |
+| world_alphabet_013 | alphabet | medium | 5 | 25 | 14 | 0.56 | 14 | 1 | 1 | alphabet | 18 | 2 | 1.26 | 4 | 4 | 6 | 7 | A |  |  |  |  | generated_alphabet_013 |
+| world_alphabet_014 | alphabet | medium | 5 | 25 | 12 | 0.48 | 12 | 1 | 1 | alphabet | 11 | 4 | 2.0 | 4 | 3 | 5 | 9 | A |  |  |  |  | generated_alphabet_014 |
+| world_alphabet_015 | alphabet | hard | 5 | 25 | 6 | 0.24 | 6 | 1 | 1 | alphabet | 11 | 4 | 2.0 | 0 | 2 | 4 | 10 | A |  |  |  |  | generated_alphabet_015 |
+| world_alphabet_016 | alphabet | easy | 5 | 25 | 6 | 0.24 | 6 | 1 | 1 | alphabet | 13 | 4 | 1.71 | 2 | 2 | 2 | 8 | A |  |  |  |  | generated_alphabet_016 |
+| world_alphabet_017 | alphabet | easy | 5 | 25 | 7 | 0.28 | 7 | 1 | 1 | alphabet | 17 | 2 | 1.33 | 1 | 2 | 4 | 6 | A |  |  |  |  | generated_alphabet_017 |
+| world_alphabet_018 | alphabet | medium | 5 | 25 | 5 | 0.2 | 5 | 1 | 1 | alphabet | 13 | 4 | 1.71 | 0 | 2 | 3 | 8 | A |  |  |  |  | generated_alphabet_018 |
+| world_alphabet_019 | alphabet | medium | 5 | 25 | 11 | 0.44 | 11 | 1 | 1 | alphabet | 14 | 4 | 1.6 | 2 | 5 | 4 | 7 | A |  |  |  |  | generated_alphabet_019 |
+| world_alphabet_020 | alphabet | hard | 5 | 25 | 8 | 0.32 | 8 | 1 | 1 | alphabet | 9 | 4 | 2.4 | 4 | 1 | 3 | 9 | A |  |  |  |  | generated_alphabet_020 |
+| world_alphabet_reverse_001 | alphabet_reverse | easy | 5 | 25 | 12 | 0.48 | 12 | 1 | 1 | alphabet_reverse | 11 | 4 | 2.0 | 1 | 6 | 5 | 6 | Z |  |  |  |  | generated_alphabet_reverse_001 |
+| world_alphabet_reverse_002 | alphabet_reverse | easy | 5 | 25 | 10 | 0.4 | 10 | 1 | 1 | alphabet_reverse | 18 | 2 | 1.26 | 1 | 3 | 6 | 5 | Z |  |  |  |  | generated_alphabet_reverse_002 |
+| world_alphabet_reverse_003 | alphabet_reverse | medium | 5 | 25 | 8 | 0.32 | 8 | 1 | 1 | alphabet_reverse | 13 | 4 | 1.71 | 0 | 5 | 3 | 8 | Z |  |  |  |  | generated_alphabet_reverse_003 |
+| world_alphabet_reverse_004 | alphabet_reverse | medium | 5 | 25 | 6 | 0.24 | 6 | 1 | 1 | alphabet_reverse | 13 | 4 | 1.71 | 2 | 2 | 2 | 4 | Z |  |  |  |  | generated_alphabet_reverse_004 |
+| world_alphabet_reverse_005 | alphabet_reverse | hard | 5 | 25 | 11 | 0.44 | 11 | 1 | 1 | alphabet_reverse | 17 | 2 | 1.33 | 2 | 5 | 4 | 8 | Z |  |  |  |  | generated_alphabet_reverse_005 |
+| world_alphabet_reverse_006 | alphabet_reverse | easy | 5 | 25 | 9 | 0.36 | 9 | 1 | 1 | alphabet_reverse | 17 | 2 | 1.33 | 0 | 5 | 4 | 6 | Z |  |  |  |  | generated_alphabet_reverse_006 |
+| world_alphabet_reverse_007 | alphabet_reverse | easy | 5 | 25 | 12 | 0.48 | 12 | 1 | 1 | alphabet_reverse | 13 | 4 | 1.71 | 2 | 5 | 5 | 8 | Z |  |  |  |  | generated_alphabet_reverse_007 |
+| world_alphabet_reverse_008 | alphabet_reverse | medium | 5 | 25 | 14 | 0.56 | 14 | 1 | 1 | alphabet_reverse | 13 | 4 | 1.71 | 3 | 6 | 5 | 7 | Z |  |  |  |  | generated_alphabet_reverse_008 |
+| world_alphabet_reverse_009 | alphabet_reverse | medium | 5 | 25 | 9 | 0.36 | 9 | 1 | 1 | alphabet_reverse | 17 | 2 | 1.33 | 1 | 5 | 3 | 9 | Z |  |  |  |  | generated_alphabet_reverse_009 |
+| world_alphabet_reverse_010 | alphabet_reverse | hard | 5 | 25 | 10 | 0.4 | 10 | 1 | 1 | alphabet_reverse | 13 | 4 | 1.71 | 2 | 4 | 4 | 12 | Z |  |  |  |  | generated_alphabet_reverse_010 |
+| world_alphabet_reverse_011 | alphabet_reverse | easy | 5 | 25 | 8 | 0.32 | 8 | 1 | 1 | alphabet_reverse | 18 | 2 | 1.26 | 1 | 5 | 2 | 5 | Z |  |  |  |  | generated_alphabet_reverse_011 |
+| world_alphabet_reverse_012 | alphabet_reverse | easy | 5 | 25 | 14 | 0.56 | 14 | 1 | 1 | alphabet_reverse | 13 | 4 | 1.71 | 3 | 5 | 6 | 4 | Z |  |  |  |  | generated_alphabet_reverse_012 |
+| world_alphabet_reverse_013 | alphabet_reverse | medium | 5 | 25 | 14 | 0.56 | 14 | 1 | 1 | alphabet_reverse | 18 | 2 | 1.26 | 4 | 5 | 5 | 6 | Z |  |  |  |  | generated_alphabet_reverse_013 |
+| world_alphabet_reverse_014 | alphabet_reverse | medium | 5 | 25 | 8 | 0.32 | 8 | 1 | 1 | alphabet_reverse | 14 | 4 | 1.6 | 2 | 4 | 2 | 7 | Z |  |  |  |  | generated_alphabet_reverse_014 |
+| world_alphabet_reverse_015 | alphabet_reverse | hard | 5 | 25 | 4 | 0.16 | 4 | 1 | 1 | alphabet_reverse | 11 | 4 | 2.0 | 1 | 1 | 2 | 12 | Z |  |  |  |  | generated_alphabet_reverse_015 |
+| world_alphabet_reverse_016 | alphabet_reverse | easy | 5 | 25 | 8 | 0.32 | 8 | 1 | 1 | alphabet_reverse | 13 | 4 | 1.71 | 3 | 3 | 2 | 7 | Z |  |  |  |  | generated_alphabet_reverse_016 |
+| world_alphabet_reverse_017 | alphabet_reverse | easy | 5 | 25 | 15 | 0.6 | 15 | 1 | 1 | alphabet_reverse | 14 | 4 | 1.6 | 2 | 8 | 5 | 6 | Z |  |  |  |  | generated_alphabet_reverse_017 |
+| world_alphabet_reverse_018 | alphabet_reverse | medium | 5 | 25 | 14 | 0.56 | 14 | 1 | 1 | alphabet_reverse | 17 | 2 | 1.33 | 2 | 7 | 5 | 7 | Z |  |  |  |  | generated_alphabet_reverse_018 |
+| world_alphabet_reverse_019 | alphabet_reverse | medium | 5 | 25 | 5 | 0.2 | 5 | 1 | 1 | alphabet_reverse | 13 | 4 | 1.71 | 0 | 3 | 2 | 8 | Z |  |  |  |  | generated_alphabet_reverse_019 |
+| world_alphabet_reverse_020 | alphabet_reverse | hard | 5 | 25 | 5 | 0.2 | 5 | 1 | 1 | alphabet_reverse | 18 | 2 | 1.26 | 0 | 2 | 3 | 10 | Z |  |  |  |  | generated_alphabet_reverse_020 |
+| world_multiples_001 | multiples | easy | 6 | 36 | 13 | 0.3611 | 13 | 2 | 2 | multiple | 24 | 5 | 1.4 | 0 | 5 | 8 | 7 |  | 2 |  |  |  | generated_multiples_001 |
+| world_multiples_002 | multiples | easy | 6 | 36 | 12 | 0.3333 | 12 | 3 | 3 | multiple | 21 | 5 | 1.59 | 1 | 7 | 4 | 4 |  | 3 |  |  |  | generated_multiples_002 |
+| world_multiples_003 | multiples | medium | 7 | 49 | 12 | 0.2449 | 12 | 4 | 4 | multiple | 17 | 6 | 2.67 | 1 | 5 | 6 | 9 |  | 4 |  |  |  | generated_multiples_003 |
+| world_multiples_004 | multiples | medium | 7 | 49 | 15 | 0.3061 | 15 | 5 | 5 | multiple | 31 | 4 | 1.5 | 0 | 7 | 8 | 11 |  | 5 |  |  |  | generated_multiples_004 |
+| world_multiples_005 | multiples | hard | 7 | 49 | 10 | 0.2041 | 10 | 3 | 3 | multiple | 15 | 6 | 3.0 | 2 | 3 | 5 | 14 |  | 3 |  |  |  | generated_multiples_005 |
+| world_multiples_006 | multiples | easy | 6 | 36 | 16 | 0.4444 | 16 | 2 | 2 | multiple | 17 | 5 | 1.94 | 2 | 7 | 7 | 6 |  | 2 |  |  |  | generated_multiples_006 |
+| world_multiples_007 | multiples | easy | 6 | 36 | 16 | 0.4444 | 16 | 3 | 3 | multiple | 21 | 5 | 1.59 | 0 | 9 | 7 | 6 |  | 3 |  |  |  | generated_multiples_007 |
+| world_multiples_008 | multiples | medium | 7 | 49 | 10 | 0.2041 | 10 | 4 | 4 | multiple | 21 | 6 | 2.18 | 3 | 3 | 4 | 11 |  | 4 |  |  |  | generated_multiples_008 |
+| world_multiples_009 | multiples | medium | 7 | 49 | 19 | 0.3878 | 19 | 5 | 5 | multiple | 16 | 6 | 2.82 | 0 | 8 | 11 | 11 |  | 5 |  |  |  | generated_multiples_009 |
+| world_multiples_010 | multiples | hard | 7 | 49 | 15 | 0.3061 | 15 | 3 | 3 | multiple | 23 | 6 | 2.0 | 2 | 4 | 9 | 12 |  | 3 |  |  |  | generated_multiples_010 |
+| world_multiples_011 | multiples | easy | 6 | 36 | 17 | 0.4722 | 17 | 2 | 2 | multiple | 18 | 4 | 1.84 | 2 | 7 | 8 | 8 |  | 2 |  |  |  | generated_multiples_011 |
+| world_multiples_012 | multiples | easy | 6 | 36 | 15 | 0.4167 | 15 | 3 | 3 | multiple | 16 | 5 | 2.06 | 2 | 6 | 7 | 6 |  | 3 |  |  |  | generated_multiples_012 |
+| world_multiples_013 | multiples | medium | 7 | 49 | 15 | 0.3061 | 15 | 4 | 4 | multiple | 23 | 6 | 2.0 | 0 | 7 | 8 | 8 |  | 4 |  |  |  | generated_multiples_013 |
+| world_multiples_014 | multiples | medium | 7 | 49 | 12 | 0.2449 | 12 | 5 | 5 | multiple | 15 | 6 | 3.0 | 3 | 3 | 6 | 7 |  | 5 |  |  |  | generated_multiples_014 |
+| world_multiples_015 | multiples | hard | 7 | 49 | 15 | 0.3061 | 15 | 3 | 3 | multiple | 30 | 4 | 1.55 | 2 | 7 | 6 | 13 |  | 3 |  |  |  | generated_multiples_015 |
+| world_multiples_016 | multiples | easy | 6 | 36 | 14 | 0.3889 | 14 | 2 | 2 | multiple | 14 | 5 | 2.33 | 0 | 8 | 6 | 8 |  | 2 |  |  |  | generated_multiples_016 |
+| world_multiples_017 | multiples | easy | 7 | 49 | 18 | 0.3673 | 18 | 3 | 3 | multiple | 39 | 2 | 1.2 | 2 | 5 | 11 | 4 |  | 3 |  |  |  | generated_multiples_017 |
+| world_multiples_018 | multiples | medium | 7 | 49 | 14 | 0.2857 | 14 | 4 | 4 | multiple | 26 | 6 | 1.78 | 3 | 3 | 8 | 12 |  | 4 |  |  |  | generated_multiples_018 |
+| world_multiples_019 | multiples | medium | 7 | 49 | 14 | 0.2857 | 14 | 5 | 5 | multiple | 31 | 4 | 1.5 | 1 | 6 | 7 | 12 |  | 5 |  |  |  | generated_multiples_019 |
+| world_multiples_020 | multiples | hard | 7 | 49 | 9 | 0.1837 | 9 | 3 | 3 | multiple | 30 | 6 | 1.55 | 1 | 3 | 5 | 15 |  | 3 |  |  |  | generated_multiples_020 |
+| world_roman_001 | roman | easy | 6 | 36 | 16 | 0.4444 | 16 | 1 | 1 | roman | 20 | 5 | 1.67 | 2 | 6 | 8 | 7 |  |  | 16 |  |  | generated_roman_001 |
+| world_roman_002 | roman | easy | 6 | 36 | 16 | 0.4444 | 16 | 1 | 1 | roman | 20 | 5 | 1.67 | 0 | 9 | 7 | 5 |  |  | 16 |  |  | generated_roman_002 |
+| world_roman_003 | roman | medium | 7 | 49 | 17 | 0.3469 | 17 | 1 | 1 | roman | 20 | 6 | 2.29 | 1 | 6 | 10 | 9 |  |  | 17 |  |  | generated_roman_003 |
+| world_roman_004 | roman | medium | 7 | 49 | 14 | 0.2857 | 14 | 1 | 1 | roman | 26 | 6 | 1.78 | 1 | 4 | 9 | 12 |  |  | 14 |  |  | generated_roman_004 |
+| world_roman_005 | roman | hard | 7 | 49 | 14 | 0.2857 | 14 | 1 | 1 | roman | 26 | 6 | 1.78 | 2 | 4 | 8 | 13 |  |  | 28 |  |  | generated_roman_005 |
+| world_roman_006 | roman | easy | 6 | 36 | 9 | 0.25 | 9 | 1 | 1 | roman | 25 | 3 | 1.35 | 1 | 4 | 4 | 8 |  |  | 9 |  |  | generated_roman_006 |
+| world_roman_007 | roman | easy | 6 | 36 | 13 | 0.3611 | 13 | 1 | 1 | roman | 21 | 3 | 1.59 | 0 | 7 | 6 | 6 |  |  | 13 |  |  | generated_roman_007 |
+| world_roman_008 | roman | medium | 7 | 49 | 11 | 0.2245 | 11 | 1 | 1 | roman | 19 | 6 | 2.4 | 2 | 3 | 6 | 11 |  |  | 11 |  |  | generated_roman_008 |
+| world_roman_009 | roman | medium | 7 | 49 | 17 | 0.3469 | 17 | 1 | 1 | roman | 20 | 6 | 2.29 | 2 | 7 | 8 | 11 |  |  | 17 |  |  | generated_roman_009 |
+| world_roman_010 | roman | hard | 7 | 49 | 15 | 0.3061 | 15 | 1 | 1 | roman | 31 | 4 | 1.5 | 0 | 7 | 8 | 12 |  |  | 15 |  |  | generated_roman_010 |
+| world_roman_011 | roman | easy | 6 | 36 | 8 | 0.2222 | 8 | 1 | 1 | roman | 14 | 5 | 2.33 | 2 | 3 | 3 | 8 |  |  | 8 |  |  | generated_roman_011 |
+| world_roman_012 | roman | easy | 6 | 36 | 16 | 0.4444 | 16 | 1 | 1 | roman | 22 | 5 | 1.52 | 0 | 9 | 7 | 6 |  |  | 16 |  |  | generated_roman_012 |
+| world_roman_013 | roman | medium | 7 | 49 | 15 | 0.3061 | 15 | 1 | 1 | roman | 16 | 6 | 2.82 | 1 | 7 | 7 | 8 |  |  | 15 |  |  | generated_roman_013 |
+| world_roman_014 | roman | medium | 7 | 49 | 11 | 0.2245 | 11 | 1 | 1 | roman | 23 | 6 | 2.0 | 1 | 4 | 6 | 9 |  |  | 11 |  |  | generated_roman_014 |
+| world_roman_015 | roman | hard | 7 | 49 | 15 | 0.3061 | 15 | 1 | 1 | roman | 15 | 6 | 3.0 | 2 | 5 | 8 | 11 |  |  | 30 |  |  | generated_roman_015 |
+| world_roman_016 | roman | easy | 7 | 49 | 20 | 0.4082 | 20 | 1 | 1 | roman | 20 | 6 | 2.29 | 2 | 7 | 11 | 7 |  |  | 20 |  |  | generated_roman_016 |
+| world_roman_017 | roman | easy | 6 | 36 | 10 | 0.2778 | 10 | 1 | 1 | roman | 16 | 5 | 2.06 | 2 | 4 | 4 | 7 |  |  | 10 |  |  | generated_roman_017 |
+| world_roman_018 | roman | medium | 7 | 49 | 13 | 0.2653 | 13 | 1 | 1 | roman | 21 | 6 | 2.18 | 2 | 6 | 5 | 11 |  |  | 13 |  |  | generated_roman_018 |
+| world_roman_019 | roman | medium | 7 | 49 | 17 | 0.3469 | 17 | 1 | 1 | roman | 19 | 6 | 2.4 | 1 | 8 | 8 | 11 |  |  | 17 |  |  | generated_roman_019 |
+| world_roman_020 | roman | hard | 7 | 49 | 9 | 0.1837 | 9 | 1 | 1 | roman | 23 | 6 | 2.0 | 1 | 3 | 5 | 15 |  |  | 9 |  |  | generated_roman_020 |
+| world_multiples_roman_001 | multiples_roman | easy | 6 | 36 | 13 | 0.3611 | 13 | 3 | 3 | multiple_roman | 28 | 3 | 1.21 | 1 | 6 | 6 | 9 |  | 3 | 39 |  |  | linkedin-editor-83 |
+| world_multiples_roman_002 | multiples_roman | easy | 6 | 36 | 15 | 0.4167 | 15 | 4 | 4 | multiple_roman | 18 | 5 | 1.84 | 2 | 6 | 7 | 0 |  | 4 | 60 |  |  | linkedin-js-12 |
+| world_multiples_roman_003 | multiples_roman | medium | 6 | 36 | 11 | 0.3056 | 11 | 5 | 5 | multiple_roman | 16 | 5 | 2.06 | 2 | 4 | 5 | 15 |  | 5 | 55 |  |  | linkedin-editor-37 |
+| world_multiples_roman_004 | multiples_roman | medium | 6 | 36 | 9 | 0.25 | 9 | 3 | 3 | multiple_roman | 29 | 3 | 1.17 | 2 | 4 | 3 | 5 |  | 3 | 27 |  |  | all-16 |
+| world_multiples_roman_005 | multiples_roman | hard | 6 | 36 | 5 | 0.1389 | 5 | 2 | 2 | multiple_roman | 18 | 5 | 1.84 | 2 | 2 | 1 | 17 |  | 2 | 10 |  |  | linkedin-editor-40 |
+| world_multiples_roman_006 | multiples_roman | easy | 7 | 49 | 18 | 0.3673 | 18 | 3 | 3 | multiple_roman | 28 | 6 | 1.66 | 1 | 8 | 9 | 0 |  | 3 | 54 |  |  | linkedin-editor-13 |
+| world_multiples_roman_007 | multiples_roman | easy | 7 | 49 | 20 | 0.4082 | 20 | 4 | 4 | multiple_roman | 20 | 6 | 2.29 | 1 | 9 | 10 | 0 |  | 4 | 80 |  |  | linkedin-editor-105 |
+| world_multiples_roman_008 | multiples_roman | medium | 6 | 36 | 8 | 0.2222 | 8 | 5 | 5 | multiple_roman | 18 | 5 | 1.84 | 3 | 2 | 3 | 15 |  | 5 | 40 |  |  | linkedin-editor-34 |
+| world_multiples_roman_009 | multiples_roman | medium | 7 | 49 | 14 | 0.2857 | 14 | 3 | 3 | multiple_roman | 29 | 6 | 1.6 | 2 | 6 | 6 | 12 |  | 3 | 42 |  |  | linkedin-editor-29 |
+| world_multiples_roman_010 | multiples_roman | hard | 7 | 49 | 8 | 0.1633 | 8 | 2 | 2 | multiple_roman | 25 | 4 | 1.85 | 2 | 2 | 4 | 20 |  | 2 | 16 |  |  | linkedin-editor-58 |
+| world_multiples_roman_011 | multiples_roman | easy | 7 | 49 | 17 | 0.3469 | 17 | 3 | 3 | multiple_roman | 20 | 6 | 2.29 | 0 | 9 | 8 | 0 |  | 3 | 51 |  |  | linkedin-editor-105 |
+| world_multiples_roman_012 | multiples_roman | easy | 6 | 36 | 11 | 0.3056 | 11 | 4 | 4 | multiple_roman | 16 | 5 | 2.06 | 2 | 5 | 4 | 0 |  | 4 | 44 |  |  | linkedin-js-11 |
+| world_multiples_roman_013 | multiples_roman | medium | 6 | 36 | 10 | 0.2778 | 10 | 5 | 5 | multiple_roman | 15 | 5 | 2.19 | 0 | 5 | 5 | 12 |  | 5 | 50 |  |  | linkedin-editor-99 |
+| world_multiples_roman_014 | multiples_roman | medium | 7 | 49 | 14 | 0.2857 | 14 | 3 | 3 | multiple_roman | 20 | 6 | 2.29 | 2 | 5 | 7 | 17 |  | 3 | 42 |  |  | linkedin-editor-86 |
+| world_multiples_roman_015 | multiples_roman | hard | 6 | 36 | 5 | 0.1389 | 5 | 2 | 2 | multiple_roman | 18 | 5 | 1.84 | 2 | 2 | 1 | 17 |  | 2 | 10 |  |  | linkedin-editor-40 |
+| world_multiples_roman_016 | multiples_roman | easy | 6 | 36 | 12 | 0.3333 | 12 | 3 | 3 | multiple_roman | 19 | 5 | 1.75 | 0 | 5 | 7 | 0 |  | 3 | 36 |  |  | linkedin-js-6 |
+| world_multiples_roman_017 | multiples_roman | easy | 7 | 49 | 15 | 0.3061 | 15 | 4 | 4 | multiple_roman | 24 | 6 | 1.92 | 1 | 6 | 8 | 0 |  | 4 | 60 |  |  | linkedin-editor-28 |
+| world_multiples_roman_018 | multiples_roman | medium | 6 | 36 | 10 | 0.2778 | 10 | 5 | 5 | multiple_roman | 18 | 5 | 1.84 | 1 | 4 | 5 | 16 |  | 5 | 50 |  |  | linkedin-editor-53 |
+| world_multiples_roman_019 | multiples_roman | medium | 7 | 49 | 13 | 0.2653 | 13 | 3 | 3 | multiple_roman | 12 | 6 | 3.69 | 2 | 4 | 7 | 18 |  | 3 | 39 |  |  | linkedin-editor-88 |
+| world_multiples_roman_020 | multiples_roman | hard | 6 | 36 | 6 | 0.1667 | 6 | 2 | 2 | multiple_roman | 10 | 5 | 3.18 | 1 | 2 | 3 | 22 |  | 2 | 12 |  |  | linkedin-editor-240 |

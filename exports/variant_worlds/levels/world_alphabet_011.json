@@ -1,0 +1,137 @@
+{
+  "id": "world_alphabet_011",
+  "size": 5,
+  "clues": [
+    {
+      "n": 1,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "n": 2,
+      "x": 4,
+      "y": 3
+    },
+    {
+      "n": 3,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 4,
+      "x": 1,
+      "y": 4
+    },
+    {
+      "n": 5,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "n": 6,
+      "x": 0,
+      "y": 4
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 3,
+        "y": 1,
+        "len": 1
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 0,
+        "len": 3
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "len": 1
+      }
+    ]
+  },
+  "solution": [
+    18,
+    23,
+    24,
+    19,
+    14,
+    13,
+    8,
+    9,
+    4,
+    3,
+    2,
+    7,
+    12,
+    17,
+    22,
+    21,
+    16,
+    11,
+    6,
+    1,
+    0,
+    5,
+    10,
+    15,
+    20
+  ],
+  "meta": {
+    "variant": "alphabet",
+    "sequence_rule": "A, B, C...",
+    "difficulty_target": "easy",
+    "representation": "alphabet",
+    "display_labels": {
+      "1": "A",
+      "2": "B",
+      "3": "C",
+      "4": "D",
+      "5": "E",
+      "6": "F"
+    },
+    "source_level_id": "generated_alphabet_011",
+    "alphabet_start_char": "A",
+    "generation_batch": "world_variant_pack_20_each",
+    "generation_index": 11
+  },
+  "metrics": {
+    "variant": "alphabet",
+    "grid_size": 5,
+    "path_length": 25,
+    "num_clues": 6,
+    "clue_density": 0.24,
+    "sequence_length": 6,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "alphabet",
+    "difficulty_estimate": "easy",
+    "turns": 12,
+    "max_straight": 4,
+    "avg_straight": 1.85,
+    "corners": 2,
+    "borders": 3,
+    "inners": 1,
+    "num_walls": 8,
+    "alphabet_start_char": "A"
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "id": "split_multiples_roman_005",
+  "size": 7,
+  "clues": [
+    {
+      "n": 1,
+      "x": 4,
+      "y": 2
+    },
+    {
+      "n": 2,
+      "x": 6,
+      "y": 0
+    },
+    {
+      "n": 3,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "n": 4,
+      "x": 4,
+      "y": 6
+    },
+    {
+      "n": 5,
+      "x": 1,
+      "y": 5
+    },
+    {
+      "n": 6,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 7,
+      "x": 5,
+      "y": 3
+    }
+  ],
+  "walls": {
+    "h": [],
+    "v": []
+  },
+  "solution": [
+    18,
+    25,
+    32,
+    33,
+    34,
+    27,
+    20,
+    13,
+    6,
+    5,
+    4,
+    3,
+    2,
+    1,
+    0,
+    7,
+    14,
+    21,
+    28,
+    35,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    41,
+    40,
+    39,
+    38,
+    37,
+    36,
+    29,
+    22,
+    23,
+    30,
+    31,
+    24,
+    17,
+    16,
+    15,
+    8,
+    9,
+    10,
+    11,
+    12,
+    19,
+    26
+  ],
+  "meta": {
+    "variant": "multiples_roman",
+    "sequence_rule": "roman multiples of 2",
+    "difficulty_target": "hard",
+    "representation": "multiple_roman",
+    "display_labels": {
+      "1": "II",
+      "2": "IV",
+      "3": "VI",
+      "4": "VIII",
+      "5": "X",
+      "6": "XII",
+      "7": "XIV"
+    },
+    "source_level_id": "all-333",
+    "multiple_base": 2,
+    "roman_max_value": 14,
+    "generation_batch": "split_variant_pack_5_each",
+    "generation_index": 5
+  },
+  "metrics": {
+    "variant": "multiples_roman",
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 7,
+    "clue_density": 0.1429,
+    "sequence_length": 7,
+    "sequence_start": 2,
+    "sequence_step": 2,
+    "representation": "multiple_roman",
+    "difficulty_estimate": "hard",
+    "turns": 16,
+    "max_straight": 6,
+    "avg_straight": 2.82,
+    "corners": 1,
+    "borders": 2,
+    "inners": 4,
+    "num_walls": 0,
+    "multiple_base": 2,
+    "roman_max_value": 14
+  }
+}

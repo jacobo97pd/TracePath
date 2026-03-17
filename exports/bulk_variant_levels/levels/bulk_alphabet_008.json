@@ -5,17 +5,17 @@
     {
       "n": 1,
       "x": 3,
-      "y": 4
+      "y": 2
     },
     {
       "n": 2,
-      "x": 0,
-      "y": 4
+      "x": 5,
+      "y": 1
     },
     {
       "n": 3,
-      "x": 0,
-      "y": 3
+      "x": 2,
+      "y": 0
     },
     {
       "n": 4,
@@ -24,21 +24,36 @@
     },
     {
       "n": 5,
-      "x": 3,
+      "x": 0,
       "y": 0
     },
     {
       "n": 6,
-      "x": 5,
-      "y": 1
-    },
-    {
-      "n": 7,
-      "x": 4,
+      "x": 0,
       "y": 3
     },
     {
+      "n": 7,
+      "x": 1,
+      "y": 5
+    },
+    {
       "n": 8,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "n": 9,
+      "x": 5,
+      "y": 2
+    },
+    {
+      "n": 10,
+      "x": 4,
+      "y": 4
+    },
+    {
+      "n": 11,
       "x": 5,
       "y": 5
     }
@@ -46,8 +61,8 @@
   "walls": {
     "h": [
       {
-        "x": 1,
-        "y": 2,
+        "x": 4,
+        "y": 1,
         "len": 1
       },
       {
@@ -56,29 +71,34 @@
         "len": 1
       },
       {
-        "x": 2,
-        "y": 3,
-        "len": 1
-      },
-      {
-        "x": 1,
+        "x": 4,
         "y": 4,
         "len": 1
       },
       {
         "x": 4,
-        "y": 4,
+        "y": 5,
         "len": 1
       }
     ],
     "v": [
       {
-        "x": 3,
-        "y": 3,
+        "x": 1,
+        "y": 1,
         "len": 1
       },
       {
-        "x": 4,
+        "x": 1,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 2,
         "y": 4,
         "len": 1
       }
@@ -97,31 +117,34 @@
       "5": "Q",
       "6": "R",
       "7": "S",
-      "8": "T"
+      "8": "T",
+      "9": "U",
+      "10": "V",
+      "11": "W"
     },
-    "source_level_id": "all-75",
+    "source_level_id": "all-106",
     "alphabet_start_char": "M",
-    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_batch": "bulk_variant_pack_100_each",
     "generation_index": 8
   },
   "metrics": {
     "variant": "alphabet",
     "grid_size": 6,
     "path_length": 36,
-    "num_clues": 8,
-    "clue_density": 0.2222,
-    "sequence_length": 8,
+    "num_clues": 11,
+    "clue_density": 0.3056,
+    "sequence_length": 11,
     "sequence_start": 1,
     "sequence_step": 1,
     "representation": "alphabet",
     "difficulty_estimate": "medium",
-    "turns": 23,
-    "max_straight": 3,
-    "avg_straight": 1.46,
-    "corners": 1,
-    "borders": 4,
-    "inners": 3,
-    "num_walls": 7,
+    "turns": 17,
+    "max_straight": 5,
+    "avg_straight": 1.94,
+    "corners": 2,
+    "borders": 5,
+    "inners": 4,
+    "num_walls": 8,
     "alphabet_start_char": "M"
   }
 }

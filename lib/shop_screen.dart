@@ -111,6 +111,8 @@ class _ShopScreenState extends State<ShopScreen> {
   bool _shopPreparing = false;
   int _shopPrepDone = 0;
   int _shopPrepTotal = 0;
+  bool _didShowCoinPackLoadError = false;
+  bool _didShowCoinPackEmptyInfo = false;
   final Set<String> _shopPrepPaths = <String>{};
   final Map<String, String> _uiResolvedUrlCache = <String, String>{};
   final Map<String, Future<String?>> _uiInflightResolveCache =
@@ -799,25 +801,43 @@ class _ShopScreenState extends State<ShopScreen> {
           );
         }
         if (snapshot.hasError) {
-          return _buildCoinPackEmptyState(
+          if (!_didShowCoinPackLoadError) {
+            _didShowCoinPackLoadError = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _showShopErrorPopup(
+                title: 'Coin packs unavailable',
+                message: 'Could not load coin packs. Please retry.',
+              );
+            });
+          }
+          return _buildCoinPackInlineInfo(
             context,
-            title: 'Could not load coin packs',
-            subtitle: 'Firestore error: ${snapshot.error}',
-            icon: Icons.wifi_off_rounded,
+            title: 'Coin packs unavailable',
+            subtitle: 'Please check your connection and retry.',
             onRetry: _reloadCoinPacks,
           );
         }
         final result = snapshot.data;
         final packs = result?.packs ?? const <CoinPack>[];
         if (packs.isEmpty) {
-          return _buildCoinPackEmptyState(
+          if (!_didShowCoinPackEmptyInfo) {
+            _didShowCoinPackEmptyInfo = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _showShopErrorPopup(
+                title: 'No coin packs available',
+                message: 'New packs will appear here soon.',
+              );
+            });
+          }
+          return _buildCoinPackInlineInfo(
             context,
             title: 'No coin packs available',
             subtitle: 'New packs will appear here soon.',
-            icon: Icons.inventory_2_outlined,
             onRetry: _reloadCoinPacks,
           );
         }
+        _didShowCoinPackLoadError = false;
+        _didShowCoinPackEmptyInfo = false;
         return ListView(
           padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
           children: [
@@ -835,13 +855,17 @@ class _ShopScreenState extends State<ShopScreen> {
             Builder(
               builder: (context) {
                 final width = MediaQuery.of(context).size.width;
+                final veryNarrow = width < 360;
                 final isNarrow = width < 390;
-                final childAspectRatio = isNarrow ? 0.62 : 0.71;
+                final crossAxisCount = veryNarrow ? 1 : 2;
+                final childAspectRatio = veryNarrow
+                    ? 1.95
+                    : (isNarrow ? 0.64 : 0.72);
                 return GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
+                    crossAxisCount: crossAxisCount,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
                     childAspectRatio: childAspectRatio,
@@ -876,28 +900,25 @@ class _ShopScreenState extends State<ShopScreen> {
     );
   }
 
-  Widget _buildCoinPackEmptyState(
+  Widget _buildCoinPackInlineInfo(
     BuildContext context, {
     required String title,
     required String subtitle,
-    required IconData icon,
     VoidCallback? onRetry,
   }) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Container(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF18253C),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFF2D3D59)),
+            color: const Color(0xFF122036),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: const Color(0xFF2A3A57)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 30, color: const Color(0xFF8EA7D3)),
-              const SizedBox(height: 10),
               Text(
                 title,
                 textAlign: TextAlign.center,
@@ -936,6 +957,57 @@ class _ShopScreenState extends State<ShopScreen> {
         timeout: const Duration(seconds: 3),
       );
     });
+  }
+
+  Future<void> _showShopErrorPopup({
+    required String title,
+    required String message,
+  }) async {
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF131E31),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: BorderSide(color: Colors.white.withOpacity(0.10)),
+        ),
+        title: Row(
+          children: [
+            const Icon(Icons.error_outline_rounded,
+                color: Color(0xFFFF8A80)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          message,
+          style: const TextStyle(
+            color: Color(0xFFB8C7E6),
+            fontSize: 14,
+            height: 1.35,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text(
+              'OK',
+              style: TextStyle(color: Color(0xFF8FC4FF)),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   String _coinPackAssetPath(CoinPack pack) {
@@ -2333,6 +2405,7 @@ class _TrailUnlockToastState extends State<_TrailUnlockToast>
       ],
     );
   }
+
 }
 
 class _TrailShopCard extends StatelessWidget {

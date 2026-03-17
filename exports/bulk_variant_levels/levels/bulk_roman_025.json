@@ -1,114 +1,118 @@
 {
   "id": "bulk_roman_025",
-  "size": 8,
+  "size": 6,
   "clues": [
     {
       "n": 1,
       "x": 5,
-      "y": 5
+      "y": 2
     },
     {
       "n": 2,
-      "x": 1,
-      "y": 3
-    },
-    {
-      "n": 3,
-      "x": 2,
-      "y": 7
-    },
-    {
-      "n": 4,
-      "x": 0,
-      "y": 3
-    },
-    {
-      "n": 5,
-      "x": 1,
-      "y": 0
-    },
-    {
-      "n": 6,
-      "x": 7,
-      "y": 0
-    },
-    {
-      "n": 7,
-      "x": 7,
-      "y": 5
-    },
-    {
-      "n": 8,
-      "x": 3,
-      "y": 7
-    },
-    {
-      "n": 9,
-      "x": 4,
-      "y": 4
-    },
-    {
-      "n": 10,
-      "x": 6,
-      "y": 4
-    },
-    {
-      "n": 11,
       "x": 4,
       "y": 1
     },
     {
-      "n": 12,
-      "x": 5,
+      "n": 3,
+      "x": 2,
+      "y": 3
+    },
+    {
+      "n": 4,
+      "x": 3,
+      "y": 4
+    },
+    {
+      "n": 5,
+      "x": 1,
+      "y": 1
+    },
+    {
+      "n": 6,
+      "x": 0,
       "y": 2
+    },
+    {
+      "n": 7,
+      "x": 3,
+      "y": 5
     }
   ],
   "walls": {
-    "h": [],
-    "v": []
+    "h": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "len": 4
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 4
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "len": 4
+      }
+    ]
   },
   "meta": {
     "variant": "roman",
-    "sequence_rule": "I, II, III...",
+    "sequence_rule": "II, IV, VI...",
     "difficulty_target": "hard",
     "representation": "roman",
     "display_labels": {
-      "1": "I",
-      "2": "II",
-      "3": "III",
-      "4": "IV",
-      "5": "V",
-      "6": "VI",
-      "7": "VII",
-      "8": "VIII",
-      "9": "IX",
-      "10": "X",
-      "11": "XI",
-      "12": "XII"
+      "1": "II",
+      "2": "IV",
+      "3": "VI",
+      "4": "VIII",
+      "5": "X",
+      "6": "XII",
+      "7": "XIV"
     },
-    "source_level_id": "all-388",
-    "roman_max_value": 12,
-    "generation_batch": "bulk_variant_pack_200_each",
+    "source_level_id": "all-364",
+    "roman_max_value": 14,
+    "roman_step": 2,
+    "generation_batch": "bulk_variant_pack_100_each",
     "generation_index": 25
   },
   "metrics": {
     "variant": "roman",
-    "grid_size": 8,
-    "path_length": 64,
-    "num_clues": 12,
-    "clue_density": 0.1875,
-    "sequence_length": 12,
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 7,
+    "clue_density": 0.1944,
+    "sequence_length": 7,
     "sequence_start": 1,
     "sequence_step": 1,
     "representation": "roman",
     "difficulty_estimate": "hard",
-    "turns": 23,
-    "max_straight": 7,
-    "avg_straight": 2.62,
-    "corners": 1,
-    "borders": 5,
-    "inners": 6,
-    "num_walls": 0,
-    "roman_max_value": 12
+    "turns": 16,
+    "max_straight": 5,
+    "avg_straight": 2.06,
+    "corners": 0,
+    "borders": 3,
+    "inners": 4,
+    "num_walls": 15,
+    "roman_max_value": 14,
+    "roman_step": 2
   }
 }

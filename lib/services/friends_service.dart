@@ -34,6 +34,44 @@ class FriendsService {
   Future<void> sendFriendRequest(String friendUid) =>
       sendFriendRequestByUid(friendUid);
 
+  Future<void> sendLevelChallenge({
+    required String toUid,
+    required String levelId,
+  }) async {
+    final fromUid = await _requireUid();
+    final targetUid = toUid.trim();
+    final normalizedLevelId = levelId.trim();
+    if (targetUid.isEmpty || targetUid == fromUid) {
+      throw StateError('INVALID_FRIEND_UID');
+    }
+    if (normalizedLevelId.isEmpty) {
+      throw StateError('INVALID_LEVEL_ID');
+    }
+
+    final fromData = await _readUserData(fromUid) ?? <String, dynamic>{};
+
+    final route = _routeFromLevelId(normalizedLevelId) ?? '/play';
+    final fromUsername = _readString(fromData['username']);
+    final fromPlayerName = _readString(fromData['playerName'], fallback: 'Player');
+    final challenger = fromUsername.isNotEmpty ? '@$fromUsername' : fromPlayerName;
+    final payload = <String, dynamic>{
+      'type': 'level_challenge',
+      'fromUid': fromUid,
+      'fromUsername': fromUsername,
+      'fromPlayerName': fromPlayerName,
+      'fromAvatarId': _readString(fromData['avatarId'], fallback: 'default'),
+      'title': 'New challenge',
+      'body': '$challenger challenged you on level $normalizedLevelId.',
+      'status': 'active',
+      'read': false,
+      'ctaType': 'open_level',
+      'ctaPayload': route,
+      'challengeLevelId': normalizedLevelId,
+      'createdAt': FieldValue.serverTimestamp(),
+    };
+    await _inboxRef(targetUid).add(payload);
+  }
+
   Future<void> sendFriendRequestByUsername(String username) async {
     final raw = username;
     final input = username.trim();
@@ -300,10 +338,29 @@ class FriendsService {
             : (inboxMessageId ?? senderUid).trim());
     final currentFriendRef = _friendsRef(currentUid).doc(senderUid);
     final senderFriendRef = _friendsRef(senderUid).doc(currentUid);
+    final senderInboxRef = _inboxRef(senderUid).doc('friend_accept_$currentUid');
     final currentFriendPayload =
         _friendDocData(uid: senderUid, data: senderData);
     final senderFriendPayload =
         _friendDocData(uid: currentUid, data: currentData);
+    final currentUsername = _readString(currentData['username']);
+    final currentPlayerName =
+        _readString(currentData['playerName'], fallback: 'Player');
+    const acceptTitle = 'Friend request accepted';
+    final acceptBody =
+        '@${currentUsername.isNotEmpty ? currentUsername : currentPlayerName} accepted your request.';
+    final senderInboxPayload = <String, dynamic>{
+      'type': 'friend_accept',
+      'fromUid': currentUid,
+      'fromUsername': currentUsername,
+      'fromPlayerName': currentPlayerName,
+      'fromAvatarId': _readString(currentData['avatarId'], fallback: 'default'),
+      'title': acceptTitle,
+      'body': acceptBody,
+      'status': 'accepted',
+      'read': false,
+      'createdAt': FieldValue.serverTimestamp(),
+    };
 
     if (kDebugMode) {
       debugPrint('[friends] accept request currentUid=$currentUid fromUid=$senderUid');
@@ -341,11 +398,15 @@ class FriendsService {
       final batch = _db().batch();
       batch.set(currentFriendRef, currentFriendPayload);
       batch.set(senderFriendRef, senderFriendPayload);
+      batch.set(senderInboxRef, senderInboxPayload, SetOptions(merge: true));
 
       if (kDebugMode) {
         debugPrint('[friends] delete path: users/$currentUid/incoming_requests/$senderUid');
         debugPrint('[friends] delete path: users/$senderUid/sent_requests/$currentUid');
         debugPrint('[friends] delete path: users/$currentUid/inbox/${currentInboxRef.id}');
+        debugPrint(
+          '[friends] write path: users/$senderUid/inbox/${senderInboxRef.id} payload=$senderInboxPayload',
+        );
       }
       batch.delete(incomingRef);
       batch.delete(senderSentRef);
@@ -536,5 +597,15 @@ class FriendsService {
       throw StateError('AUTH_REQUIRED');
     }
     return uid;
+  }
+
+  String? _routeFromLevelId(String levelId) {
+    final sep = levelId.lastIndexOf('_');
+    if (sep <= 0 || sep >= levelId.length - 1) return null;
+    final packId = levelId.substring(0, sep).trim();
+    final levelPart = levelId.substring(sep + 1).trim();
+    final level = int.tryParse(levelPart);
+    if (packId.isEmpty || level == null || level <= 0) return null;
+    return '/play/$packId/$level';
   }
 }

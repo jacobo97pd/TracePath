@@ -1,7 +1,7 @@
 name: zip_path_flutter
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.0.2+3
+version: 1.0.5+7
 
 environment:
   sdk: ^3.5.4
@@ -15,8 +15,6 @@ dependencies:
   shared_preferences: ^2.3.3
   path_provider: ^2.1.5
   crypto: ^3.0.6
-  flutter_local_notifications: ^17.2.3
-  timezone: ^0.9.4
   file_picker: ^8.1.2
   image: ^4.2.0
   google_sign_in: ^6.2.2
@@ -43,6 +41,29 @@ flutter:
     - assets/levels/pack_linkedin_js_generated_v1.json
     - assets/levels/pack_bulk_variant_100_v1.json
     - assets/levels/pack_bulk_variant_200_v1.json
+    - assets/levels/pack_variant_alphabet_v1.json
+    - assets/levels/pack_variant_alphabet_reverse_v1.json
+    - assets/levels/pack_variant_multiples_v1.json
+    - assets/levels/pack_variant_roman_v1.json
+    - assets/levels/pack_variant_multiples_roman_v1.json
+    - assets/levels/master_pack_v1.json
+    - assets/levels/pack_world_01_v1.json
+    - assets/levels/pack_world_02_v1.json
+    - assets/levels/pack_world_03_v1.json
+    - assets/levels/pack_world_04_v1.json
+    - assets/levels/pack_world_05_v1.json
+    - assets/levels/pack_world_06_v1.json
+    - assets/levels/pack_world_07_v1.json
+    - assets/levels/pack_world_08_v1.json
+    - assets/levels/pack_world_09_v1.json
+    - assets/levels/pack_world_10_v1.json
+    - assets/levels/pack_world_11_v1.json
+    - assets/levels/pack_world_12_v1.json
+    - assets/levels/pack_world_13_v1.json
+    - assets/levels/pack_world_14_v1.json
+    - assets/levels/pack_world_15_v1.json
+    - assets/levels/pack_world_16_v1.json
+    - assets/levels/pack_world_17_v1.json
     - assets/branding/logo_tracePath.png
     - assets/branding/splash_tracePath.png
     - assets/branding/coin_tracepath.png

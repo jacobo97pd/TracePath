@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 enum InboxItemType {
   friendRequest,
   friendAccept,
+  levelChallenge,
   systemNews,
   unknown,
 }
@@ -77,6 +78,8 @@ class InboxItem {
         return InboxItemType.friendRequest;
       case 'friend_accept':
         return InboxItemType.friendAccept;
+      case 'level_challenge':
+        return InboxItemType.levelChallenge;
       case 'system_news':
         return InboxItemType.systemNews;
       default:
@@ -84,4 +87,3 @@ class InboxItem {
     }
   }
 }
-

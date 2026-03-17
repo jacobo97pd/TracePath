@@ -1,69 +1,129 @@
 {
   "id": "bulk_roman_016",
-  "size": 6,
+  "size": 8,
   "clues": [
     {
       "n": 1,
-      "x": 5,
-      "y": 2
+      "x": 4,
+      "y": 5
     },
     {
       "n": 2,
-      "x": 3,
-      "y": 0
+      "x": 5,
+      "y": 7
     },
     {
       "n": 3,
-      "x": 3,
-      "y": 2
+      "x": 7,
+      "y": 6
     },
     {
       "n": 4,
-      "x": 4,
-      "y": 3
-    },
-    {
-      "n": 5,
-      "x": 1,
+      "x": 6,
       "y": 4
     },
     {
+      "n": 5,
+      "x": 7,
+      "y": 2
+    },
+    {
       "n": 6,
-      "x": 1,
-      "y": 1
+      "x": 5,
+      "y": 0
     },
     {
       "n": 7,
-      "x": 0,
+      "x": 3,
       "y": 0
     },
     {
       "n": 8,
-      "x": 0,
-      "y": 4
+      "x": 1,
+      "y": 1
     },
     {
       "n": 9,
-      "x": 3,
-      "y": 5
+      "x": 0,
+      "y": 0
     },
     {
       "n": 10,
-      "x": 5,
+      "x": 0,
       "y": 3
+    },
+    {
+      "n": 11,
+      "x": 0,
+      "y": 5
+    },
+    {
+      "n": 12,
+      "x": 1,
+      "y": 7
+    },
+    {
+      "n": 13,
+      "x": 3,
+      "y": 7
+    },
+    {
+      "n": 14,
+      "x": 2,
+      "y": 5
+    },
+    {
+      "n": 15,
+      "x": 1,
+      "y": 6
+    },
+    {
+      "n": 16,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 17,
+      "x": 1,
+      "y": 3
+    },
+    {
+      "n": 18,
+      "x": 3,
+      "y": 2
+    },
+    {
+      "n": 19,
+      "x": 4,
+      "y": 2
+    },
+    {
+      "n": 20,
+      "x": 6,
+      "y": 1
+    },
+    {
+      "n": 21,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "n": 22,
+      "x": 5,
+      "y": 4
+    },
+    {
+      "n": 23,
+      "x": 6,
+      "y": 6
     }
   ],
   "walls": {
     "h": [
       {
-        "x": 1,
+        "x": 5,
         "y": 1,
-        "len": 1
-      },
-      {
-        "x": 4,
-        "y": 1,
-        "len": 1
+        "len": 2
       },
       {
         "x": 5,
@@ -71,21 +131,46 @@
         "len": 1
       },
       {
-        "x": 1,
+        "x": 2,
         "y": 5,
-        "len": 4
+        "len": 1
+      },
+      {
+        "x": 1,
+        "y": 7,
+        "len": 2
       }
     ],
     "v": [
       {
         "x": 1,
-        "y": 1,
-        "len": 4
+        "y": 4,
+        "len": 2
       },
       {
-        "x": 5,
-        "y": 1,
-        "len": 4
+        "x": 2,
+        "y": 5,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "len": 1
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "len": 2
       }
     ]
   },
@@ -104,31 +189,46 @@
       "7": "VII",
       "8": "VIII",
       "9": "IX",
-      "10": "X"
+      "10": "X",
+      "11": "XI",
+      "12": "XII",
+      "13": "XIII",
+      "14": "XIV",
+      "15": "XV",
+      "16": "XVI",
+      "17": "XVII",
+      "18": "XVIII",
+      "19": "XIX",
+      "20": "XX",
+      "21": "XXI",
+      "22": "XXII",
+      "23": "XXIII"
     },
-    "source_level_id": "all-267",
-    "roman_max_value": 10,
-    "generation_batch": "bulk_variant_pack_200_each",
+    "source_level_id": "all-139",
+    "roman_max_value": 23,
+    "roman_step": 1,
+    "generation_batch": "bulk_variant_pack_100_each",
     "generation_index": 16
   },
   "metrics": {
     "variant": "roman",
-    "grid_size": 6,
-    "path_length": 36,
-    "num_clues": 10,
-    "clue_density": 0.2778,
-    "sequence_length": 10,
+    "grid_size": 8,
+    "path_length": 64,
+    "num_clues": 23,
+    "clue_density": 0.3594,
+    "sequence_length": 23,
     "sequence_start": 1,
     "sequence_step": 1,
     "representation": "roman",
     "difficulty_estimate": "easy",
-    "turns": 16,
-    "max_straight": 5,
-    "avg_straight": 2.06,
+    "turns": 35,
+    "max_straight": 7,
+    "avg_straight": 1.75,
     "corners": 1,
-    "borders": 5,
-    "inners": 4,
-    "num_walls": 15,
-    "roman_max_value": 10
+    "borders": 9,
+    "inners": 13,
+    "num_walls": 14,
+    "roman_max_value": 23,
+    "roman_step": 1
   }
 }

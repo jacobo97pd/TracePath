@@ -4,90 +4,88 @@
   "clues": [
     {
       "n": 1,
-      "x": 3,
-      "y": 1
+      "x": 4,
+      "y": 5
     },
     {
       "n": 2,
-      "x": 1,
+      "x": 5,
       "y": 3
     },
     {
       "n": 3,
-      "x": 0,
-      "y": 0
+      "x": 5,
+      "y": 1
     },
     {
       "n": 4,
-      "x": 2,
-      "y": 2
+      "x": 4,
+      "y": 0
     },
     {
       "n": 5,
       "x": 4,
-      "y": 0
-    },
-    {
-      "n": 6,
-      "x": 4,
-      "y": 1
-    },
-    {
-      "n": 7,
-      "x": 4,
       "y": 3
     },
     {
-      "n": 8,
-      "x": 4,
-      "y": 5
+      "n": 6,
+      "x": 3,
+      "y": 4
     },
     {
-      "n": 9,
+      "n": 7,
       "x": 2,
       "y": 5
     },
     {
+      "n": 8,
+      "x": 2,
+      "y": 3
+    },
+    {
+      "n": 9,
+      "x": 3,
+      "y": 1
+    },
+    {
       "n": 10,
+      "x": 2,
+      "y": 0
+    },
+    {
+      "n": 11,
+      "x": 1,
+      "y": 2
+    },
+    {
+      "n": 12,
+      "x": 1,
+      "y": 0
+    },
+    {
+      "n": 13,
       "x": 0,
+      "y": 1
+    },
+    {
+      "n": 14,
+      "x": 1,
+      "y": 3
+    },
+    {
+      "n": 15,
+      "x": 0,
+      "y": 4
+    },
+    {
+      "n": 16,
+      "x": 1,
       "y": 5
     }
   ],
   "walls": {
-    "h": [
-      {
-        "x": 1,
-        "y": 4,
-        "len": 1
-      }
-    ],
-    "v": [
-      {
-        "x": 2,
-        "y": 1,
-        "len": 1
-      },
-      {
-        "x": 2,
-        "y": 4,
-        "len": 1
-      },
-      {
-        "x": 3,
-        "y": 2,
-        "len": 1
-      },
-      {
-        "x": 4,
-        "y": 1,
-        "len": 2
-      },
-      {
-        "x": 4,
-        "y": 4,
-        "len": 1
-      }
-    ]
+    "h": [],
+    "v": []
   },
   "meta": {
     "variant": "alphabet",
@@ -104,31 +102,37 @@
       "7": "W",
       "8": "X",
       "9": "Y",
-      "10": "Z"
+      "10": "Z",
+      "11": "[",
+      "12": "\\",
+      "13": "]",
+      "14": "^",
+      "15": "_",
+      "16": "`"
     },
-    "source_level_id": "all-72",
+    "source_level_id": "all-221",
     "alphabet_start_char": "Q",
-    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_batch": "bulk_variant_pack_100_each",
     "generation_index": 14
   },
   "metrics": {
     "variant": "alphabet",
     "grid_size": 6,
     "path_length": 36,
-    "num_clues": 10,
-    "clue_density": 0.2778,
-    "sequence_length": 10,
+    "num_clues": 16,
+    "clue_density": 0.4444,
+    "sequence_length": 16,
     "sequence_start": 1,
     "sequence_step": 1,
     "representation": "alphabet",
     "difficulty_estimate": "medium",
-    "turns": 24,
-    "max_straight": 3,
-    "avg_straight": 1.4,
-    "corners": 2,
-    "borders": 3,
-    "inners": 5,
-    "num_walls": 7,
+    "turns": 20,
+    "max_straight": 5,
+    "avg_straight": 1.67,
+    "corners": 0,
+    "borders": 10,
+    "inners": 6,
+    "num_walls": 0,
     "alphabet_start_char": "Q"
   }
 }

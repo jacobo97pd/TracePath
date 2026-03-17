@@ -1,0 +1,1821 @@
+{
+  "source_pack": "pack_all_v1.json",
+  "shuffle_seed": 20260316,
+  "count": 301,
+  "variant_extra_hard_count": 100,
+  "difficulty_distribution": {
+    "d1": 24,
+    "d2": 111,
+    "d3": 85,
+    "d4": 45,
+    "d5": 36
+  },
+  "levels": [
+    {
+      "id": "linkedin-editor-357",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.2,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-338",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.2,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-9",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.2,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-89",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.2,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-69",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.2,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-340",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.2,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-343",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.2,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "classic-import-editor-188",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.2,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "classic-import-editor-189",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.2,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-24",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.32,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-77",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.32,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-332",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.32,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-2",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.32,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-73",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.32,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-80",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.32,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-346",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.32,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-290",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.32,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-353",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.32,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-298",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.32,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-125",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.32,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-72",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.32,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-350",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.32,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-17",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.32,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "linkedin-editor-358",
+      "difficultyTag": "d1",
+      "difficulty_score": 1.32,
+      "difficulty_rebalanced_from": "d1"
+    },
+    {
+      "id": "classic-import-editor-187",
+      "difficultyTag": "d2",
+      "difficulty_score": 1.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-5",
+      "difficultyTag": "d2",
+      "difficulty_score": 1.6,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-6",
+      "difficultyTag": "d2",
+      "difficulty_score": 1.6,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-10",
+      "difficultyTag": "d2",
+      "difficulty_score": 1.6,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-7",
+      "difficultyTag": "d2",
+      "difficulty_score": 1.72,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-14",
+      "difficultyTag": "d2",
+      "difficulty_score": 1.72,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-1",
+      "difficultyTag": "d2",
+      "difficulty_score": 1.72,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-90",
+      "difficultyTag": "d2",
+      "difficulty_score": 1.82,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-10",
+      "difficultyTag": "d2",
+      "difficulty_score": 1.82,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-67",
+      "difficultyTag": "d2",
+      "difficulty_score": 1.82,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-68",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.1,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-105",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.1,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-219",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.1,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-9",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.22,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-13",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.22,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-2",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.22,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-18",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.22,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-4",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.22,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "all-8",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.26,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-50",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-291",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-292",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-261",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-52",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-95",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-71",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-304",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-104",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-299",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-333",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-351",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-297",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-21",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.3424,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-13",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.3424,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-46",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.3424,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "classic-import-editor-157",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.5333,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-60",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.6533,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-253",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.6533,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "classic-import-editor-146",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.6533,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-12",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.72,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-11",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.72,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-8",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.72,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-19",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.72,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-3",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.72,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-17",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.72,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-263",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.82,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "all-6",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.98,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "all-12",
+      "difficultyTag": "d2",
+      "difficulty_score": 2.98,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-356",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.0771,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-7",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.0771,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-341",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.0771,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-1",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.0771,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-15",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.22,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-16",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.22,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-js-20",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.22,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-312",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-294",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-295",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-267",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-305",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-54",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-61",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-91",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-286",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-360",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-285",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-336",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-49",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-293",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-51",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-259",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-284",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-344",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.4445,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-309",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.4445,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-107",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.4445,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-98",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.4445,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-14",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.495,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-76",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.495,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-93",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.6533,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "all-7",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.7,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-96",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.8118,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-20",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.8118,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-74",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.8118,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-265",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.8118,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-56",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.8118,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-27",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.8118,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-81",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.8118,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-256",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.8118,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-361",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.8118,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-348",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.8118,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-28",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.8118,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-64",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.9867,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-84",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.9867,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "classic-import-editor-192",
+      "difficultyTag": "d2",
+      "difficulty_score": 3.9867,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-264",
+      "difficultyTag": "d2",
+      "difficulty_score": 4.0575,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-345",
+      "difficultyTag": "d2",
+      "difficulty_score": 4.1792,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-97",
+      "difficultyTag": "d2",
+      "difficulty_score": 4.1792,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-83",
+      "difficultyTag": "d2",
+      "difficulty_score": 4.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-316",
+      "difficultyTag": "d2",
+      "difficulty_score": 4.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-296",
+      "difficultyTag": "d2",
+      "difficulty_score": 4.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-279",
+      "difficultyTag": "d2",
+      "difficulty_score": 4.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-329",
+      "difficultyTag": "d2",
+      "difficulty_score": 4.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-352",
+      "difficultyTag": "d2",
+      "difficulty_score": 4.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-275",
+      "difficultyTag": "d2",
+      "difficulty_score": 4.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-289",
+      "difficultyTag": "d2",
+      "difficulty_score": 4.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-276",
+      "difficultyTag": "d2",
+      "difficulty_score": 4.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-306",
+      "difficultyTag": "d2",
+      "difficulty_score": 4.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-335",
+      "difficultyTag": "d2",
+      "difficulty_score": 4.32,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "classic-import-editor-186",
+      "difficultyTag": "d2",
+      "difficulty_score": 4.5261,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-103",
+      "difficultyTag": "d2",
+      "difficulty_score": 4.5465,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-359",
+      "difficultyTag": "d2",
+      "difficulty_score": 4.5465,
+      "difficulty_rebalanced_from": "d2"
+    },
+    {
+      "id": "linkedin-editor-258",
+      "difficultyTag": "d3",
+      "difficulty_score": 4.5465,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-260",
+      "difficultyTag": "d3",
+      "difficulty_score": 4.5465,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-6",
+      "difficultyTag": "d3",
+      "difficulty_score": 4.5465,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-15",
+      "difficultyTag": "d3",
+      "difficulty_score": 4.62,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-25",
+      "difficultyTag": "d3",
+      "difficulty_score": 4.62,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "classic-import-editor-193",
+      "difficultyTag": "d3",
+      "difficulty_score": 4.62,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "classic-import-editor-171",
+      "difficultyTag": "d3",
+      "difficulty_score": 4.7642,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-313",
+      "difficultyTag": "d3",
+      "difficulty_score": 4.82,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-272",
+      "difficultyTag": "d3",
+      "difficulty_score": 4.82,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-273",
+      "difficultyTag": "d3",
+      "difficulty_score": 4.82,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-283",
+      "difficultyTag": "d3",
+      "difficulty_score": 4.82,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-271",
+      "difficultyTag": "d3",
+      "difficulty_score": 4.82,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-354",
+      "difficultyTag": "d3",
+      "difficulty_score": 4.9139,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-331",
+      "difficultyTag": "d3",
+      "difficulty_score": 4.9139,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-62",
+      "difficultyTag": "d3",
+      "difficulty_score": 4.9139,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-79",
+      "difficultyTag": "d3",
+      "difficulty_score": 4.9867,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-63",
+      "difficultyTag": "d3",
+      "difficulty_score": 4.9867,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "all-67",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.12,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-47",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.1825,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-300",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.2812,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-328",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.2812,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-330",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.2812,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-268",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.2812,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-301",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.2812,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "all-14",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.2867,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "all-5",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.2867,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-278",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.32,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-320",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.32,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-349",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.32,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-317",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.32,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-315",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.32,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-302",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.32,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-280",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.32,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-324",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.32,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-310",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.32,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-321",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.32,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-339",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.32,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-277",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.32,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-251",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.3493,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "all-75",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.4533,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "all-43",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.4533,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "all-21",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.62,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-303",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.6486,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-342",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.6486,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-347",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.6486,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-257",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.6486,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-334",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.6486,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-266",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.6486,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-323",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.6486,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "all-17",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.7867,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "all-2",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.7867,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "all-16",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.7867,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-318",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.82,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-314",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.82,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-270",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.82,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-282",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.82,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-274",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.82,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-269",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.82,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-255",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.9867,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-109",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.9867,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-66",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.9867,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-55",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.9867,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-65",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.9867,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "classic-import-editor-184",
+      "difficultyTag": "d3",
+      "difficulty_score": 5.9867,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-262",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.0159,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-307",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.0159,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-288",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.0159,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "all-23",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.2867,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "all-13",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.2867,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-287",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.3075,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-308",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.3075,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-325",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.32,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-281",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.32,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-322",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.32,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-11",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.32,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-319",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.32,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-337",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.3833,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "all-131",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.5506,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-19",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.5575,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-327",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.5888,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "all-22",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.62,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "classic-import-editor-154",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.6533,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-22",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.669,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-102",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.7778,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "classic-import-editor-177",
+      "difficultyTag": "d3",
+      "difficulty_score": 6.8186,
+      "difficulty_rebalanced_from": "d3"
+    },
+    {
+      "id": "linkedin-editor-355",
+      "difficultyTag": "d4",
+      "difficulty_score": 6.87,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-75",
+      "difficultyTag": "d4",
+      "difficulty_score": 6.9867,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "classic-import-editor-153",
+      "difficultyTag": "d4",
+      "difficulty_score": 6.9867,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "classic-import-editor-175",
+      "difficultyTag": "d4",
+      "difficulty_score": 6.9867,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "classic-import-editor-152",
+      "difficultyTag": "d4",
+      "difficulty_score": 7.0771,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-326",
+      "difficultyTag": "d4",
+      "difficulty_score": 7.118,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "all-83",
+      "difficultyTag": "d4",
+      "difficulty_score": 7.2037,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-247",
+      "difficultyTag": "d4",
+      "difficulty_score": 7.2948,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-5",
+      "difficultyTag": "d4",
+      "difficulty_score": 7.32,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-94",
+      "difficultyTag": "d4",
+      "difficulty_score": 7.32,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-48",
+      "difficultyTag": "d4",
+      "difficulty_score": 7.32,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-70",
+      "difficultyTag": "d4",
+      "difficulty_score": 7.32,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-4",
+      "difficultyTag": "d4",
+      "difficulty_score": 7.4037,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-8",
+      "difficultyTag": "d4",
+      "difficulty_score": 7.4037,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-311",
+      "difficultyTag": "d4",
+      "difficulty_score": 7.4325,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-59",
+      "difficultyTag": "d4",
+      "difficulty_score": 7.6533,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-18",
+      "difficultyTag": "d4",
+      "difficulty_score": 7.82,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-26",
+      "difficultyTag": "d4",
+      "difficulty_score": 7.9867,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-29",
+      "difficultyTag": "d4",
+      "difficulty_score": 8.1384,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "classic-import-editor-178",
+      "difficultyTag": "d4",
+      "difficulty_score": 8.2986,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-99",
+      "difficultyTag": "d4",
+      "difficulty_score": 8.32,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "classic-import-editor-183",
+      "difficultyTag": "d4",
+      "difficulty_score": 8.3561,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-57",
+      "difficultyTag": "d4",
+      "difficulty_score": 8.4504,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-231",
+      "difficultyTag": "d4",
+      "difficulty_score": 8.5057,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "classic-import-editor-170",
+      "difficultyTag": "d4",
+      "difficulty_score": 8.5057,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-53",
+      "difficultyTag": "d4",
+      "difficulty_score": 8.6533,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "classic-import-editor-161",
+      "difficultyTag": "d4",
+      "difficulty_score": 8.6533,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-244",
+      "difficultyTag": "d4",
+      "difficulty_score": 8.9867,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "all-93",
+      "difficultyTag": "d4",
+      "difficulty_score": 9.1493,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-220",
+      "difficultyTag": "d4",
+      "difficulty_score": 9.1533,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-101",
+      "difficultyTag": "d4",
+      "difficulty_score": 9.1646,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-37",
+      "difficultyTag": "d4",
+      "difficulty_score": 9.32,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-86",
+      "difficultyTag": "d4",
+      "difficulty_score": 9.3288,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-100",
+      "difficultyTag": "d4",
+      "difficulty_score": 9.3493,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-245",
+      "difficultyTag": "d4",
+      "difficulty_score": 9.5669,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-85",
+      "difficultyTag": "d4",
+      "difficulty_score": 9.5669,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-243",
+      "difficultyTag": "d4",
+      "difficulty_score": 9.5669,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "classic-import-editor-194",
+      "difficultyTag": "d4",
+      "difficulty_score": 9.6533,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "all-94",
+      "difficultyTag": "d4",
+      "difficulty_score": 9.7547,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-34",
+      "difficultyTag": "d4",
+      "difficulty_score": 9.82,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-12",
+      "difficultyTag": "d4",
+      "difficulty_score": 9.8254,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-23",
+      "difficultyTag": "d4",
+      "difficulty_score": 9.9343,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-88",
+      "difficultyTag": "d4",
+      "difficulty_score": 9.9343,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-41",
+      "difficultyTag": "d4",
+      "difficulty_score": 9.9867,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-239",
+      "difficultyTag": "d4",
+      "difficulty_score": 9.9867,
+      "difficulty_rebalanced_from": "d4"
+    },
+    {
+      "id": "linkedin-editor-35",
+      "difficultyTag": "d5",
+      "difficulty_score": 10.1533,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-250",
+      "difficultyTag": "d5",
+      "difficulty_score": 10.2361,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-223",
+      "difficultyTag": "d5",
+      "difficulty_score": 10.32,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-87",
+      "difficultyTag": "d5",
+      "difficulty_score": 10.32,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-252",
+      "difficultyTag": "d5",
+      "difficulty_score": 10.32,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-228",
+      "difficultyTag": "d5",
+      "difficulty_score": 10.32,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-45",
+      "difficultyTag": "d5",
+      "difficulty_score": 10.4867,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-33",
+      "difficultyTag": "d5",
+      "difficulty_score": 10.4867,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-254",
+      "difficultyTag": "d5",
+      "difficulty_score": 10.5193,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "classic-import-editor-165",
+      "difficultyTag": "d5",
+      "difficulty_score": 10.6486,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-224",
+      "difficultyTag": "d5",
+      "difficulty_score": 10.6533,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-227",
+      "difficultyTag": "d5",
+      "difficulty_score": 10.6533,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-242",
+      "difficultyTag": "d5",
+      "difficulty_score": 10.6959,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-58",
+      "difficultyTag": "d5",
+      "difficulty_score": 10.7778,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-225",
+      "difficultyTag": "d5",
+      "difficulty_score": 10.82,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-40",
+      "difficultyTag": "d5",
+      "difficulty_score": 10.9867,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-38",
+      "difficultyTag": "d5",
+      "difficulty_score": 10.9867,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-30",
+      "difficultyTag": "d5",
+      "difficulty_score": 11.1533,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-226",
+      "difficultyTag": "d5",
+      "difficulty_score": 11.32,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-43",
+      "difficultyTag": "d5",
+      "difficulty_score": 11.32,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-42",
+      "difficultyTag": "d5",
+      "difficulty_score": 11.32,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "classic-import-editor-172",
+      "difficultyTag": "d5",
+      "difficulty_score": 11.32,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-44",
+      "difficultyTag": "d5",
+      "difficulty_score": 11.4867,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-106",
+      "difficultyTag": "d5",
+      "difficulty_score": 11.6533,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-39",
+      "difficultyTag": "d5",
+      "difficulty_score": 11.6533,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-222",
+      "difficultyTag": "d5",
+      "difficulty_score": 11.6533,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-249",
+      "difficultyTag": "d5",
+      "difficulty_score": 12.1533,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-36",
+      "difficultyTag": "d5",
+      "difficulty_score": 12.1533,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-31",
+      "difficultyTag": "d5",
+      "difficulty_score": 12.1533,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-221",
+      "difficultyTag": "d5",
+      "difficulty_score": 12.1533,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-3",
+      "difficultyTag": "d5",
+      "difficulty_score": 12.3152,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-229",
+      "difficultyTag": "d5",
+      "difficulty_score": 12.32,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "classic-import-editor-156",
+      "difficultyTag": "d5",
+      "difficulty_score": 12.5737,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-241",
+      "difficultyTag": "d5",
+      "difficulty_score": 12.8322,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-240",
+      "difficultyTag": "d5",
+      "difficulty_score": 13.6533,
+      "difficulty_rebalanced_from": "d5"
+    },
+    {
+      "id": "linkedin-editor-108",
+      "difficultyTag": "d5",
+      "difficulty_score": 13.8611,
+      "difficulty_rebalanced_from": "d5"
+    }
+  ]
+}

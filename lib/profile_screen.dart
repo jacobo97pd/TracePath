@@ -85,7 +85,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final profileSubtitle = widget.authService.isGuest
             ? 'Guest mode'
             : (authEmail.isNotEmpty ? authEmail : 'Google account');
-        final reminderTime = widget.notificationService.reminderTime;
         final ownedSkins = widget.skinCatalogService.items
             .where((e) => widget.coinsService.ownsSkin(e.id))
             .toList(growable: false);
@@ -648,66 +647,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              const SectionHeader(title: 'Daily Reminder'),
-              const SizedBox(height: 10),
-              GameCard(
-                child: Column(
-                  children: [
-                    SwitchListTile(
-                      value: widget.notificationService.isReminderEnabled,
-                      title: const Text(
-                        'Enable reminder',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      subtitle: Text(
-                        'Stay on your streak • ${_formatTime(reminderTime)}',
-                        style: const TextStyle(color: Color(0xFF9AAAD0)),
-                      ),
-                      onChanged: (value) {
-                        widget.notificationService.setReminderEnabled(value);
-                      },
-                    ),
-                    ListTile(
-                      title: const Text(
-                        'Reminder time',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      subtitle: Text(
-                        _formatTime(reminderTime),
-                        style: const TextStyle(color: Color(0xFF9AAAD0)),
-                      ),
-                      trailing: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF18263E),
-                          borderRadius: BorderRadius.circular(999),
-                          border: Border.all(
-                            color: const Color(0xFF385583),
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.schedule_rounded,
-                          color: Color(0xFFB5C6EA),
-                          size: 18,
-                        ),
-                      ),
-                      onTap: () async {
-                        final picked = await showTimePicker(
-                          context: context,
-                          initialTime: reminderTime,
-                        );
-                        if (picked == null) return;
-                        await widget.notificationService
-                            .setReminderTime(picked);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
               _AchievementsSection(
                 states: widget.achievementsService.states,
                 formatDateTime: _formatDateTime,
@@ -1076,12 +1015,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         duration: Duration(milliseconds: 900),
       ),
     );
-  }
-
-  String _formatTime(TimeOfDay time) {
-    final hh = time.hour.toString().padLeft(2, '0');
-    final mm = time.minute.toString().padLeft(2, '0');
-    return '$hh:$mm';
   }
 
   static String _formatMs(int? ms) {
@@ -2392,6 +2325,8 @@ class _InboxItemCard extends StatelessWidget {
         return Icons.person_add_alt_1_rounded;
       case InboxItemType.friendAccept:
         return Icons.handshake_rounded;
+      case InboxItemType.levelChallenge:
+        return Icons.sports_esports_rounded;
       case InboxItemType.systemNews:
         return Icons.campaign_rounded;
       case InboxItemType.unknown:
@@ -2908,3 +2843,5 @@ class _AvatarCandidate {
   final String type;
   final String path;
 }
+
+

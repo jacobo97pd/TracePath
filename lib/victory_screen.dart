@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,7 +7,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 
 import 'network_burst_overlay.dart';
+import 'models/friend_profile.dart';
 import 'models/leaderboard_entry.dart';
+import 'services/friends_service.dart';
 import 'services/leaderboard_service.dart';
 import 'ui/avatar_utils.dart';
 import 'ui/components/game_button.dart';
@@ -72,6 +73,7 @@ class _VictoryScreenState extends State<VictoryScreen>
   static const String _firestoreDatabaseId = 'tracepath-database';
   final SocialLeaderboardService _socialLeaderboardService =
       SocialLeaderboardService();
+  final FriendsService _friendsService = FriendsService();
   final Map<String, String?> _skinPreviewUrlCache = <String, String?>{};
   late Future<List<_VictoryRankRowData>> _friendsRankingFuture;
   late final AnimationController _introController;
@@ -350,6 +352,198 @@ class _VictoryScreenState extends State<VictoryScreen>
     return 'Player';
   }
 
+  int _rankAtIndexByTime(List<int> timesMs, int index) {
+    if (index <= 0) return 1;
+    var rank = index + 1;
+    for (var j = index - 1; j >= 0; j--) {
+      if (timesMs[j] == timesMs[index]) {
+        rank = j + 1;
+      } else {
+        break;
+      }
+    }
+    return rank;
+  }
+
+  Future<void> _sendChallengeToFriend() async {
+    final levelId = widget.args.levelId.trim();
+    if (levelId.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('This challenge is only available for level runs.'),
+          duration: Duration(milliseconds: 1100),
+        ),
+      );
+      return;
+    }
+    List<FriendProfile> friends = const <FriendProfile>[];
+    try {
+      friends = await _friendsService.getFriends();
+    } catch (_) {}
+    if (!mounted) return;
+    if (friends.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Add friends first to send in-game challenges.'),
+          duration: Duration(milliseconds: 1200),
+        ),
+      );
+      return;
+    }
+
+    final friend = await showModalBottomSheet<FriendProfile>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF1A2A45), Color(0xFF121D34)],
+              ),
+              border: Border.all(color: const Color(0xFF355687)),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x55102138),
+                  blurRadius: 18,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Challenge a friend',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Send in-game challenge for level $levelId',
+                  style: const TextStyle(color: Color(0xFF9EB0D2), fontSize: 12),
+                ),
+                const SizedBox(height: 10),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 340),
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: friends.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      final f = friends[index];
+                      return Material(
+                        color: const Color(0xFF1A2A43),
+                        borderRadius: BorderRadius.circular(14),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(14),
+                          onTap: () => Navigator.of(context).pop(f),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 16,
+                                  backgroundColor: const Color(0xFF2A3E63),
+                                  child: Text(
+                                    f.displayName.isNotEmpty
+                                        ? f.displayName.substring(0, 1).toUpperCase()
+                                        : 'P',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        f.displayName,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Level $levelId',
+                                        style: const TextStyle(
+                                          color: Color(0xFF9EB0D2),
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const Icon(
+                                  Icons.send_rounded,
+                                  color: Color(0xFFA9C4FF),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+    if (!mounted || friend == null) return;
+
+    try {
+      await _friendsService.sendLevelChallenge(
+        toUid: friend.uid,
+        levelId: levelId,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Challenge sent to ${friend.displayName}'),
+          duration: const Duration(milliseconds: 1000),
+        ),
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[victory] sendLevelChallenge failed toUid=${friend.uid} levelId=$levelId error=$e');
+      }
+      if (!mounted) return;
+      var message = 'Could not send challenge right now';
+      if (e is FirebaseException && e.code == 'permission-denied') {
+        message = 'Challenge blocked by Firestore rules';
+      } else if (e.toString().contains('AUTH_REQUIRED')) {
+        message = 'You need to be signed in';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          duration: const Duration(milliseconds: 1100),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final args = widget.args;
@@ -533,71 +727,75 @@ class _VictoryScreenState extends State<VictoryScreen>
                                 return Column(
                                   children: [
                                     for (var i = 0; i < rows.length; i++) ...[
-                                      _StaggerIn(
-                                        parent: _introController,
-                                        start: 0.7 + i * 0.04,
-                                        end: 0.92 + i * 0.04,
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 6,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: rows[i].entry.uid == currentUid
-                                                ? const Color(0x1A4A7CFF)
-                                                : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: 28,
-                                                child: Text(
-                                                  '#${i + 1}',
-                                                  style: TextStyle(
-                                                    color: i == 0
-                                                        ? const Color(0xFFFFD166)
-                                                        : i == 1
-                                                            ? const Color(0xFFD7E3F4)
-                                                            : i == 2
-                                                                ? const Color(0xFFC7935F)
-                                                                : const Color(
-                                                                    0xFF8FA6CF,
-                                                                  ),
+                                      (() {
+                                        final rank = _rankAtIndexByTime(
+                                          rows.map((r) => r.entry.bestTimeMs).toList(growable: false),
+                                          i,
+                                        );
+                                        return _StaggerIn(
+                                          parent: _introController,
+                                          start: 0.7 + i * 0.04,
+                                          end: 0.92 + i * 0.04,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 6,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: rows[i].entry.uid == currentUid
+                                                  ? const Color(0x1A4A7CFF)
+                                                  : Colors.transparent,
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: 28,
+                                                  child: Text(
+                                                    '#$rank',
+                                                    style: TextStyle(
+                                                      color: rank == 1
+                                                          ? const Color(0xFFFFD166)
+                                                          : rank == 2
+                                                              ? const Color(0xFFD7E3F4)
+                                                              : rank == 3
+                                                                  ? const Color(0xFFC7935F)
+                                                                  : const Color(0xFF8FA6CF),
+                                                      fontWeight: FontWeight.w800,
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                _VictoryAvatar(
+                                                  photoUrl: rows[i].photoUrl,
+                                                  skinUrl: rows[i].skinPreviewUrl,
+                                                  preferSkin: rows[i].preferSkin,
+                                                ),
+                                                const SizedBox(width: 10),
+                                                Expanded(
+                                                  child: Text(
+                                                    _displayName(rows[i].entry),
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight: FontWeight.w700,
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  _formatMs(rows[i].entry.bestTimeMs),
+                                                  style: const TextStyle(
+                                                    color: Color(0xFF9BB4FF),
                                                     fontWeight: FontWeight.w800,
                                                   ),
                                                 ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              _VictoryAvatar(
-                                                photoUrl: rows[i].photoUrl,
-                                                skinUrl: rows[i].skinPreviewUrl,
-                                                preferSkin: rows[i].preferSkin,
-                                              ),
-                                              const SizedBox(width: 10),
-                                              Expanded(
-                                                child: Text(
-                                                  _displayName(rows[i].entry),
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                _formatMs(rows[i].entry.bestTimeMs),
-                                                style: const TextStyle(
-                                                  color: Color(0xFF9BB4FF),
-                                                  fontWeight: FontWeight.w800,
-                                                ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      ),
+                                        );
+                                      })(),
                                       if (i < rows.length - 1) const SizedBox(height: 2),
                                     ],
                                   ],
@@ -647,37 +845,38 @@ class _VictoryScreenState extends State<VictoryScreen>
                     parent: _introController,
                     start: 0.86,
                     end: 1.0,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: GameButton(
-                            label: 'Replay',
-                            outlined: true,
-                            expanded: true,
-                            onTap: () => Navigator.of(context).pop('replay'),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: GameButton(
-                            label: 'Challenge Friend',
-                            outlined: true,
-                            expanded: true,
-                            onTap: () async {
-                              await Clipboard.setData(
-                                ClipboardData(text: args.shareText),
-                              );
-                              if (!context.mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Challenge text copied'),
-                                  duration: Duration(milliseconds: 900),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final compact = constraints.maxWidth < 430;
+                        final replayButton = GameButton(
+                          label: 'Replay',
+                          outlined: true,
+                          expanded: true,
+                          onTap: () => Navigator.of(context).pop('replay'),
+                        );
+                        final challengeButton = GameButton(
+                          label: 'Challenge Friend',
+                          outlined: true,
+                          expanded: true,
+                          onTap: _sendChallengeToFriend,
+                        );
+                        if (compact) {
+                          return Column(
+                            children: [
+                              replayButton,
+                              const SizedBox(height: 10),
+                              challengeButton,
+                            ],
+                          );
+                        }
+                        return Row(
+                          children: [
+                            Expanded(child: replayButton),
+                            const SizedBox(width: 10),
+                            Expanded(child: challengeButton),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ],

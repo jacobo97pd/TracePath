@@ -1,0 +1,154 @@
+{
+  "id": "split_alphabet_reverse_005",
+  "size": 5,
+  "clues": [
+    {
+      "n": 1,
+      "x": 0,
+      "y": 4
+    },
+    {
+      "n": 2,
+      "x": 1,
+      "y": 4
+    },
+    {
+      "n": 3,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "n": 4,
+      "x": 4,
+      "y": 2
+    },
+    {
+      "n": 5,
+      "x": 4,
+      "y": 1
+    },
+    {
+      "n": 6,
+      "x": 2,
+      "y": 1
+    },
+    {
+      "n": 7,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "n": 8,
+      "x": 1,
+      "y": 1
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 3,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "len": 4
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "len": 1
+      }
+    ]
+  },
+  "solution": [
+    20,
+    15,
+    16,
+    21,
+    22,
+    17,
+    18,
+    23,
+    24,
+    19,
+    14,
+    13,
+    8,
+    9,
+    4,
+    3,
+    2,
+    7,
+    12,
+    11,
+    10,
+    5,
+    0,
+    1,
+    6
+  ],
+  "meta": {
+    "variant": "alphabet_reverse",
+    "sequence_rule": "Z, Y, X...",
+    "difficulty_target": "hard",
+    "representation": "alphabet_reverse",
+    "display_labels": {
+      "1": "Z",
+      "2": "Y",
+      "3": "X",
+      "4": "W",
+      "5": "V",
+      "6": "U",
+      "7": "T",
+      "8": "S"
+    },
+    "source_level_id": "generated_alphabet_reverse_005",
+    "alphabet_start_char": "Z",
+    "generation_batch": "split_variant_pack_5_each",
+    "generation_index": 5
+  },
+  "metrics": {
+    "variant": "alphabet_reverse",
+    "grid_size": 5,
+    "path_length": 25,
+    "num_clues": 8,
+    "clue_density": 0.32,
+    "sequence_length": 8,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "alphabet_reverse",
+    "difficulty_estimate": "hard",
+    "turns": 18,
+    "max_straight": 2,
+    "avg_straight": 1.26,
+    "corners": 1,
+    "borders": 4,
+    "inners": 3,
+    "num_walls": 10,
+    "alphabet_start_char": "Z"
+  }
+}

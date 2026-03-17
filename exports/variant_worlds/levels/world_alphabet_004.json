@@ -1,0 +1,150 @@
+{
+  "id": "world_alphabet_004",
+  "size": 5,
+  "clues": [
+    {
+      "n": 1,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "n": 2,
+      "x": 1,
+      "y": 1
+    },
+    {
+      "n": 3,
+      "x": 1,
+      "y": 2
+    },
+    {
+      "n": 4,
+      "x": 0,
+      "y": 4
+    },
+    {
+      "n": 5,
+      "x": 2,
+      "y": 3
+    },
+    {
+      "n": 6,
+      "x": 4,
+      "y": 3
+    },
+    {
+      "n": 7,
+      "x": 2,
+      "y": 1
+    },
+    {
+      "n": 8,
+      "x": 4,
+      "y": 1
+    },
+    {
+      "n": 9,
+      "x": 2,
+      "y": 0
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 3,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "len": 1
+      }
+    ],
+    "v": [
+      {
+        "x": 2,
+        "y": 0,
+        "len": 2
+      }
+    ]
+  },
+  "solution": [
+    0,
+    1,
+    6,
+    5,
+    10,
+    11,
+    16,
+    15,
+    20,
+    21,
+    22,
+    17,
+    18,
+    23,
+    24,
+    19,
+    14,
+    13,
+    12,
+    7,
+    8,
+    9,
+    4,
+    3,
+    2
+  ],
+  "meta": {
+    "variant": "alphabet",
+    "sequence_rule": "A, B, C...",
+    "difficulty_target": "medium",
+    "representation": "alphabet",
+    "display_labels": {
+      "1": "A",
+      "2": "B",
+      "3": "C",
+      "4": "D",
+      "5": "E",
+      "6": "F",
+      "7": "G",
+      "8": "H",
+      "9": "I"
+    },
+    "source_level_id": "generated_alphabet_004",
+    "alphabet_start_char": "A",
+    "generation_batch": "world_variant_pack_20_each",
+    "generation_index": 4
+  },
+  "metrics": {
+    "variant": "alphabet",
+    "grid_size": 5,
+    "path_length": 25,
+    "num_clues": 9,
+    "clue_density": 0.36,
+    "sequence_length": 9,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "alphabet",
+    "difficulty_estimate": "medium",
+    "turns": 18,
+    "max_straight": 2,
+    "avg_straight": 1.26,
+    "corners": 2,
+    "borders": 3,
+    "inners": 4,
+    "num_walls": 6,
+    "alphabet_start_char": "A"
+  }
+}

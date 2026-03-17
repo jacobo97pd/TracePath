@@ -1,0 +1,3188 @@
+{
+  "packId": "world_11",
+  "version": "pack_world_11_v1",
+  "count": 24,
+  "world": 11,
+  "levels": [
+    {
+      "id": "linkedin-editor-359",
+      "size": {
+        "w": 7,
+        "h": 7
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 6,
+          "y": 0
+        },
+        {
+          "n": 2,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "n": 4,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "n": 5,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 6,
+          "x": 3,
+          "y": 2
+        },
+        {
+          "n": 7,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 8,
+          "x": 6,
+          "y": 6
+        },
+        {
+          "n": 9,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 10,
+          "x": 0,
+          "y": 6
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d2",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "d9b0041f20f24a6b61868895c1653c139904177d819c391905beceb356b2e13b",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "d9b0041f20f24a6b61868895c1653c139904177d819c391905beceb356b2e13b",
+        "difficulty_rebalanced_from": "d2",
+        "difficulty_score": 4.5465
+      }
+    },
+    {
+      "id": "linkedin-editor-309",
+      "size": {
+        "w": 7,
+        "h": 7
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 0,
+          "y": 6
+        },
+        {
+          "n": 2,
+          "x": 6,
+          "y": 5
+        },
+        {
+          "n": 3,
+          "x": 6,
+          "y": 3
+        },
+        {
+          "n": 4,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 5,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 6,
+          "x": 0,
+          "y": 1
+        },
+        {
+          "n": 7,
+          "x": 6,
+          "y": 0
+        },
+        {
+          "n": 8,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 9,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 10,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 11,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 12,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 13,
+          "x": 3,
+          "y": 3
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d2",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "225441792ea0f031a253722b980c089b638d5f8b6a08f63bf921110329a862c3",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "225441792ea0f031a253722b980c089b638d5f8b6a08f63bf921110329a862c3",
+        "difficulty_rebalanced_from": "d2",
+        "difficulty_score": 3.4445
+      }
+    },
+    {
+      "id": "linkedin-js-2",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 2,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 0,
+          "y": 1
+        },
+        {
+          "n": 4,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 5,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 6,
+          "x": 0,
+          "y": 5
+        },
+        {
+          "n": 7,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 8,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 9,
+          "x": 3,
+          "y": 5
+        },
+        {
+          "n": 10,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 11,
+          "x": 4,
+          "y": 4
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d2",
+      "source": "linkedin_js_generator",
+      "source_pack": "pack_linkedin_js_generated_v1",
+      "source_origin": "linkedin_js_generator",
+      "variant": "classic",
+      "canonical_hash": "5b15a6d256c90b5c3769bc95f0fe7ea27897fce04c373fc10eff197aeb37d1bc",
+      "meta": {
+        "source_pack": "pack_linkedin_js_generated_v1",
+        "source_origin": "linkedin_js_generator",
+        "variant": "classic",
+        "canonical_hash": "5b15a6d256c90b5c3769bc95f0fe7ea27897fce04c373fc10eff197aeb37d1bc",
+        "difficulty_rebalanced_from": "d2",
+        "difficulty_score": 2.22
+      },
+      "solution": [
+        3,
+        4,
+        5,
+        11,
+        10,
+        9,
+        8,
+        2,
+        1,
+        0,
+        6,
+        7,
+        13,
+        12,
+        18,
+        19,
+        25,
+        24,
+        30,
+        31,
+        32,
+        26,
+        20,
+        14,
+        15,
+        16,
+        17,
+        23,
+        22,
+        21,
+        27,
+        33,
+        34,
+        35,
+        29,
+        28
+      ]
+    },
+    {
+      "id": "linkedin-editor-104",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 2,
+          "x": 0,
+          "y": 5
+        },
+        {
+          "n": 3,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 4,
+          "x": 0,
+          "y": 2
+        },
+        {
+          "n": 5,
+          "x": 5,
+          "y": 0
+        },
+        {
+          "n": 6,
+          "x": 5,
+          "y": 3
+        },
+        {
+          "n": 7,
+          "x": 3,
+          "y": 2
+        },
+        {
+          "n": 8,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 9,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 10,
+          "x": 4,
+          "y": 4
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d2",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "0c9a150635cafca1faca5164cc3b242c1851976f2e4c0847ba1ee24c37dc1dcd",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "0c9a150635cafca1faca5164cc3b242c1851976f2e4c0847ba1ee24c37dc1dcd",
+        "difficulty_rebalanced_from": "d2",
+        "difficulty_score": 2.32
+      },
+      "solution": [
+        25,
+        24,
+        30,
+        31,
+        32,
+        26,
+        20,
+        19,
+        18,
+        12,
+        6,
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        11,
+        17,
+        23,
+        29,
+        35,
+        34,
+        33,
+        27,
+        21,
+        15,
+        14,
+        13,
+        7,
+        8,
+        9,
+        10,
+        16,
+        22,
+        28
+      ]
+    },
+    {
+      "id": "linkedin-editor-284",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 2,
+          "x": 0,
+          "y": 5
+        },
+        {
+          "n": 3,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 4,
+          "x": 3,
+          "y": 2
+        },
+        {
+          "n": 5,
+          "x": 4,
+          "y": 3
+        },
+        {
+          "n": 6,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 7,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 8,
+          "x": 1,
+          "y": 3
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d2",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "ca8ca4640229df55f9437536306ecc45ea84f1741d7017ebce71378797491a37",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "ca8ca4640229df55f9437536306ecc45ea84f1741d7017ebce71378797491a37",
+        "difficulty_rebalanced_from": "d2",
+        "difficulty_score": 3.32
+      }
+    },
+    {
+      "id": "linkedin-js-1",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 5,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 4,
+          "y": 0
+        },
+        {
+          "n": 3,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "n": 4,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 5,
+          "x": 1,
+          "y": 5
+        },
+        {
+          "n": 6,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 7,
+          "x": 4,
+          "y": 3
+        },
+        {
+          "n": 8,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 9,
+          "x": 2,
+          "y": 5
+        },
+        {
+          "n": 10,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "n": 11,
+          "x": 4,
+          "y": 5
+        },
+        {
+          "n": 12,
+          "x": 5,
+          "y": 4
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d2",
+      "source": "linkedin_js_generator",
+      "source_pack": "pack_linkedin_js_generated_v1",
+      "source_origin": "linkedin_js_generator",
+      "variant": "classic",
+      "canonical_hash": "c4ea399f9d24a3be206cf080e8025b6151b06a4a6b51c45ecc9503f26aad2f18",
+      "meta": {
+        "source_pack": "pack_linkedin_js_generated_v1",
+        "source_origin": "linkedin_js_generator",
+        "variant": "classic",
+        "canonical_hash": "c4ea399f9d24a3be206cf080e8025b6151b06a4a6b51c45ecc9503f26aad2f18",
+        "difficulty_rebalanced_from": "d2",
+        "difficulty_score": 1.72
+      },
+      "solution": [
+        23,
+        17,
+        11,
+        5,
+        4,
+        3,
+        2,
+        1,
+        0,
+        6,
+        12,
+        18,
+        24,
+        30,
+        31,
+        25,
+        19,
+        13,
+        7,
+        8,
+        9,
+        10,
+        16,
+        22,
+        21,
+        15,
+        14,
+        20,
+        26,
+        32,
+        33,
+        27,
+        28,
+        34,
+        35,
+        29
+      ]
+    },
+    {
+      "id": "linkedin-editor-272",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 0,
+          "y": 4
+        },
+        {
+          "n": 2,
+          "x": 2,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 4,
+          "x": 4,
+          "y": 0
+        },
+        {
+          "n": 5,
+          "x": 0,
+          "y": 5
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d3",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "6241b0102e866977310b75329710d72f717bf701bbded93389e2f6a7108fa5d9",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "6241b0102e866977310b75329710d72f717bf701bbded93389e2f6a7108fa5d9",
+        "difficulty_rebalanced_from": "d3",
+        "difficulty_score": 4.82
+      }
+    },
+    {
+      "id": "all-93",
+      "size": {
+        "w": 7,
+        "h": 7
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 2,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 3,
+          "y": 6
+        },
+        {
+          "n": 4,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 5,
+          "x": 6,
+          "y": 0
+        },
+        {
+          "n": 6,
+          "x": 6,
+          "y": 2
+        }
+      ],
+      "walls": [
+        {
+          "cell1": 2,
+          "cell2": 9
+        },
+        {
+          "cell1": 4,
+          "cell2": 11
+        },
+        {
+          "cell1": 7,
+          "cell2": 8
+        },
+        {
+          "cell1": 11,
+          "cell2": 12
+        },
+        {
+          "cell1": 15,
+          "cell2": 22
+        },
+        {
+          "cell1": 16,
+          "cell2": 23
+        },
+        {
+          "cell1": 17,
+          "cell2": 18
+        },
+        {
+          "cell1": 21,
+          "cell2": 28
+        },
+        {
+          "cell1": 23,
+          "cell2": 24
+        },
+        {
+          "cell1": 29,
+          "cell2": 36
+        },
+        {
+          "cell1": 30,
+          "cell2": 31
+        },
+        {
+          "cell1": 30,
+          "cell2": 37
+        },
+        {
+          "cell1": 31,
+          "cell2": 38
+        },
+        {
+          "cell1": 32,
+          "cell2": 33
+        }
+      ],
+      "difficultyTag": "d4",
+      "source": "unified",
+      "source_pack": "pack_all_v1",
+      "source_origin": "unified",
+      "variant": "classic",
+      "canonical_hash": "f5500c9e8380bda9960712cc08b61a4bbb3c104979cf6dfe8c963ba5bfaed34e",
+      "meta": {
+        "source_pack": "pack_all_v1",
+        "source_origin": "unified",
+        "variant": "classic",
+        "canonical_hash": "f5500c9e8380bda9960712cc08b61a4bbb3c104979cf6dfe8c963ba5bfaed34e",
+        "difficulty_rebalanced_from": "d4",
+        "difficulty_score": 9.1493
+      },
+      "solution": [
+        18,
+        11,
+        10,
+        9,
+        8,
+        15,
+        16,
+        17,
+        24,
+        31,
+        32,
+        25,
+        26,
+        27,
+        34,
+        33,
+        40,
+        41,
+        48,
+        47,
+        46,
+        39,
+        38,
+        45,
+        44,
+        37,
+        36,
+        43,
+        42,
+        35,
+        28,
+        29,
+        30,
+        23,
+        22,
+        21,
+        14,
+        7,
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        13,
+        12,
+        19,
+        20
+      ]
+    },
+    {
+      "id": "all-5",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 4,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 3,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 4,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 1
+        },
+        {
+          "n": 6,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 7,
+          "x": 5,
+          "y": 5
+        }
+      ],
+      "walls": [
+        {
+          "cell1": 7,
+          "cell2": 13
+        },
+        {
+          "cell1": 12,
+          "cell2": 18
+        },
+        {
+          "cell1": 15,
+          "cell2": 21
+        },
+        {
+          "cell1": 20,
+          "cell2": 21
+        },
+        {
+          "cell1": 27,
+          "cell2": 28
+        }
+      ],
+      "difficultyTag": "d3",
+      "source": "unified",
+      "source_pack": "pack_all_v1",
+      "source_origin": "unified",
+      "variant": "classic",
+      "canonical_hash": "d8a878466ded0229784f0c7c0869de763645d56fafee53313b1bc5e7aaa4a74b",
+      "meta": {
+        "source_pack": "pack_all_v1",
+        "source_origin": "unified",
+        "variant": "classic",
+        "canonical_hash": "d8a878466ded0229784f0c7c0869de763645d56fafee53313b1bc5e7aaa4a74b",
+        "difficulty_rebalanced_from": "d3",
+        "difficulty_score": 5.2867
+      },
+      "solution": [
+        22,
+        21,
+        27,
+        33,
+        32,
+        26,
+        25,
+        31,
+        30,
+        24,
+        18,
+        19,
+        20,
+        14,
+        13,
+        12,
+        6,
+        0,
+        1,
+        7,
+        8,
+        2,
+        3,
+        9,
+        15,
+        16,
+        10,
+        4,
+        5,
+        11,
+        17,
+        23,
+        29,
+        28,
+        34,
+        35
+      ]
+    },
+    {
+      "id": "linkedin-editor-282",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 2,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 5,
+          "y": 2
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d3",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "f7956cdf54bf7da646e6205fb186366003445cecc3d11e805fea85efcca76549",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "f7956cdf54bf7da646e6205fb186366003445cecc3d11e805fea85efcca76549",
+        "difficulty_rebalanced_from": "d3",
+        "difficulty_score": 5.82
+      }
+    },
+    {
+      "id": "linkedin-editor-62",
+      "size": {
+        "w": 7,
+        "h": 7
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 3,
+          "y": 5
+        },
+        {
+          "n": 4,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 5,
+          "x": 0,
+          "y": 6
+        },
+        {
+          "n": 6,
+          "x": 6,
+          "y": 6
+        },
+        {
+          "n": 7,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 8,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "n": 9,
+          "x": 4,
+          "y": 2
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d3",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "35afed47de4893ad5ac8bba01e0977161f6e6d7563b33f64f1bde4aed4b89edc",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "35afed47de4893ad5ac8bba01e0977161f6e6d7563b33f64f1bde4aed4b89edc",
+        "difficulty_rebalanced_from": "d3",
+        "difficulty_score": 4.9139
+      },
+      "solution": [
+        24,
+        17,
+        10,
+        11,
+        12,
+        19,
+        26,
+        33,
+        40,
+        39,
+        38,
+        37,
+        36,
+        29,
+        22,
+        15,
+        8,
+        1,
+        0,
+        7,
+        14,
+        21,
+        28,
+        35,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        41,
+        34,
+        27,
+        20,
+        13,
+        6,
+        5,
+        4,
+        3,
+        2,
+        9,
+        16,
+        23,
+        30,
+        31,
+        32,
+        25,
+        18
+      ]
+    },
+    {
+      "id": "linkedin-editor-326",
+      "size": {
+        "w": 7,
+        "h": 7
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "n": 2,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 3,
+          "x": 6,
+          "y": 0
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d4",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "f11cccbd371f978479625c37f861afe12ea3f0e4f939d748b0d9ade0586be660",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "f11cccbd371f978479625c37f861afe12ea3f0e4f939d748b0d9ade0586be660",
+        "difficulty_rebalanced_from": "d4",
+        "difficulty_score": 7.118
+      }
+    },
+    {
+      "id": "linkedin-editor-288",
+      "size": {
+        "w": 7,
+        "h": 7
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 4,
+          "y": 0
+        },
+        {
+          "n": 2,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 3,
+          "y": 6
+        },
+        {
+          "n": 4,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 6
+        },
+        {
+          "n": 6,
+          "x": 1,
+          "y": 5
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d3",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "8351faf55fba13394f0a0ae602b380a5bbcd11c3110fca31a03c43d8ab59cd8a",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "8351faf55fba13394f0a0ae602b380a5bbcd11c3110fca31a03c43d8ab59cd8a",
+        "difficulty_rebalanced_from": "d3",
+        "difficulty_score": 6.0159
+      }
+    },
+    {
+      "id": "world_multiples_roman_011",
+      "size": 7,
+      "clues": [
+        {
+          "n": 1,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 5,
+          "y": 4
+        },
+        {
+          "n": 3,
+          "x": 4,
+          "y": 6
+        },
+        {
+          "n": 4,
+          "x": 6,
+          "y": 5
+        },
+        {
+          "n": 5,
+          "x": 6,
+          "y": 2
+        },
+        {
+          "n": 6,
+          "x": 5,
+          "y": 0
+        },
+        {
+          "n": 7,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 8,
+          "x": 3,
+          "y": 2
+        },
+        {
+          "n": 9,
+          "x": 2,
+          "y": 0
+        },
+        {
+          "n": 10,
+          "x": 0,
+          "y": 1
+        },
+        {
+          "n": 11,
+          "x": 0,
+          "y": 4
+        },
+        {
+          "n": 12,
+          "x": 1,
+          "y": 6
+        },
+        {
+          "n": 13,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 14,
+          "x": 2,
+          "y": 1
+        },
+        {
+          "n": 15,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 16,
+          "x": 3,
+          "y": 6
+        },
+        {
+          "n": 17,
+          "x": 4,
+          "y": 4
+        }
+      ],
+      "walls": {
+        "h": [],
+        "v": []
+      },
+      "solution": [
+        24,
+        25,
+        26,
+        33,
+        40,
+        39,
+        46,
+        47,
+        48,
+        41,
+        34,
+        27,
+        20,
+        13,
+        6,
+        5,
+        4,
+        11,
+        12,
+        19,
+        18,
+        17,
+        10,
+        3,
+        2,
+        1,
+        0,
+        7,
+        14,
+        21,
+        28,
+        35,
+        42,
+        43,
+        36,
+        29,
+        22,
+        15,
+        8,
+        9,
+        16,
+        23,
+        30,
+        37,
+        44,
+        45,
+        38,
+        31,
+        32
+      ],
+      "meta": {
+        "variant": "multiples_roman",
+        "sequence_rule": "roman multiples of 3",
+        "difficulty_target": "easy",
+        "representation": "multiple_roman",
+        "display_labels": {
+          "1": "III",
+          "2": "VI",
+          "3": "IX",
+          "4": "XII",
+          "5": "XV",
+          "6": "XVIII",
+          "7": "XXI",
+          "8": "XXIV",
+          "9": "XXVII",
+          "10": "XXX",
+          "11": "XXXIII",
+          "12": "XXXVI",
+          "13": "XXXIX",
+          "14": "XLII",
+          "15": "XLV",
+          "16": "XLVIII",
+          "17": "LI"
+        },
+        "source_level_id": "linkedin-editor-105",
+        "multiple_base": 3,
+        "roman_max_value": 51,
+        "generation_batch": "world_variant_pack_20_each",
+        "generation_index": 11
+      },
+      "metrics": {
+        "variant": "multiples_roman",
+        "grid_size": 7,
+        "path_length": 49,
+        "num_clues": 17,
+        "clue_density": 0.3469,
+        "sequence_length": 17,
+        "sequence_start": 3,
+        "sequence_step": 3,
+        "representation": "multiple_roman",
+        "difficulty_estimate": "easy",
+        "turns": 20,
+        "max_straight": 6,
+        "avg_straight": 2.29,
+        "corners": 0,
+        "borders": 9,
+        "inners": 8,
+        "num_walls": 0,
+        "multiple_base": 3,
+        "roman_max_value": 51
+      }
+    },
+    {
+      "id": "world_alphabet_015",
+      "size": 5,
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 0,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 4,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 5,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 6,
+          "x": 2,
+          "y": 2
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 3,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 1,
+            "y": 3,
+            "len": 1
+          }
+        ],
+        "v": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 1,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 3,
+            "len": 2
+          },
+          {
+            "x": 3,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 2,
+            "len": 1
+          }
+        ]
+      },
+      "solution": [
+        16,
+        21,
+        20,
+        15,
+        10,
+        5,
+        0,
+        1,
+        2,
+        3,
+        4,
+        9,
+        14,
+        19,
+        24,
+        23,
+        22,
+        17,
+        18,
+        13,
+        8,
+        7,
+        6,
+        11,
+        12
+      ],
+      "meta": {
+        "variant": "alphabet",
+        "sequence_rule": "A, B, C...",
+        "difficulty_target": "hard",
+        "representation": "alphabet",
+        "display_labels": {
+          "1": "A",
+          "2": "B",
+          "3": "C",
+          "4": "D",
+          "5": "E",
+          "6": "F"
+        },
+        "source_level_id": "generated_alphabet_015",
+        "alphabet_start_char": "A",
+        "generation_batch": "world_variant_pack_20_each",
+        "generation_index": 15
+      },
+      "metrics": {
+        "variant": "alphabet",
+        "grid_size": 5,
+        "path_length": 25,
+        "num_clues": 6,
+        "clue_density": 0.24,
+        "sequence_length": 6,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "alphabet",
+        "difficulty_estimate": "hard",
+        "turns": 11,
+        "max_straight": 4,
+        "avg_straight": 2.0,
+        "corners": 0,
+        "borders": 2,
+        "inners": 4,
+        "num_walls": 10,
+        "alphabet_start_char": "A"
+      }
+    },
+    {
+      "id": "world_roman_012",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 2,
+          "y": 5
+        },
+        {
+          "n": 2,
+          "x": 0,
+          "y": 4
+        },
+        {
+          "n": 3,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 4,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 6,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 7,
+          "x": 1,
+          "y": 0
+        },
+        {
+          "n": 8,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 9,
+          "x": 3,
+          "y": 2
+        },
+        {
+          "n": 10,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "n": 11,
+          "x": 4,
+          "y": 5
+        },
+        {
+          "n": 12,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 13,
+          "x": 5,
+          "y": 3
+        },
+        {
+          "n": 14,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 15,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 16,
+          "x": 4,
+          "y": 0
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 5,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 5,
+            "len": 1
+          }
+        ],
+        "v": [
+          {
+            "x": 3,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 0,
+            "len": 2
+          }
+        ]
+      },
+      "solution": [
+        32,
+        31,
+        30,
+        24,
+        25,
+        26,
+        20,
+        19,
+        18,
+        12,
+        13,
+        14,
+        8,
+        7,
+        6,
+        0,
+        1,
+        2,
+        3,
+        9,
+        15,
+        21,
+        27,
+        33,
+        34,
+        35,
+        29,
+        28,
+        22,
+        23,
+        17,
+        16,
+        10,
+        11,
+        5,
+        4
+      ],
+      "meta": {
+        "variant": "roman",
+        "sequence_rule": "I, II, III...",
+        "difficulty_target": "easy",
+        "representation": "roman",
+        "display_labels": {
+          "1": "I",
+          "2": "II",
+          "3": "III",
+          "4": "IV",
+          "5": "V",
+          "6": "VI",
+          "7": "VII",
+          "8": "VIII",
+          "9": "IX",
+          "10": "X",
+          "11": "XI",
+          "12": "XII",
+          "13": "XIII",
+          "14": "XIV",
+          "15": "XV",
+          "16": "XVI"
+        },
+        "source_level_id": "generated_roman_012",
+        "roman_max_value": 16,
+        "roman_step": 1,
+        "generation_batch": "world_variant_pack_20_each",
+        "generation_index": 12
+      },
+      "metrics": {
+        "variant": "roman",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 16,
+        "clue_density": 0.4444,
+        "sequence_length": 16,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "roman",
+        "difficulty_estimate": "easy",
+        "turns": 22,
+        "max_straight": 5,
+        "avg_straight": 1.52,
+        "corners": 0,
+        "borders": 9,
+        "inners": 7,
+        "num_walls": 6,
+        "roman_max_value": 16,
+        "roman_step": 1
+      }
+    },
+    {
+      "id": "world_roman_014",
+      "size": 7,
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 3,
+          "y": 6
+        },
+        {
+          "n": 3,
+          "x": 6,
+          "y": 5
+        },
+        {
+          "n": 4,
+          "x": 2,
+          "y": 5
+        },
+        {
+          "n": 5,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "n": 6,
+          "x": 6,
+          "y": 3
+        },
+        {
+          "n": 7,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 8,
+          "x": 6,
+          "y": 1
+        },
+        {
+          "n": 9,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 10,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "n": 11,
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 2,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 3,
+            "len": 2
+          },
+          {
+            "x": 1,
+            "y": 4,
+            "len": 1
+          },
+          {
+            "x": 3,
+            "y": 4,
+            "len": 1
+          }
+        ],
+        "v": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 1,
+            "y": 4,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 2,
+            "len": 1
+          }
+        ]
+      },
+      "solution": [
+        22,
+        21,
+        28,
+        35,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        41,
+        40,
+        39,
+        38,
+        37,
+        36,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        27,
+        26,
+        25,
+        24,
+        23,
+        16,
+        17,
+        18,
+        19,
+        20,
+        13,
+        6,
+        5,
+        12,
+        11,
+        4,
+        3,
+        10,
+        9,
+        2,
+        1,
+        0,
+        7,
+        14,
+        15,
+        8
+      ],
+      "meta": {
+        "variant": "roman",
+        "sequence_rule": "I, II, III...",
+        "difficulty_target": "medium",
+        "representation": "roman",
+        "display_labels": {
+          "1": "I",
+          "2": "II",
+          "3": "III",
+          "4": "IV",
+          "5": "V",
+          "6": "VI",
+          "7": "VII",
+          "8": "VIII",
+          "9": "IX",
+          "10": "X",
+          "11": "XI"
+        },
+        "source_level_id": "generated_roman_014",
+        "roman_max_value": 11,
+        "roman_step": 1,
+        "generation_batch": "world_variant_pack_20_each",
+        "generation_index": 14
+      },
+      "metrics": {
+        "variant": "roman",
+        "grid_size": 7,
+        "path_length": 49,
+        "num_clues": 11,
+        "clue_density": 0.2245,
+        "sequence_length": 11,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "roman",
+        "difficulty_estimate": "medium",
+        "turns": 23,
+        "max_straight": 6,
+        "avg_straight": 2.0,
+        "corners": 1,
+        "borders": 4,
+        "inners": 6,
+        "num_walls": 9,
+        "roman_max_value": 11,
+        "roman_step": 1
+      }
+    },
+    {
+      "id": "world_roman_018",
+      "size": 7,
+      "clues": [
+        {
+          "n": 1,
+          "x": 3,
+          "y": 5
+        },
+        {
+          "n": 2,
+          "x": 2,
+          "y": 6
+        },
+        {
+          "n": 3,
+          "x": 0,
+          "y": 6
+        },
+        {
+          "n": 4,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 5,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 6,
+          "x": 0,
+          "y": 2
+        },
+        {
+          "n": 7,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 8,
+          "x": 0,
+          "y": 1
+        },
+        {
+          "n": 9,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 10,
+          "x": 6,
+          "y": 1
+        },
+        {
+          "n": 11,
+          "x": 5,
+          "y": 4
+        },
+        {
+          "n": 12,
+          "x": 6,
+          "y": 6
+        },
+        {
+          "n": 13,
+          "x": 6,
+          "y": 2
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 2,
+            "y": 2,
+            "len": 2
+          },
+          {
+            "x": 1,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 1,
+            "y": 5,
+            "len": 1
+          }
+        ],
+        "v": [
+          {
+            "x": 3,
+            "y": 5,
+            "len": 1
+          },
+          {
+            "x": 5,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 5,
+            "y": 4,
+            "len": 3
+          },
+          {
+            "x": 6,
+            "y": 2,
+            "len": 2
+          }
+        ]
+      },
+      "solution": [
+        38,
+        39,
+        46,
+        45,
+        44,
+        37,
+        36,
+        43,
+        42,
+        35,
+        28,
+        29,
+        30,
+        31,
+        32,
+        25,
+        24,
+        23,
+        22,
+        21,
+        14,
+        15,
+        16,
+        17,
+        18,
+        11,
+        10,
+        9,
+        8,
+        7,
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        13,
+        12,
+        19,
+        26,
+        33,
+        40,
+        47,
+        48,
+        41,
+        34,
+        27,
+        20
+      ],
+      "meta": {
+        "variant": "roman",
+        "sequence_rule": "I, II, III...",
+        "difficulty_target": "medium",
+        "representation": "roman",
+        "display_labels": {
+          "1": "I",
+          "2": "II",
+          "3": "III",
+          "4": "IV",
+          "5": "V",
+          "6": "VI",
+          "7": "VII",
+          "8": "VIII",
+          "9": "IX",
+          "10": "X",
+          "11": "XI",
+          "12": "XII",
+          "13": "XIII"
+        },
+        "source_level_id": "generated_roman_018",
+        "roman_max_value": 13,
+        "roman_step": 1,
+        "generation_batch": "world_variant_pack_20_each",
+        "generation_index": 18
+      },
+      "metrics": {
+        "variant": "roman",
+        "grid_size": 7,
+        "path_length": 49,
+        "num_clues": 13,
+        "clue_density": 0.2653,
+        "sequence_length": 13,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "roman",
+        "difficulty_estimate": "medium",
+        "turns": 21,
+        "max_straight": 6,
+        "avg_straight": 2.18,
+        "corners": 2,
+        "borders": 6,
+        "inners": 5,
+        "num_walls": 11,
+        "roman_max_value": 13,
+        "roman_step": 1
+      }
+    },
+    {
+      "id": "world_multiples_009",
+      "size": 7,
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 0,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 2,
+          "y": 0
+        },
+        {
+          "n": 4,
+          "x": 5,
+          "y": 0
+        },
+        {
+          "n": 5,
+          "x": 6,
+          "y": 2
+        },
+        {
+          "n": 6,
+          "x": 6,
+          "y": 5
+        },
+        {
+          "n": 7,
+          "x": 4,
+          "y": 6
+        },
+        {
+          "n": 8,
+          "x": 1,
+          "y": 6
+        },
+        {
+          "n": 9,
+          "x": 0,
+          "y": 4
+        },
+        {
+          "n": 10,
+          "x": 2,
+          "y": 5
+        },
+        {
+          "n": 11,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 12,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 13,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 14,
+          "x": 2,
+          "y": 1
+        },
+        {
+          "n": 15,
+          "x": 1,
+          "y": 2
+        },
+        {
+          "n": 16,
+          "x": 3,
+          "y": 2
+        },
+        {
+          "n": 17,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 18,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 19,
+          "x": 3,
+          "y": 3
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 3,
+            "y": 1,
+            "len": 2
+          },
+          {
+            "x": 0,
+            "y": 4,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 5,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 6,
+            "len": 1
+          }
+        ],
+        "v": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 1,
+            "y": 5,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 3,
+            "len": 2
+          },
+          {
+            "x": 4,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 5,
+            "y": 3,
+            "len": 1
+          }
+        ]
+      },
+      "solution": [
+        22,
+        21,
+        14,
+        7,
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        13,
+        20,
+        27,
+        34,
+        41,
+        48,
+        47,
+        46,
+        45,
+        44,
+        43,
+        42,
+        35,
+        28,
+        29,
+        36,
+        37,
+        38,
+        39,
+        40,
+        33,
+        26,
+        19,
+        12,
+        11,
+        10,
+        9,
+        8,
+        15,
+        16,
+        17,
+        18,
+        25,
+        32,
+        31,
+        30,
+        23,
+        24
+      ],
+      "meta": {
+        "variant": "multiples",
+        "sequence_rule": "multiples of 5",
+        "difficulty_target": "medium",
+        "representation": "multiple",
+        "display_labels": {
+          "1": "5",
+          "2": "10",
+          "3": "15",
+          "4": "20",
+          "5": "25",
+          "6": "30",
+          "7": "35",
+          "8": "40",
+          "9": "45",
+          "10": "50",
+          "11": "55",
+          "12": "60",
+          "13": "65",
+          "14": "70",
+          "15": "75",
+          "16": "80",
+          "17": "85",
+          "18": "90",
+          "19": "95"
+        },
+        "source_level_id": "generated_multiples_009",
+        "multiple_base": 5,
+        "generation_batch": "world_variant_pack_20_each",
+        "generation_index": 9
+      },
+      "metrics": {
+        "variant": "multiples",
+        "grid_size": 7,
+        "path_length": 49,
+        "num_clues": 19,
+        "clue_density": 0.3878,
+        "sequence_length": 19,
+        "sequence_start": 5,
+        "sequence_step": 5,
+        "representation": "multiple",
+        "difficulty_estimate": "medium",
+        "turns": 16,
+        "max_straight": 6,
+        "avg_straight": 2.82,
+        "corners": 0,
+        "borders": 8,
+        "inners": 11,
+        "num_walls": 11,
+        "multiple_base": 5
+      }
+    },
+    {
+      "id": "world_alphabet_reverse_015",
+      "size": 5,
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 2,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 4,
+          "x": 4,
+          "y": 4
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 1,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 2,
+            "y": 4,
+            "len": 1
+          }
+        ],
+        "v": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 3
+          },
+          {
+            "x": 3,
+            "y": 0,
+            "len": 1
+          },
+          {
+            "x": 3,
+            "y": 2,
+            "len": 2
+          },
+          {
+            "x": 4,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 4,
+            "len": 1
+          }
+        ]
+      },
+      "solution": [
+        16,
+        17,
+        12,
+        11,
+        6,
+        7,
+        2,
+        1,
+        0,
+        5,
+        10,
+        15,
+        20,
+        21,
+        22,
+        23,
+        18,
+        13,
+        8,
+        3,
+        4,
+        9,
+        14,
+        19,
+        24
+      ],
+      "meta": {
+        "variant": "alphabet_reverse",
+        "sequence_rule": "Z, Y, X...",
+        "difficulty_target": "hard",
+        "representation": "alphabet_reverse",
+        "display_labels": {
+          "1": "Z",
+          "2": "Y",
+          "3": "X",
+          "4": "W"
+        },
+        "source_level_id": "generated_alphabet_reverse_015",
+        "alphabet_start_char": "Z",
+        "generation_batch": "world_variant_pack_20_each",
+        "generation_index": 15
+      },
+      "metrics": {
+        "variant": "alphabet_reverse",
+        "grid_size": 5,
+        "path_length": 25,
+        "num_clues": 4,
+        "clue_density": 0.16,
+        "sequence_length": 4,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "alphabet_reverse",
+        "difficulty_estimate": "hard",
+        "turns": 11,
+        "max_straight": 4,
+        "avg_straight": 2.0,
+        "corners": 1,
+        "borders": 1,
+        "inners": 2,
+        "num_walls": 12,
+        "alphabet_start_char": "Z"
+      }
+    },
+    {
+      "id": "world_multiples_roman_016",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 2,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 5,
+          "y": 4
+        },
+        {
+          "n": 4,
+          "x": 4,
+          "y": 3
+        },
+        {
+          "n": 5,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 6,
+          "x": 2,
+          "y": 1
+        },
+        {
+          "n": 7,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 8,
+          "x": 0,
+          "y": 1
+        },
+        {
+          "n": 9,
+          "x": 0,
+          "y": 4
+        },
+        {
+          "n": 10,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 11,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "n": 12,
+          "x": 3,
+          "y": 5
+        }
+      ],
+      "walls": {
+        "h": [],
+        "v": []
+      },
+      "solution": [
+        10,
+        4,
+        5,
+        11,
+        17,
+        23,
+        29,
+        35,
+        34,
+        28,
+        22,
+        16,
+        15,
+        9,
+        3,
+        2,
+        8,
+        14,
+        13,
+        7,
+        1,
+        0,
+        6,
+        12,
+        18,
+        24,
+        30,
+        31,
+        25,
+        19,
+        20,
+        21,
+        27,
+        26,
+        32,
+        33
+      ],
+      "meta": {
+        "variant": "multiples_roman",
+        "sequence_rule": "roman multiples of 3",
+        "difficulty_target": "easy",
+        "representation": "multiple_roman",
+        "display_labels": {
+          "1": "III",
+          "2": "VI",
+          "3": "IX",
+          "4": "XII",
+          "5": "XV",
+          "6": "XVIII",
+          "7": "XXI",
+          "8": "XXIV",
+          "9": "XXVII",
+          "10": "XXX",
+          "11": "XXXIII",
+          "12": "XXXVI"
+        },
+        "source_level_id": "linkedin-js-6",
+        "multiple_base": 3,
+        "roman_max_value": 36,
+        "generation_batch": "world_variant_pack_20_each",
+        "generation_index": 16
+      },
+      "metrics": {
+        "variant": "multiples_roman",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 12,
+        "clue_density": 0.3333,
+        "sequence_length": 12,
+        "sequence_start": 3,
+        "sequence_step": 3,
+        "representation": "multiple_roman",
+        "difficulty_estimate": "easy",
+        "turns": 19,
+        "max_straight": 5,
+        "avg_straight": 1.75,
+        "corners": 0,
+        "borders": 5,
+        "inners": 7,
+        "num_walls": 0,
+        "multiple_base": 3,
+        "roman_max_value": 36
+      }
+    },
+    {
+      "id": "world_multiples_roman_013",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 4,
+          "y": 5
+        },
+        {
+          "n": 3,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 4,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 5,
+          "x": 0,
+          "y": 1
+        },
+        {
+          "n": 6,
+          "x": 0,
+          "y": 4
+        },
+        {
+          "n": 7,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 8,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 9,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 10,
+          "x": 4,
+          "y": 4
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 1,
+            "y": 5,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 5,
+            "len": 1
+          }
+        ],
+        "v": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 4
+          },
+          {
+            "x": 5,
+            "y": 1,
+            "len": 4
+          }
+        ]
+      },
+      "solution": [
+        20,
+        21,
+        27,
+        33,
+        34,
+        35,
+        29,
+        23,
+        17,
+        11,
+        5,
+        4,
+        3,
+        2,
+        1,
+        0,
+        6,
+        12,
+        18,
+        24,
+        30,
+        31,
+        32,
+        26,
+        25,
+        19,
+        13,
+        7,
+        8,
+        14,
+        15,
+        9,
+        10,
+        16,
+        22,
+        28
+      ],
+      "meta": {
+        "variant": "multiples_roman",
+        "sequence_rule": "roman multiples of 5",
+        "difficulty_target": "medium",
+        "representation": "multiple_roman",
+        "display_labels": {
+          "1": "V",
+          "2": "X",
+          "3": "XV",
+          "4": "XX",
+          "5": "XXV",
+          "6": "XXX",
+          "7": "XXXV",
+          "8": "XL",
+          "9": "XLV",
+          "10": "L"
+        },
+        "source_level_id": "linkedin-editor-99",
+        "multiple_base": 5,
+        "roman_max_value": 50,
+        "generation_batch": "world_variant_pack_20_each",
+        "generation_index": 13
+      },
+      "metrics": {
+        "variant": "multiples_roman",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 10,
+        "clue_density": 0.2778,
+        "sequence_length": 10,
+        "sequence_start": 5,
+        "sequence_step": 5,
+        "representation": "multiple_roman",
+        "difficulty_estimate": "medium",
+        "turns": 15,
+        "max_straight": 5,
+        "avg_straight": 2.19,
+        "corners": 0,
+        "borders": 5,
+        "inners": 5,
+        "num_walls": 12,
+        "multiple_base": 5,
+        "roman_max_value": 50
+      }
+    },
+    {
+      "id": "world_multiples_016",
+      "size": 6,
+      "clues": [
+        {
+          "n": 1,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 3,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 4,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 5,
+          "x": 1,
+          "y": 2
+        },
+        {
+          "n": 6,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 7,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 8,
+          "x": 4,
+          "y": 0
+        },
+        {
+          "n": 9,
+          "x": 1,
+          "y": 0
+        },
+        {
+          "n": 10,
+          "x": 0,
+          "y": 2
+        },
+        {
+          "n": 11,
+          "x": 0,
+          "y": 4
+        },
+        {
+          "n": 12,
+          "x": 2,
+          "y": 5
+        },
+        {
+          "n": 13,
+          "x": 4,
+          "y": 5
+        },
+        {
+          "n": 14,
+          "x": 5,
+          "y": 3
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 3,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 1,
+            "y": 5,
+            "len": 2
+          },
+          {
+            "x": 4,
+            "y": 5,
+            "len": 1
+          }
+        ],
+        "v": [
+          {
+            "x": 2,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 3,
+            "y": 3,
+            "len": 1
+          },
+          {
+            "x": 5,
+            "y": 4,
+            "len": 1
+          }
+        ]
+      },
+      "solution": [
+        20,
+        14,
+        15,
+        21,
+        22,
+        28,
+        27,
+        26,
+        25,
+        19,
+        13,
+        7,
+        8,
+        9,
+        10,
+        16,
+        17,
+        11,
+        5,
+        4,
+        3,
+        2,
+        1,
+        0,
+        6,
+        12,
+        18,
+        24,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        29,
+        23
+      ],
+      "meta": {
+        "variant": "multiples",
+        "sequence_rule": "multiples of 2",
+        "difficulty_target": "easy",
+        "representation": "multiple",
+        "display_labels": {
+          "1": "2",
+          "2": "4",
+          "3": "6",
+          "4": "8",
+          "5": "10",
+          "6": "12",
+          "7": "14",
+          "8": "16",
+          "9": "18",
+          "10": "20",
+          "11": "22",
+          "12": "24",
+          "13": "26",
+          "14": "28"
+        },
+        "source_level_id": "generated_multiples_016",
+        "multiple_base": 2,
+        "generation_batch": "world_variant_pack_20_each",
+        "generation_index": 16
+      },
+      "metrics": {
+        "variant": "multiples",
+        "grid_size": 6,
+        "path_length": 36,
+        "num_clues": 14,
+        "clue_density": 0.3889,
+        "sequence_length": 14,
+        "sequence_start": 2,
+        "sequence_step": 2,
+        "representation": "multiple",
+        "difficulty_estimate": "easy",
+        "turns": 14,
+        "max_straight": 5,
+        "avg_straight": 2.33,
+        "corners": 0,
+        "borders": 8,
+        "inners": 6,
+        "num_walls": 8,
+        "multiple_base": 2
+      }
+    },
+    {
+      "id": "world_alphabet_reverse_019",
+      "size": 5,
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 3,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 4,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 5,
+          "x": 0,
+          "y": 2
+        }
+      ],
+      "walls": {
+        "h": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 1
+          },
+          {
+            "x": 4,
+            "y": 2,
+            "len": 1
+          },
+          {
+            "x": 0,
+            "y": 3,
+            "len": 2
+          },
+          {
+            "x": 3,
+            "y": 3,
+            "len": 1
+          }
+        ],
+        "v": [
+          {
+            "x": 1,
+            "y": 1,
+            "len": 2
+          },
+          {
+            "x": 4,
+            "y": 3,
+            "len": 1
+          }
+        ]
+      },
+      "solution": [
+        16,
+        15,
+        20,
+        21,
+        22,
+        17,
+        18,
+        23,
+        24,
+        19,
+        14,
+        13,
+        12,
+        11,
+        6,
+        7,
+        8,
+        9,
+        4,
+        3,
+        2,
+        1,
+        0,
+        5,
+        10
+      ],
+      "meta": {
+        "variant": "alphabet_reverse",
+        "sequence_rule": "Z, Y, X...",
+        "difficulty_target": "medium",
+        "representation": "alphabet_reverse",
+        "display_labels": {
+          "1": "Z",
+          "2": "Y",
+          "3": "X",
+          "4": "W",
+          "5": "V"
+        },
+        "source_level_id": "generated_alphabet_reverse_019",
+        "alphabet_start_char": "Z",
+        "generation_batch": "world_variant_pack_20_each",
+        "generation_index": 19
+      },
+      "metrics": {
+        "variant": "alphabet_reverse",
+        "grid_size": 5,
+        "path_length": 25,
+        "num_clues": 5,
+        "clue_density": 0.2,
+        "sequence_length": 5,
+        "sequence_start": 1,
+        "sequence_step": 1,
+        "representation": "alphabet_reverse",
+        "difficulty_estimate": "medium",
+        "turns": 13,
+        "max_straight": 4,
+        "avg_straight": 1.71,
+        "corners": 0,
+        "borders": 3,
+        "inners": 2,
+        "num_walls": 8,
+        "alphabet_start_char": "Z"
+      }
+    }
+  ]
+}

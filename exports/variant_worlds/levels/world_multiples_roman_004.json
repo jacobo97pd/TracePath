@@ -1,0 +1,162 @@
+{
+  "id": "world_multiples_roman_004",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "n": 2,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 3,
+      "x": 4,
+      "y": 5
+    },
+    {
+      "n": 4,
+      "x": 4,
+      "y": 3
+    },
+    {
+      "n": 5,
+      "x": 4,
+      "y": 0
+    },
+    {
+      "n": 6,
+      "x": 2,
+      "y": 0
+    },
+    {
+      "n": 7,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "n": 8,
+      "x": 0,
+      "y": 3
+    },
+    {
+      "n": 9,
+      "x": 0,
+      "y": 5
+    }
+  ],
+  "walls": {
+    "h": [],
+    "v": [
+      {
+        "x": 2,
+        "y": 0,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 0,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "len": 1
+      }
+    ]
+  },
+  "solution": [
+    21,
+    15,
+    14,
+    20,
+    26,
+    32,
+    33,
+    27,
+    28,
+    34,
+    35,
+    29,
+    23,
+    22,
+    16,
+    17,
+    11,
+    5,
+    4,
+    10,
+    9,
+    3,
+    2,
+    8,
+    7,
+    1,
+    0,
+    6,
+    12,
+    13,
+    19,
+    18,
+    24,
+    25,
+    31,
+    30
+  ],
+  "meta": {
+    "variant": "multiples_roman",
+    "sequence_rule": "roman multiples of 3",
+    "difficulty_target": "medium",
+    "representation": "multiple_roman",
+    "display_labels": {
+      "1": "III",
+      "2": "VI",
+      "3": "IX",
+      "4": "XII",
+      "5": "XV",
+      "6": "XVIII",
+      "7": "XXI",
+      "8": "XXIV",
+      "9": "XXVII"
+    },
+    "source_level_id": "all-16",
+    "multiple_base": 3,
+    "roman_max_value": 27,
+    "generation_batch": "world_variant_pack_20_each",
+    "generation_index": 4
+  },
+  "metrics": {
+    "variant": "multiples_roman",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 9,
+    "clue_density": 0.25,
+    "sequence_length": 9,
+    "sequence_start": 3,
+    "sequence_step": 3,
+    "representation": "multiple_roman",
+    "difficulty_estimate": "medium",
+    "turns": 29,
+    "max_straight": 3,
+    "avg_straight": 1.17,
+    "corners": 2,
+    "borders": 4,
+    "inners": 3,
+    "num_walls": 5,
+    "multiple_base": 3,
+    "roman_max_value": 27
+  }
+}

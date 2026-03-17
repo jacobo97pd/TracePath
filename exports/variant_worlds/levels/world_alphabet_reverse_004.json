@@ -1,0 +1,122 @@
+{
+  "id": "world_alphabet_reverse_004",
+  "size": 5,
+  "clues": [
+    {
+      "n": 1,
+      "x": 0,
+      "y": 4
+    },
+    {
+      "n": 2,
+      "x": 1,
+      "y": 2
+    },
+    {
+      "n": 3,
+      "x": 2,
+      "y": 1
+    },
+    {
+      "n": 4,
+      "x": 3,
+      "y": 4
+    },
+    {
+      "n": 5,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 6,
+      "x": 4,
+      "y": 4
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 1,
+        "y": 3,
+        "len": 1
+      }
+    ],
+    "v": [
+      {
+        "x": 2,
+        "y": 3,
+        "len": 2
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "len": 1
+      }
+    ]
+  },
+  "solution": [
+    20,
+    21,
+    16,
+    15,
+    10,
+    11,
+    6,
+    5,
+    0,
+    1,
+    2,
+    7,
+    12,
+    17,
+    22,
+    23,
+    18,
+    13,
+    8,
+    3,
+    4,
+    9,
+    14,
+    19,
+    24
+  ],
+  "meta": {
+    "variant": "alphabet_reverse",
+    "sequence_rule": "Z, Y, X...",
+    "difficulty_target": "medium",
+    "representation": "alphabet_reverse",
+    "display_labels": {
+      "1": "Z",
+      "2": "Y",
+      "3": "X",
+      "4": "W",
+      "5": "V",
+      "6": "U"
+    },
+    "source_level_id": "generated_alphabet_reverse_004",
+    "alphabet_start_char": "Z",
+    "generation_batch": "world_variant_pack_20_each",
+    "generation_index": 4
+  },
+  "metrics": {
+    "variant": "alphabet_reverse",
+    "grid_size": 5,
+    "path_length": 25,
+    "num_clues": 6,
+    "clue_density": 0.24,
+    "sequence_length": 6,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "alphabet_reverse",
+    "difficulty_estimate": "medium",
+    "turns": 13,
+    "max_straight": 4,
+    "avg_straight": 1.71,
+    "corners": 2,
+    "borders": 2,
+    "inners": 2,
+    "num_walls": 4,
+    "alphabet_start_char": "Z"
+  }
+}

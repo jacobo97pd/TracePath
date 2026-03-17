@@ -1,0 +1,177 @@
+{
+  "id": "world_multiples_roman_008",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 0,
+      "y": 4
+    },
+    {
+      "n": 2,
+      "x": 4,
+      "y": 3
+    },
+    {
+      "n": 3,
+      "x": 1,
+      "y": 3
+    },
+    {
+      "n": 4,
+      "x": 1,
+      "y": 0
+    },
+    {
+      "n": 5,
+      "x": 3,
+      "y": 1
+    },
+    {
+      "n": 6,
+      "x": 5,
+      "y": 0
+    },
+    {
+      "n": 7,
+      "x": 5,
+      "y": 5
+    },
+    {
+      "n": 8,
+      "x": 0,
+      "y": 5
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 2,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "len": 2
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "len": 4
+      },
+      {
+        "x": 0,
+        "y": 5,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "len": 2
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 2
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "len": 1
+      }
+    ]
+  },
+  "solution": [
+    24,
+    25,
+    26,
+    27,
+    28,
+    22,
+    21,
+    20,
+    14,
+    13,
+    19,
+    18,
+    12,
+    6,
+    0,
+    1,
+    7,
+    8,
+    2,
+    3,
+    9,
+    15,
+    16,
+    10,
+    4,
+    5,
+    11,
+    17,
+    23,
+    29,
+    35,
+    34,
+    33,
+    32,
+    31,
+    30
+  ],
+  "meta": {
+    "variant": "multiples_roman",
+    "sequence_rule": "roman multiples of 5",
+    "difficulty_target": "medium",
+    "representation": "multiple_roman",
+    "display_labels": {
+      "1": "V",
+      "2": "X",
+      "3": "XV",
+      "4": "XX",
+      "5": "XXV",
+      "6": "XXX",
+      "7": "XXXV",
+      "8": "XL"
+    },
+    "source_level_id": "linkedin-editor-34",
+    "multiple_base": 5,
+    "roman_max_value": 40,
+    "generation_batch": "world_variant_pack_20_each",
+    "generation_index": 8
+  },
+  "metrics": {
+    "variant": "multiples_roman",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 8,
+    "clue_density": 0.2222,
+    "sequence_length": 8,
+    "sequence_start": 5,
+    "sequence_step": 5,
+    "representation": "multiple_roman",
+    "difficulty_estimate": "medium",
+    "turns": 18,
+    "max_straight": 5,
+    "avg_straight": 1.84,
+    "corners": 3,
+    "borders": 2,
+    "inners": 3,
+    "num_walls": 15,
+    "multiple_base": 5,
+    "roman_max_value": 40
+  }
+}

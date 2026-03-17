@@ -1,31 +1,51 @@
 {
   "id": "bulk_roman_005",
-  "size": 6,
+  "size": 8,
   "clues": [
     {
       "n": 1,
-      "x": 0,
-      "y": 0
+      "x": 3,
+      "y": 3
     },
     {
       "n": 2,
-      "x": 5,
-      "y": 2
+      "x": 1,
+      "y": 1
     },
     {
       "n": 3,
-      "x": 0,
+      "x": 4,
       "y": 4
     },
     {
       "n": 4,
-      "x": 2,
-      "y": 2
+      "x": 3,
+      "y": 5
     },
     {
       "n": 5,
-      "x": 2,
-      "y": 3
+      "x": 0,
+      "y": 4
+    },
+    {
+      "n": 6,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 7,
+      "x": 7,
+      "y": 4
+    },
+    {
+      "n": 8,
+      "x": 4,
+      "y": 7
+    },
+    {
+      "n": 9,
+      "x": 6,
+      "y": 1
     }
   ],
   "walls": {
@@ -34,39 +54,45 @@
   },
   "meta": {
     "variant": "roman",
-    "sequence_rule": "I, II, III...",
+    "sequence_rule": "II, IV, VI...",
     "difficulty_target": "hard",
     "representation": "roman",
     "display_labels": {
-      "1": "I",
-      "2": "II",
-      "3": "III",
-      "4": "IV",
-      "5": "V"
+      "1": "II",
+      "2": "IV",
+      "3": "VI",
+      "4": "VIII",
+      "5": "X",
+      "6": "XII",
+      "7": "XIV",
+      "8": "XVI",
+      "9": "XVIII"
     },
-    "source_level_id": "all-367",
-    "roman_max_value": 5,
-    "generation_batch": "bulk_variant_pack_200_each",
+    "source_level_id": "all-324",
+    "roman_max_value": 18,
+    "roman_step": 2,
+    "generation_batch": "bulk_variant_pack_100_each",
     "generation_index": 5
   },
   "metrics": {
     "variant": "roman",
-    "grid_size": 6,
-    "path_length": 36,
-    "num_clues": 5,
-    "clue_density": 0.1389,
-    "sequence_length": 5,
+    "grid_size": 8,
+    "path_length": 64,
+    "num_clues": 9,
+    "clue_density": 0.1406,
+    "sequence_length": 9,
     "sequence_start": 1,
     "sequence_step": 1,
     "representation": "roman",
     "difficulty_estimate": "hard",
-    "turns": 14,
-    "max_straight": 5,
-    "avg_straight": 2.33,
-    "corners": 1,
-    "borders": 2,
-    "inners": 2,
+    "turns": 25,
+    "max_straight": 7,
+    "avg_straight": 2.42,
+    "corners": 0,
+    "borders": 4,
+    "inners": 5,
     "num_walls": 0,
-    "roman_max_value": 5
+    "roman_max_value": 18,
+    "roman_step": 2
   }
 }

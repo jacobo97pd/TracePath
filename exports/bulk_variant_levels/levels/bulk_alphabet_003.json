@@ -4,69 +4,94 @@
   "clues": [
     {
       "n": 1,
-      "x": 4,
-      "y": 2
+      "x": 3,
+      "y": 4
     },
     {
       "n": 2,
       "x": 2,
-      "y": 2
+      "y": 4
     },
     {
       "n": 3,
-      "x": 2,
-      "y": 1
+      "x": 0,
+      "y": 5
     },
     {
       "n": 4,
-      "x": 5,
-      "y": 1
+      "x": 0,
+      "y": 3
     },
     {
       "n": 5,
-      "x": 5,
-      "y": 5
+      "x": 2,
+      "y": 2
     },
     {
       "n": 6,
-      "x": 3,
-      "y": 5
+      "x": 0,
+      "y": 1
     },
     {
       "n": 7,
-      "x": 0,
-      "y": 5
+      "x": 1,
+      "y": 1
     },
     {
       "n": 8,
       "x": 2,
-      "y": 4
+      "y": 0
     },
     {
       "n": 9,
-      "x": 0,
-      "y": 2
+      "x": 4,
+      "y": 1
     },
     {
       "n": 10,
-      "x": 2,
+      "x": 5,
       "y": 0
     },
     {
       "n": 11,
       "x": 5,
-      "y": 0
+      "y": 2
+    },
+    {
+      "n": 12,
+      "x": 3,
+      "y": 2
+    },
+    {
+      "n": 13,
+      "x": 5,
+      "y": 3
+    },
+    {
+      "n": 14,
+      "x": 4,
+      "y": 4
+    },
+    {
+      "n": 15,
+      "x": 5,
+      "y": 5
     }
   ],
   "walls": {
     "h": [
       {
-        "x": 1,
-        "y": 3,
+        "x": 2,
+        "y": 2,
         "len": 1
       },
       {
-        "x": 0,
+        "x": 4,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 2,
         "y": 4,
         "len": 1
       },
@@ -74,22 +99,17 @@
         "x": 4,
         "y": 4,
         "len": 1
-      },
-      {
-        "x": 2,
-        "y": 5,
-        "len": 1
       }
     ],
     "v": [
       {
-        "x": 1,
-        "y": 2,
-        "len": 1
+        "x": 3,
+        "y": 1,
+        "len": 2
       },
       {
-        "x": 5,
-        "y": 3,
+        "x": 4,
+        "y": 4,
         "len": 1
       }
     ]
@@ -110,31 +130,35 @@
       "8": "T",
       "9": "U",
       "10": "V",
-      "11": "W"
+      "11": "W",
+      "12": "X",
+      "13": "Y",
+      "14": "Z",
+      "15": "["
     },
-    "source_level_id": "all-40",
+    "source_level_id": "all-39",
     "alphabet_start_char": "M",
-    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_batch": "bulk_variant_pack_100_each",
     "generation_index": 3
   },
   "metrics": {
     "variant": "alphabet",
     "grid_size": 6,
     "path_length": 36,
-    "num_clues": 11,
-    "clue_density": 0.3056,
-    "sequence_length": 11,
+    "num_clues": 15,
+    "clue_density": 0.4167,
+    "sequence_length": 15,
     "sequence_start": 1,
     "sequence_step": 1,
     "representation": "alphabet",
     "difficulty_estimate": "medium",
-    "turns": 17,
-    "max_straight": 5,
-    "avg_straight": 1.94,
+    "turns": 27,
+    "max_straight": 2,
+    "avg_straight": 1.25,
     "corners": 3,
-    "borders": 4,
-    "inners": 4,
-    "num_walls": 6,
+    "borders": 5,
+    "inners": 7,
+    "num_walls": 7,
     "alphabet_start_char": "M"
   }
 }

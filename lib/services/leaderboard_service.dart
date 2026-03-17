@@ -9,6 +9,7 @@ import '../models/leaderboard_entry.dart';
 
 class SocialLeaderboardService {
   static const String _firestoreDatabaseId = 'tracepath-database';
+  static const String _globalLeaderboardId = 'global';
 
   Future<void> submitLevelScore({
     required String uid,
@@ -222,6 +223,50 @@ class SocialLeaderboardService {
       },
       SetOptions(merge: true),
     );
+
+    await _upsertGlobalScore(
+      uid: uid,
+      userData: currentUser,
+      totalLevelsCompleted: totalCompleted,
+      highestLevelReached: nextHighest,
+      fastestSolveMs: nextFastest,
+    );
+  }
+
+  Future<List<LeaderboardEntry>> getGlobalTopScores({int limit = 10}) async {
+    final safeLimit = limit <= 0 ? 1 : (limit > 200 ? 200 : limit);
+    final snap = await _db()
+        .collection('leaderboards')
+        .doc(_globalLeaderboardId)
+        .collection('scores')
+        .orderBy('globalScore', descending: true)
+        .orderBy('bestTimeMs')
+        .limit(safeLimit)
+        .get();
+    final items = snap.docs
+        .map((doc) => LeaderboardEntry.fromFirestore(doc.data()))
+        .toList(growable: false);
+    final filtered = items.where((e) => e.uid.trim().isNotEmpty).toList(growable: false);
+    return filtered;
+  }
+
+  Stream<List<LeaderboardEntry>> watchGlobalTopScores({int limit = 10}) async* {
+    final safeLimit = limit <= 0 ? 1 : (limit > 200 ? 200 : limit);
+    yield* _db()
+        .collection('leaderboards')
+        .doc(_globalLeaderboardId)
+        .collection('scores')
+        .orderBy('globalScore', descending: true)
+        .orderBy('bestTimeMs')
+        .limit(safeLimit)
+        .snapshots()
+        .map((snap) {
+      final items = snap.docs
+          .map((doc) => LeaderboardEntry.fromFirestore(doc.data()))
+          .where((e) => e.uid.trim().isNotEmpty)
+          .toList(growable: false);
+      return items;
+    });
   }
 
   Future<List<LeaderboardEntry>> getTopScores(
@@ -356,5 +401,68 @@ class SocialLeaderboardService {
       throw StateError('AUTH_REQUIRED');
     }
     return uid;
+  }
+
+  Future<void> _upsertGlobalScore({
+    required String uid,
+    required Map<String, dynamic> userData,
+    required int totalLevelsCompleted,
+    required int highestLevelReached,
+    required int fastestSolveMs,
+  }) async {
+    final username = (userData['username'] as String?)?.trim() ?? '';
+    final playerName =
+        ((userData['playerName'] as String?)?.trim().isNotEmpty == true)
+            ? (userData['playerName'] as String).trim()
+            : 'Player';
+    final photoUrl = (userData['photoUrl'] as String?)?.trim().isNotEmpty == true
+        ? (userData['photoUrl'] as String).trim()
+        : ((userData['photoURL'] as String?)?.trim().isNotEmpty == true
+            ? (userData['photoURL'] as String).trim()
+            : (FirebaseAuth.instance.currentUser?.photoURL ?? '').trim());
+    final avatarId =
+        ((userData['avatarId'] as String?)?.trim().isNotEmpty == true)
+            ? (userData['avatarId'] as String).trim()
+            : 'default';
+    final equippedSkinId =
+        ((userData['equippedSkinId'] as String?)?.trim().isNotEmpty == true)
+            ? (userData['equippedSkinId'] as String).trim()
+            : 'default';
+    final equippedTrailId =
+        ((userData['equippedTrailId'] as String?)?.trim().isNotEmpty == true)
+            ? (userData['equippedTrailId'] as String).trim()
+            : 'none';
+
+    final safeFastest = fastestSolveMs > 0 ? fastestSolveMs : 99999999;
+    final globalScore = (totalLevelsCompleted * 1000000) +
+        (highestLevelReached * 1000) +
+        max(0, 100000 - safeFastest);
+    final globalRef = _db()
+        .collection('leaderboards')
+        .doc(_globalLeaderboardId)
+        .collection('scores')
+        .doc(uid);
+
+    await globalRef.set(
+      <String, dynamic>{
+        'uid': uid,
+        'playerName': playerName,
+        'username': username,
+        'photoUrl': photoUrl,
+        'avatarId': avatarId,
+        'equippedSkinId': equippedSkinId,
+        'equippedTrailId': equippedTrailId,
+        'levelId': _globalLeaderboardId,
+        'bestTimeMs': safeFastest,
+        'moves': totalLevelsCompleted,
+        'stars': highestLevelReached,
+        'globalScore': globalScore,
+        'totalLevelsCompleted': totalLevelsCompleted,
+        'highestLevelReached': highestLevelReached,
+        'fastestSolveMs': safeFastest,
+        'updatedAt': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
   }
 }

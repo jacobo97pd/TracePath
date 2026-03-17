@@ -1,76 +1,81 @@
 {
   "id": "bulk_roman_074",
-  "size": 7,
+  "size": 6,
   "clues": [
     {
       "n": 1,
-      "x": 2,
-      "y": 4
+      "x": 4,
+      "y": 5
     },
     {
       "n": 2,
-      "x": 3,
+      "x": 5,
       "y": 3
     },
     {
       "n": 3,
       "x": 5,
-      "y": 4
+      "y": 1
     },
     {
       "n": 4,
-      "x": 6,
-      "y": 5
+      "x": 4,
+      "y": 0
     },
     {
       "n": 5,
-      "x": 5,
+      "x": 4,
       "y": 2
     },
     {
       "n": 6,
-      "x": 6,
-      "y": 0
-    },
-    {
-      "n": 7,
-      "x": 2,
-      "y": 0
-    },
-    {
-      "n": 8,
-      "x": 1,
-      "y": 1
-    },
-    {
-      "n": 9,
-      "x": 4,
-      "y": 2
-    },
-    {
-      "n": 10,
-      "x": 1,
-      "y": 2
-    },
-    {
-      "n": 11,
-      "x": 0,
-      "y": 5
-    },
-    {
-      "n": 12,
       "x": 3,
       "y": 4
     },
     {
+      "n": 7,
+      "x": 2,
+      "y": 5
+    },
+    {
+      "n": 8,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "n": 9,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 10,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 11,
+      "x": 1,
+      "y": 1
+    },
+    {
+      "n": 12,
+      "x": 0,
+      "y": 1
+    },
+    {
       "n": 13,
-      "x": 4,
-      "y": 6
+      "x": 1,
+      "y": 3
     },
     {
       "n": 14,
       "x": 0,
-      "y": 6
+      "y": 4
+    },
+    {
+      "n": 15,
+      "x": 1,
+      "y": 5
     }
   ],
   "walls": {
@@ -96,31 +101,34 @@
       "11": "XI",
       "12": "XII",
       "13": "XIII",
-      "14": "XIV"
+      "14": "XIV",
+      "15": "XV"
     },
-    "source_level_id": "all-113",
-    "roman_max_value": 14,
-    "generation_batch": "bulk_variant_pack_200_each",
+    "source_level_id": "all-221",
+    "roman_max_value": 15,
+    "roman_step": 1,
+    "generation_batch": "bulk_variant_pack_100_each",
     "generation_index": 74
   },
   "metrics": {
     "variant": "roman",
-    "grid_size": 7,
-    "path_length": 49,
-    "num_clues": 14,
-    "clue_density": 0.2857,
-    "sequence_length": 14,
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 15,
+    "clue_density": 0.4167,
+    "sequence_length": 15,
     "sequence_start": 1,
     "sequence_step": 1,
     "representation": "roman",
     "difficulty_estimate": "medium",
     "turns": 20,
-    "max_straight": 6,
-    "avg_straight": 2.29,
-    "corners": 2,
-    "borders": 4,
-    "inners": 8,
+    "max_straight": 5,
+    "avg_straight": 1.67,
+    "corners": 0,
+    "borders": 9,
+    "inners": 6,
     "num_walls": 0,
-    "roman_max_value": 14
+    "roman_max_value": 15,
+    "roman_step": 1
   }
 }

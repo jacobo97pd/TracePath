@@ -1,52 +1,56 @@
 {
   "id": "bulk_alphabet_020",
-  "size": 6,
+  "size": 7,
   "clues": [
     {
       "n": 1,
       "x": 2,
-      "y": 2
+      "y": 4
     },
     {
       "n": 2,
-      "x": 0,
-      "y": 1
+      "x": 5,
+      "y": 3
     },
     {
       "n": 3,
-      "x": 1,
-      "y": 5
+      "x": 6,
+      "y": 4
     },
     {
       "n": 4,
-      "x": 4,
-      "y": 5
+      "x": 6,
+      "y": 0
     },
     {
       "n": 5,
-      "x": 4,
-      "y": 2
+      "x": 0,
+      "y": 0
     },
     {
       "n": 6,
       "x": 4,
-      "y": 1
+      "y": 2
+    },
+    {
+      "n": 7,
+      "x": 0,
+      "y": 4
+    },
+    {
+      "n": 8,
+      "x": 4,
+      "y": 4
+    },
+    {
+      "n": 9,
+      "x": 0,
+      "y": 6
     }
   ],
   "walls": {
     "h": [],
-    "v": [
-      {
-        "x": 3,
-        "y": 0,
-        "len": 3
-      },
-      {
-        "x": 3,
-        "y": 4,
-        "len": 2
-      }
-    ]
+    "v": []
   },
   "meta": {
     "variant": "alphabet",
@@ -59,31 +63,34 @@
       "3": "E",
       "4": "F",
       "5": "G",
-      "6": "H"
+      "6": "H",
+      "7": "I",
+      "8": "J",
+      "9": "K"
     },
-    "source_level_id": "all-361",
+    "source_level_id": "all-355",
     "alphabet_start_char": "C",
-    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_batch": "bulk_variant_pack_100_each",
     "generation_index": 20
   },
   "metrics": {
     "variant": "alphabet",
-    "grid_size": 6,
-    "path_length": 36,
-    "num_clues": 6,
-    "clue_density": 0.1667,
-    "sequence_length": 6,
+    "grid_size": 7,
+    "path_length": 49,
+    "num_clues": 9,
+    "clue_density": 0.1837,
+    "sequence_length": 9,
     "sequence_start": 1,
     "sequence_step": 1,
     "representation": "alphabet",
     "difficulty_estimate": "hard",
-    "turns": 24,
-    "max_straight": 3,
-    "avg_straight": 1.4,
-    "corners": 0,
-    "borders": 3,
-    "inners": 3,
-    "num_walls": 5,
+    "turns": 20,
+    "max_straight": 6,
+    "avg_straight": 2.29,
+    "corners": 3,
+    "borders": 2,
+    "inners": 4,
+    "num_walls": 0,
     "alphabet_start_char": "C"
   }
 }

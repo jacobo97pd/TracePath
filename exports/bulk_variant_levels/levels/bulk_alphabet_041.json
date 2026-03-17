@@ -4,58 +4,58 @@
   "clues": [
     {
       "n": 1,
-      "x": 2,
-      "y": 5
-    },
-    {
-      "n": 2,
-      "x": 3,
-      "y": 4
-    },
-    {
-      "n": 3,
-      "x": 4,
-      "y": 4
-    },
-    {
-      "n": 4,
-      "x": 4,
-      "y": 2
-    },
-    {
-      "n": 5,
       "x": 3,
       "y": 3
     },
     {
-      "n": 6,
+      "n": 2,
       "x": 2,
-      "y": 1
+      "y": 2
+    },
+    {
+      "n": 3,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 4,
+      "x": 1,
+      "y": 5
+    },
+    {
+      "n": 5,
+      "x": 0,
+      "y": 5
+    },
+    {
+      "n": 6,
+      "x": 1,
+      "y": 4
     },
     {
       "n": 7,
       "x": 1,
-      "y": 2
+      "y": 3
     },
     {
       "n": 8,
-      "x": 1,
-      "y": 4
+      "x": 0,
+      "y": 2
     },
     {
       "n": 9,
       "x": 0,
-      "y": 4
+      "y": 1
     },
     {
       "n": 10,
-      "x": 0,
-      "y": 2
+      "x": 1,
+      "y": 0
     },
     {
       "n": 11,
-      "x": 0,
-      "y": 0
+      "x": 2,
+      "y": 1
     },
     {
       "n": 12,
@@ -64,13 +64,13 @@
     },
     {
       "n": 13,
-      "x": 4,
-      "y": 1
+      "x": 5,
+      "y": 0
     },
     {
       "n": 14,
-      "x": 5,
-      "y": 0
+      "x": 4,
+      "y": 1
     },
     {
       "n": 15,
@@ -79,53 +79,43 @@
     },
     {
       "n": 16,
+      "x": 3,
+      "y": 4
+    },
+    {
+      "n": 17,
       "x": 5,
-      "y": 5
+      "y": 4
     }
   ],
   "walls": {
     "h": [
       {
-        "x": 1,
-        "y": 1,
+        "x": 2,
+        "y": 2,
         "len": 2
       },
       {
-        "x": 4,
-        "y": 2,
-        "len": 1
-      },
-      {
-        "x": 2,
+        "x": 3,
         "y": 4,
         "len": 1
       }
     ],
     "v": [
       {
-        "x": 1,
-        "y": 1,
-        "len": 4
-      },
-      {
         "x": 2,
         "y": 2,
-        "len": 2
+        "len": 3
       },
       {
-        "x": 2,
-        "y": 5,
+        "x": 3,
+        "y": 4,
         "len": 1
       },
       {
         "x": 4,
-        "y": 3,
+        "y": 2,
         "len": 2
-      },
-      {
-        "x": 5,
-        "y": 1,
-        "len": 4
       }
     ]
   },
@@ -150,31 +140,32 @@
       "13": "M",
       "14": "N",
       "15": "O",
-      "16": "P"
+      "16": "P",
+      "17": "Q"
     },
-    "source_level_id": "all-155",
+    "source_level_id": "all-264",
     "alphabet_start_char": "A",
-    "generation_batch": "bulk_variant_pack_200_each",
+    "generation_batch": "bulk_variant_pack_100_each",
     "generation_index": 41
   },
   "metrics": {
     "variant": "alphabet",
     "grid_size": 6,
     "path_length": 36,
-    "num_clues": 16,
-    "clue_density": 0.4444,
-    "sequence_length": 16,
+    "num_clues": 17,
+    "clue_density": 0.4722,
+    "sequence_length": 17,
     "sequence_start": 1,
     "sequence_step": 1,
     "representation": "alphabet",
     "difficulty_estimate": "easy",
-    "turns": 18,
-    "max_straight": 5,
-    "avg_straight": 1.84,
-    "corners": 3,
-    "borders": 5,
+    "turns": 28,
+    "max_straight": 3,
+    "avg_straight": 1.21,
+    "corners": 2,
+    "borders": 7,
     "inners": 8,
-    "num_walls": 17,
+    "num_walls": 9,
     "alphabet_start_char": "A"
   }
 }

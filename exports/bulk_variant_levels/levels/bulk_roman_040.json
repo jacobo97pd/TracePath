@@ -4,28 +4,28 @@
   "clues": [
     {
       "n": 1,
-      "x": 1,
-      "y": 4
-    },
-    {
-      "n": 2,
       "x": 0,
       "y": 2
     },
     {
-      "n": 3,
+      "n": 2,
       "x": 5,
-      "y": 2
+      "y": 4
+    },
+    {
+      "n": 3,
+      "x": 0,
+      "y": 0
     },
     {
       "n": 4,
-      "x": 3,
-      "y": 2
+      "x": 4,
+      "y": 4
     },
     {
       "n": 5,
-      "x": 4,
-      "y": 4
+      "x": 3,
+      "y": 2
     }
   ],
   "walls": {
@@ -44,9 +44,10 @@
       "4": "IV",
       "5": "V"
     },
-    "source_level_id": "all-381",
+    "source_level_id": "all-368",
     "roman_max_value": 5,
-    "generation_batch": "bulk_variant_pack_200_each",
+    "roman_step": 1,
+    "generation_batch": "bulk_variant_pack_100_each",
     "generation_index": 40
   },
   "metrics": {
@@ -63,10 +64,11 @@
     "turns": 13,
     "max_straight": 5,
     "avg_straight": 2.5,
-    "corners": 0,
+    "corners": 1,
     "borders": 2,
-    "inners": 3,
+    "inners": 2,
     "num_walls": 0,
-    "roman_max_value": 5
+    "roman_max_value": 5,
+    "roman_step": 1
   }
 }

@@ -92,8 +92,6 @@ class HomeScreen extends StatelessWidget {
                       onDaily: () => context.go('/daily'),
                       onLevels: () => context.go('/play'),
                       onDuelFriends: () => _showInviteFriendsPopup(context),
-                      onSkinEditor:
-                          kDebugMode ? () => context.go('/skin-editor') : null,
                     ),
                     const SizedBox(height: 22),
                     const _SectionTitle(
@@ -559,13 +557,11 @@ class _QuickAccessGrid extends StatelessWidget {
     required this.onDaily,
     required this.onLevels,
     required this.onDuelFriends,
-    this.onSkinEditor,
   });
 
   final VoidCallback onDaily;
   final VoidCallback onLevels;
   final VoidCallback onDuelFriends;
-  final VoidCallback? onSkinEditor;
 
   @override
   Widget build(BuildContext context) {
@@ -591,15 +587,6 @@ class _QuickAccessGrid extends StatelessWidget {
           subtitle: 'Social rankings and challenges',
           onTap: onDuelFriends,
         ),
-        if (onSkinEditor != null) ...[
-          const SizedBox(height: 10),
-          _QuickCard(
-            icon: Icons.tune_rounded,
-            title: 'Skin Editor',
-            subtitle: 'Import, place and price skins',
-            onTap: onSkinEditor!,
-          ),
-        ],
       ],
     );
   }

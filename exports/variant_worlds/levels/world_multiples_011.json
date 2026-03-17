@@ -1,0 +1,224 @@
+{
+  "id": "world_multiples_011",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 3,
+      "y": 0
+    },
+    {
+      "n": 2,
+      "x": 1,
+      "y": 0
+    },
+    {
+      "n": 3,
+      "x": 1,
+      "y": 1
+    },
+    {
+      "n": 4,
+      "x": 3,
+      "y": 1
+    },
+    {
+      "n": 5,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "n": 6,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "n": 7,
+      "x": 0,
+      "y": 4
+    },
+    {
+      "n": 8,
+      "x": 1,
+      "y": 5
+    },
+    {
+      "n": 9,
+      "x": 1,
+      "y": 3
+    },
+    {
+      "n": 10,
+      "x": 2,
+      "y": 4
+    },
+    {
+      "n": 11,
+      "x": 3,
+      "y": 5
+    },
+    {
+      "n": 12,
+      "x": 4,
+      "y": 3
+    },
+    {
+      "n": 13,
+      "x": 4,
+      "y": 1
+    },
+    {
+      "n": 14,
+      "x": 5,
+      "y": 0
+    },
+    {
+      "n": 15,
+      "x": 5,
+      "y": 3
+    },
+    {
+      "n": 16,
+      "x": 4,
+      "y": 4
+    },
+    {
+      "n": 17,
+      "x": 5,
+      "y": 5
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 2,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 0,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "len": 1
+      }
+    ],
+    "v": [
+      {
+        "x": 3,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "len": 1
+      }
+    ]
+  },
+  "solution": [
+    3,
+    2,
+    1,
+    0,
+    6,
+    7,
+    8,
+    9,
+    15,
+    14,
+    13,
+    12,
+    18,
+    24,
+    30,
+    31,
+    25,
+    19,
+    20,
+    26,
+    32,
+    33,
+    27,
+    21,
+    22,
+    16,
+    10,
+    4,
+    5,
+    11,
+    17,
+    23,
+    29,
+    28,
+    34,
+    35
+  ],
+  "meta": {
+    "variant": "multiples",
+    "sequence_rule": "multiples of 2",
+    "difficulty_target": "easy",
+    "representation": "multiple",
+    "display_labels": {
+      "1": "2",
+      "2": "4",
+      "3": "6",
+      "4": "8",
+      "5": "10",
+      "6": "12",
+      "7": "14",
+      "8": "16",
+      "9": "18",
+      "10": "20",
+      "11": "22",
+      "12": "24",
+      "13": "26",
+      "14": "28",
+      "15": "30",
+      "16": "32",
+      "17": "34"
+    },
+    "source_level_id": "generated_multiples_011",
+    "multiple_base": 2,
+    "generation_batch": "world_variant_pack_20_each",
+    "generation_index": 11
+  },
+  "metrics": {
+    "variant": "multiples",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 17,
+    "clue_density": 0.4722,
+    "sequence_length": 17,
+    "sequence_start": 2,
+    "sequence_step": 2,
+    "representation": "multiple",
+    "difficulty_estimate": "easy",
+    "turns": 18,
+    "max_straight": 4,
+    "avg_straight": 1.84,
+    "corners": 2,
+    "borders": 7,
+    "inners": 8,
+    "num_walls": 8,
+    "multiple_base": 2
+  }
+}

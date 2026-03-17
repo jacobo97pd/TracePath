@@ -56,6 +56,24 @@ def _pick_source_level(
     pool: List[Dict[str, Any]] = []
     for tag in tags:
         pool.extend(by_tag.get(tag, []))
+    def _has_solution(level: Dict[str, Any]) -> bool:
+        solution = level.get("solution")
+        if not isinstance(solution, list) or not solution:
+            return False
+        size = level.get("size", {})
+        if isinstance(size, dict):
+            w = int(size.get("w", 0))
+            h = int(size.get("h", 0))
+        else:
+            w = int(size or 0)
+            h = w
+        expected = w * h
+        return expected > 0 and len(solution) == expected
+
+    solved_pool = [lv for lv in pool if _has_solution(lv)]
+    if solved_pool:
+        pool = solved_pool
+
     if not pool:
         pool = list(levels)
     if not pool:
@@ -132,7 +150,7 @@ def main() -> None:
         default="all",
         help=(
             "Comma-separated variants or 'all'. "
-            "Valid: roman,alphabet,multiples,multiples_roman,dice,arithmetic"
+            "Valid: roman,alphabet,alphabet_reverse,multiples,multiples_roman,dice,arithmetic"
         ),
     )
     parser.add_argument(

@@ -1,0 +1,141 @@
+{
+  "id": "world_alphabet_reverse_020",
+  "size": 5,
+  "clues": [
+    {
+      "n": 1,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "n": 2,
+      "x": 2,
+      "y": 3
+    },
+    {
+      "n": 3,
+      "x": 0,
+      "y": 3
+    },
+    {
+      "n": 4,
+      "x": 2,
+      "y": 0
+    },
+    {
+      "n": 5,
+      "x": 2,
+      "y": 2
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 1,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 0,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "len": 3
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "len": 1
+      }
+    ],
+    "v": [
+      {
+        "x": 1,
+        "y": 3,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "len": 1
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "len": 1
+      }
+    ]
+  },
+  "solution": [
+    18,
+    19,
+    24,
+    23,
+    22,
+    17,
+    16,
+    21,
+    20,
+    15,
+    10,
+    11,
+    6,
+    5,
+    0,
+    1,
+    2,
+    7,
+    8,
+    3,
+    4,
+    9,
+    14,
+    13,
+    12
+  ],
+  "meta": {
+    "variant": "alphabet_reverse",
+    "sequence_rule": "Z, Y, X...",
+    "difficulty_target": "hard",
+    "representation": "alphabet_reverse",
+    "display_labels": {
+      "1": "Z",
+      "2": "Y",
+      "3": "X",
+      "4": "W",
+      "5": "V"
+    },
+    "source_level_id": "generated_alphabet_reverse_020",
+    "alphabet_start_char": "Z",
+    "generation_batch": "world_variant_pack_20_each",
+    "generation_index": 20
+  },
+  "metrics": {
+    "variant": "alphabet_reverse",
+    "grid_size": 5,
+    "path_length": 25,
+    "num_clues": 5,
+    "clue_density": 0.2,
+    "sequence_length": 5,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "alphabet_reverse",
+    "difficulty_estimate": "hard",
+    "turns": 18,
+    "max_straight": 2,
+    "avg_straight": 1.26,
+    "corners": 0,
+    "borders": 2,
+    "inners": 3,
+    "num_walls": 10,
+    "alphabet_start_char": "Z"
+  }
+}

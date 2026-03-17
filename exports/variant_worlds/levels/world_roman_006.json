@@ -1,0 +1,173 @@
+{
+  "id": "world_roman_006",
+  "size": 6,
+  "clues": [
+    {
+      "n": 1,
+      "x": 5,
+      "y": 4
+    },
+    {
+      "n": 2,
+      "x": 4,
+      "y": 4
+    },
+    {
+      "n": 3,
+      "x": 5,
+      "y": 2
+    },
+    {
+      "n": 4,
+      "x": 5,
+      "y": 1
+    },
+    {
+      "n": 5,
+      "x": 1,
+      "y": 1
+    },
+    {
+      "n": 6,
+      "x": 1,
+      "y": 2
+    },
+    {
+      "n": 7,
+      "x": 3,
+      "y": 5
+    },
+    {
+      "n": 8,
+      "x": 0,
+      "y": 5
+    },
+    {
+      "n": 9,
+      "x": 1,
+      "y": 3
+    }
+  ],
+  "walls": {
+    "h": [
+      {
+        "x": 3,
+        "y": 1,
+        "len": 1
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "len": 1
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "len": 2
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "len": 1
+      }
+    ],
+    "v": [
+      {
+        "x": 3,
+        "y": 4,
+        "len": 1
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "len": 1
+      }
+    ]
+  },
+  "solution": [
+    29,
+    35,
+    34,
+    28,
+    22,
+    23,
+    17,
+    16,
+    15,
+    9,
+    10,
+    11,
+    5,
+    4,
+    3,
+    2,
+    8,
+    7,
+    1,
+    0,
+    6,
+    12,
+    13,
+    14,
+    20,
+    21,
+    27,
+    33,
+    32,
+    26,
+    25,
+    31,
+    30,
+    24,
+    18,
+    19
+  ],
+  "meta": {
+    "variant": "roman",
+    "sequence_rule": "I, II, III...",
+    "difficulty_target": "easy",
+    "representation": "roman",
+    "display_labels": {
+      "1": "I",
+      "2": "II",
+      "3": "III",
+      "4": "IV",
+      "5": "V",
+      "6": "VI",
+      "7": "VII",
+      "8": "VIII",
+      "9": "IX"
+    },
+    "source_level_id": "generated_roman_006",
+    "roman_max_value": 9,
+    "roman_step": 1,
+    "generation_batch": "world_variant_pack_20_each",
+    "generation_index": 6
+  },
+  "metrics": {
+    "variant": "roman",
+    "grid_size": 6,
+    "path_length": 36,
+    "num_clues": 9,
+    "clue_density": 0.25,
+    "sequence_length": 9,
+    "sequence_start": 1,
+    "sequence_step": 1,
+    "representation": "roman",
+    "difficulty_estimate": "easy",
+    "turns": 25,
+    "max_straight": 3,
+    "avg_straight": 1.35,
+    "corners": 1,
+    "borders": 4,
+    "inners": 4,
+    "num_walls": 8,
+    "roman_max_value": 9,
+    "roman_step": 1
+  }
+}

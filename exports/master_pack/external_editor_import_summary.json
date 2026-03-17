@@ -1,0 +1,38 @@
+{
+  "source_file": "C:\\Users\\jacob\\Downloads\\niveles_linkedin_editor.json",
+  "input_objects": 194,
+  "added_to_classic": 23,
+  "rejected_on_normalize": 1,
+  "final_classic_count": 301,
+  "added_ids": [
+    "classic-import-editor-146",
+    "classic-import-editor-152",
+    "classic-import-editor-153",
+    "classic-import-editor-154",
+    "classic-import-editor-156",
+    "classic-import-editor-157",
+    "classic-import-editor-161",
+    "classic-import-editor-165",
+    "classic-import-editor-170",
+    "classic-import-editor-171",
+    "classic-import-editor-172",
+    "classic-import-editor-175",
+    "classic-import-editor-177",
+    "classic-import-editor-178",
+    "classic-import-editor-183",
+    "classic-import-editor-184",
+    "classic-import-editor-186",
+    "classic-import-editor-187",
+    "classic-import-editor-188",
+    "classic-import-editor-189",
+    "classic-import-editor-192",
+    "classic-import-editor-193",
+    "classic-import-editor-194"
+  ],
+  "rejected": [
+    {
+      "index": 16,
+      "reason": "normalize_error:duplicate clue"
+    }
+  ]
+}

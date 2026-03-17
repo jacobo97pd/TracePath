@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_data.dart';
 import 'achievements_service.dart';
@@ -189,6 +190,7 @@ class _GameScreenState extends State<GameScreen>
       setState(() {
         _isLevelLoading = false;
       });
+      unawaited(_maybeShowVariantTutorial(level));
     } catch (error) {
       if (!mounted || generation != _levelLoadGeneration) {
         return;
@@ -197,6 +199,142 @@ class _GameScreenState extends State<GameScreen>
         _isLevelLoading = false;
         _levelLoadError = error;
       });
+    }
+  }
+
+  Future<void> _maybeShowVariantTutorial(Level level) async {
+    final variant = _variantFromLevelId(level.id);
+    if (variant == null) return;
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'variant_tutorial_shown_$variant';
+    final alreadyShown = prefs.getBool(key) ?? false;
+    if (alreadyShown || !mounted) return;
+
+    final info = _variantTutorialInfo(variant);
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 24),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
+            decoration: BoxDecoration(
+              color: const Color(0xFF111827),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFF334155)),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x66000000),
+                  blurRadius: 24,
+                  offset: Offset(0, 12),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  info.$1,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  info.$2,
+                  style: const TextStyle(
+                    color: Color(0xFFB6C2DA),
+                    fontSize: 14,
+                    height: 1.35,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Example: ${info.$3}',
+                  style: const TextStyle(
+                    color: Color(0xFF93C5FD),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFF3B82F6),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text('Got it'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+    await prefs.setBool(key, true);
+  }
+
+  String? _variantFromLevelId(String levelId) {
+    final id = levelId.trim().toLowerCase();
+    if (id.contains('alphabet_reverse')) return 'alphabet_reverse';
+    if (id.contains('multiples_roman')) return 'multiples_roman';
+    if (id.contains('alphabet')) return 'alphabet';
+    if (id.contains('multiples')) return 'multiples';
+    if (id.contains('roman')) return 'roman';
+    return null;
+  }
+
+  (String, String, String) _variantTutorialInfo(String variant) {
+    switch (variant) {
+      case 'alphabet':
+        return (
+          'Alphabet Mode',
+          'Connect cells in alphabetical order following the path clues.',
+          'A → B → C → D',
+        );
+      case 'alphabet_reverse':
+        return (
+          'Reverse Alphabet Mode',
+          'Connect cells in reverse alphabetical order.',
+          'Z → Y → X → W',
+        );
+      case 'multiples':
+        return (
+          'Multiples Mode',
+          'Numbers are multiples of a base. Follow increasing multiples in order.',
+          '3, 6, 9, 12 ...',
+        );
+      case 'multiples_roman':
+        return (
+          'Roman Multiples Mode',
+          'Follow increasing multiples shown as roman numerals.',
+          'III, VI, IX, XII ...',
+        );
+      case 'roman':
+        return (
+          'Roman Numerals Mode',
+          'Follow the sequence of roman numerals in order.',
+          'I → II → III → IV',
+        );
+      default:
+        return (
+          'Variant Mode',
+          'Follow the clue sequence in the correct order.',
+          '1 → 2 → 3',
+        );
     }
   }
 
@@ -532,8 +670,14 @@ class _GameScreenState extends State<GameScreen>
                                   const SizedBox(height: 8),
                               itemBuilder: (context, index) {
                                 final row = rows[index];
+                                final rank = _rankAtIndexByTime(
+                                  rows
+                                      .map((r) => r.entry.bestTimeMs)
+                                      .toList(growable: false),
+                                  index,
+                                );
                                 return _InLevelRankRow(
-                                  rank: index + 1,
+                                  rank: rank,
                                   data: row,
                                   highlighted: row.entry.uid == currentUid,
                                 );
@@ -574,6 +718,19 @@ class _GameScreenState extends State<GameScreen>
       return a.entry.uid.compareTo(b.entry.uid);
     });
     return rows;
+  }
+
+  int _rankAtIndexByTime(List<int> timesMs, int index) {
+    if (index <= 0) return 1;
+    var rank = index + 1;
+    for (var j = index - 1; j >= 0; j--) {
+      if (timesMs[j] == timesMs[index]) {
+        rank = j + 1;
+      } else {
+        break;
+      }
+    }
+    return rank;
   }
 
   Future<String?> _resolveRankingSkinPreviewUrl(String skinId) async {

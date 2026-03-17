@@ -38,7 +38,12 @@ import 'startup_splash_gate.dart';
 import 'storage_paths.dart';
 import 'pack_level_repository.dart';
 
+// Temporary diagnostics switch:
+// Set to true to skip notification initialization and isolate startup issues in release.
+const bool kDisableNotificationsForReleaseDiagnostics = true;
+
 Future<void> main() async {
+  debugPrint('[Startup] main start');
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
     await Firebase.initializeApp(
@@ -72,7 +77,23 @@ Future<void> main() async {
   final exportBasePath = await resolveExportBasePath();
   await LevelExportRegistry.instance.initialize(basePath: exportBasePath);
   await PackLevelRepository.instance.loadPack('all');
-  await notificationService.initialize(progressService: progressService);
+
+  final shouldSkipNotifications = kDisableNotificationsForReleaseDiagnostics;
+  if (shouldSkipNotifications) {
+    debugPrint(
+      '[Startup] Notifications temporarily disabled for release diagnostics',
+    );
+  } else {
+    debugPrint('[Startup] NotificationService.initialize start');
+    try {
+      await notificationService.initialize(progressService: progressService);
+      debugPrint('[Startup] NotificationService.initialize ok');
+    } catch (e, st) {
+      debugPrint('[Startup] NotificationService.initialize failed: $e');
+      debugPrintStack(stackTrace: st);
+    }
+  }
+  debugPrint('[Startup] runApp()');
   runApp(
     MyApp(
       progressService: progressService,
