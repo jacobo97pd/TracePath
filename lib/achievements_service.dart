@@ -44,9 +44,9 @@ class AchievementsService extends ChangeNotifier {
     _load();
     _persistenceService = persistenceService ?? AchievementPersistenceService();
     _authSub = FirebaseAuth.instance.authStateChanges().listen((user) {
-      unawaited(_hydrateForUid(user?.uid));
+      _hydrationFuture = _hydrateForUid(user?.uid);
     });
-    unawaited(_hydrateForUid(FirebaseAuth.instance.currentUser?.uid));
+    _hydrationFuture = _hydrateForUid(FirebaseAuth.instance.currentUser?.uid);
   }
 
   static const String _storageKeyBase = 'achievements_unlocked_at';
@@ -87,6 +87,11 @@ class AchievementsService extends ChangeNotifier {
       title: 'Speedrunner',
       description: 'Complete any level under 30 seconds',
     ),
+    AchievementDef(
+      id: 'beat_the_ghost',
+      title: 'Beat the Ghost',
+      description: 'Beat your personal ghost in a replay',
+    ),
   ];
 
   final SharedPreferences _prefs;
@@ -97,6 +102,7 @@ class AchievementsService extends ChangeNotifier {
   StreamSubscription<User?>? _authSub;
   final Map<String, int> _unlockedAtMs = <String, int>{};
   String? _activeUid;
+  Future<void> _hydrationFuture = Future<void>.value();
 
   List<AchievementState> get states {
     return definitions.map((def) {
@@ -116,6 +122,7 @@ class AchievementsService extends ChangeNotifier {
     required int hintsUsed,
     required int rewindsUsed,
   }) async {
+    await _hydrationFuture;
     final unlockedNow = <AchievementDef>[];
     final totalSolved = _statsService.totalCampaignSolved +
         _statsService.totalDailySolved +
@@ -145,6 +152,28 @@ class AchievementsService extends ChangeNotifier {
       notifyListeners();
     }
     return unlockedNow;
+  }
+
+  Future<AchievementDef?> unlockById(String achievementId) async {
+    await _hydrationFuture;
+    final normalizedId = achievementId.trim();
+    if (normalizedId.isEmpty) return null;
+    if (_unlockedAtMs.containsKey(normalizedId)) {
+      return null;
+    }
+    AchievementDef? def;
+    for (final item in definitions) {
+      if (item.id == normalizedId) {
+        def = item;
+        break;
+      }
+    }
+    if (def == null) return null;
+    final unlockedAtMs = await _persistUnlock(def.id);
+    _unlockedAtMs[def.id] = unlockedAtMs;
+    await _save();
+    notifyListeners();
+    return def;
   }
 
   bool _checkUnlocked(
@@ -210,7 +239,8 @@ class AchievementsService extends ChangeNotifier {
 
     if (_activeUid != null) {
       try {
-        final remote = await _persistenceService.loadUserAchievements(_activeUid!);
+        final remote =
+            await _persistenceService.loadUserAchievements(_activeUid!);
         for (final entry in remote.entries) {
           if (!entry.value.unlocked) continue;
           final at = entry.value.unlockedAt ??

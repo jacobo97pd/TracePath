@@ -21,6 +21,7 @@ class CoinPackCatalogResult {
 class CoinPackCatalogService {
   static const String _collection = 'shop_coin_packs';
   static const String _expectedProjectId = 'tracepath-e2e90';
+  static const String _firestoreDatabaseId = 'tracepath-database';
 
   CoinPackCatalogResult localFallbackResult({String reason = 'local_bootstrap'}) {
     return CoinPackCatalogResult(
@@ -35,7 +36,7 @@ class CoinPackCatalogService {
   }) async {
     _logFirebaseConfig();
     try {
-      final snap = await FirebaseFirestore.instance
+      final snap = await _db()
           .collection(_collection)
           .get()
           .timeout(timeout);
@@ -108,7 +109,8 @@ class CoinPackCatalogService {
       if (kDebugMode) {
         debugPrint('[coin-packs] firebase app=${app.name}');
         debugPrint(
-          '[coin-packs] firebase projectId=${options.projectId} storageBucket=${options.storageBucket}',
+          '[coin-packs] firebase projectId=${options.projectId} '
+          'storageBucket=${options.storageBucket} db=${_activeFirestoreName()}',
         );
       }
       if (options.projectId.trim() != _expectedProjectId && kDebugMode) {
@@ -120,6 +122,25 @@ class CoinPackCatalogService {
       if (kDebugMode) {
         debugPrint('[coin-packs] firebase options read failed: $e');
       }
+    }
+  }
+
+  FirebaseFirestore _db() {
+    try {
+      return FirebaseFirestore.instanceFor(
+        app: Firebase.app(),
+        databaseId: _firestoreDatabaseId,
+      );
+    } catch (_) {
+      return FirebaseFirestore.instance;
+    }
+  }
+
+  String _activeFirestoreName() {
+    try {
+      return _db().databaseId;
+    } catch (_) {
+      return '(unknown)';
     }
   }
 

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,8 +15,10 @@ import 'auth_service.dart';
 import 'coins_service.dart';
 import 'models/inbox_item.dart';
 import 'notification_service.dart';
+import 'services/friend_challenge_service.dart';
 import 'services/friends_service.dart';
 import 'services/inbox_service.dart';
+import 'services/live_duel_service.dart';
 import 'skin_catalog_service.dart';
 import 'stats_service.dart';
 import 'trail/trail_catalog.dart';
@@ -51,6 +54,9 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final InboxService _inboxService = InboxService();
   final FriendsService _friendsService = FriendsService();
+  final FriendChallengeService _friendChallengeService =
+      FriendChallengeService();
+  final LiveDuelService _liveDuelService = LiveDuelService();
   static const String _firestoreDatabaseId = 'tracepath-database';
 
   @override
@@ -116,7 +122,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF0A1322).withOpacity(0.55),
+                                  color:
+                                      const Color(0xFF0A1322).withOpacity(0.55),
                                   blurRadius: 8,
                                   offset: const Offset(0, 3),
                                 ),
@@ -150,507 +157,529 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-              StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                stream: _currentUserDocStream(),
-                builder: (context, snapshot) {
-                  final data = snapshot.data?.data() ?? const <String, dynamic>{};
-                  final resolvedGoogleAvatar = _resolveGoogleAvatar(
-                    authUser: authUser,
-                    authServiceAvatar: widget.authService.avatarUrl,
-                    firestoreData: data,
-                  );
-                  final profileName =
-                      ((data['playerName'] as String?)?.trim().isNotEmpty == true)
-                          ? (data['playerName'] as String).trim()
-                          : (authName.isNotEmpty ? authName : 'Player');
-                  final username = (data['username'] as String?)?.trim() ?? '';
-                  final highestLevelReached =
-                      _readInt(data['highestLevelReached'], fallback: 1);
-                  final currentStreak = _readInt(
-                    data['currentStreak'],
-                    fallback: widget.statsService.currentDailyStreak,
-                  );
-                  final bestStreak = _readInt(
-                    data['bestStreak'],
-                    fallback: widget.statsService.bestDailyStreak,
-                  );
-                  final fastestSolveMs = _readInt(
-                    data['fastestSolveMs'],
-                    fallback: widget.statsService.bestTimeMsForDifficulty(1) ?? 0,
-                  );
-                  final equippedSkinName = selectedCatalogItem?.name ?? 'Default';
-                  return Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(22),
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: <Color>[
-                          Color(0xFF1A2740),
-                          Color(0xFF142037),
-                          Color(0xFF101B30),
+                StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                  stream: _currentUserDocStream(),
+                  builder: (context, snapshot) {
+                    final data =
+                        snapshot.data?.data() ?? const <String, dynamic>{};
+                    final resolvedGoogleAvatar = _resolveGoogleAvatar(
+                      authUser: authUser,
+                      authServiceAvatar: widget.authService.avatarUrl,
+                      firestoreData: data,
+                    );
+                    final profileName =
+                        ((data['playerName'] as String?)?.trim().isNotEmpty ==
+                                true)
+                            ? (data['playerName'] as String).trim()
+                            : (authName.isNotEmpty ? authName : 'Player');
+                    final username =
+                        (data['username'] as String?)?.trim() ?? '';
+                    final highestLevelReached =
+                        _readInt(data['highestLevelReached'], fallback: 1);
+                    final currentStreak = _readInt(
+                      data['currentStreak'],
+                      fallback: widget.statsService.currentDailyStreak,
+                    );
+                    final bestStreak = _readInt(
+                      data['bestStreak'],
+                      fallback: widget.statsService.bestDailyStreak,
+                    );
+                    final fastestSolveMs = _readInt(
+                      data['fastestSolveMs'],
+                      fallback:
+                          widget.statsService.bestTimeMsForDifficulty(1) ?? 0,
+                    );
+                    final equippedSkinName =
+                        selectedCatalogItem?.name ?? 'Default';
+                    return Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(22),
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: <Color>[
+                            Color(0xFF1A2740),
+                            Color(0xFF142037),
+                            Color(0xFF101B30),
+                          ],
+                        ),
+                        border: Border.all(
+                          color: const Color(0xFF3B5076).withOpacity(0.85),
+                        ),
+                        boxShadow: <BoxShadow>[
+                          BoxShadow(
+                            color: const Color(0xFF111A2B).withOpacity(0.6),
+                            blurRadius: 18,
+                            offset: const Offset(0, 10),
+                          ),
                         ],
                       ),
-                      border: Border.all(
-                        color: const Color(0xFF3B5076).withOpacity(0.85),
-                      ),
-                      boxShadow: <BoxShadow>[
-                        BoxShadow(
-                          color: const Color(0xFF111A2B).withOpacity(0.6),
-                          blurRadius: 18,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 74,
-                                height: 74,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF0A1323),
-                                  borderRadius: BorderRadius.circular(22),
-                                  border: Border.all(
-                                    color: const Color(0xFF4C6695).withOpacity(0.9),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 74,
+                                  height: 74,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF0A1323),
+                                    borderRadius: BorderRadius.circular(22),
+                                    border: Border.all(
+                                      color: const Color(0xFF4C6695)
+                                          .withOpacity(0.9),
+                                    ),
                                   ),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(21),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      onTap: () => _showSkinCardPreview(selectedSkinId),
-                                      child: IgnorePointer(
-                                        child: _ProfileHeaderAvatar(
-                                          skinCandidates: isDefaultSkinSelected
-                                              ? const <String>[]
-                                              : selectedSkinCandidates,
-                                          googleAvatarUrl: resolvedGoogleAvatar,
-                                          preferSkin: !isDefaultSkinSelected,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(21),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () => _showSkinCardPreview(
+                                            selectedSkinId),
+                                        child: IgnorePointer(
+                                          child: _ProfileHeaderAvatar(
+                                            skinCandidates:
+                                                isDefaultSkinSelected
+                                                    ? const <String>[]
+                                                    : selectedSkinCandidates,
+                                            googleAvatarUrl:
+                                                resolvedGoogleAvatar,
+                                            preferSkin: !isDefaultSkinSelected,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      profileName,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: 22,
-                                        letterSpacing: 0.2,
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        profileName,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 22,
+                                          letterSpacing: 0.2,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      username.isNotEmpty ? '@$username' : '@player',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Color(0xFF9DB9FF),
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w700,
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        username.isNotEmpty
+                                            ? '@$username'
+                                            : '@player',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: Color(0xFF9DB9FF),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      profileSubtitle,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Color(0xFF8FA3C9),
-                                        fontSize: 12,
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        profileSubtitle,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: Color(0xFF8FA3C9),
+                                          fontSize: 12,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () => context.go('/shop'),
+                                  child: const Text('Shop'),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _HeroStatChip(
+                                    label: 'Level',
+                                    value: '$highestLevelReached',
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: _HeroStatChip(
+                                    label: 'Streak',
+                                    value: '$currentStreak',
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: _HeroStatChip(
+                                    label: 'Best',
+                                    value: _formatMs(fastestSolveMs),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF1A2A44),
+                                  borderRadius: BorderRadius.circular(999),
+                                  border: Border.all(
+                                    color: const Color(0xFF4567A0)
+                                        .withOpacity(0.9),
+                                  ),
+                                ),
+                                child: Text(
+                                  '🔥 Best streak: $bestStreak',
+                                  style: const TextStyle(
+                                    color: Color(0xFFC9D8F9),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
                               ),
-                              TextButton(
-                                onPressed: () => context.go('/shop'),
-                                child: const Text('Shop'),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 14),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _HeroStatChip(
-                                  label: 'Level',
-                                  value: '$highestLevelReached',
+                            ),
+                            const SizedBox(height: 10),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF1A2A44),
+                                  borderRadius: BorderRadius.circular(999),
+                                  border: Border.all(
+                                    color: const Color(0xFF4567A0)
+                                        .withOpacity(0.9),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Equipped Skin: $equippedSkinName',
+                                  style: const TextStyle(
+                                    color: Color(0xFFC9D8F9),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: _HeroStatChip(
-                                  label: 'Streak',
-                                  value: '$currentStreak',
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+                _ProfileProgressCard(
+                  solvedLevels: widget.statsService.totalCampaignSolved,
+                  highestLevel: widget.statsService.totalCampaignSolved + 1,
+                ),
+                const SizedBox(height: 16),
+                const SectionHeader(title: 'Stats'),
+                const SizedBox(height: 10),
+                StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                  stream: _currentUserDocStream(),
+                  builder: (context, snapshot) {
+                    final data =
+                        snapshot.data?.data() ?? const <String, dynamic>{};
+                    final totalLevelsCompleted = _readInt(
+                      data['totalLevelsCompleted'],
+                      fallback: widget.statsService.totalCampaignSolved,
+                    );
+                    final gamesPlayed = _readInt(
+                      data['gamesPlayed'],
+                      fallback: widget.statsService.totalCampaignSolved +
+                          widget.statsService.totalDailySolved,
+                    );
+                    final fastestSolveMs = _readInt(
+                      data['fastestSolveMs'],
+                      fallback:
+                          widget.statsService.bestTimeMsForDifficulty(1) ?? 0,
+                    );
+                    final highestLevelReached = _readInt(
+                      data['highestLevelReached'],
+                      fallback: 1,
+                    );
+                    if (kDebugMode) {
+                      debugPrint(
+                        '[profile] stats loaded from firestore totalLevelsCompleted=$totalLevelsCompleted gamesPlayed=$gamesPlayed fastestSolveMs=$fastestSolveMs highestLevelReached=$highestLevelReached',
+                      );
+                    }
+                    return Column(
+                      children: [
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final gap = 10.0;
+                            final cardWidth = (constraints.maxWidth - gap) / 2;
+                            return Wrap(
+                              spacing: gap,
+                              runSpacing: gap,
+                              children: [
+                                SizedBox(
+                                  width: cardWidth,
+                                  child: _PremiumStatTile(
+                                    title: 'Levels Solved',
+                                    value: '$totalLevelsCompleted',
+                                    icon: Icons.check_circle_outline_rounded,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: _HeroStatChip(
-                                  label: 'Best',
-                                  value: _formatMs(fastestSolveMs),
+                                SizedBox(
+                                  width: cardWidth,
+                                  child: _PremiumStatTile(
+                                    title: 'Games Played',
+                                    value: '$gamesPlayed',
+                                    icon: Icons.sports_esports_rounded,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF1A2A44),
-                                borderRadius: BorderRadius.circular(999),
-                                border: Border.all(
-                                  color: const Color(0xFF4567A0).withOpacity(0.9),
+                                SizedBox(
+                                  width: cardWidth,
+                                  child: _PremiumStatTile(
+                                    title: 'Best Time',
+                                    value: _formatMs(fastestSolveMs),
+                                    icon: Icons.bolt_rounded,
+                                  ),
                                 ),
-                              ),
-                              child: Text(
-                                '🔥 Best streak: $bestStreak',
-                                style: const TextStyle(
-                                  color: Color(0xFFC9D8F9),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
+                                SizedBox(
+                                  width: cardWidth,
+                                  child: _PremiumStatTile(
+                                    title: 'Highest Level',
+                                    value: '$highestLevelReached',
+                                    icon: Icons.flag_rounded,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+                const SectionHeader(title: 'Wardrobe'),
+                const SizedBox(height: 10),
+                GameCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _LoadoutMiniCard(
+                              title: 'Skin',
+                              name: selectedCatalogItem?.name ?? 'Default',
+                              tag: 'Equipped',
+                              icon: Icons.face_rounded,
+                              preview: Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF060E20),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: const Color(0xFF334155),
+                                  ),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(11),
+                                  child: _ProfileHeaderAvatar(
+                                    skinCandidates: isDefaultSkinSelected
+                                        ? const <String>[]
+                                        : selectedSkinCandidates,
+                                    googleAvatarUrl: isDefaultSkinSelected
+                                        ? googleAvatar
+                                        : '',
+                                    preferSkin: !isDefaultSkinSelected,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF1A2A44),
-                                borderRadius: BorderRadius.circular(999),
-                                border: Border.all(
-                                  color: const Color(0xFF4567A0).withOpacity(0.9),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _LoadoutMiniCard(
+                              title: 'Trail',
+                              name: TrailCatalog.resolveByTrailId(
+                                      widget.coinsService.selectedTrail)
+                                  .name,
+                              tag: 'Equipped',
+                              icon: Icons.timeline_rounded,
+                              preview: Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF060E20),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: const Color(0xFF334155),
+                                  ),
                                 ),
-                              ),
-                              child: Text(
-                                'Equipped Skin: $equippedSkinName',
-                                style: const TextStyle(
-                                  color: Color(0xFFC9D8F9),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
+                                child: Center(
+                                  child: Icon(
+                                    Icons.linear_scale_rounded,
+                                    color: TrailCatalog.resolveByTrailId(
+                                            widget.coinsService.selectedTrail)
+                                        .primaryColor,
+                                    size: 26,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
-              _ProfileProgressCard(
-                solvedLevels: widget.statsService.totalCampaignSolved,
-                highestLevel: widget.statsService.totalCampaignSolved + 1,
-              ),
-              const SizedBox(height: 16),
-              const SectionHeader(title: 'Stats'),
-              const SizedBox(height: 10),
-              StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                stream: _currentUserDocStream(),
-                builder: (context, snapshot) {
-                  final data = snapshot.data?.data() ?? const <String, dynamic>{};
-                  final totalLevelsCompleted = _readInt(
-                    data['totalLevelsCompleted'],
-                    fallback: widget.statsService.totalCampaignSolved,
-                  );
-                  final gamesPlayed = _readInt(
-                    data['gamesPlayed'],
-                    fallback: widget.statsService.totalCampaignSolved +
-                        widget.statsService.totalDailySolved,
-                  );
-                  final fastestSolveMs = _readInt(
-                    data['fastestSolveMs'],
-                    fallback: widget.statsService.bestTimeMsForDifficulty(1) ?? 0,
-                  );
-                  final highestLevelReached = _readInt(
-                    data['highestLevelReached'],
-                    fallback: 1,
-                  );
-                  if (kDebugMode) {
-                    debugPrint(
-                      '[profile] stats loaded from firestore totalLevelsCompleted=$totalLevelsCompleted gamesPlayed=$gamesPlayed fastestSolveMs=$fastestSolveMs highestLevelReached=$highestLevelReached',
-                    );
-                  }
-                  return Column(
-                    children: [
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final gap = 10.0;
-                          final cardWidth = (constraints.maxWidth - gap) / 2;
-                          return Wrap(
-                            spacing: gap,
-                            runSpacing: gap,
-                            children: [
-                              SizedBox(
-                                width: cardWidth,
-                                child: _PremiumStatTile(
-                                  title: 'Levels Solved',
-                                  value: '$totalLevelsCompleted',
-                                  icon: Icons.check_circle_outline_rounded,
-                                ),
-                              ),
-                              SizedBox(
-                                width: cardWidth,
-                                child: _PremiumStatTile(
-                                  title: 'Games Played',
-                                  value: '$gamesPlayed',
-                                  icon: Icons.sports_esports_rounded,
-                                ),
-                              ),
-                              SizedBox(
-                                width: cardWidth,
-                                child: _PremiumStatTile(
-                                  title: 'Best Time',
-                                  value: _formatMs(fastestSolveMs),
-                                  icon: Icons.bolt_rounded,
-                                ),
-                              ),
-                              SizedBox(
-                                width: cardWidth,
-                                child: _PremiumStatTile(
-                                  title: 'Highest Level',
-                                  value: '$highestLevelReached',
-                                  icon: Icons.flag_rounded,
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
-              const SectionHeader(title: 'Wardrobe'),
-              const SizedBox(height: 10),
-              GameCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _LoadoutMiniCard(
-                            title: 'Skin',
-                            name: selectedCatalogItem?.name ?? 'Default',
-                            tag: 'Equipped',
-                            icon: Icons.face_rounded,
-                            preview: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF060E20),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: const Color(0xFF334155),
-                                ),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(11),
-                                child: _ProfileHeaderAvatar(
-                                  skinCandidates: isDefaultSkinSelected
-                                      ? const <String>[]
-                                      : selectedSkinCandidates,
-                                  googleAvatarUrl:
-                                      isDefaultSkinSelected ? googleAvatar : '',
-                                  preferSkin: !isDefaultSkinSelected,
-                                ),
-                              ),
-                            ),
-                          ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'My Skins',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: _LoadoutMiniCard(
-                            title: 'Trail',
-                            name: TrailCatalog
-                                .resolveByTrailId(widget.coinsService.selectedTrail)
-                                .name,
-                            tag: 'Equipped',
-                            icon: Icons.timeline_rounded,
-                            preview: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF060E20),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: const Color(0xFF334155),
-                                ),
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  Icons.linear_scale_rounded,
-                                  color: TrailCatalog
-                                      .resolveByTrailId(widget.coinsService.selectedTrail)
-                                      .primaryColor,
-                                  size: 26,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'My Skins',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 15,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    if (ownedSkins.isEmpty)
-                      const _WardrobeEmptyState(
-                        message: 'No owned skins yet.',
-                        icon: Icons.face_retouching_natural_rounded,
-                      )
-                    else
-                      SizedBox(
-                        height: 286,
-                        child: _SkinWardrobeCarousel(
-                          skins: ownedSkins,
-                          selectedSkinId: widget.coinsService.selectedSkin,
-                          resolveRenderablePath: (skin) =>
-                              _bestRenderableSkinPath(skin),
-                          onEquip: (skin) async {
-                            final fullPathRaw = skin.fullImagePath.trim();
-                            final resolved = await widget.skinCatalogService
-                                .resolveDownloadUrl(
-                              fullPathRaw,
-                              context: 'profile-equip:${skin.id}',
-                            );
-                            final renderPath =
-                                (resolved ?? '').trim().isNotEmpty
-                                    ? resolved!.trim()
-                                    : widget.skinCatalogService
-                                        .toRenderablePath(skin.imagePath);
-                            await widget.coinsService.registerSkinAsset(
-                              skin.id,
-                              renderPath,
-                            );
-                            await widget.coinsService.selectSkin(skin.id);
-                          },
-                        ),
-                      ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'My Trails',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 15,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    if (ownedTrails.isEmpty)
-                      const _WardrobeEmptyState(
-                        message: 'No owned trails yet.',
-                        icon: Icons.timeline_rounded,
-                      )
-                    else
-                      SizedBox(
-                        height: 228,
-                        child: _TrailWardrobeCarousel(
-                          trails: ownedTrails,
-                          selectedTrailId: widget.coinsService.selectedTrail,
-                          onEquip: (trail) =>
-                              widget.coinsService.selectTrail(trail.id),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              StreamBuilder<List<InboxItem>>(
-                stream: _inboxService.watchInbox(),
-                builder: (context, snapshot) {
-                  final inboxItems = snapshot.data ?? const <InboxItem>[];
-                  final unreadCount =
-                      inboxItems.where((e) => !e.read || e.isPendingFriendRequest).length;
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SectionHeader(
-                        title: unreadCount > 0
-                            ? 'Inbox ($unreadCount)'
-                            : 'Inbox',
                       ),
                       const SizedBox(height: 10),
-                      if (snapshot.hasError)
-                        const _InboxEmptyCard(
-                          title: 'Inbox unavailable right now',
-                          subtitle: 'Please try again in a moment.',
-                          icon: Icons.inbox_rounded,
-                        )
-                      else if (inboxItems.isEmpty)
-                        const _InboxEmptyCard(
-                          title: 'No messages yet',
-                          subtitle:
-                              'Friend requests, rewards and news will appear here.',
-                          icon: Icons.mark_email_unread_outlined,
+                      if (ownedSkins.isEmpty)
+                        const _WardrobeEmptyState(
+                          message: 'No owned skins yet.',
+                          icon: Icons.face_retouching_natural_rounded,
                         )
                       else
-                        Column(
-                          children: [
-                            for (final item in inboxItems.take(12))
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 10),
-                                child: _InboxItemCard(
-                                  item: item,
-                                  onTap: () => _markInboxAsRead(item),
-                                  onAccept: item.isPendingFriendRequest
-                                      ? () => _acceptFriendRequest(item)
-                                      : null,
-                                  onDecline: item.isPendingFriendRequest
-                                      ? () => _declineFriendRequest(item)
-                                      : null,
-                                  onCta: item.hasCta
-                                      ? () => _handleInboxCta(item)
-                                      : null,
-                                  onDelete: item.read && !item.isPendingFriendRequest
-                                      ? () => _deleteInboxItem(item)
-                                      : null,
-                                ),
-                              ),
-                          ],
+                        SizedBox(
+                          height: 286,
+                          child: _SkinWardrobeCarousel(
+                            skins: ownedSkins,
+                            selectedSkinId: widget.coinsService.selectedSkin,
+                            resolveRenderablePath: (skin) =>
+                                _bestRenderableSkinPath(skin),
+                            onEquip: (skin) async {
+                              final fullPathRaw = skin.fullImagePath.trim();
+                              final resolved = await widget.skinCatalogService
+                                  .resolveDownloadUrl(
+                                fullPathRaw,
+                                context: 'profile-equip:${skin.id}',
+                              );
+                              final renderPath =
+                                  (resolved ?? '').trim().isNotEmpty
+                                      ? resolved!.trim()
+                                      : widget.skinCatalogService
+                                          .toRenderablePath(skin.imagePath);
+                              await widget.coinsService.registerSkinAsset(
+                                skin.id,
+                                renderPath,
+                              );
+                              await widget.coinsService.selectSkin(skin.id);
+                            },
+                          ),
                         ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'My Trails',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      if (ownedTrails.isEmpty)
+                        const _WardrobeEmptyState(
+                          message: 'No owned trails yet.',
+                          icon: Icons.timeline_rounded,
+                        )
+                      else
+                        SizedBox(
+                          height: 228,
+                          child: _TrailWardrobeCarousel(
+                            trails: ownedTrails,
+                            selectedTrailId: widget.coinsService.selectedTrail,
+                            onEquip: (trail) =>
+                                widget.coinsService.selectTrail(trail.id),
+                          ),
+                        ),
                     ],
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
-              _AchievementsSection(
-                states: widget.achievementsService.states,
-                formatDateTime: _formatDateTime,
-              ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                StreamBuilder<List<InboxItem>>(
+                  stream: _inboxService.watchInbox(),
+                  builder: (context, snapshot) {
+                    final inboxItems = snapshot.data ?? const <InboxItem>[];
+                    final unreadCount = inboxItems
+                        .where((e) => !e.read || e.isPendingFriendRequest)
+                        .length;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SectionHeader(
+                          title: unreadCount > 0
+                              ? 'Inbox ($unreadCount)'
+                              : 'Inbox',
+                        ),
+                        const SizedBox(height: 10),
+                        if (snapshot.hasError)
+                          const _InboxEmptyCard(
+                            title: 'Inbox unavailable right now',
+                            subtitle: 'Please try again in a moment.',
+                            icon: Icons.inbox_rounded,
+                          )
+                        else if (inboxItems.isEmpty)
+                          const _InboxEmptyCard(
+                            title: 'No messages yet',
+                            subtitle:
+                                'Friend requests, rewards and news will appear here.',
+                            icon: Icons.mark_email_unread_outlined,
+                          )
+                        else
+                          Column(
+                            children: [
+                              for (final item in inboxItems.take(12))
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: _InboxItemCard(
+                                    item: item,
+                                    onTap: () => _markInboxAsRead(item),
+                                    onAccept: item.isPendingFriendRequest
+                                        ? () => _acceptFriendRequest(item)
+                                        : null,
+                                    onDecline: item.isPendingFriendRequest
+                                        ? () => _declineFriendRequest(item)
+                                        : _isPendingChallengeInvite(item)
+                                            ? () =>
+                                                _declineChallengeInvite(item)
+                                            : null,
+                                    onCta: item.hasCta
+                                        ? () => unawaited(_handleInboxCta(item))
+                                        : null,
+                                    onDelete: item.read &&
+                                            !item.isPendingFriendRequest
+                                        ? () => _deleteInboxItem(item)
+                                        : null,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        const SizedBox(height: 6),
+                      ],
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+                _AchievementsSection(
+                  states: widget.achievementsService.states,
+                  formatDateTime: _formatDateTime,
+                ),
               ],
             ),
           ),
@@ -708,7 +737,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     for (final raw in ordered) {
       final trimmed = raw.trim();
       if (trimmed.isEmpty) continue;
-      final renderable = widget.skinCatalogService.toRenderablePath(trimmed).trim();
+      final renderable =
+          widget.skinCatalogService.toRenderablePath(trimmed).trim();
       if (renderable.isEmpty) continue;
       if (!out.contains(renderable)) {
         out.add(renderable);
@@ -792,7 +822,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('[profile] acceptFriendRequest failed fromUid=$fromUid error=$e');
+        debugPrint(
+            '[profile] acceptFriendRequest failed fromUid=$fromUid error=$e');
       }
       var message = 'Could not accept friend request';
       if (e.toString().contains('REQUEST_NOT_FOUND')) {
@@ -838,22 +869,202 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  void _handleInboxCta(InboxItem item) {
+  bool _isPendingChallengeInvite(InboxItem item) {
+    if (item.status.trim().toLowerCase() != 'pending') return false;
+    return item.type == InboxItemType.friendChallenge ||
+        item.type == InboxItemType.levelChallenge ||
+        item.type == InboxItemType.liveDuelInvite;
+  }
+
+  Future<void> _declineChallengeInvite(InboxItem item) async {
+    try {
+      switch (item.type) {
+        case InboxItemType.friendChallenge:
+          final challengeId = item.ctaPayload.trim();
+          if (challengeId.isEmpty) {
+            await _deleteInboxItem(item);
+            throw StateError('INVALID_CHALLENGE_ID');
+          }
+          await _friendChallengeService.declineInvite(
+            challengeId: challengeId,
+            inboxMessageId: item.id,
+          );
+          break;
+        case InboxItemType.liveDuelInvite:
+          final matchId = item.ctaPayload.trim();
+          if (matchId.isEmpty) {
+            await _deleteInboxItem(item);
+            throw StateError('INVALID_MATCH_ID');
+          }
+          await _liveDuelService.declineInvite(
+            matchId: matchId,
+            inboxMessageId: item.id,
+          );
+          break;
+        case InboxItemType.levelChallenge:
+          await _sendGenericDeclineResponse(
+            item: item,
+            title: 'Challenge declined',
+            bodySuffix: 'declined your challenge.',
+          );
+          await _deleteInboxItem(item);
+          break;
+        case InboxItemType.friendRequest:
+        case InboxItemType.friendAccept:
+        case InboxItemType.systemNews:
+        case InboxItemType.unknown:
+          return;
+      }
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Challenge declined'),
+          duration: Duration(milliseconds: 900),
+        ),
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint(
+            '[profile] decline challenge invite failed id=${item.id} error=$e');
+      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not decline challenge'),
+          duration: Duration(milliseconds: 900),
+        ),
+      );
+    }
+  }
+
+  Future<void> _sendGenericDeclineResponse({
+    required InboxItem item,
+    required String title,
+    required String bodySuffix,
+  }) async {
+    final targetUid = item.fromUid.trim();
+    if (targetUid.isEmpty) return;
+    final me = await _readCurrentUserSocialProfile();
+    final username = (me['username'] as String?)?.trim() ?? '';
+    final playerName = (me['playerName'] as String?)?.trim().isNotEmpty == true
+        ? (me['playerName'] as String).trim()
+        : 'Player';
+    final avatarId = (me['avatarId'] as String?)?.trim().isNotEmpty == true
+        ? (me['avatarId'] as String).trim()
+        : 'default';
+    final label = username.isNotEmpty ? '@$username' : playerName;
+
+    await _inboxService.addInboxItem(
+      uid: targetUid,
+      type: 'system_news',
+      title: title,
+      body: '$label $bodySuffix',
+      status: 'declined',
+      extraData: <String, dynamic>{
+        'fromUid': FirebaseAuth.instance.currentUser?.uid.trim() ?? '',
+        'fromUsername': username,
+        'fromPlayerName': playerName,
+        'fromAvatarId': avatarId,
+        'ctaType': 'open_social',
+        'ctaPayload': '/social',
+      },
+      messageId: 'decline_reply_${item.type.name}_${item.id}',
+    );
+  }
+
+  Future<void> _sendGenericAcceptedResponse({
+    required InboxItem item,
+    required String title,
+    required String bodySuffix,
+  }) async {
+    final targetUid = item.fromUid.trim();
+    if (targetUid.isEmpty) return;
+    final me = await _readCurrentUserSocialProfile();
+    final username = (me['username'] as String?)?.trim() ?? '';
+    final playerName = (me['playerName'] as String?)?.trim().isNotEmpty == true
+        ? (me['playerName'] as String).trim()
+        : 'Player';
+    final avatarId = (me['avatarId'] as String?)?.trim().isNotEmpty == true
+        ? (me['avatarId'] as String).trim()
+        : 'default';
+    final label = username.isNotEmpty ? '@$username' : playerName;
+
+    await _inboxService.addInboxItem(
+      uid: targetUid,
+      type: 'system_news',
+      title: title,
+      body: '$label $bodySuffix',
+      status: 'accepted',
+      extraData: <String, dynamic>{
+        'fromUid': FirebaseAuth.instance.currentUser?.uid.trim() ?? '',
+        'fromUsername': username,
+        'fromPlayerName': playerName,
+        'fromAvatarId': avatarId,
+        'ctaType': 'open_social',
+        'ctaPayload': '/social',
+      },
+      messageId: 'accept_reply_${item.type.name}_${item.id}',
+    );
+  }
+
+  Future<void> _handleInboxCta(InboxItem item) async {
+    String? targetRoute;
+    final ctaPayload = item.ctaPayload.trim();
     switch (item.ctaType) {
       case 'open_shop':
-        context.go('/shop');
-        return;
+        targetRoute = '/shop';
+        break;
       case 'open_social':
-        context.go('/social');
-        return;
+        targetRoute = '/social';
+        break;
       case 'open_profile':
-        context.go('/profile');
-        return;
-      default:
-        if (item.ctaPayload.trim().isNotEmpty) {
-          context.go(item.ctaPayload.trim());
-          return;
+        targetRoute = '/profile';
+        break;
+      case 'open_live_duel':
+        final matchId = ctaPayload;
+        if (matchId.isNotEmpty) {
+          targetRoute = '/live-duel/$matchId';
         }
+        break;
+      case 'open_friend_challenge':
+        final challengeId = ctaPayload;
+        if (challengeId.isNotEmpty) {
+          try {
+            await _friendChallengeService.acknowledgeInviteOpened(
+              challengeId: challengeId,
+            );
+          } catch (e) {
+            if (kDebugMode) {
+              debugPrint(
+                '[profile] challenge acknowledge failed challengeId=$challengeId error=$e',
+              );
+            }
+          }
+          targetRoute = '/friend-challenge/$challengeId';
+        }
+        break;
+      default:
+        if (item.type == InboxItemType.levelChallenge) {
+          await _sendGenericAcceptedResponse(
+            item: item,
+            title: 'Challenge accepted',
+            bodySuffix: 'accepted your challenge.',
+          );
+        }
+        if (ctaPayload.isNotEmpty) {
+          targetRoute = ctaPayload;
+        }
+    }
+    if (targetRoute == null || targetRoute.trim().isEmpty) {
+      return;
+    }
+    if (!mounted) return;
+    context.go(targetRoute.trim());
+    try {
+      await _inboxService.deleteInboxItem(uid: '', messageId: item.id);
+    } catch (_) {
+      // Keep navigation flow even if delete fails; user can retry manually.
     }
   }
 
@@ -861,8 +1072,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final selectedCatalogItem =
         widget.skinCatalogService.getById(selectedSkinId);
     final cardPathRaw = (selectedCatalogItem?.cardPath ?? '').trim();
-    final rarityBackAsset =
-        _cardBackAssetForRarity((selectedCatalogItem?.rarity ?? 'Common').trim());
+    final rarityBackAsset = _cardBackAssetForRarity(
+        (selectedCatalogItem?.rarity ?? 'Common').trim());
     final candidates = <String>[];
 
     Future<void> addResolvedCandidate(String raw, String contextTag) async {
@@ -882,8 +1093,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     final rawCardCandidates = <String>{
       cardPathRaw,
-      ..._inferTarjetaCandidatesFromPath(selectedCatalogItem?.fullImagePath ?? ''),
-      ..._inferTarjetaCandidatesFromPath(selectedCatalogItem?.previewImagePath ?? ''),
+      ..._inferTarjetaCandidatesFromPath(
+          selectedCatalogItem?.fullImagePath ?? ''),
+      ..._inferTarjetaCandidatesFromPath(
+          selectedCatalogItem?.previewImagePath ?? ''),
       ..._inferTarjetaCandidatesFromPath(selectedCatalogItem?.imagePath ?? ''),
     }..removeWhere((e) => e.trim().isEmpty);
 
@@ -975,7 +1188,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
         databaseId: _firestoreDatabaseId,
       ).collection('users').doc(uid).snapshots();
     } catch (_) {
-      return FirebaseFirestore.instance.collection('users').doc(uid).snapshots();
+      return FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .snapshots();
+    }
+  }
+
+  Future<Map<String, dynamic>> _readCurrentUserSocialProfile() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
+    if (uid.isEmpty) return const <String, dynamic>{};
+    try {
+      final snap = await FirebaseFirestore.instanceFor(
+        app: Firebase.app(),
+        databaseId: _firestoreDatabaseId,
+      ).collection('users').doc(uid).get();
+      return snap.data() ?? const <String, dynamic>{};
+    } catch (_) {
+      final snap =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      return snap.data() ?? const <String, dynamic>{};
     }
   }
 
@@ -1382,7 +1614,9 @@ class _SkinFlipCardState extends State<SkinFlipCard>
 
   @override
   Widget build(BuildContext context) {
-    final rarity = widget.skin.rarity.trim().isEmpty ? 'Common' : widget.skin.rarity.trim();
+    final rarity = widget.skin.rarity.trim().isEmpty
+        ? 'Common'
+        : widget.skin.rarity.trim();
     final rarityColor = _rarityColor(rarity);
     return GestureDetector(
       onTap: _flip,
@@ -1487,7 +1721,8 @@ class _SkinFlipCardState extends State<SkinFlipCard>
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: rarityColor.withOpacity(0.16),
                     borderRadius: BorderRadius.circular(999),
@@ -1512,8 +1747,9 @@ class _SkinFlipCardState extends State<SkinFlipCard>
                 style: FilledButton.styleFrom(
                   backgroundColor:
                       widget.isEquipped ? const Color(0xFF243858) : rarityColor,
-                  foregroundColor:
-                      widget.isEquipped ? const Color(0xFFC9D8F4) : Colors.white,
+                  foregroundColor: widget.isEquipped
+                      ? const Color(0xFFC9D8F4)
+                      : Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 10),
                 ),
                 child: Text(widget.isEquipped ? 'Equipped' : 'Equip'),
@@ -1684,7 +1920,9 @@ class _TrailWardrobeCarouselState extends State<_TrailWardrobeCarousel> {
               borderRadius: BorderRadius.circular(18),
               color: const Color(0xFF172338),
               border: Border.all(
-                color: equipped ? accent.withOpacity(0.95) : const Color(0xFF31465F),
+                color: equipped
+                    ? accent.withOpacity(0.95)
+                    : const Color(0xFF31465F),
                 width: equipped ? 1.6 : 1.1,
               ),
             ),
@@ -1707,7 +1945,11 @@ class _TrailWardrobeCarouselState extends State<_TrailWardrobeCarousel> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(999),
                           gradient: LinearGradient(
-                            colors: [accent.withOpacity(0.2), accent, trail.secondaryColor],
+                            colors: [
+                              accent.withOpacity(0.2),
+                              accent,
+                              trail.secondaryColor
+                            ],
                           ),
                           boxShadow: [
                             BoxShadow(
@@ -1737,8 +1979,9 @@ class _TrailWardrobeCarouselState extends State<_TrailWardrobeCarousel> {
                     child: FilledButton(
                       onPressed: equipped ? null : () => widget.onEquip(trail),
                       style: FilledButton.styleFrom(
-                        backgroundColor:
-                            equipped ? const Color(0xFF263854) : accent.withOpacity(0.9),
+                        backgroundColor: equipped
+                            ? const Color(0xFF263854)
+                            : accent.withOpacity(0.9),
                         foregroundColor:
                             equipped ? const Color(0xFFD1DEF8) : Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -2048,8 +2291,9 @@ class _AchievementMedalCard extends StatelessWidget {
               const SizedBox(height: 14),
               CircleAvatar(
                 radius: 34,
-                backgroundColor:
-                    unlocked ? accent.withOpacity(0.2) : const Color(0xFF1E293B),
+                backgroundColor: unlocked
+                    ? accent.withOpacity(0.2)
+                    : const Color(0xFF1E293B),
                 child: Icon(
                   icon,
                   color: unlocked ? accent : const Color(0xFF94A3B8),
@@ -2109,6 +2353,8 @@ class _AchievementMedalCard extends StatelessWidget {
         return Icons.whatshot_rounded;
       case 'speedrunner':
         return Icons.bolt_rounded;
+      case 'beat_the_ghost':
+        return Icons.nightlight_round;
       default:
         return Icons.emoji_events_rounded;
     }
@@ -2120,6 +2366,8 @@ class _AchievementMedalCard extends StatelessWidget {
       case 'hardcore':
       case 'speedrunner':
         return const Color(0xFFFFD761);
+      case 'beat_the_ghost':
+        return const Color(0xFF67E8F9);
       case 'streak_7':
       case 'daily_habit':
         return const Color(0xFF60A5FA);
@@ -2255,7 +2503,8 @@ class _InboxItemCard extends StatelessWidget {
                       item.title,
                       style: TextStyle(
                         color: Colors.white,
-                        fontWeight: isUnread ? FontWeight.w800 : FontWeight.w700,
+                        fontWeight:
+                            isUnread ? FontWeight.w800 : FontWeight.w700,
                       ),
                     ),
                   ),
@@ -2295,6 +2544,8 @@ class _InboxItemCard extends StatelessWidget {
                         child: const Text('Decline'),
                       ),
                     ),
+                  if (onDecline != null && onCta != null)
+                    const SizedBox(width: 8),
                   if (onCta != null)
                     Expanded(
                       child: ElevatedButton(
@@ -2325,8 +2576,12 @@ class _InboxItemCard extends StatelessWidget {
         return Icons.person_add_alt_1_rounded;
       case InboxItemType.friendAccept:
         return Icons.handshake_rounded;
+      case InboxItemType.friendChallenge:
+        return Icons.sports_score_rounded;
       case InboxItemType.levelChallenge:
         return Icons.sports_esports_rounded;
+      case InboxItemType.liveDuelInvite:
+        return Icons.sports_martial_arts_rounded;
       case InboxItemType.systemNews:
         return Icons.campaign_rounded;
       case InboxItemType.unknown:
@@ -2466,17 +2721,17 @@ class _SkinCardViewerState extends State<_SkinCardViewer> {
         child: Container(
           color: const Color(0xFF0F172A),
           padding: const EdgeInsets.all(6),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: showBack
-                  ? _FallbackImage(
-                      candidates: widget.backCandidates,
-                      fit: BoxFit.cover,
-                    )
-                  : _FallbackImage(
-                      candidates: widget.candidates,
-                      fit: BoxFit.cover,
-                      initialIndex: _candidateIndex,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: showBack
+                ? _FallbackImage(
+                    candidates: widget.backCandidates,
+                    fit: BoxFit.cover,
+                  )
+                : _FallbackImage(
+                    candidates: widget.candidates,
+                    fit: BoxFit.cover,
+                    initialIndex: _candidateIndex,
                     onIndexChanged: (value) {
                       if (value == _candidateIndex) return;
                       setState(() {
@@ -2553,7 +2808,8 @@ class _FallbackImageState extends State<_FallbackImage> {
             url: url,
             fit: widget.fit,
             filterQuality: FilterQuality.high,
-            fallback: _CandidateAdvanceSignal(onAdvance: _advanceToNextCandidate),
+            fallback:
+                _CandidateAdvanceSignal(onAdvance: _advanceToNextCandidate),
           );
         }
         if (!(url.startsWith('http://') || url.startsWith('https://'))) {
@@ -2611,7 +2867,8 @@ class _CandidateAdvanceSignal extends StatefulWidget {
   final bool Function() onAdvance;
 
   @override
-  State<_CandidateAdvanceSignal> createState() => _CandidateAdvanceSignalState();
+  State<_CandidateAdvanceSignal> createState() =>
+      _CandidateAdvanceSignalState();
 }
 
 class _CandidateAdvanceSignalState extends State<_CandidateAdvanceSignal> {
@@ -2706,7 +2963,8 @@ class _ProfileHeaderAvatarState extends State<_ProfileHeaderAvatar> {
     }
     if (!_notifiedExhausted && kDebugMode) {
       _notifiedExhausted = true;
-      debugPrint('[profile] avatar exhausted, using placeholder. source=$fromType path=$fromPath');
+      debugPrint(
+          '[profile] avatar exhausted, using placeholder. source=$fromType path=$fromPath');
     }
   }
 
@@ -2748,7 +3006,8 @@ class _ProfileAvatarImageCandidate extends StatelessWidget {
           path,
           fit: BoxFit.cover,
           filterQuality: FilterQuality.high,
-          errorBuilder: (_, __, ___) => _AvatarFailureSignal(onFailed: onFailed),
+          errorBuilder: (_, __, ___) =>
+              _AvatarFailureSignal(onFailed: onFailed),
         );
       }
       if (kIsWeb) {
@@ -2773,7 +3032,8 @@ class _ProfileAvatarImageCandidate extends StatelessWidget {
         return Image.memory(
           bytes,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _AvatarFailureSignal(onFailed: onFailed),
+          errorBuilder: (_, __, ___) =>
+              _AvatarFailureSignal(onFailed: onFailed),
         );
       }
       return _AvatarFailureSignal(onFailed: onFailed);
@@ -2843,5 +3103,3 @@ class _AvatarCandidate {
   final String type;
   final String path;
 }
-
-

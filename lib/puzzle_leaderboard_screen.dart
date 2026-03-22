@@ -1,7 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'leaderboard_service.dart';
-import 'puzzle_attempt.dart';
+import 'services/friends_ranking_service.dart';
+import 'ui/components/friends_ranking_list.dart';
+import 'ui/components/game_card.dart';
 
 class PuzzleLeaderboardScreen extends StatefulWidget {
   const PuzzleLeaderboardScreen({
@@ -20,110 +24,81 @@ class PuzzleLeaderboardScreen extends StatefulWidget {
 }
 
 class _PuzzleLeaderboardScreenState extends State<PuzzleLeaderboardScreen> {
-  late Future<List<PuzzleAttempt>> _future;
+  final FriendsRankingService _friendsRankingService = FriendsRankingService();
+  late Future<List<FriendsRankingRow>> _future;
 
   @override
   void initState() {
     super.initState();
-    _future = widget.leaderboardService.getPuzzleLeaderboard(
-      widget.packId,
-      widget.levelIndex,
-    );
+    _future = _friendsRankingService.loadForLevel(_levelId);
   }
+
+  String get _levelId => '${widget.packId}_${widget.levelIndex}';
 
   @override
   Widget build(BuildContext context) {
+    final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
     return Scaffold(
+      backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
-        title: Text('Leaderboard ${widget.packId} #${widget.levelIndex}'),
+        backgroundColor: const Color(0xFF0F172A),
+        elevation: 0,
+        title: Text(
+          'Friends ranking - L${widget.levelIndex}',
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/play/${widget.packId}');
+            }
+          },
+          icon: const Icon(Icons.arrow_back_rounded),
+        ),
       ),
-      body: FutureBuilder<List<PuzzleAttempt>>(
-        future: _future,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final attempts = snapshot.data!;
-          if (attempts.isEmpty) {
-            return const Center(child: Text('No attempts yet'));
-          }
-
-          final personalAttempts = attempts.where((a) => a.playerName == 'You').toList();
-          final personalBestRunId =
-              personalAttempts.isEmpty ? null : personalAttempts.first.runId;
-
-          return ListView.separated(
-            padding: const EdgeInsets.all(12),
-            itemCount: attempts.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemBuilder: (context, index) {
-              final attempt = attempts[index];
-              final rank = _rankAtIndexByTime(
-                attempts.map((a) => a.timeMs).toList(growable: false),
-                index,
-              );
-              final isTop1 = rank == 1;
-              final isPersonalBest =
-                  personalBestRunId != null && attempt.runId == personalBestRunId;
-              return Card(
-                color: isTop1
-                    ? Colors.amber.withOpacity(0.12)
-                    : isPersonalBest
-                        ? Colors.blue.withOpacity(0.08)
-                        : null,
-                child: ListTile(
-                  leading: Text(
-                    '#$rank',
-                    style: const TextStyle(fontWeight: FontWeight.w700),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+          children: [
+            GameCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Friends ranking',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                    ),
                   ),
-                  title: Text(_formatMs(attempt.timeMs)),
-                  subtitle: Text(
-                    'h:${attempt.hintsUsed}  r:${attempt.rewindsUsed}  '
-                    '${_formatDate(attempt.createdAtIso)}'
-                    '${attempt.score == null ? '' : '  s:${attempt.score}'}',
+                  const SizedBox(height: 4),
+                  Text(
+                    'Level ${widget.levelIndex} - ${widget.packId}',
+                    style: const TextStyle(
+                      color: Color(0xFF9EB0D2),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                  trailing: isTop1
-                      ? const Icon(Icons.emoji_events_outlined)
-                      : isPersonalBest
-                          ? const Icon(Icons.person)
-                          : null,
-                ),
-              );
-            },
-          );
-        },
+                  const SizedBox(height: 10),
+                  FriendsRankingList(
+                    future: _future,
+                    currentUid: currentUid,
+                    emptyText: 'No friends scores yet for this level.',
+                    errorText: 'Friends ranking unavailable right now.',
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
-  }
-
-  String _formatMs(int ms) {
-    final seconds = (ms / 1000).round();
-    final mm = (seconds ~/ 60).toString().padLeft(2, '0');
-    final ss = (seconds % 60).toString().padLeft(2, '0');
-    return '$mm:$ss';
-  }
-
-  String _formatDate(String iso) {
-    final dt = DateTime.tryParse(iso);
-    if (dt == null) {
-      return iso;
-    }
-    final y = dt.year.toString().padLeft(4, '0');
-    final m = dt.month.toString().padLeft(2, '0');
-    final d = dt.day.toString().padLeft(2, '0');
-    return '$y-$m-$d';
-  }
-
-  int _rankAtIndexByTime(List<int> timesMs, int index) {
-    if (index <= 0) return 1;
-    var rank = index + 1;
-    for (var j = index - 1; j >= 0; j--) {
-      if (timesMs[j] == timesMs[index]) {
-        rank = j + 1;
-      } else {
-        break;
-      }
-    }
-    return rank;
   }
 }

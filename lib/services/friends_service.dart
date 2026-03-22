@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 
 import '../models/friend_profile.dart';
+import 'friend_challenge_service.dart';
 import 'user_profile_service.dart';
 
 class FriendsService {
@@ -26,50 +27,26 @@ class FriendsService {
       throw StateError('FRIEND_NOT_FOUND');
     }
     await _friendsRef(currentUid).doc(targetUid).set(
-      _friendDocData(uid: targetUid, data: targetData),
-      SetOptions(merge: true),
-    );
+          _friendDocData(uid: targetUid, data: targetData),
+          SetOptions(merge: true),
+        );
   }
 
   Future<void> sendFriendRequest(String friendUid) =>
       sendFriendRequestByUid(friendUid);
 
-  Future<void> sendLevelChallenge({
+  Future<String> sendLevelChallenge({
     required String toUid,
     required String levelId,
   }) async {
     final fromUid = await _requireUid();
-    final targetUid = toUid.trim();
-    final normalizedLevelId = levelId.trim();
-    if (targetUid.isEmpty || targetUid == fromUid) {
-      throw StateError('INVALID_FRIEND_UID');
-    }
-    if (normalizedLevelId.isEmpty) {
-      throw StateError('INVALID_LEVEL_ID');
-    }
-
-    final fromData = await _readUserData(fromUid) ?? <String, dynamic>{};
-
-    final route = _routeFromLevelId(normalizedLevelId) ?? '/play';
-    final fromUsername = _readString(fromData['username']);
-    final fromPlayerName = _readString(fromData['playerName'], fallback: 'Player');
-    final challenger = fromUsername.isNotEmpty ? '@$fromUsername' : fromPlayerName;
-    final payload = <String, dynamic>{
-      'type': 'level_challenge',
-      'fromUid': fromUid,
-      'fromUsername': fromUsername,
-      'fromPlayerName': fromPlayerName,
-      'fromAvatarId': _readString(fromData['avatarId'], fallback: 'default'),
-      'title': 'New challenge',
-      'body': '$challenger challenged you on level $normalizedLevelId.',
-      'status': 'active',
-      'read': false,
-      'ctaType': 'open_level',
-      'ctaPayload': route,
-      'challengeLevelId': normalizedLevelId,
-      'createdAt': FieldValue.serverTimestamp(),
-    };
-    await _inboxRef(targetUid).add(payload);
+    await FriendChallengeService().createRandomFriendChallenge(
+      challengerUid: fromUid,
+      challengedUid: toUid,
+      currentLevelId: levelId,
+      sourceScreen: 'friends_service',
+    );
+    return '';
   }
 
   Future<void> sendFriendRequestByUsername(String username) async {
@@ -87,7 +64,8 @@ class FriendsService {
     final friendUid = await _resolveUidByUsername(normalized);
     if (friendUid == null || friendUid.trim().isEmpty) {
       if (kDebugMode) {
-        debugPrint('[friends] reason=FRIEND_USERNAME_NOT_FOUND username="$normalized"');
+        debugPrint(
+            '[friends] reason=FRIEND_USERNAME_NOT_FOUND username="$normalized"');
       }
       throw StateError('FRIEND_USERNAME_NOT_FOUND');
     }
@@ -99,11 +77,39 @@ class FriendsService {
     await sendFriendRequestByUid(friendUid);
   }
 
+  Future<void> sendFriendRequestByEmail(String email) async {
+    final raw = email;
+    final normalized = email.trim().toLowerCase();
+    if (kDebugMode) {
+      debugPrint(
+        '[friends] sendFriendRequestByEmail raw="$raw" normalized="$normalized"',
+      );
+    }
+    if (normalized.isEmpty || !normalized.contains('@')) {
+      throw StateError('FRIEND_EMAIL_INVALID');
+    }
+    final friendUid = await _resolveUidByEmail(normalized);
+    if (friendUid == null || friendUid.trim().isEmpty) {
+      if (kDebugMode) {
+        debugPrint(
+            '[friends] reason=FRIEND_EMAIL_NOT_FOUND email="$normalized"');
+      }
+      throw StateError('FRIEND_EMAIL_NOT_FOUND');
+    }
+    if (kDebugMode) {
+      debugPrint(
+          '[friends] resolved email="$normalized" -> targetUid=$friendUid');
+    }
+    await sendFriendRequestByUid(friendUid);
+  }
+
   Future<void> sendFriendRequestByUid(String friendUid) async {
     final currentUid = await _requireUid();
     final targetUid = friendUid.trim();
+    final staleCutoff = DateTime.now().subtract(const Duration(days: 2));
     if (kDebugMode) {
-      debugPrint('[friends] sendFriendRequestByUid currentUid=$currentUid targetUid=$targetUid');
+      debugPrint(
+          '[friends] sendFriendRequestByUid currentUid=$currentUid targetUid=$targetUid');
     }
     if (targetUid.isEmpty) {
       if (kDebugMode) {
@@ -139,7 +145,8 @@ class FriendsService {
         _readString(targetUserData['avatarId'], fallback: 'default');
 
     if (kDebugMode) {
-      debugPrint('[friends] send request currentUid=$currentUid targetUid=$targetUid');
+      debugPrint(
+          '[friends] send request currentUid=$currentUid targetUid=$targetUid');
       debugPrint(
         '[friends] current profile username=$currentUsername playerName=$currentPlayerName avatarId=$currentAvatarId',
       );
@@ -162,6 +169,7 @@ class FriendsService {
       'fromUsername': currentUsername,
       'fromPlayerName': currentPlayerName,
       'fromAvatarId': currentAvatarId,
+      'status': 'pending',
       'createdAt': FieldValue.serverTimestamp(),
     };
     final sentPayload = <String, dynamic>{
@@ -169,6 +177,7 @@ class FriendsService {
       'toUsername': targetUsername,
       'toPlayerName': targetPlayerName,
       'toAvatarId': targetAvatarId,
+      'status': 'pending',
       'createdAt': FieldValue.serverTimestamp(),
     };
     final inboxPayload = <String, dynamic>{
@@ -186,71 +195,105 @@ class FriendsService {
     };
 
     try {
-      if (kDebugMode) {
-        debugPrint('[friends] read path: users/$currentUid/friends/$targetUid');
-      }
-      final currentFriendSnap = await currentFriendRef.get();
-      if (kDebugMode) {
-        debugPrint('[friends] alreadyFriends=${currentFriendSnap.exists}');
-      }
-      if (currentFriendSnap.exists) {
+      await _db().runTransaction((tx) async {
         if (kDebugMode) {
-          debugPrint('[friends] reason=ALREADY_FRIENDS');
+          debugPrint(
+              '[friends] read path: users/$currentUid/friends/$targetUid');
         }
-        throw StateError('ALREADY_FRIENDS');
-      }
-
-      if (kDebugMode) {
-        debugPrint('[friends] read path: users/$currentUid/sent_requests/$targetUid');
-      }
-      final sentSnap = await currentSentRef.get();
-      if (kDebugMode) {
-        debugPrint('[friends] pendingSentRequest=${sentSnap.exists}');
-      }
-      if (sentSnap.exists) {
+        final currentFriendSnap = await tx.get(currentFriendRef);
         if (kDebugMode) {
-          debugPrint('[friends] reason=REQUEST_ALREADY_SENT');
+          debugPrint('[friends] alreadyFriends=${currentFriendSnap.exists}');
         }
-        throw StateError('REQUEST_ALREADY_SENT');
-      }
+        if (currentFriendSnap.exists) {
+          throw StateError('ALREADY_FRIENDS');
+        }
 
-      if (kDebugMode) {
-        debugPrint(
-          '[friends] read path: users/$currentUid/incoming_requests/$targetUid',
-        );
-      }
-      final reverseIncomingSnap =
-          await _incomingRequestsRef(currentUid).doc(targetUid).get();
-      if (kDebugMode) {
-        debugPrint('[friends] reverseIncomingRequest=${reverseIncomingSnap.exists}');
-      }
-      if (reverseIncomingSnap.exists) {
         if (kDebugMode) {
-          debugPrint('[friends] reason=REQUEST_ALREADY_RECEIVED');
+          debugPrint(
+              '[friends] read path: users/$currentUid/sent_requests/$targetUid');
         }
-        throw StateError('REQUEST_ALREADY_RECEIVED');
-      }
+        final sentSnap = await tx.get(currentSentRef);
+        if (sentSnap.exists) {
+          final sentData = sentSnap.data() ?? <String, dynamic>{};
+          final sentStatus =
+              _readString(sentData['status'], fallback: 'pending')
+                  .toLowerCase();
+          final sentCreatedAt = sentData['createdAt'];
+          final sentCreatedAtDate =
+              sentCreatedAt is Timestamp ? sentCreatedAt.toDate() : null;
+          final stalePending = !_isTerminalRequestStatus(sentStatus) &&
+              (sentStatus.isEmpty ||
+                  sentStatus == 'pending' ||
+                  sentStatus == 'sent' ||
+                  sentStatus == 'active') &&
+              sentCreatedAtDate != null &&
+              sentCreatedAtDate.isBefore(staleCutoff);
+          if (_isTerminalRequestStatus(sentStatus) || stalePending) {
+            if (kDebugMode) {
+              debugPrint(
+                '[friends] clearing stale/terminal sent request '
+                'status=$sentStatus createdAt=$sentCreatedAtDate',
+              );
+            }
+            tx.delete(currentSentRef);
+          } else {
+            if (kDebugMode) {
+              debugPrint(
+                '[friends] pendingSentRequest=true status=$sentStatus createdAt=$sentCreatedAtDate',
+              );
+            }
+            throw StateError('REQUEST_ALREADY_SENT');
+          }
+        } else if (kDebugMode) {
+          debugPrint('[friends] pendingSentRequest=false');
+        }
 
-      if (kDebugMode) {
-        debugPrint(
-          '[friends] write path: users/$targetUid/incoming_requests/$currentUid payload=$incomingPayload',
-        );
-      }
-      await targetIncomingRef.set(incomingPayload, SetOptions(merge: true));
+        if (kDebugMode) {
+          debugPrint(
+            '[friends] read path: users/$currentUid/incoming_requests/$targetUid',
+          );
+        }
+        final reverseIncomingSnap =
+            await tx.get(_incomingRequestsRef(currentUid).doc(targetUid));
+        if (reverseIncomingSnap.exists) {
+          final reverseData = reverseIncomingSnap.data() ?? <String, dynamic>{};
+          final reverseStatus =
+              _readString(reverseData['status'], fallback: 'pending')
+                  .toLowerCase();
+          final reverseCreatedAt = reverseData['createdAt'];
+          final reverseCreatedAtDate =
+              reverseCreatedAt is Timestamp ? reverseCreatedAt.toDate() : null;
+          final stalePending = !_isTerminalRequestStatus(reverseStatus) &&
+              (reverseStatus.isEmpty ||
+                  reverseStatus == 'pending' ||
+                  reverseStatus == 'sent' ||
+                  reverseStatus == 'active') &&
+              reverseCreatedAtDate != null &&
+              reverseCreatedAtDate.isBefore(staleCutoff);
+          if (_isTerminalRequestStatus(reverseStatus) || stalePending) {
+            if (kDebugMode) {
+              debugPrint(
+                '[friends] clearing stale/terminal reverse incoming request '
+                'status=$reverseStatus createdAt=$reverseCreatedAtDate',
+              );
+            }
+            tx.delete(_incomingRequestsRef(currentUid).doc(targetUid));
+          } else {
+            if (kDebugMode) {
+              debugPrint(
+                '[friends] reverseIncomingRequest=true status=$reverseStatus createdAt=$reverseCreatedAtDate',
+              );
+            }
+            throw StateError('REQUEST_ALREADY_RECEIVED');
+          }
+        } else if (kDebugMode) {
+          debugPrint('[friends] reverseIncomingRequest=false');
+        }
 
-      if (kDebugMode) {
-        debugPrint(
-          '[friends] write path: users/$currentUid/sent_requests/$targetUid payload=$sentPayload',
-        );
-      }
-      await currentSentRef.set(sentPayload, SetOptions(merge: true));
-
-      if (kDebugMode) {
-        debugPrint(
-          '[friends] write path: users/$targetUid/inbox/$currentUid payload=$inboxPayload',
-        );
-      }
-      await targetInboxRef.set(inboxPayload, SetOptions(merge: true));
+        tx.set(targetIncomingRef, incomingPayload, SetOptions(merge: true));
+        tx.set(currentSentRef, sentPayload, SetOptions(merge: true));
+        tx.set(targetInboxRef, inboxPayload, SetOptions(merge: true));
+      });
       if (kDebugMode) {
         debugPrint('[friends] reason=REQUEST_SENT_OK');
       }
@@ -332,13 +375,14 @@ class FriendsService {
 
     final incomingRef = _incomingRequestsRef(currentUid).doc(senderUid);
     final senderSentRef = _sentRequestsRef(senderUid).doc(currentUid);
-    final currentInboxRef =
-        _inboxRef(currentUid).doc((inboxMessageId ?? senderUid).trim().isEmpty
+    final currentInboxRef = _inboxRef(currentUid).doc(
+        (inboxMessageId ?? senderUid).trim().isEmpty
             ? senderUid
             : (inboxMessageId ?? senderUid).trim());
     final currentFriendRef = _friendsRef(currentUid).doc(senderUid);
     final senderFriendRef = _friendsRef(senderUid).doc(currentUid);
-    final senderInboxRef = _inboxRef(senderUid).doc('friend_accept_$currentUid');
+    final senderInboxRef =
+        _inboxRef(senderUid).doc('friend_accept_$currentUid');
     final currentFriendPayload =
         _friendDocData(uid: senderUid, data: senderData);
     final senderFriendPayload =
@@ -363,7 +407,8 @@ class FriendsService {
     };
 
     if (kDebugMode) {
-      debugPrint('[friends] accept request currentUid=$currentUid fromUid=$senderUid');
+      debugPrint(
+          '[friends] accept request currentUid=$currentUid fromUid=$senderUid');
       debugPrint('[friends] current profile data=$currentData');
       debugPrint('[friends] sender profile data=$senderData');
       debugPrint(
@@ -379,7 +424,8 @@ class FriendsService {
 
     try {
       if (kDebugMode) {
-        debugPrint('[friends] read path: users/$currentUid/incoming_requests/$senderUid');
+        debugPrint(
+            '[friends] read path: users/$currentUid/incoming_requests/$senderUid');
       }
       final incomingSnap = await incomingRef.get();
       if (!incomingSnap.exists) {
@@ -401,9 +447,12 @@ class FriendsService {
       batch.set(senderInboxRef, senderInboxPayload, SetOptions(merge: true));
 
       if (kDebugMode) {
-        debugPrint('[friends] delete path: users/$currentUid/incoming_requests/$senderUid');
-        debugPrint('[friends] delete path: users/$senderUid/sent_requests/$currentUid');
-        debugPrint('[friends] delete path: users/$currentUid/inbox/${currentInboxRef.id}');
+        debugPrint(
+            '[friends] delete path: users/$currentUid/incoming_requests/$senderUid');
+        debugPrint(
+            '[friends] delete path: users/$senderUid/sent_requests/$currentUid');
+        debugPrint(
+            '[friends] delete path: users/$currentUid/inbox/${currentInboxRef.id}');
         debugPrint(
           '[friends] write path: users/$senderUid/inbox/${senderInboxRef.id} payload=$senderInboxPayload',
         );
@@ -421,7 +470,8 @@ class FriendsService {
       rethrow;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('[friends] accept request failed currentUid=$currentUid fromUid=$senderUid error=$e');
+        debugPrint(
+            '[friends] accept request failed currentUid=$currentUid fromUid=$senderUid error=$e');
       }
       rethrow;
     }
@@ -438,12 +488,37 @@ class FriendsService {
     }
     final incomingRef = _incomingRequestsRef(currentUid).doc(senderUid);
     final senderSentRef = _sentRequestsRef(senderUid).doc(currentUid);
-    final currentInboxRef =
-        _inboxRef(currentUid).doc((inboxMessageId ?? senderUid).trim().isEmpty
+    final currentData = await _readUserData(currentUid) ?? <String, dynamic>{};
+    final currentUsername = _readString(currentData['username']);
+    final currentPlayerName =
+        _readString(currentData['playerName'], fallback: 'Player');
+    final currentAvatarId =
+        _readString(currentData['avatarId'], fallback: 'default');
+    final senderInboxRef =
+        _inboxRef(senderUid).doc('friend_declined_$currentUid');
+    final senderInboxPayload = <String, dynamic>{
+      'type': 'system_news',
+      'fromUid': currentUid,
+      'fromUsername': currentUsername,
+      'fromPlayerName': currentPlayerName,
+      'fromAvatarId': currentAvatarId,
+      'title': 'Friend request declined',
+      'body':
+          '@${currentUsername.isNotEmpty ? currentUsername : currentPlayerName} declined your friend request.',
+      'status': 'declined',
+      'read': false,
+      'createdAt': FieldValue.serverTimestamp(),
+      'ctaType': 'open_social',
+      'ctaPayload': '/social',
+      'relatedType': 'friend_request',
+    };
+    final currentInboxRef = _inboxRef(currentUid).doc(
+        (inboxMessageId ?? senderUid).trim().isEmpty
             ? senderUid
             : (inboxMessageId ?? senderUid).trim());
     if (kDebugMode) {
-      debugPrint('[friends] decline request currentUid=$currentUid fromUid=$senderUid');
+      debugPrint(
+          '[friends] decline request currentUid=$currentUid fromUid=$senderUid');
       debugPrint(
         '[friends] delete paths incoming=users/$currentUid/incoming_requests/$senderUid '
         'sent=users/$senderUid/sent_requests/$currentUid '
@@ -452,13 +527,15 @@ class FriendsService {
     }
     try {
       final batch = _db().batch();
+      batch.set(senderInboxRef, senderInboxPayload, SetOptions(merge: true));
       batch.delete(incomingRef);
       batch.delete(senderSentRef);
       batch.delete(currentInboxRef);
       await batch.commit();
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('[friends] decline request failed currentUid=$currentUid fromUid=$senderUid error=$e');
+        debugPrint(
+            '[friends] decline request failed currentUid=$currentUid fromUid=$senderUid error=$e');
       }
       rethrow;
     }
@@ -471,7 +548,8 @@ class FriendsService {
 
   Future<List<FriendProfile>> getFriends() async {
     final uid = await _requireUid();
-    final snap = await _friendsRef(uid).orderBy('addedAt', descending: true).get();
+    final snap =
+        await _friendsRef(uid).orderBy('addedAt', descending: true).get();
     return snap.docs
         .map((doc) => FriendProfile.fromFirestore(doc.id, doc.data()))
         .toList(growable: false);
@@ -545,6 +623,40 @@ class FriendsService {
     return uid;
   }
 
+  Future<String?> _resolveUidByEmail(String normalizedEmail) async {
+    final key = normalizedEmail.trim().toLowerCase();
+    if (key.isEmpty) return null;
+    if (kDebugMode) {
+      debugPrint('[friends] read path: emails/$key');
+    }
+    final indexSnap = await _db().collection('emails').doc(key).get();
+    if (indexSnap.exists) {
+      final uid = _readString(indexSnap.data()?['uid']);
+      if (uid.isNotEmpty) return uid;
+    }
+
+    if (kDebugMode) {
+      debugPrint('[friends] fallback query users by emailLowercase/email');
+    }
+    final byLower = await _db()
+        .collection('users')
+        .where('emailLowercase', isEqualTo: key)
+        .limit(1)
+        .get();
+    if (byLower.docs.isNotEmpty) {
+      return byLower.docs.first.id.trim();
+    }
+    final byRaw = await _db()
+        .collection('users')
+        .where('email', isEqualTo: key)
+        .limit(1)
+        .get();
+    if (byRaw.docs.isNotEmpty) {
+      return byRaw.docs.first.id.trim();
+    }
+    return null;
+  }
+
   String _readString(Object? value, {String fallback = ''}) {
     if (value is String && value.trim().isNotEmpty) return value.trim();
     return fallback;
@@ -554,6 +666,26 @@ class FriendsService {
     if (value is num) return value.toInt();
     if (value is String) return int.tryParse(value.trim()) ?? 0;
     return 0;
+  }
+
+  bool _isTerminalRequestStatus(String status) {
+    switch (status.trim().toLowerCase()) {
+      case 'declined':
+      case 'rejected':
+      case 'no_accept':
+      case 'noaccept':
+      case 'no accept':
+      case 'not_accepted':
+      case 'cancelled':
+      case 'canceled':
+      case 'expired':
+      case 'failed':
+      case 'closed':
+      case 'accepted':
+        return true;
+      default:
+        return false;
+    }
   }
 
   DocumentReference<Map<String, dynamic>> _userRef(String uid) {
@@ -597,15 +729,5 @@ class FriendsService {
       throw StateError('AUTH_REQUIRED');
     }
     return uid;
-  }
-
-  String? _routeFromLevelId(String levelId) {
-    final sep = levelId.lastIndexOf('_');
-    if (sep <= 0 || sep >= levelId.length - 1) return null;
-    final packId = levelId.substring(0, sep).trim();
-    final levelPart = levelId.substring(sep + 1).trim();
-    final level = int.tryParse(levelPart);
-    if (packId.isEmpty || level == null || level <= 0) return null;
-    return '/play/$packId/$level';
   }
 }

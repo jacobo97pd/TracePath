@@ -11,6 +11,8 @@ class LeaderboardEntry {
     required this.equippedTrailId,
     required this.levelId,
     required this.bestTimeMs,
+    required this.firstClearTimeMs,
+    required this.personalBestTimeMs,
     required this.moves,
     required this.stars,
     required this.updatedAt,
@@ -24,7 +26,11 @@ class LeaderboardEntry {
   final String equippedSkinId;
   final String equippedTrailId;
   final String levelId;
+  // Ranking time (frozen first clear for competitive/friends leaderboard).
   final int bestTimeMs;
+  final int firstClearTimeMs;
+  // Personal historical best used for self-improvement systems (ghost).
+  final int personalBestTimeMs;
   final int moves;
   final int stars;
   final DateTime? updatedAt;
@@ -38,6 +44,19 @@ class LeaderboardEntry {
         (data['avatarURL'] as String?)?.trim() ??
         '';
     final legacyEquippedSkin = (data['equippedSkin'] as String?)?.trim() ?? '';
+    final legacyBest = readInt(data['bestTimeMs']);
+    final explicitFirst = readInt(data['firstClearTimeMs']);
+    final explicitRanking = readInt(data['rankingTimeMs']);
+    final explicitPersonal = readInt(data['personalBestTimeMs']);
+    final resolvedFirst = explicitFirst > 0
+        ? explicitFirst
+        : (explicitRanking > 0 ? explicitRanking : legacyBest);
+    final resolvedRanking =
+        explicitRanking > 0 ? explicitRanking : resolvedFirst;
+    final resolvedPersonal = explicitPersonal > 0
+        ? explicitPersonal
+        : (legacyBest > 0 ? legacyBest : resolvedRanking);
+
     return LeaderboardEntry(
       uid: (data['uid'] as String?)?.trim() ?? '',
       playerName: (data['playerName'] as String?)?.trim().isNotEmpty == true
@@ -59,7 +78,9 @@ class LeaderboardEntry {
               ? (data['equippedTrailId'] as String).trim()
               : 'none',
       levelId: (data['levelId'] as String?)?.trim() ?? '',
-      bestTimeMs: readInt(data['bestTimeMs']),
+      bestTimeMs: resolvedRanking,
+      firstClearTimeMs: resolvedFirst,
+      personalBestTimeMs: resolvedPersonal,
       moves: readInt(data['moves']),
       stars: readInt(data['stars']),
       updatedAt: ts is Timestamp ? ts.toDate() : null,

@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models/user_model.dart';
+import 'services/coin_reward_overlay_service.dart';
 import 'shop/coin_pack.dart';
 
 class CoinSkinDef {
@@ -83,6 +84,20 @@ class LevelRewardGrantResult {
   final bool firstCompletion;
 }
 
+class LegacyLevelRewardGap {
+  const LegacyLevelRewardGap({
+    required this.levelId,
+    required this.completedAt,
+    required this.bestTimeMs,
+    required this.personalBestTimeMs,
+  });
+
+  final String levelId;
+  final DateTime? completedAt;
+  final int bestTimeMs;
+  final int personalBestTimeMs;
+}
+
 class CoinsService extends ChangeNotifier {
   CoinsService(this._prefs) {
     _coins = _prefs.getInt(_coinsKey) ?? 0;
@@ -120,6 +135,8 @@ class CoinsService extends ChangeNotifier {
   static const String _ownedTrailsKey = 'coins_owned_trails';
   static const String _selectedTrailKey = 'coins_selected_trail';
   static const String _claimedLevelRewardsKey = 'coins_claimed_level_rewards';
+  static const String _claimedLevelRewardsPrefix =
+      'coins_claimed_level_rewards:';
   static const String _unsyncedDeltaKey = 'coins_unsynced_delta_v1';
   static const String _lastSyncedUidKey = 'coins_last_synced_uid_v1';
   static const String _unsyncedEarnedKey = 'coins_unsynced_earned_v1';
@@ -160,6 +177,7 @@ class CoinsService extends ChangeNotifier {
   int _unsyncedLevelsCompleted = 0;
   String? _lastSyncedUid;
   String? _activeCosmeticUid;
+  String? _activeRewardsUid;
 
   StreamSubscription<User?>? _authSub;
   Timer? _remoteRetryTimer;
@@ -205,6 +223,7 @@ class CoinsService extends ChangeNotifier {
     _unsyncedLifetimeEarned += amount;
     await _persistCoinSyncState();
     _emitCoinUpdate();
+    _triggerCoinRewardAnimation(amount);
     unawaited(_syncCoinsToRemoteSilently());
   }
 
@@ -245,12 +264,10 @@ class CoinsService extends ChangeNotifier {
     _unsyncedDelta += amount;
     _unsyncedLifetimeEarned += amount;
     _unsyncedLevelsCompleted += 1;
-    await _prefs.setStringList(
-      _claimedLevelRewardsKey,
-      _claimedLevelRewards.toList()..sort(),
-    );
+    await _persistClaimedLevelRewardsScoped();
     await _persistCoinSyncState();
     _emitCoinUpdate();
+    _triggerCoinRewardAnimation(amount);
     unawaited(_syncCoinsToRemoteSilently());
     return true;
   }
@@ -266,6 +283,7 @@ class CoinsService extends ChangeNotifier {
     _unsyncedLevelsCompleted += 1;
     await _persistCoinSyncState();
     _emitCoinUpdate();
+    _triggerCoinRewardAnimation(total);
     unawaited(_syncCoinsToRemoteSilently());
     return total;
   }
@@ -276,29 +294,56 @@ class CoinsService extends ChangeNotifier {
   }) async {
     final normalizedLevelId = levelId.trim();
     if (normalizedLevelId.isEmpty) {
-      return const LevelRewardGrantResult(coinsAwarded: 0, firstCompletion: false);
+      return const LevelRewardGrantResult(
+          coinsAwarded: 0, firstCompletion: false);
     }
     final bonus = perfectCompletion ? perfectLevelBonus : 0;
     final total = levelClearReward + bonus;
     if (total <= 0) {
-      return const LevelRewardGrantResult(coinsAwarded: 0, firstCompletion: false);
+      return const LevelRewardGrantResult(
+          coinsAwarded: 0, firstCompletion: false);
     }
 
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       if (_claimedLevelRewards.contains(normalizedLevelId)) {
-        return const LevelRewardGrantResult(coinsAwarded: 0, firstCompletion: false);
+        if (kDebugMode) {
+          debugPrint(
+            '[coins][level-reward] first clear skipped (already claimed) '
+            'uid=guest level=$normalizedLevelId',
+          );
+          debugPrint(
+            '[coins][level-reward] perfect bonus skipped '
+            'uid=guest level=$normalizedLevelId reason=already_claimed',
+          );
+        }
+        return const LevelRewardGrantResult(
+            coinsAwarded: 0, firstCompletion: false);
       }
-      _claimedLevelRewards = <String>{..._claimedLevelRewards, normalizedLevelId};
+      _claimedLevelRewards = <String>{
+        ..._claimedLevelRewards,
+        normalizedLevelId
+      };
       _coins += total;
       _unsyncedDelta += total;
       _unsyncedLifetimeEarned += total;
-      await _prefs.setStringList(
-        _claimedLevelRewardsKey,
-        _claimedLevelRewards.toList()..sort(),
-      );
+      await _persistClaimedLevelRewardsScoped();
       await _persistCoinSyncState();
       _emitCoinUpdate();
+      _triggerCoinRewardAnimation(total);
+      if (kDebugMode) {
+        debugPrint(
+          '[coins][level-reward] first clear granted uid=guest '
+          'level=$normalizedLevelId coins=$total perfect=$perfectCompletion',
+        );
+        debugPrint(
+          perfectCompletion
+              ? '[coins][level-reward] perfect bonus granted '
+                  'uid=guest level=$normalizedLevelId bonus=$bonus'
+              : '[coins][level-reward] perfect bonus skipped '
+                  'uid=guest level=$normalizedLevelId reason=not_perfect',
+        );
+      }
       return LevelRewardGrantResult(coinsAwarded: total, firstCompletion: true);
     }
 
@@ -306,63 +351,210 @@ class CoinsService extends ChangeNotifier {
     final userRef = _usersDocRef(uid);
     final completedRef =
         userRef.collection('completed_levels').doc(normalizedLevelId);
+    final rewardRef =
+        userRef.collection('level_rewards').doc(normalizedLevelId);
 
     var awardedCoins = 0;
     var firstCompletion = false;
-    await _activeFirestore().runTransaction((tx) async {
-      final completedSnap = await tx.get(completedRef);
-      if (completedSnap.exists) {
-        firstCompletion = false;
-        awardedCoins = 0;
-        return;
+    Future<void> attemptGrant() async {
+      await _activeFirestore().runTransaction((tx) async {
+        final rewardSnap = await tx.get(rewardRef);
+        if (rewardSnap.exists) {
+          firstCompletion = false;
+          awardedCoins = 0;
+          return;
+        }
+        firstCompletion = true;
+        awardedCoins = total;
+        tx.set(
+          rewardRef,
+          <String, dynamic>{
+            'levelId': normalizedLevelId,
+            'coinsAwarded': total,
+            'awardedAt': FieldValue.serverTimestamp(),
+            'source': 'level_first_completion',
+          },
+          SetOptions(merge: true),
+        );
+        tx.set(
+          completedRef,
+          <String, dynamic>{
+            'completed': true,
+            'levelId': normalizedLevelId,
+            'firstCompletedAt': FieldValue.serverTimestamp(),
+            'updatedAt': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
+        tx.set(
+          userRef,
+          <String, dynamic>{
+            'uid': uid,
+            'coins': FieldValue.increment(total),
+            'lifetimeCoinsEarned': FieldValue.increment(total),
+            'updatedAt': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
+      });
+    }
+
+    Object? lastError;
+    StackTrace? lastStackTrace;
+    for (var attempt = 1; attempt <= 2; attempt++) {
+      try {
+        await attemptGrant();
+        lastError = null;
+        lastStackTrace = null;
+        break;
+      } catch (e, st) {
+        lastError = e;
+        lastStackTrace = st;
+        if (kDebugMode) {
+          debugPrint(
+            '[coins][level-reward] transaction failure uid=$uid '
+            'level=$normalizedLevelId attempt=$attempt error=$e',
+          );
+        }
       }
-      firstCompletion = true;
-      awardedCoins = total;
-      tx.set(
-        completedRef,
-        <String, dynamic>{
-          'completed': true,
-          'levelId': normalizedLevelId,
-          'firstCompletedAt': FieldValue.serverTimestamp(),
-          'updatedAt': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
-      );
-      tx.set(
-        userRef,
-        <String, dynamic>{
-          'uid': uid,
-          'coins': FieldValue.increment(total),
-          'lifetimeCoinsEarned': FieldValue.increment(total),
-          'updatedAt': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
-      );
-    });
+    }
+    if (lastError != null) {
+      if (kDebugMode) {
+        debugPrint(
+          '[coins][level-reward] transaction failure final uid=$uid '
+          'level=$normalizedLevelId',
+        );
+      }
+      Error.throwWithStackTrace(
+          lastError, lastStackTrace ?? StackTrace.current);
+    }
 
     if (!firstCompletion || awardedCoins <= 0) {
-      return const LevelRewardGrantResult(coinsAwarded: 0, firstCompletion: false);
+      if (kDebugMode) {
+        debugPrint(
+          '[coins][level-reward] first clear skipped (already claimed) '
+          'uid=$uid level=$normalizedLevelId '
+          'firstCompletion=$firstCompletion awarded=$awardedCoins',
+        );
+        debugPrint(
+          '[coins][level-reward] perfect bonus skipped '
+          'uid=$uid level=$normalizedLevelId reason=already_claimed',
+        );
+      }
+      return const LevelRewardGrantResult(
+          coinsAwarded: 0, firstCompletion: false);
     }
 
     _claimedLevelRewards = <String>{..._claimedLevelRewards, normalizedLevelId};
     _coins += awardedCoins;
-    await _prefs.setStringList(
-      _claimedLevelRewardsKey,
-      _claimedLevelRewards.toList()..sort(),
-    );
+    await _persistClaimedLevelRewardsScoped();
     await _prefs.setInt(_coinsKey, _coins);
     _emitCoinUpdate();
+    _triggerCoinRewardAnimation(awardedCoins);
+    if (kDebugMode) {
+      debugPrint(
+        '[coins][level-reward] first clear granted uid=$uid '
+        'level=$normalizedLevelId coins=$awardedCoins perfect=$perfectCompletion',
+      );
+      debugPrint(
+        perfectCompletion
+            ? '[coins][level-reward] perfect bonus granted '
+                'uid=$uid level=$normalizedLevelId bonus=$bonus'
+            : '[coins][level-reward] perfect bonus skipped '
+                'uid=$uid level=$normalizedLevelId reason=not_perfect',
+      );
+    }
     return LevelRewardGrantResult(
       coinsAwarded: awardedCoins,
       firstCompletion: true,
     );
   }
 
+  Future<List<LegacyLevelRewardGap>> detectLegacyLevelRewardGaps({
+    String? uid,
+  }) async {
+    final resolvedUid =
+        (uid ?? FirebaseAuth.instance.currentUser?.uid ?? '').trim();
+    if (resolvedUid.isEmpty) return const <LegacyLevelRewardGap>[];
+    final userRef = _usersDocRef(resolvedUid);
+    final completedSnap = await userRef.collection('completed_levels').get();
+    final rewardSnap = await userRef.collection('level_rewards').get();
+    final rewardedLevelIds = rewardSnap.docs.map((d) => d.id).toSet();
+    final gaps = <LegacyLevelRewardGap>[];
+    for (final doc in completedSnap.docs) {
+      final levelId = doc.id.trim();
+      if (levelId.isEmpty || rewardedLevelIds.contains(levelId)) continue;
+      final data = doc.data();
+      final completedAtRaw = data['completedAt'] ?? data['firstCompletedAt'];
+      gaps.add(
+        LegacyLevelRewardGap(
+          levelId: levelId,
+          completedAt:
+              completedAtRaw is Timestamp ? completedAtRaw.toDate() : null,
+          bestTimeMs: _readRemoteInt(data, 'bestTimeMs'),
+          personalBestTimeMs: _readRemoteInt(data, 'personalBestTimeMs'),
+        ),
+      );
+    }
+    gaps.sort((a, b) => a.levelId.compareTo(b.levelId));
+    if (kDebugMode) {
+      debugPrint(
+        '[coins][legacy-reconcile] detect uid=$resolvedUid '
+        'completed=${completedSnap.docs.length} rewards=${rewardSnap.docs.length} '
+        'gaps=${gaps.length}',
+      );
+    }
+    return gaps;
+  }
+
+  Future<int> repairLegacyLevelRewardMarkers({
+    required Iterable<String> levelIds,
+    String? uid,
+    String source = 'legacy_manual_reconcile',
+  }) async {
+    final resolvedUid =
+        (uid ?? FirebaseAuth.instance.currentUser?.uid ?? '').trim();
+    if (resolvedUid.isEmpty) return 0;
+    final normalized = levelIds
+        .map((id) => id.trim())
+        .where((id) => id.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort();
+    if (normalized.isEmpty) return 0;
+    final userRef = _usersDocRef(resolvedUid);
+    final batch = _activeFirestore().batch();
+    var writes = 0;
+    for (final levelId in normalized) {
+      final rewardRef = userRef.collection('level_rewards').doc(levelId);
+      batch.set(
+        rewardRef,
+        <String, dynamic>{
+          'levelId': levelId,
+          'coinsAwarded': 0,
+          'awardedAt': FieldValue.serverTimestamp(),
+          'source': source,
+          'legacyReconciled': true,
+        },
+        SetOptions(merge: true),
+      );
+      writes += 1;
+    }
+    await batch.commit();
+    if (kDebugMode) {
+      debugPrint(
+        '[coins][legacy-reconcile] repair uid=$resolvedUid markers=$writes '
+        'source=$source',
+      );
+    }
+    return writes;
+  }
+
   Future<BuyCoinPackResult> buyCoinPack(CoinPack pack) async {
     return const BuyCoinPackResult(
-      status: BuyCoinPackStatus.comingSoon,
+      status: BuyCoinPackStatus.failed,
       addedCoins: 0,
-      message: 'Purchases coming soon',
+      message: 'IAP is handled by IapService',
     );
   }
 
@@ -375,8 +567,106 @@ class CoinsService extends ChangeNotifier {
     _unsyncedLifetimePurchased += amount;
     await _persistCoinSyncState();
     _emitCoinUpdate();
+    _triggerCoinRewardAnimation(amount,
+        visualOverride: _visualCoinsForPurchase(amount));
     unawaited(_syncCoinsToRemoteSilently());
     return amount;
+  }
+
+  Future<int> grantVerifiedCoinPackPurchase({
+    required CoinPack pack,
+    required String productId,
+    required String purchaseId,
+    required String purchaseStatus,
+    String verificationData = '',
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return 0;
+
+    final amount =
+        pack.totalCoins > 0 ? pack.totalCoins : (pack.coins + pack.bonusCoins);
+    if (amount <= 0) return 0;
+
+    final uid = user.uid;
+    final safePurchaseId = purchaseId.trim().isEmpty
+        ? '${productId}_${DateTime.now().millisecondsSinceEpoch}'
+        : purchaseId.trim();
+    final refId = _sanitizeDocId(safePurchaseId);
+
+    final userRef = _usersDocRef(uid);
+    final purchaseRef = userRef.collection('purchases').doc(refId);
+    final walletRef = userRef.collection('wallet_transactions').doc(refId);
+
+    var credited = 0;
+    await _activeFirestore().runTransaction((tx) async {
+      final purchaseSnap = await tx.get(purchaseRef);
+      if (purchaseSnap.exists) {
+        credited = 0;
+        return;
+      }
+      credited = amount;
+      tx.set(
+        userRef,
+        <String, dynamic>{
+          'uid': uid,
+          'coins': FieldValue.increment(amount),
+          'lifetimeCoinsPurchased': FieldValue.increment(amount),
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+      tx.set(
+        purchaseRef,
+        <String, dynamic>{
+          'purchaseId': refId,
+          'status': purchaseStatus,
+          'productId': productId,
+          'packId': pack.id,
+          'coins': pack.coins,
+          'bonusCoins': pack.bonusCoins,
+          'totalCoins': amount,
+          'source': 'iap_coin_pack',
+          'verificationData': verificationData,
+          'createdAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+      tx.set(
+        walletRef,
+        <String, dynamic>{
+          'type': 'purchase',
+          'source': 'iap_coin_pack',
+          'amount': amount,
+          'referenceId': refId,
+          'packId': pack.id,
+          'productId': productId,
+          'coins': pack.coins,
+          'bonusCoins': pack.bonusCoins,
+          'totalCoins': amount,
+          'createdAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+    });
+
+    if (credited > 0) {
+      _coins += credited;
+      await _prefs.setInt(_coinsKey, _coins);
+      _emitCoinUpdate();
+      _triggerCoinRewardAnimation(
+        credited,
+        visualOverride: _visualCoinsForPurchase(credited),
+      );
+    }
+    return credited;
+  }
+
+  String _sanitizeDocId(String value) {
+    final cleaned = value.replaceAll('/', '_').trim();
+    if (cleaned.isEmpty) return '';
+    if (cleaned.length <= 140) return cleaned;
+    return cleaned.substring(0, 140);
   }
 
   Future<void> updateProfileProgress({
@@ -405,7 +695,8 @@ class CoinsService extends ChangeNotifier {
           payload['totalPlayTimeSeconds'] =
               FieldValue.increment(playTimeSecondsDelta);
         }
-        if (highestLevelReached != null && highestLevelReached > currentHighest) {
+        if (highestLevelReached != null &&
+            highestLevelReached > currentHighest) {
           payload['highestLevelReached'] = highestLevelReached;
         }
         if (solveMs != null && solveMs > 0) {
@@ -552,9 +843,20 @@ class CoinsService extends ChangeNotifier {
     if (_activeCosmeticUid != user.uid) {
       await _loadUserScopedCosmeticState(user.uid);
     }
+    if (_activeRewardsUid != user.uid) {
+      await _loadUserScopedRewardState(user.uid);
+    }
     await _ensureUserDocument(user.uid);
     await _hydrateInventoryFromRemote(user.uid);
     await _mergeLocalWithRemote(user.uid);
+  }
+
+  Future<void> _loadUserScopedRewardState(String uid) async {
+    _activeRewardsUid = uid;
+    final scoped = _prefs.getStringList(_claimedLevelRewardsKeyForUid(uid));
+    final legacy = _prefs.getStringList(_claimedLevelRewardsKey);
+    _claimedLevelRewards = (scoped ?? legacy ?? const <String>[]).toSet();
+    await _persistClaimedLevelRewardsScoped();
   }
 
   Future<void> _loadUserScopedCosmeticState(String uid) async {
@@ -571,8 +873,9 @@ class CoinsService extends ChangeNotifier {
     final legacySelectedTrail = _prefs.getString(_selectedTrailKey);
     final legacySkinMapRaw = _prefs.getString(_skinAssetMapKey);
 
-    _ownedSkins = (scopedOwnedSkins ?? legacyOwnedSkins ?? <String>[_defaultSkinId])
-        .toSet();
+    _ownedSkins =
+        (scopedOwnedSkins ?? legacyOwnedSkins ?? <String>[_defaultSkinId])
+            .toSet();
     if (_ownedSkins.isEmpty) {
       _ownedSkins = <String>{_defaultSkinId};
     } else {
@@ -634,7 +937,8 @@ class CoinsService extends ChangeNotifier {
       final userSnap = await userRef.get();
       final userData = userSnap.data() ?? const <String, dynamic>{};
 
-      final remoteOwnedSkinsSnap = await userRef.collection('owned_skins').get();
+      final remoteOwnedSkinsSnap =
+          await userRef.collection('owned_skins').get();
       final remoteOwnedTrailsSnap =
           await userRef.collection('owned_trails').get();
 
@@ -736,10 +1040,18 @@ class CoinsService extends ChangeNotifier {
         if (authEmail.isNotEmpty && existingEmail.isEmpty) {
           authPatch['email'] = authEmail;
         }
+        final existingEmailLower =
+            (existing['emailLowercase'] as String?)?.trim() ?? '';
+        if (authEmail.isNotEmpty &&
+            (existingEmailLower.isEmpty ||
+                existingEmailLower != authEmail.toLowerCase())) {
+          authPatch['emailLowercase'] = authEmail.toLowerCase();
+        }
         if (authPhoto.isNotEmpty && existingPhoto.isEmpty) {
           authPatch['photoUrl'] = authPhoto;
         }
-        final existingUsername = (existing['username'] as String?)?.trim() ?? '';
+        final existingUsername =
+            (existing['username'] as String?)?.trim() ?? '';
         final existingLower =
             (existing['usernameLowercase'] as String?)?.trim() ?? '';
         if (existingUsername.isNotEmpty && existingLower.isEmpty) {
@@ -759,27 +1071,30 @@ class CoinsService extends ChangeNotifier {
             '[coins] user doc already exists users/$uid db=${_activeFirestoreName()}',
           );
         }
+        final merged = <String, dynamic>{...existing, ...missing};
+        await _syncUserLookupIndexes(uid: uid, userData: merged);
         await _ensureOwnedDefaultsRemote(uid);
         return;
       }
-      await ref.set(
-        UserModel.defaultFirestore(
-          uid: uid,
-          createdAt: ts,
-          updatedAt: ts,
-        )
-          ..['coins'] = max(0, _coins)
-          ..['playerName'] = (authUser?.displayName ?? '').trim().isNotEmpty
-              ? authUser!.displayName!.trim()
-              : 'Player'
-          ..['email'] = (authUser?.email ?? '').trim()
-          ..['photoUrl'] = (authUser?.photoURL ?? '').trim(),
-      );
+      final freshPayload = UserModel.defaultFirestore(
+        uid: uid,
+        createdAt: ts,
+        updatedAt: ts,
+      )
+        ..['coins'] = max(0, _coins)
+        ..['playerName'] = (authUser?.displayName ?? '').trim().isNotEmpty
+            ? authUser!.displayName!.trim()
+            : 'Player'
+        ..['email'] = (authUser?.email ?? '').trim()
+        ..['emailLowercase'] = (authUser?.email ?? '').trim().toLowerCase()
+        ..['photoUrl'] = (authUser?.photoURL ?? '').trim();
+      await ref.set(freshPayload);
       if (kDebugMode) {
         debugPrint(
           '[coins] user doc created users/$uid db=${_activeFirestoreName()}',
         );
       }
+      await _syncUserLookupIndexes(uid: uid, userData: freshPayload);
       await _ensureOwnedDefaultsRemote(uid);
     } catch (e) {
       if (kDebugMode) {
@@ -800,17 +1115,15 @@ class CoinsService extends ChangeNotifier {
           _readRemoteInt(snap.data(), 'lifetimeCoinsPurchased');
       final remoteLevels = _readRemoteInt(snap.data(), 'totalLevelsCompleted');
       final isFirstSyncForUid = _lastSyncedUid != uid;
-      final target = (isFirstSyncForUid
-              ? (remoteCoins + max(0, _coins))
-              : max(0, remoteCoins + _unsyncedDelta))
-          .toInt();
+      final target =
+          max(0, remoteCoins + (isFirstSyncForUid ? 0 : _unsyncedDelta))
+              .toInt();
       final now = FieldValue.serverTimestamp();
       await docRef.set(<String, dynamic>{
         'uid': uid,
         'coins': target,
         'lifetimeCoinsEarned': remoteEarned + _unsyncedLifetimeEarned,
-        'lifetimeCoinsPurchased':
-            remotePurchased + _unsyncedLifetimePurchased,
+        'lifetimeCoinsPurchased': remotePurchased + _unsyncedLifetimePurchased,
         'totalLevelsCompleted': remoteLevels + _unsyncedLevelsCompleted,
         'equippedSkinId': _remoteSkinId(_selectedSkin),
         'equippedTrailId': _remoteTrailId(_selectedTrail),
@@ -829,6 +1142,12 @@ class CoinsService extends ChangeNotifier {
       _remoteRetryTimer?.cancel();
       _emitCoinUpdate();
       if (kDebugMode) {
+        if (isFirstSyncForUid) {
+          debugPrint(
+            '[coins] first sync for uid=$uid uses remote source of truth '
+            '(no cross-user local carryover)',
+          );
+        }
         debugPrint(
           '[coins] merge sync OK uid=$uid coins=$_coins db=${_activeFirestoreName()}',
         );
@@ -860,8 +1179,7 @@ class CoinsService extends ChangeNotifier {
         'uid': user.uid,
         'coins': target,
         'lifetimeCoinsEarned': remoteEarned + _unsyncedLifetimeEarned,
-        'lifetimeCoinsPurchased':
-            remotePurchased + _unsyncedLifetimePurchased,
+        'lifetimeCoinsPurchased': remotePurchased + _unsyncedLifetimePurchased,
         'totalLevelsCompleted': remoteLevels + _unsyncedLevelsCompleted,
         'equippedSkinId': _remoteSkinId(_selectedSkin),
         'equippedTrailId': _remoteTrailId(_selectedTrail),
@@ -914,6 +1232,31 @@ class CoinsService extends ChangeNotifier {
   void _emitCoinUpdate() {
     _coinsController.add(_coins);
     notifyListeners();
+  }
+
+  void _triggerCoinRewardAnimation(int amount, {int? visualOverride}) {
+    if (amount <= 0) return;
+    final visual = visualOverride ?? _visualCoinsForReward(amount);
+    unawaited(
+      CoinRewardOverlayService.instance.showCoinRewardAnimation(
+        amount: amount,
+        visualCount: visual,
+      ),
+    );
+  }
+
+  int _visualCoinsForReward(int amount) {
+    if (amount <= 30) return 12;
+    if (amount <= 200) return 14;
+    if (amount <= 1200) return 16;
+    return 18;
+  }
+
+  int _visualCoinsForPurchase(int amount) {
+    if (amount <= 1200) return 16;
+    if (amount <= 6500) return 18;
+    if (amount <= 14000) return 20;
+    return 24;
   }
 
   Future<void> _updateEquippedRemote({
@@ -1023,6 +1366,43 @@ class CoinsService extends ChangeNotifier {
     }
   }
 
+  Future<void> _syncUserLookupIndexes({
+    required String uid,
+    required Map<String, dynamic> userData,
+  }) async {
+    try {
+      final username = (userData['username'] as String?)?.trim() ?? '';
+      final usernameLower = username.toLowerCase();
+      if (usernameLower.isNotEmpty) {
+        await _activeFirestore().collection('usernames').doc(usernameLower).set(
+          <String, dynamic>{
+            'uid': uid,
+            'username': username,
+            'updatedAt': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
+      }
+
+      final emailRaw = (userData['email'] as String?)?.trim() ?? '';
+      final emailLower = emailRaw.toLowerCase();
+      if (emailLower.isNotEmpty && emailLower.contains('@')) {
+        await _activeFirestore().collection('emails').doc(emailLower).set(
+          <String, dynamic>{
+            'uid': uid,
+            'email': emailRaw,
+            'updatedAt': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[coins] sync user lookup indexes failed uid=$uid: $e');
+      }
+    }
+  }
+
   DocumentReference<Map<String, dynamic>> _usersDocRef(String uid) {
     return _activeFirestore().collection('users').doc(uid);
   }
@@ -1057,7 +1437,8 @@ class CoinsService extends ChangeNotifier {
       final value = entry.value.trim();
       if (value.isEmpty) continue;
       final isAsset = value.startsWith('assets/');
-      final isHttp = value.startsWith('http://') || value.startsWith('https://');
+      final isHttp =
+          value.startsWith('http://') || value.startsWith('https://');
       final isData = value.startsWith('data:image');
       if (isAsset || isData) continue;
 
@@ -1089,6 +1470,19 @@ class CoinsService extends ChangeNotifier {
   String _ownedTrailsKeyForUid(String uid) => 'ownedTrails_$uid';
   String _selectedTrailKeyForUid(String uid) => 'equippedTrail_$uid';
   String _skinAssetMapKeyForUid(String uid) => 'skinAssetMap_$uid';
+  String _claimedLevelRewardsKeyForUid(String uid) =>
+      '$_claimedLevelRewardsPrefix$uid';
+
+  Future<void> _persistClaimedLevelRewardsScoped() async {
+    final sorted = _claimedLevelRewards.toList()..sort();
+    final rewardsUid = _activeRewardsUid?.trim() ?? '';
+    if (rewardsUid.isEmpty) {
+      await _prefs.setStringList(_claimedLevelRewardsKey, sorted);
+      return;
+    }
+    await _prefs.setStringList(
+        _claimedLevelRewardsKeyForUid(rewardsUid), sorted);
+  }
 
   Future<void> _persistOwnedSkinsScoped() async {
     await _prefs.setStringList(
@@ -1109,7 +1503,8 @@ class CoinsService extends ChangeNotifier {
   }
 
   Future<void> _persistSelectedTrailScoped() async {
-    await _prefs.setString(_selectedTrailKeyForUid(_stateUid()), _selectedTrail);
+    await _prefs.setString(
+        _selectedTrailKeyForUid(_stateUid()), _selectedTrail);
   }
 
   Future<void> _persistSkinAssetMapScoped() async {
@@ -1157,7 +1552,8 @@ class CoinsService extends ChangeNotifier {
     final isLocalhost = host == 'localhost' || host == '127.0.0.1';
     if (isLocalhost) {
       final canonicalId = _canonicalSkinIdFromAny(skinId);
-      final encoded = Uri.encodeComponent('skins/$canonicalId/$canonicalId.png');
+      final encoded =
+          Uri.encodeComponent('skins/$canonicalId/$canonicalId.png');
       return 'https://firebasestorage.googleapis.com/v0/b/$_firebaseStorageBucket/o/$encoded?alt=media';
     }
 
@@ -1187,7 +1583,8 @@ class CoinsService extends ChangeNotifier {
 
     if (lower.startsWith('skins_low_renders/')) {
       final canonicalId = _canonicalSkinIdFromAny(skinId);
-      final encoded = Uri.encodeComponent('skins/$canonicalId/$canonicalId.png');
+      final encoded =
+          Uri.encodeComponent('skins/$canonicalId/$canonicalId.png');
       return 'https://firebasestorage.googleapis.com/v0/b/$_firebaseStorageBucket/o/$encoded?alt=media';
     }
 

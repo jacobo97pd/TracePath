@@ -1,7 +1,7 @@
 name: zip_path_flutter
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.0.5+7
+version: 1.0.5+17
 
 environment:
   sdk: ^3.5.4
@@ -24,6 +24,7 @@ dependencies:
   firebase_storage: ^12.3.0
   flutter_cache_manager: ^3.4.1
   in_app_purchase: ^3.2.0
+  google_mobile_ads: ^5.2.0
 
 dev_dependencies:
   flutter_test:
@@ -77,4 +78,7 @@ flutter:
     - assets/shop/icons/
     - assets/ui/cards/
     - assets/skins/
+    - assets/trails/
+    - assets/trails/comic_spiderverse/
+    - assets/trails/urban_graffiti/
     - assets/vfx/smoke/

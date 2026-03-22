@@ -7,11 +7,17 @@ class CoinPackCard extends StatelessWidget {
     super.key,
     required this.pack,
     required this.assetPath,
+    required this.priceText,
+    required this.enabled,
+    required this.loading,
     required this.onBuy,
   });
 
   final CoinPack pack;
   final String assetPath;
+  final String priceText;
+  final bool enabled;
+  final bool loading;
   final VoidCallback onBuy;
 
   @override
@@ -19,9 +25,8 @@ class CoinPackCard extends StatelessWidget {
     final title = pack.title.trim().isEmpty ? 'Coin Pack' : pack.title;
     final description = pack.description.trim();
     final hasBonus = pack.bonusCoins > 0;
-    final effectiveTotal = pack.totalCoins > 0
-        ? pack.totalCoins
-        : (pack.coins + pack.bonusCoins);
+    final effectiveTotal =
+        pack.totalCoins > 0 ? pack.totalCoins : (pack.coins + pack.bonusCoins);
     final tag = pack.tag.trim();
     final tagLower = tag.toLowerCase();
     final isBestValue = tagLower == 'best value';
@@ -32,12 +37,14 @@ class CoinPackCard extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final compact = constraints.maxHeight < 250;
-        final imageHeight = compact ? 82.0 : 98.0;
+        final compact = constraints.maxHeight < 310;
+        final imageHeight = compact ? 92.0 : 124.0;
         final titleSize = compact ? 12.0 : 13.0;
         final coinsSize = compact ? 14.0 : 15.0;
         final bonusSize = compact ? 10.0 : 11.0;
-        final buttonHeight = compact ? 30.0 : 34.0;
+        final buttonHeight = compact ? 28.0 : 34.0;
+        final verticalGap = compact ? 4.0 : 6.0;
+        final canShowSecondaryText = !compact && constraints.maxHeight >= 340;
         return Container(
           decoration: BoxDecoration(
             color: const Color(0xFF1B2538),
@@ -66,7 +73,7 @@ class CoinPackCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                padding: EdgeInsets.fromLTRB(10, compact ? 8 : 10, 10, 0),
                 child: Stack(
                   children: [
                     ClipRRect(
@@ -90,93 +97,104 @@ class CoinPackCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: titleSize,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    if (!compact && description.isNotEmpty) ...[
-                      const SizedBox(height: 2),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                      12, compact ? 8 : 10, 12, compact ? 8 : 10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        description,
+                        title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF9EB3D8),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 6),
-                    Text(
-                      '${pack.coins} Coins',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: coinsSize,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    if (hasBonus) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        '+${pack.bonusCoins} Bonus',
                         style: TextStyle(
-                          color: const Color(0xFF6DE6A6),
-                          fontSize: bonusSize,
+                          color: Colors.white,
+                          fontSize: titleSize,
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-                      if (!compact) ...[
+                      if (canShowSecondaryText && description.isNotEmpty) ...[
                         const SizedBox(height: 2),
                         Text(
-                          'Total: $effectiveTotal',
+                          description,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            color: Color(0xFF9FB0D3),
+                            color: Color(0xFF9EB3D8),
                             fontSize: 11,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
-                    ],
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      width: double.infinity,
-                      height: buttonHeight,
-                      child: ElevatedButton(
-                        onPressed: onBuy,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF3B82F6),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          elevation: 0,
-                          textStyle: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: compact ? 11 : 12,
-                          ),
-                        ),
-                        child: Text(
-                          pack.priceLabel.trim().isEmpty
-                              ? 'Coming soon'
-                              : pack.priceLabel,
+                      SizedBox(height: verticalGap),
+                      Text(
+                        '${pack.coins} Coins',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: coinsSize,
+                          fontWeight: FontWeight.w900,
                         ),
                       ),
-                    ),
-                  ],
+                      if (hasBonus) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          '+${pack.bonusCoins} Bonus',
+                          style: TextStyle(
+                            color: const Color(0xFF6DE6A6),
+                            fontSize: bonusSize,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        if (canShowSecondaryText) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            'Total: $effectiveTotal',
+                            style: const TextStyle(
+                              color: Color(0xFF9FB0D3),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ],
+                      const Spacer(),
+                      SizedBox(
+                        width: double.infinity,
+                        height: buttonHeight,
+                        child: ElevatedButton(
+                          onPressed: (enabled && !loading) ? onBuy : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF3B82F6),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            elevation: 0,
+                            textStyle: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: compact ? 11 : 12,
+                            ),
+                          ),
+                          child: loading
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Text(priceText.trim().isEmpty
+                                  ? 'Unavailable'
+                                  : priceText),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -242,10 +260,14 @@ class _CoinPackImage extends StatelessWidget {
     if (path.isEmpty || !path.startsWith('assets/')) {
       return const _ImageFallback();
     }
-    return Image.asset(
-      path,
-      fit: BoxFit.contain,
-      errorBuilder: (_, __, ___) => const _ImageFallback(),
+    return Transform.scale(
+      scale: 1.12,
+      child: Image.asset(
+        path,
+        fit: BoxFit.contain,
+        alignment: Alignment.center,
+        errorBuilder: (_, __, ___) => const _ImageFallback(),
+      ),
     );
   }
 }

@@ -58,7 +58,12 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 22),
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  14,
+                  16,
+                  22 + _homeBottomClearance(context),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -91,6 +96,7 @@ class HomeScreen extends StatelessWidget {
                     _QuickAccessGrid(
                       onDaily: () => context.go('/daily'),
                       onLevels: () => context.go('/play'),
+                      onSocial: () => context.go('/social'),
                       onDuelFriends: () => _showInviteFriendsPopup(context),
                     ),
                     const SizedBox(height: 22),
@@ -209,6 +215,11 @@ class HomeScreen extends StatelessWidget {
       return value;
     }
     return '';
+  }
+
+  double _homeBottomClearance(BuildContext context) {
+    final inset = MediaQuery.of(context).padding.bottom;
+    return 96 + inset;
   }
 }
 
@@ -556,11 +567,13 @@ class _QuickAccessGrid extends StatelessWidget {
   const _QuickAccessGrid({
     required this.onDaily,
     required this.onLevels,
+    required this.onSocial,
     required this.onDuelFriends,
   });
 
   final VoidCallback onDaily;
   final VoidCallback onLevels;
+  final VoidCallback onSocial;
   final VoidCallback onDuelFriends;
 
   @override
@@ -579,6 +592,13 @@ class _QuickAccessGrid extends StatelessWidget {
           title: 'Levels',
           subtitle: 'Choose any available level',
           onTap: onLevels,
+        ),
+        const SizedBox(height: 10),
+        _QuickCard(
+          icon: Icons.groups_rounded,
+          title: 'Social',
+          subtitle: 'Friends, inbox and multiplayer',
+          onTap: onSocial,
         ),
         const SizedBox(height: 10),
         _QuickCard(

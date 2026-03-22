@@ -41,9 +41,8 @@ class CoinPack {
     final coins = _readInt(data['coins']);
     final bonusCoins = _readInt(data['bonusCoins']);
     final totalCoinsRaw = _readInt(data['totalCoins']);
-    final totalCoins =
-        totalCoinsRaw > 0 ? totalCoinsRaw : (coins + bonusCoins);
-    final priceLabel = _readString(data['priceLabel']).ifEmpty('Coming soon');
+    final totalCoins = totalCoinsRaw > 0 ? totalCoinsRaw : (coins + bonusCoins);
+    final priceLabel = _readString(data['priceLabel']);
     final productIdAndroid = _readString(data['productIdAndroid']);
     final productIdIos = _readString(data['productIdIos']);
     final imagePath = _readString(data['imagePath']);

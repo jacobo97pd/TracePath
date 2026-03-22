@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -172,16 +173,21 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
     await PackLevelRepository.instance.loadPack(widget.packId);
     final total = await PackLevelRepository.instance.totalLevels(widget.packId);
     final continueIndex = _continueIndex(total);
+    final savedCurrent = widget.progressService.getCurrentLevelForPack(
+      widget.packId,
+      fallback: continueIndex,
+    );
+    final initialLevel = total <= 0 ? 1 : savedCurrent.clamp(1, total);
     final record =
-        await PackLevelRepository.instance.getLevel(widget.packId, continueIndex);
+        await PackLevelRepository.instance.getLevel(widget.packId, initialLevel);
     if (!mounted) return;
     setState(() {
       _totalLevels = total;
-      _selectedLevelIndex = continueIndex;
+      _selectedLevelIndex = initialLevel;
       _selectedRecord = record;
       _isLoading = false;
     });
-    _scheduleAutoScroll(continueIndex);
+    _scheduleAutoScroll(initialLevel);
     _scheduleChipReveal();
   }
 
@@ -190,7 +196,8 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
       return 1;
     }
     final highestCompleted = _highestSequentialCompleted(total);
-    return math.min(highestCompleted + 1, total);
+    final sequential = math.min(highestCompleted + 1, total);
+    return sequential.clamp(1, total);
   }
 
   int _highestSequentialCompleted(int total) {
@@ -241,71 +248,21 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
   }
 
   void _handleNodeTap(int levelIndex, bool unlocked) {
-    if (!unlocked) {
-      _showErrorPopup(
-        title: 'Level locked',
-        message: 'Complete the previous level to unlock this one.',
-      );
-      return;
-    }
     _selectLevel(levelIndex);
   }
 
-  Future<void> _showErrorPopup({
-    required String title,
-    required String message,
-  }) async {
-    if (!mounted) return;
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF131E31),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-            side: BorderSide(color: Colors.white.withOpacity(0.10)),
-          ),
-          title: Row(
-            children: [
-              const Icon(Icons.error_outline_rounded,
-                  color: Color(0xFFFF8A80)),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          content: Text(
-            message,
-            style: const TextStyle(
-              color: Color(0xFFB8C7E6),
-              fontSize: 14,
-              height: 1.35,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text(
-                'OK',
-                style: TextStyle(color: Color(0xFF8FC4FF)),
-              ),
-            ),
-          ],
-        );
-      },
+  void _playSelectedLevel() {
+    unawaited(
+      widget.progressService.setCurrentLevelForPack(
+        widget.packId,
+        _selectedLevelIndex,
+      ),
     );
+    context.go('/play/${widget.packId}/$_selectedLevelIndex');
   }
 
-  void _playSelectedLevel() {
-    context.go('/play/${widget.packId}/$_selectedLevelIndex');
+  void _openSelectedLevelRanking() {
+    context.push('/leaderboard/${widget.packId}/$_selectedLevelIndex');
   }
 
   bool _isCompleted(int levelIndex) {
@@ -329,7 +286,6 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
             .where(_isCompleted)
             .length;
         final continueIndex = _continueIndex(_totalLevels);
-        final selectedIsUnlocked = _selectedLevelIndex <= continueIndex;
         final currentNode = continueIndex;
 
         return Scaffold(
@@ -475,8 +431,9 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                     record: _selectedRecord,
                     levelIndex: _selectedLevelIndex,
                     accent: palette.accent,
-                    canPlay: selectedIsUnlocked,
-                    onPlay: selectedIsUnlocked ? _playSelectedLevel : null,
+                    canPlay: true,
+                    onPlay: _playSelectedLevel,
+                    onRanking: _openSelectedLevelRanking,
                     compact: _compact,
                   ),
                 ),
@@ -909,10 +866,15 @@ class _LevelMapNode extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: RadialGradient(
-          colors: [
-            if (unlocked) glowColor.withOpacity(current ? 0.28 : 0.18),
-            base,
-          ],
+          colors: unlocked
+              ? <Color>[
+                  glowColor.withOpacity(current ? 0.28 : 0.18),
+                  base,
+                ]
+              : <Color>[
+                  const Color(0xFF1A2433),
+                  base,
+                ],
         ),
         border: Border.all(
           color: completed
@@ -1013,6 +975,7 @@ class _SelectedLevelCard extends StatelessWidget {
     required this.accent,
     required this.canPlay,
     required this.onPlay,
+    required this.onRanking,
     required this.compact,
   });
 
@@ -1021,6 +984,7 @@ class _SelectedLevelCard extends StatelessWidget {
   final Color accent;
   final bool canPlay;
   final VoidCallback? onPlay;
+  final VoidCallback onRanking;
   final bool compact;
 
   @override
@@ -1110,19 +1074,38 @@ class _SelectedLevelCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          FilledButton(
-            onPressed: onPlay,
-            style: FilledButton.styleFrom(
-              backgroundColor: canPlay ? Colors.white : Colors.white24,
-              foregroundColor:
-                  canPlay ? const Color(0xFF0A1220) : Colors.white70,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FilledButton(
+                onPressed: onPlay,
+                style: FilledButton.styleFrom(
+                  backgroundColor: canPlay ? Colors.white : Colors.white24,
+                  foregroundColor:
+                      canPlay ? const Color(0xFF0A1220) : Colors.white70,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                ),
+                child: Text(canPlay ? 'Play' : 'Locked'),
               ),
-            ),
-            child: Text(canPlay ? 'Play' : 'Locked'),
+              const SizedBox(height: 8),
+              OutlinedButton(
+                onPressed: onRanking,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: BorderSide(color: Colors.white.withOpacity(0.26)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Text('Ranking'),
+              ),
+            ],
           ),
         ],
       ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'dart:async';
 import 'dart:io';
 
@@ -12,14 +13,19 @@ import 'app_theme.dart';
 import 'auth_gate.dart';
 import 'auth_service.dart';
 import 'campaign_screen.dart';
+import 'cards_collection_screen.dart';
 import 'coins_service.dart';
 import 'curate_batch_screen.dart';
 import 'daily_screen.dart';
 import 'game_screen.dart';
 import 'home_screen.dart';
+import 'live_duel_screen.dart';
+import 'friend_challenge_screen.dart';
 import 'editor/editor_page.dart';
 import 'editor/editor_nuevos_page.dart';
 import 'leaderboard_service.dart';
+import 'models/live_match.dart';
+import 'models/friend_challenge.dart';
 import 'nav_shell_scaffold.dart';
 import 'notification_service.dart';
 import 'profile_screen.dart';
@@ -37,6 +43,8 @@ import 'play_levels_screen.dart';
 import 'startup_splash_gate.dart';
 import 'storage_paths.dart';
 import 'pack_level_repository.dart';
+import 'services/ads_service.dart';
+import 'ui/components/coin_reward_overlay.dart';
 
 // Temporary diagnostics switch:
 // Set to true to skip notification initialization and isolate startup issues in release.
@@ -45,6 +53,14 @@ const bool kDisableNotificationsForReleaseDiagnostics = true;
 Future<void> main() async {
   debugPrint('[Startup] main start');
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await MobileAds.instance.initialize();
+    debugPrint('[ADS] MobileAds initialized');
+    unawaited(AdsService.instance.loadRewardedAd());
+  } catch (e, st) {
+    debugPrint('[ADS] MobileAds init failed: $e');
+    debugPrintStack(stackTrace: st);
+  }
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
@@ -78,7 +94,7 @@ Future<void> main() async {
   await LevelExportRegistry.instance.initialize(basePath: exportBasePath);
   await PackLevelRepository.instance.loadPack('all');
 
-  final shouldSkipNotifications = kDisableNotificationsForReleaseDiagnostics;
+  const shouldSkipNotifications = kDisableNotificationsForReleaseDiagnostics;
   if (shouldSkipNotifications) {
     debugPrint(
       '[Startup] Notifications temporarily disabled for release diagnostics',
@@ -238,6 +254,13 @@ class _MyAppState extends State<MyApp> {
               skinCatalogService: widget.skinCatalogService,
             ),
           ),
+          GoRoute(
+            path: '/cards',
+            builder: (context, state) => CardsCollectionScreen(
+              coinsService: widget.coinsService,
+              skinCatalogService: widget.skinCatalogService,
+            ),
+          ),
         ],
       ),
       GoRoute(
@@ -253,6 +276,12 @@ class _MyAppState extends State<MyApp> {
         builder: (context, state) {
           final packId = state.pathParameters['packId']!;
           final levelIndex = int.tryParse(state.pathParameters['level']!) ?? 1;
+          final duelArgs = state.extra is LiveDuelGameArgs
+              ? state.extra as LiveDuelGameArgs
+              : null;
+          final friendChallengeArgs = state.extra is FriendChallengeGameArgs
+              ? state.extra as FriendChallengeGameArgs
+              : null;
           return GameScreen(
             packId: packId,
             levelIndex: levelIndex,
@@ -261,7 +290,23 @@ class _MyAppState extends State<MyApp> {
             statsService: widget.statsService,
             achievementsService: widget.achievementsService,
             leaderboardService: widget.leaderboardService,
+            liveDuelArgs: duelArgs,
+            friendChallengeArgs: friendChallengeArgs,
           );
+        },
+      ),
+      GoRoute(
+        path: '/live-duel/:matchId',
+        builder: (context, state) {
+          final matchId = state.pathParameters['matchId'] ?? '';
+          return LiveDuelScreen(matchId: matchId);
+        },
+      ),
+      GoRoute(
+        path: '/friend-challenge/:challengeId',
+        builder: (context, state) {
+          final challengeId = state.pathParameters['challengeId'] ?? '';
+          return FriendChallengeScreen(challengeId: challengeId);
         },
       ),
       GoRoute(
@@ -401,11 +446,11 @@ class _MyAppState extends State<MyApp> {
     ImageProvider provider;
     if (trimmed.startsWith('assets/')) {
       provider = AssetImage(trimmed);
-    } else if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    } else if (trimmed.startsWith('http://') ||
+        trimmed.startsWith('https://')) {
       final network = NetworkImage(trimmed);
-      provider = isThumb
-          ? ResizeImage.resizeIfNeeded(256, 256, network)
-          : network;
+      provider =
+          isThumb ? ResizeImage.resizeIfNeeded(256, 256, network) : network;
     } else if (trimmed.startsWith('data:image')) {
       return false;
     } else {
@@ -451,6 +496,15 @@ class _MyAppState extends State<MyApp> {
       themeMode: ThemeMode.dark,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
+      builder: (context, child) {
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            if (child != null) child,
+            const CoinRewardOverlay(),
+          ],
+        );
+      },
     );
   }
 }

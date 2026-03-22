@@ -17,10 +17,15 @@ enum TrailRenderType {
   comic,
   punkRiff,
   graffiti,
+  urbanGraffiti,
   halftoneExplosion,
   stickerBomb,
   glitchPrint,
   web,
+  webLegendary,
+  comicSpiderverse,
+  comicSpiderverseV2,
+  comicSpiderverseRebuilt,
   inkBrush,
   electricArc,
   goldenThread,
@@ -69,6 +74,10 @@ class TrailSkinConfig {
     this.snapshotCount = 5,
     this.chromaOffsetPx = 1.8,
     this.web = const WebTrailConfig(),
+    this.webLegendary = const WebTrailLegendaryConfig(),
+    this.comicSpiderverse = const ComicSpiderverseTrailConfig(),
+    this.comicSpiderverseV2 = const ComicSpiderverseTrailV2Config(),
+    this.comicSpiderverseRebuilt = const ComicSpiderverseRebuiltTrailConfig(),
     this.ink = const InkBrushTrailConfig(),
     this.arc = const ElectricArcTrailConfig(),
     this.golden = const GoldenThreadTrailConfig(),
@@ -86,6 +95,7 @@ class TrailSkinConfig {
     this.binaryRain = const BinaryRainTrailConfig(),
     this.punkRiff = const PunkRiffTrailConfig(),
     this.graffiti = const GraffitiTrailConfig(),
+    this.urbanGraffiti = const UrbanGraffitiTrailConfig(),
     this.halftoneExplosion = const HalftoneExplosionTrailConfig(),
     this.stickerBomb = const StickerBombTrailConfig(),
     this.glitchPrint = const GlitchPrintTrailConfig(),
@@ -106,6 +116,10 @@ class TrailSkinConfig {
   final int snapshotCount;
   final double chromaOffsetPx;
   final WebTrailConfig web;
+  final WebTrailLegendaryConfig webLegendary;
+  final ComicSpiderverseTrailConfig comicSpiderverse;
+  final ComicSpiderverseTrailV2Config comicSpiderverseV2;
+  final ComicSpiderverseRebuiltTrailConfig comicSpiderverseRebuilt;
   final InkBrushTrailConfig ink;
   final ElectricArcTrailConfig arc;
   final GoldenThreadTrailConfig golden;
@@ -123,6 +137,7 @@ class TrailSkinConfig {
   final BinaryRainTrailConfig binaryRain;
   final PunkRiffTrailConfig punkRiff;
   final GraffitiTrailConfig graffiti;
+  final UrbanGraffitiTrailConfig urbanGraffiti;
   final HalftoneExplosionTrailConfig halftoneExplosion;
   final StickerBombTrailConfig stickerBomb;
   final GlitchPrintTrailConfig glitchPrint;
@@ -194,6 +209,78 @@ class GraffitiTrailConfig {
   final List<Color> colorPalette;
 }
 
+class UrbanGraffitiTrailConfig {
+  const UrbanGraffitiTrailConfig({
+    this.mainWidth = 1.0,
+    this.lineJitter = 0.03,
+    this.widthVariance = 0.1,
+    this.alphaVariance = 0.09,
+    this.spraySpacingMinPx = 18,
+    this.spraySpacingMaxPx = 28,
+    this.sprayScaleMin = 1.4,
+    this.sprayScaleMax = 1.8,
+    this.sprayOpacityMin = 0.12,
+    this.sprayOpacityMax = 0.25,
+    this.splashMilestoneSpacingMinPx = 70,
+    this.splashMilestoneSpacingMaxPx = 120,
+    this.splashChanceOnTurn = 0.25,
+    this.splashChanceOnNode = 0.65,
+    this.splashScaleMin = 0.4,
+    this.splashScaleMax = 0.8,
+    this.splashOpacityMin = 0.45,
+    this.splashOpacityMax = 0.8,
+    this.dripChance = 0.03,
+    this.dripScaleMin = 0.5,
+    this.dripScaleMax = 0.9,
+    this.dripOpacityMin = 0.5,
+    this.dripOpacityMax = 0.7,
+    this.tagChance = 0.01,
+    this.tagScaleMin = 0.3,
+    this.tagScaleMax = 0.6,
+    this.tagOpacityMin = 0.35,
+    this.tagOpacityMax = 0.65,
+    this.maxSplashes = 3,
+    this.maxDrips = 2,
+    this.maxTags = 1,
+    this.nodeAvoidRadiusCells = 0.32,
+    this.debugMode = false,
+  });
+
+  final double mainWidth;
+  final double lineJitter;
+  final double widthVariance;
+  final double alphaVariance;
+  final double spraySpacingMinPx;
+  final double spraySpacingMaxPx;
+  final double sprayScaleMin;
+  final double sprayScaleMax;
+  final double sprayOpacityMin;
+  final double sprayOpacityMax;
+  final double splashMilestoneSpacingMinPx;
+  final double splashMilestoneSpacingMaxPx;
+  final double splashChanceOnTurn;
+  final double splashChanceOnNode;
+  final double splashScaleMin;
+  final double splashScaleMax;
+  final double splashOpacityMin;
+  final double splashOpacityMax;
+  final double dripChance;
+  final double dripScaleMin;
+  final double dripScaleMax;
+  final double dripOpacityMin;
+  final double dripOpacityMax;
+  final double tagChance;
+  final double tagScaleMin;
+  final double tagScaleMax;
+  final double tagOpacityMin;
+  final double tagOpacityMax;
+  final int maxSplashes;
+  final int maxDrips;
+  final int maxTags;
+  final double nodeAvoidRadiusCells;
+  final bool debugMode;
+}
+
 class HalftoneExplosionTrailConfig {
   const HalftoneExplosionTrailConfig({
     this.coreWidth = 0.88,
@@ -246,13 +333,33 @@ class GlitchPrintTrailConfig {
 
 class WebTrailConfig {
   const WebTrailConfig({
-    this.mainStrandWidth = 0.22,
-    this.strandGap = 0.18,
-    this.bridgeSpacing = 0.35,
-    this.bridgeJitter = 0.12,
-    this.bridgeOpacity = 0.55,
+    this.mainStrandWidth = 0.2,
+    this.strandGap = 0.16,
+    this.bridgeSpacing = 0.32,
+    this.bridgeJitter = 0.11,
+    this.bridgeOpacity = 0.48,
     this.strandOpacity = 0.9,
-    this.highlightStrength = 0.35,
+    this.highlightStrength = 0.34,
+    this.mainThicknessVariance = 0.18,
+    this.mainTaperStrength = 0.22,
+    this.glowOpacity = 0.2,
+    this.fiberNoise = 0.14,
+    this.fiberAlpha = 0.22,
+    this.microBridgeDensity = 0.62,
+    this.maxMicroBridgesPerSegment = 3,
+    this.nodeBurstLines = 7,
+    this.nodeBurstArcHints = 2,
+    this.nodeBurstScale = 0.36,
+    this.nodeBurstOpacity = 0.34,
+    this.tensionAmplitude = 0.055,
+    this.tensionSpeed = 0.72,
+    this.elasticity = 0.18,
+    this.depthOffset = 0.028,
+    this.shimmerSpeed = 0.26,
+    this.sparkleFrequency = 0.18,
+    this.silkTravelerCount = 8,
+    this.dustParticleCount = 16,
+    this.silkFragmentFrequency = 0.08,
   });
 
   final double mainStrandWidth;
@@ -262,6 +369,242 @@ class WebTrailConfig {
   final double bridgeOpacity;
   final double strandOpacity;
   final double highlightStrength;
+  final double mainThicknessVariance;
+  final double mainTaperStrength;
+  final double glowOpacity;
+  final double fiberNoise;
+  final double fiberAlpha;
+  final double microBridgeDensity;
+  final int maxMicroBridgesPerSegment;
+  final int nodeBurstLines;
+  final int nodeBurstArcHints;
+  final double nodeBurstScale;
+  final double nodeBurstOpacity;
+  final double tensionAmplitude;
+  final double tensionSpeed;
+  final double elasticity;
+  final double depthOffset;
+  final double shimmerSpeed;
+  final double sparkleFrequency;
+  final int silkTravelerCount;
+  final int dustParticleCount;
+  final double silkFragmentFrequency;
+}
+
+class WebTrailLegendaryConfig {
+  const WebTrailLegendaryConfig({
+    this.mainWidth = 0.25,
+    this.glowIntensity = 0.36,
+    this.chromaticOffsetStrength = 0.055,
+    this.bridgeDensity = 0.5,
+    this.sparkleRate = 0.24,
+    this.energyFlickRate = 0.16,
+    this.nodeBurstScale = 0.44,
+    this.highlightSpeed = 0.34,
+    this.halftoneFrequency = 0.14,
+    this.glitchFlashProbability = 0.12,
+    this.sparkleCount = 14,
+    this.energyFlickCount = 8,
+    this.maxBridgesPerSegment = 3,
+  });
+
+  final double mainWidth;
+  final double glowIntensity;
+  final double chromaticOffsetStrength;
+  final double bridgeDensity;
+  final double sparkleRate;
+  final double energyFlickRate;
+  final double nodeBurstScale;
+  final double highlightSpeed;
+  final double halftoneFrequency;
+  final double glitchFlashProbability;
+  final int sparkleCount;
+  final int energyFlickCount;
+  final int maxBridgesPerSegment;
+}
+
+class ComicSpiderverseTrailConfig {
+  const ComicSpiderverseTrailConfig({
+    this.baseOpacityMin = 0.7,
+    this.baseOpacityMax = 1.0,
+    this.scaleMin = 0.9,
+    this.scaleMax = 1.1,
+    this.rotationJitterDeg = 3.0,
+    this.chromaticOffsetPx = 2.0,
+    this.chromaticOpacity = 0.38,
+    this.particleLifeMinMs = 300,
+    this.particleLifeMaxMs = 600,
+    this.comicDropDistanceMin = 120,
+    this.comicDropDistanceMax = 180,
+    this.comicDropLifeMinMs = 700,
+    this.comicDropLifeMaxMs = 1200,
+    this.glitchSliceMinMs = 500,
+    this.glitchSliceMaxMs = 1000,
+    this.glitchSliceLifeMinMs = 80,
+    this.glitchSliceLifeMaxMs = 120,
+    this.textSpawnChance = 0.2,
+    this.maxParticles = 40,
+    this.maxComicDrops = 2,
+    this.maxBursts = 3,
+  });
+
+  final double baseOpacityMin;
+  final double baseOpacityMax;
+  final double scaleMin;
+  final double scaleMax;
+  final double rotationJitterDeg;
+  final double chromaticOffsetPx;
+  final double chromaticOpacity;
+  final int particleLifeMinMs;
+  final int particleLifeMaxMs;
+  final int comicDropDistanceMin;
+  final int comicDropDistanceMax;
+  final int comicDropLifeMinMs;
+  final int comicDropLifeMaxMs;
+  final int glitchSliceMinMs;
+  final int glitchSliceMaxMs;
+  final int glitchSliceLifeMinMs;
+  final int glitchSliceLifeMaxMs;
+  final double textSpawnChance;
+  final int maxParticles;
+  final int maxComicDrops;
+  final int maxBursts;
+}
+
+class ComicSpiderverseTrailV2Config {
+  const ComicSpiderverseTrailV2Config({
+    this.mainTrailWidth = 1.08,
+    this.baseTrailOpacity = 0.96,
+    this.cyanOffsetX = -4,
+    this.cyanOffsetY = -1,
+    this.magentaOffsetX = 4,
+    this.magentaOffsetY = 1,
+    this.chromaticOpacity = 0.72,
+    this.glitchFrequency = 0.52,
+    this.glitchDurationMin = 60,
+    this.glitchDurationMax = 120,
+    this.halftoneOpacityMin = 0.18,
+    this.halftoneOpacityMax = 0.35,
+    this.inkOpacityMin = 0.22,
+    this.inkOpacityMax = 0.38,
+    this.nodeBurstScaleMin = 0.5,
+    this.nodeBurstScaleMax = 1.2,
+    this.comicElementSpawnDistanceMin = 80,
+    this.comicElementSpawnDistanceMax = 140,
+    this.comicElementMaxActive = 3,
+    this.particleMaxActive = 56,
+    this.steppedFrameMs = 41,
+    this.steppedFrameJitter = 4,
+    this.nodeTextSpawnChance = 0.45,
+    this.enableDebugBoost = false,
+  });
+
+  final double mainTrailWidth;
+  final double baseTrailOpacity;
+  final double cyanOffsetX;
+  final double cyanOffsetY;
+  final double magentaOffsetX;
+  final double magentaOffsetY;
+  final double chromaticOpacity;
+  final double glitchFrequency;
+  final int glitchDurationMin;
+  final int glitchDurationMax;
+  final double halftoneOpacityMin;
+  final double halftoneOpacityMax;
+  final double inkOpacityMin;
+  final double inkOpacityMax;
+  final double nodeBurstScaleMin;
+  final double nodeBurstScaleMax;
+  final int comicElementSpawnDistanceMin;
+  final int comicElementSpawnDistanceMax;
+  final int comicElementMaxActive;
+  final int particleMaxActive;
+  final int steppedFrameMs;
+  final int steppedFrameJitter;
+  final double nodeTextSpawnChance;
+  final bool enableDebugBoost;
+}
+
+class ComicSpiderverseRebuiltTrailConfig {
+  const ComicSpiderverseRebuiltTrailConfig({
+    this.mainSpriteOpacity = 0.95,
+    this.supportLineOpacity = 0.85,
+    this.supportLineMinPx = 10.0,
+    this.supportLineMaxPx = 17.0,
+    this.offsetShadowOpacity = 0.44,
+    this.offsetShadowScale = 1.35,
+    this.chromaticOpacity = 0.65,
+    this.chromaticOffsetX = 3.0,
+    this.chromaticOffsetY = 1.0,
+    this.nodeHitChromaticBoost = 1.32,
+    this.halftoneOpacity = 0.14,
+    this.inkOpacity = 0.22,
+    this.burstOpacity = 0.95,
+    this.bubbleOpacity = 0.9,
+    this.textOpacity = 1.0,
+    this.frameSliceOpacity = 0.62,
+    this.particleMaxActive = 48,
+    this.burstMaxActive = 2,
+    this.bubbleMaxActive = 1,
+    this.textMaxActive = 1,
+    this.inkMaxActive = 2,
+    this.halftoneMaxActive = 2,
+    this.decalMaxActive = 1,
+    this.frameSliceMaxActive = 1,
+    this.streakSpacingMinPx = 20.0,
+    this.streakSpacingMaxPx = 30.0,
+    this.longSegmentSpawnMinPx = 160.0,
+    this.longSegmentSpawnMaxPx = 240.0,
+    this.lingerDecalCount = 2,
+    this.lingerHoldFrames = 10,
+    this.steppedFrameMs = 41,
+    this.steppedFrameJitter = 3,
+    this.nodeTextSpawnChance = 0.26,
+    this.turnTextSpawnChance = 0.12,
+    this.swayAmount = 0.2,
+    this.swaySpeed = 0.9,
+    this.debugMode = false,
+    this.debugVisualDensity = false,
+  });
+
+  final double mainSpriteOpacity;
+  final double supportLineOpacity;
+  final double supportLineMinPx;
+  final double supportLineMaxPx;
+  final double offsetShadowOpacity;
+  final double offsetShadowScale;
+  final double chromaticOpacity;
+  final double chromaticOffsetX;
+  final double chromaticOffsetY;
+  final double nodeHitChromaticBoost;
+  final double halftoneOpacity;
+  final double inkOpacity;
+  final double burstOpacity;
+  final double bubbleOpacity;
+  final double textOpacity;
+  final double frameSliceOpacity;
+  final int particleMaxActive;
+  final int burstMaxActive;
+  final int bubbleMaxActive;
+  final int textMaxActive;
+  final int inkMaxActive;
+  final int halftoneMaxActive;
+  final int decalMaxActive;
+  final int frameSliceMaxActive;
+  final double streakSpacingMinPx;
+  final double streakSpacingMaxPx;
+  final double longSegmentSpawnMinPx;
+  final double longSegmentSpawnMaxPx;
+  final int lingerDecalCount;
+  final int lingerHoldFrames;
+  final int steppedFrameMs;
+  final int steppedFrameJitter;
+  final double nodeTextSpawnChance;
+  final double turnTextSpawnChance;
+  final double swayAmount;
+  final double swaySpeed;
+  final bool debugMode;
+  final bool debugVisualDensity;
 }
 
 class InkBrushTrailConfig {

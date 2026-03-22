@@ -36,13 +36,25 @@ class UserProfileService {
     final snap = await ref.get();
     final ts = FieldValue.serverTimestamp();
     if (!snap.exists) {
+      final initial = UserModel.defaultFirestore(
+        uid: uid,
+        createdAt: ts,
+        updatedAt: ts,
+      );
+      final authEmail =
+          (FirebaseAuth.instance.currentUser?.email ?? '').trim().toLowerCase();
+      if (authEmail.isNotEmpty) {
+        initial['email'] = authEmail;
+        initial['emailLowercase'] = authEmail;
+      }
       await ref.set(
-        UserModel.defaultFirestore(
-          uid: uid,
-          createdAt: ts,
-          updatedAt: ts,
-        ),
+        initial,
         SetOptions(merge: true),
+      );
+      await _syncLookupIndexes(
+        uid: uid,
+        username: (initial['username'] as String?)?.trim() ?? '',
+        emailLowercase: authEmail,
       );
       return;
     }
@@ -52,19 +64,36 @@ class UserProfileService {
       existing: data,
       updatedAt: ts,
     );
+    final email = (FirebaseAuth.instance.currentUser?.email ?? '').trim();
+    if (email.isNotEmpty &&
+        ((data['email'] as String?)?.trim().isEmpty ?? true)) {
+      missing['email'] = email;
+    }
+    final emailLower = email.toLowerCase();
+    if (emailLower.isNotEmpty &&
+        ((data['emailLowercase'] as String?)?.trim().isEmpty ?? true)) {
+      missing['emailLowercase'] = emailLower;
+    }
     if (missing.isNotEmpty) {
       await ref.set(missing, SetOptions(merge: true));
     }
     if (!data.containsKey('usernameChangeCount') ||
         data['usernameChangeCount'] == null) {
       await ref.set(
-        <String, dynamic>{
-          'usernameChangeCount': 0,
-          'updatedAt': FieldValue.serverTimestamp(),
-        },
+        UserModel.defaultFirestore(
+          uid: uid,
+          createdAt: ts,
+          updatedAt: ts,
+        )..['usernameChangeCount'] = 0,
         SetOptions(merge: true),
       );
     }
+    final merged = <String, dynamic>{...data, ...missing};
+    await _syncLookupIndexes(
+      uid: uid,
+      username: (merged['username'] as String?)?.trim() ?? '',
+      emailLowercase: (merged['emailLowercase'] as String?)?.trim() ?? '',
+    );
   }
 
   Future<bool> isUsernameAvailable(String username) async {
@@ -145,13 +174,21 @@ class UserProfileService {
         SetOptions(merge: true),
       );
     });
+    final authEmail =
+        (FirebaseAuth.instance.currentUser?.email ?? '').trim().toLowerCase();
+    await _syncLookupIndexes(
+      uid: uid,
+      username: username.trim(),
+      emailLowercase: authEmail,
+    );
   }
 
   Future<String?> getUidByUsername(String username) async {
     final raw = username;
     final normalized = _normalizeUsername(username);
     if (kDebugMode) {
-      debugPrint('[username-lookup] raw="$raw" normalized="${normalized ?? ''}"');
+      debugPrint(
+          '[username-lookup] raw="$raw" normalized="${normalized ?? ''}"');
     }
     if (normalized == null) {
       if (kDebugMode) {
@@ -174,7 +211,8 @@ class UserProfileService {
       if (snap.exists) {
         final uid = (snap.data()?['uid'] as String?)?.trim();
         if (kDebugMode) {
-          debugPrint('[username-lookup] resolved uid from index="${uid ?? ''}"');
+          debugPrint(
+              '[username-lookup] resolved uid from index="${uid ?? ''}"');
         }
         if (uid != null && uid.isNotEmpty) {
           final userSnap = await _usersRef().doc(uid).get();
@@ -223,16 +261,17 @@ class UserProfileService {
         await _db().collection('usernames').doc(normalized).set(
           <String, dynamic>{
             'uid': uid,
-            'username': (doc.data()['username'] as String?)?.trim().isNotEmpty ==
-                    true
-                ? (doc.data()['username'] as String).trim()
-                : username.trim(),
+            'username':
+                (doc.data()['username'] as String?)?.trim().isNotEmpty == true
+                    ? (doc.data()['username'] as String).trim()
+                    : username.trim(),
             'createdAt': FieldValue.serverTimestamp(),
           },
           SetOptions(merge: true),
         );
         if (kDebugMode) {
-          debugPrint('[username-lookup] healed index doc usernames/$normalized');
+          debugPrint(
+              '[username-lookup] healed index doc usernames/$normalized');
         }
       } catch (e) {
         if (kDebugMode) {
@@ -304,6 +343,35 @@ class UserProfileService {
 
   CollectionReference<Map<String, dynamic>> _usersRef() =>
       _db().collection('users');
+
+  Future<void> _syncLookupIndexes({
+    required String uid,
+    required String username,
+    required String emailLowercase,
+  }) async {
+    final normalizedUsername = _normalizeUsername(username) ?? '';
+    if (normalizedUsername.isNotEmpty) {
+      await _db().collection('usernames').doc(normalizedUsername).set(
+        <String, dynamic>{
+          'uid': uid,
+          'username': username.trim(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+    }
+    if (emailLowercase.trim().isNotEmpty &&
+        emailLowercase.trim().contains('@')) {
+      await _db().collection('emails').doc(emailLowercase.trim()).set(
+        <String, dynamic>{
+          'uid': uid,
+          'email': emailLowercase.trim(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+    }
+  }
 
   FirebaseFirestore _db() {
     try {

@@ -20,20 +20,26 @@ import 'game_board.dart';
 import 'game_theme.dart';
 import 'leaderboard_service.dart';
 import 'models/leaderboard_entry.dart';
+import 'models/live_match.dart';
+import 'models/friend_challenge.dart';
 import 'puzzle_attempt.dart';
 import 'progress_service.dart';
 import 'score_calculator.dart';
 import 'stats_service.dart';
 import 'victory_screen.dart';
 import 'pack_level_repository.dart';
+import 'services/ghost_service.dart';
 import 'services/leaderboard_service.dart' as social_lb;
+import 'services/live_duel_service.dart';
+import 'services/friend_challenge_service.dart';
 import 'services/streak_service.dart';
 import 'trail/trail_catalog.dart';
 import 'trail/trail_skin.dart';
 import 'services/wallet_history_service.dart';
 import 'ui/avatar_utils.dart';
 import 'ui/components/game_toast.dart';
-import 'services/rewarded_ad_service.dart';
+import 'services/ads_service.dart';
+import 'ui/components/ghost_replay_overlay.dart';
 import 'ui/components/rewarded_ad_offer_dialog.dart';
 
 class GameScreen extends StatefulWidget {
@@ -46,6 +52,8 @@ class GameScreen extends StatefulWidget {
     required this.achievementsService,
     required this.leaderboardService,
     required this.coinsService,
+    this.liveDuelArgs,
+    this.friendChallengeArgs,
   });
 
   final String packId;
@@ -55,6 +63,8 @@ class GameScreen extends StatefulWidget {
   final AchievementsService achievementsService;
   final LeaderboardService leaderboardService;
   final CoinsService coinsService;
+  final LiveDuelGameArgs? liveDuelArgs;
+  final FriendChallengeGameArgs? friendChallengeArgs;
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -65,13 +75,18 @@ class _GameScreenState extends State<GameScreen>
   static const int _maxHintsPerLevel = 3;
   static const bool _unlimitedHintsForTesting = true;
   static const String _firestoreDatabaseId = 'tracepath-database';
+  static bool _ghostModeSessionEnabled = true;
 
   final GameBoardController _boardController = GameBoardController();
   final social_lb.SocialLeaderboardService _socialLeaderboardService =
       social_lb.SocialLeaderboardService();
   final StreakService _streakService = StreakService();
   final WalletHistoryService _walletHistoryService = WalletHistoryService();
-  final RewardedAdService _rewardedAdService = RewardedAdService.instance;
+  final GhostService _ghostService = GhostService();
+  final LiveDuelService _liveDuelService = LiveDuelService();
+  final FriendChallengeService _friendChallengeService =
+      FriendChallengeService();
+  final AdsService _adsService = AdsService.instance;
   final Map<String, String?> _rankingSkinPreviewUrlCache = <String, String?>{};
   late final AnimationController _pathColorController;
   Level? _level;
@@ -104,6 +119,40 @@ class _GameScreenState extends State<GameScreen>
   bool _coinRewardVisible = false;
   int _coinRewardAmount = 0;
   Offset _coinRewardOffset = const Offset(-1.2, 0);
+  List<int> _initialPath = const <int>[];
+  GhostRun? _ghostRun;
+  DateTime? _ghostPlaybackStartedAt;
+  List<GhostFrame> _recordedGhostFrames = <GhostFrame>[];
+  int _lastRecordedGhostSampleMs = -1;
+  Offset? _lastRecordedGhostPos;
+  bool _ghostEnabled = _ghostModeSessionEnabled;
+  StreamSubscription<LiveMatch?>? _liveMatchSub;
+  StreamSubscription<LiveMatchRealtimeTrail?>? _liveTrailSub;
+  String _duelOpponentName = 'Opponent';
+  String _duelOpponentState = 'Waiting...';
+  String _liveTrailSubscribedUid = '';
+  List<int> _duelOpponentPath = const <int>[];
+  bool _liveFinishReported = false;
+  String _liveWinnerAnnouncementKey = '';
+  bool _liveWinnerResolved = false;
+  bool _liveLostBeforeFinish = false;
+  bool _liveResultOverlayVisible = false;
+  String _liveResultOverlayText = '';
+  Timer? _liveResultOverlayTimer;
+  Timer? _liveTrailPublishTimer;
+  int _liveTrailPublishVersion = 0;
+  int _lastLiveTrailPublishedAtMs = 0;
+  String _lastLiveTrailPublishedSignature = '';
+  String _pendingLiveTrailSignature = '';
+  List<int> _pendingLiveTrailPath = const <int>[];
+  String _pendingLiveTrailState = 'drawing';
+  final Map<String, int> _duelEmoteLastSentAtMs = <String, int>{};
+  String? _lastNearCompleteFeedbackKey;
+  int _manualAdsWatchedToday = 0;
+  int _manualAdsDailyLimit = AdsService.maxDailyManualAds;
+  bool _manualAdsLimitReached = false;
+  bool _manualAdBusy = false;
+  Duration _manualAdCooldownRemaining = Duration.zero;
 
   @override
   void initState() {
@@ -116,6 +165,14 @@ class _GameScreenState extends State<GameScreen>
       brightnessOverride:
           WidgetsBinding.instance.platformDispatcher.platformBrightness,
     );
+    _attachLiveMatchListener();
+    if (_isLiveDuelMode) {
+      unawaited(
+        _liveDuelService.ensurePlaying(widget.liveDuelArgs!.matchId),
+      );
+    }
+    unawaited(_adsService.loadRewardedAd());
+    unawaited(_refreshManualAdQuota());
   }
 
   @override
@@ -132,8 +189,25 @@ class _GameScreenState extends State<GameScreen>
     _hintTimer?.cancel();
     _clockTimer?.cancel();
     _coinRewardTimer?.cancel();
+    _liveResultOverlayTimer?.cancel();
+    _liveTrailPublishTimer?.cancel();
     _pathColorController.dispose();
     _boardController.dispose();
+    _liveMatchSub?.cancel();
+    _liveTrailSub?.cancel();
+    if (_isLiveDuelMode) {
+      unawaited(
+        _liveDuelService.clearRealtimeTrail(
+          matchId: widget.liveDuelArgs!.matchId,
+          state: _completionHandled ? 'finished' : 'stopped',
+        ),
+      );
+    }
+    if (_isLiveDuelMode && !_completionHandled) {
+      unawaited(
+        _liveDuelService.markAbandoned(widget.liveDuelArgs!.matchId),
+      );
+    }
     super.dispose();
   }
 
@@ -157,12 +231,47 @@ class _GameScreenState extends State<GameScreen>
       }
       _level = level;
       _themeSeed = ThemeGenerator.seedFromLevelId(level.id);
-      _status = GameBoardStatus.fromPath(level, const []);
+      final savedInProgress = widget.progressService.getInProgressLevel(
+        widget.packId,
+        widget.levelIndex,
+      );
+      final restoredPath = savedInProgress?.path ?? const <int>[];
+      final restoredStartMs = savedInProgress?.startedAtMs ?? 0;
+      final nowMs = DateTime.now().millisecondsSinceEpoch;
+      final restoredStartTime = restoredStartMs > 0 && restoredStartMs <= nowMs
+          ? DateTime.fromMillisecondsSinceEpoch(restoredStartMs)
+          : DateTime.now();
+      _initialPath = restoredPath;
+      _status = GameBoardStatus.fromPath(level, restoredPath);
       _completionHandled = false;
-      _hintsUsed = 0;
-      _rewindsUsed = 0;
-      _runStartedAt = DateTime.now();
+      _hintsUsed = savedInProgress?.hintsUsed ?? 0;
+      _rewindsUsed = savedInProgress?.rewindsUsed ?? 0;
+      _mistakesUsed = savedInProgress?.mistakesUsed ?? 0;
+      _runStartedAt = restoredStartTime;
+      _ghostPlaybackStartedAt = restoredStartTime;
+      _recordedGhostFrames = <GhostFrame>[];
+      _lastRecordedGhostSampleMs = -1;
+      _lastRecordedGhostPos = null;
+      _liveFinishReported = false;
+      _liveWinnerAnnouncementKey = '';
+      _duelOpponentPath = const <int>[];
+      _liveTrailSubscribedUid = '';
+      _lastLiveTrailPublishedAtMs = 0;
+      _lastLiveTrailPublishedSignature = '';
+      _pendingLiveTrailSignature = '';
+      _pendingLiveTrailPath = const <int>[];
+      _pendingLiveTrailState = 'drawing';
+      _liveWinnerResolved = false;
+      _liveLostBeforeFinish = false;
+      _liveResultOverlayVisible = false;
+      _liveResultOverlayText = '';
       _elapsedAtSolve = null;
+      if (!_isLiveDuelMode && !_isFriendChallengeMode) {
+        _recordGhostFrame(_status.path, force: true);
+        unawaited(_loadGhostRunForLevel(_currentLevelId));
+      } else {
+        _ghostRun = null;
+      }
 
       final nextColor = ThemeGenerator.generateTheme(
         seed: _themeSeed!,
@@ -184,12 +293,20 @@ class _GameScreenState extends State<GameScreen>
       _clockTimer?.cancel();
       _clockTimer = Timer.periodic(const Duration(seconds: 1), (_) {
         if (!mounted) return;
-        setState(() {});
+        setState(() {
+          if (_manualAdCooldownRemaining > Duration.zero) {
+            final next =
+                _manualAdCooldownRemaining - const Duration(seconds: 1);
+            _manualAdCooldownRemaining =
+                next > Duration.zero ? next : Duration.zero;
+          }
+        });
       });
       _clearHint();
       setState(() {
         _isLevelLoading = false;
       });
+      _persistInProgressLevel(_status.path);
       unawaited(_maybeShowVariantTutorial(level));
     } catch (error) {
       if (!mounted || generation != _levelLoadGeneration) {
@@ -217,7 +334,8 @@ class _GameScreenState extends State<GameScreen>
       builder: (context) {
         return Dialog(
           backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 24),
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 22, vertical: 24),
           child: Container(
             padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
             decoration: BoxDecoration(
@@ -421,8 +539,41 @@ class _GameScreenState extends State<GameScreen>
                     walletCoins: widget.coinsService.coins,
                     onRankingTap: _openFriendsRankingSheet,
                     onWalletTap: () => context.go('/shop'),
+                    showRanking: !_isFriendChallengeMode,
                   ),
                   const SizedBox(height: 14),
+                  if (_isFriendChallengeMode) ...[
+                    const _FriendChallengeInfoBar(),
+                    const SizedBox(height: 10),
+                  ],
+                  if (_isLiveDuelMode) ...[
+                    _LiveDuelStatusBar(
+                      opponentName: _duelOpponentName,
+                      opponentState: _duelOpponentState,
+                    ),
+                    if (_liveLostBeforeFinish) ...[
+                      const SizedBox(height: 8),
+                      const _LiveDuelResolvedBanner(
+                        text:
+                            'Winner already resolved. You can finish for your time.',
+                      ),
+                    ],
+                    const SizedBox(height: 10),
+                  ],
+                  if (!_isLiveDuelMode && !_isFriendChallengeMode) ...[
+                    if (_ghostRun != null)
+                      _GhostRaceInfoBar(
+                        bestTimeText: _formatGhostTime(_ghostRun!.totalTimeMs),
+                        enabled: _ghostEnabled,
+                        onToggle: _toggleGhostMode,
+                      )
+                    else
+                      _GhostPendingInfoBar(
+                        enabled: _ghostEnabled,
+                        onToggle: _toggleGhostMode,
+                      ),
+                    const SizedBox(height: 10),
+                  ],
                   Expanded(
                     child: Center(
                       child: ConstrainedBox(
@@ -439,25 +590,48 @@ class _GameScreenState extends State<GameScreen>
                                   final pathColor =
                                       _currentPathColor(brightness) ??
                                           gameTheme.pathColor;
-                                  return GameBoard(
-                                    controller: _boardController,
-                                    level: level,
-                                    gameTheme: gameTheme,
-                                    pathColorOverride: pathColor,
-                                    trailSkin: _activeTrailSkin,
-                                    pointerAssetPath:
-                                        widget.coinsService.selectedSkinAssetPath,
-                                    hintDirection: _hintDirection,
-                                    hintVisible: _hintVisible,
-                                    onStatusChanged: _handleStatusChanged,
-                                    onChange: _handleBoardChange,
-                                    onInvalidMove: (_) {
-                                      setState(() {
-                                        _mistakesUsed++;
-                                      });
-                                      _clearHint();
-                                      HapticFeedback.mediumImpact();
-                                    },
+                                  return Stack(
+                                    fit: StackFit.expand,
+                                    children: [
+                                      GameBoard(
+                                        controller: _boardController,
+                                        level: level,
+                                        initialPath: _initialPath,
+                                        gameTheme: gameTheme,
+                                        pathColorOverride: pathColor,
+                                        trailSkin: _activeTrailSkin,
+                                        pointerAssetPath: widget
+                                            .coinsService.selectedSkinAssetPath,
+                                        hintDirection: _hintDirection,
+                                        hintVisible: _hintVisible,
+                                        onStatusChanged: _handleStatusChanged,
+                                        onChange: _handleBoardChange,
+                                        opponentPath: _isLiveDuelMode
+                                            ? _duelOpponentPath
+                                            : const <int>[],
+                                        opponentTrailColor:
+                                            const Color(0xFFE2538A),
+                                        onInvalidMove: (_) {
+                                          setState(() {
+                                            _mistakesUsed++;
+                                          });
+                                          _clearHint();
+                                          HapticFeedback.mediumImpact();
+                                        },
+                                      ),
+                                      if (_ghostRun != null &&
+                                          _ghostPlaybackStartedAt != null &&
+                                          _ghostEnabled &&
+                                          _isGhostEnabledForLevel(
+                                            _currentLevelId,
+                                          ))
+                                        Positioned.fill(
+                                          child: GhostReplayOverlay(
+                                            run: _ghostRun!,
+                                            startedAt: _ghostPlaybackStartedAt!,
+                                          ),
+                                        ),
+                                    ],
                                   );
                                 },
                               ),
@@ -497,8 +671,9 @@ class _GameScreenState extends State<GameScreen>
                       const SizedBox(width: 12),
                       Expanded(
                         child: _GameActionButton(
-                          label:
-                              _unlimitedHintsForTesting ? 'Hint (INF)' : 'Hint ($_hintsLeft)',
+                          label: _unlimitedHintsForTesting
+                              ? 'Hint (INF)'
+                              : 'Hint ($_hintsLeft)',
                           onTap: _handleHint,
                           outlined: true,
                           visuallyEnabled:
@@ -509,6 +684,64 @@ class _GameScreenState extends State<GameScreen>
                       ),
                     ],
                   ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _GameActionButton(
+                          label:
+                              'Watch Ad (${_manualAdsWatchedToday} / $_manualAdsDailyLimit)',
+                          onTap: (_manualAdBusy ||
+                                  _manualAdsLimitReached ||
+                                  _manualAdCooldownRemaining > Duration.zero)
+                              ? null
+                              : () => unawaited(_handleManualWatchAd()),
+                          outlined: true,
+                          borderColor: const Color(0xFFFFD166),
+                          foregroundColor: const Color(0xFFFFD166),
+                          visuallyEnabled: !_manualAdsLimitReached &&
+                              _manualAdCooldownRemaining <= Duration.zero,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _GameActionButton(
+                          label: 'Ad Status',
+                          onTap: () => unawaited(_showAdDiagnostics()),
+                          outlined: true,
+                          borderColor: const Color(0xFF60A5FA),
+                          foregroundColor: const Color(0xFF93C5FD),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (_manualAdsLimitReached) ...[
+                    const SizedBox(height: 6),
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Daily limit reached. No more ads available today.',
+                        style: TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ] else if (_manualAdCooldownRemaining > Duration.zero) ...[
+                    const SizedBox(height: 6),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Next ad in ${_formatDurationShort(_manualAdCooldownRemaining)}',
+                        style: const TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -544,7 +777,8 @@ class _GameScreenState extends State<GameScreen>
                             border: Border.all(color: const Color(0xFF4ADE80)),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF22C55E).withOpacity(0.28),
+                                color:
+                                    const Color(0xFF22C55E).withOpacity(0.28),
                                 blurRadius: 16,
                                 offset: const Offset(0, 8),
                               ),
@@ -569,6 +803,62 @@ class _GameScreenState extends State<GameScreen>
                                 ),
                               ),
                             ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Positioned.fill(
+              child: IgnorePointer(
+                child: SafeArea(
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: AnimatedSlide(
+                      duration: const Duration(milliseconds: 220),
+                      curve: Curves.easeOutCubic,
+                      offset: _liveResultOverlayVisible
+                          ? Offset.zero
+                          : const Offset(0, -0.35),
+                      child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 180),
+                        opacity: _liveResultOverlayVisible ? 1 : 0,
+                        child: Container(
+                          margin: const EdgeInsets.only(top: 14),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [Color(0xFF1D2F4F), Color(0xFF12233D)],
+                            ),
+                            border: Border.all(color: const Color(0xFF5F9BFF)),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    const Color(0xFF5F9BFF).withOpacity(0.24),
+                                blurRadius: 18,
+                                spreadRadius: 2,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            _liveResultOverlayText,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 16,
+                              height: 1.25,
+                              letterSpacing: 0.2,
+                            ),
                           ),
                         ),
                       ),
@@ -664,7 +954,8 @@ class _GameScreenState extends State<GameScreen>
                                   'Complete the level and invite friends to compete.',
                             )
                           : ListView.separated(
-                              padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
+                              padding:
+                                  const EdgeInsets.fromLTRB(14, 12, 14, 16),
                               itemCount: rows.length,
                               separatorBuilder: (_, __) =>
                                   const SizedBox(height: 8),
@@ -694,11 +985,14 @@ class _GameScreenState extends State<GameScreen>
     );
   }
 
-  Future<List<_InLevelRankRowData>> _loadFriendsRankingRows(String levelId) async {
-    final entries = await _socialLeaderboardService.getFriendsTopScores(levelId);
+  Future<List<_InLevelRankRowData>> _loadFriendsRankingRows(
+      String levelId) async {
+    final entries =
+        await _socialLeaderboardService.getFriendsTopScores(levelId);
     final rows = <_InLevelRankRowData>[];
     for (final entry in entries) {
-      final skinPreview = await _resolveRankingSkinPreviewUrl(entry.equippedSkinId);
+      final skinPreview =
+          await _resolveRankingSkinPreviewUrl(entry.equippedSkinId);
       rows.add(
         _InLevelRankRowData(
           entry: entry,
@@ -910,7 +1204,6 @@ class _GameScreenState extends State<GameScreen>
       _hintsUsed = 0;
       _rewindsUsed = 0;
       _mistakesUsed = 0;
-      _runStartedAt = DateTime.now();
       _elapsedAtSolve = null;
     });
     _clearHint();
@@ -954,6 +1247,7 @@ class _GameScreenState extends State<GameScreen>
       _hintDirection = direction;
       _hintVisible = true;
     });
+    _persistInProgressLevel(_status.path);
     _hintTimer?.cancel();
     _hintTimer = Timer(const Duration(seconds: 2), () {
       if (!mounted) return;
@@ -980,6 +1274,10 @@ class _GameScreenState extends State<GameScreen>
       case GameBoardChangeType.reset:
         break;
     }
+    _scheduleLiveTrailPublish(
+      change.path,
+      state: _completionHandled ? 'finished' : 'drawing',
+    );
   }
 
   void _clearHint() {
@@ -1037,6 +1335,23 @@ class _GameScreenState extends State<GameScreen>
       }
     });
 
+    if (status.solved) {
+      unawaited(
+        widget.progressService.clearInProgressLevel(
+          widget.packId,
+          widget.levelIndex,
+        ),
+      );
+    } else {
+      _persistInProgressLevel(status.path);
+    }
+    _recordGhostFrame(status.path);
+    _scheduleLiveTrailPublish(
+      status.path,
+      state: status.solved ? 'finished' : 'drawing',
+    );
+    _maybeShowNearCompleteFeedback(status);
+
     if (becameSolved && !_completionHandled) {
       final level = _level;
       if (kEnableSolvedDebugLogs) {
@@ -1060,6 +1375,49 @@ class _GameScreenState extends State<GameScreen>
     }
   }
 
+  void _maybeShowNearCompleteFeedback(GameBoardStatus status) {
+    final level = _level;
+    if (level == null || !mounted || status.solved) {
+      _lastNearCompleteFeedbackKey = null;
+      return;
+    }
+
+    final totalCells = level.width * level.height;
+    final isPathFull = status.path.length == totalCells;
+    final isSequenceComplete = status.lastSequentialNumber == status.maxNumber;
+    final endCell = GameBoardRules.endCell(level);
+    if (endCell == null) {
+      _lastNearCompleteFeedbackKey = null;
+      return;
+    }
+    final endsAtFinal = status.path.isNotEmpty && status.path.last == endCell;
+
+    if (!(isPathFull && isSequenceComplete && !endsAtFinal)) {
+      _lastNearCompleteFeedbackKey = null;
+      return;
+    }
+
+    final key = '${status.path.last}_${endCell}_${status.path.length}';
+    if (_lastNearCompleteFeedbackKey == key) {
+      return;
+    }
+    _lastNearCompleteFeedbackKey = key;
+
+    final finalCell = endCell;
+    final finalLabel = level.displayLabels[finalCell]?.trim().isNotEmpty == true
+        ? level.displayLabels[finalCell]!.trim()
+        : '${level.numbers[finalCell] ?? status.maxNumber}';
+    unawaited(
+      GameToast.show(
+        context,
+        type: GameToastType.info,
+        title: 'Almost there',
+        message: 'Finish on $finalLabel to complete the level.',
+        duration: const Duration(milliseconds: 1800),
+      ),
+    );
+  }
+
   Future<void> _startCelebrationAndShowDialog() async {
     setState(() {
       _showCelebration = true;
@@ -1077,14 +1435,114 @@ class _GameScreenState extends State<GameScreen>
       return;
     }
     final levelId = '${widget.packId}_${widget.levelIndex}';
-    await widget.progressService
-        .markCompleted(widget.packId, widget.levelIndex);
-    await widget.progressService.markDailyCompleted();
+    if (_isFriendChallengeMode) {
+      await _runCompletionStep(
+        'friendChallenge.markCompleted',
+        () => _friendChallengeService.markCompleted(
+          challengeId: widget.friendChallengeArgs!.challengeId,
+          elapsedMs: _currentElapsedDuration.inMilliseconds,
+        ),
+      );
+      if (!mounted) return;
+      final brightness = Theme.of(context).brightness;
+      final gameTheme = ThemeGenerator.generateTheme(
+        seed: _themeSeed!,
+        brightness: brightness,
+      );
+      final action = await _runCompletionStep<String?>(
+            'navigation.pushVictory.friendChallenge',
+            () => context.push<String>(
+              '/victory',
+              extra: VictoryScreenArgs(
+                zipNumber: widget.levelIndex,
+                headline: 'Friendly Challenge Complete',
+                timeText: _elapsedText,
+                averageText: '--:--',
+                streak: widget.progressService.getDailyStreak(),
+                primaryLabel: 'Replay',
+                primaryActionId: 'replay',
+                accentColor: gameTheme.pathColor,
+                coinsEarned: 0,
+                adBonusCoins: 0,
+                levelId: levelId,
+                shareText: 'Friendly challenge done in $_elapsedText.',
+                copyText: 'Friendly challenge | $_elapsedText',
+              ),
+            ),
+          ) ??
+          'back';
+      if (!mounted) return;
+      switch (action) {
+        case 'replay':
+          _boardController.reset();
+          setState(() {
+            _completionHandled = false;
+            _status = GameBoardStatus.fromPath(level, const []);
+            _hintVisible = false;
+            _hintsUsed = 0;
+            _rewindsUsed = 0;
+            _mistakesUsed = 0;
+            _runStartedAt = DateTime.now();
+            _ghostPlaybackStartedAt = _runStartedAt;
+            _recordedGhostFrames = <GhostFrame>[];
+            _lastRecordedGhostSampleMs = -1;
+            _lastRecordedGhostPos = null;
+            _elapsedAtSolve = null;
+            _showCelebration = false;
+          });
+          break;
+        default:
+          setState(() {
+            _showCelebration = false;
+          });
+          context.go('/social');
+          break;
+      }
+      return;
+    }
     final perfectCompletion = _mistakesUsed == 0;
-    final levelReward = await widget.coinsService.rewardLevelCompletionOncePerLevel(
-      levelId: levelId,
-      perfectCompletion: perfectCompletion,
+    final previousGhostBestMs =
+        _isLiveDuelMode ? 0 : (_ghostRun?.totalTimeMs ?? 0);
+    final levelReward = await _runCompletionStep<LevelRewardGrantResult>(
+          'coins.rewardLevelCompletionOncePerLevel',
+          () => widget.coinsService.rewardLevelCompletionOncePerLevel(
+            levelId: levelId,
+            perfectCompletion: perfectCompletion,
+          ),
+          fallback: const LevelRewardGrantResult(
+            coinsAwarded: 0,
+            firstCompletion: false,
+          ),
+        ) ??
+        const LevelRewardGrantResult(
+          coinsAwarded: 0,
+          firstCompletion: false,
+        );
+    await _runCompletionStep(
+      'progress.markCompleted',
+      () => widget.progressService
+          .markCompleted(widget.packId, widget.levelIndex),
     );
+    await _runCompletionStep(
+      'progress.clearInProgress',
+      () => widget.progressService.clearInProgressLevel(
+        widget.packId,
+        widget.levelIndex,
+      ),
+    );
+    await _runCompletionStep(
+      'progress.markDailyCompleted',
+      () => widget.progressService.markDailyCompleted(),
+    );
+    if (!_isLiveDuelMode) {
+      await _runCompletionStep(
+        'ghost.persistIfBest',
+        () => _persistGhostIfBest(
+          levelId: levelId,
+          elapsedMs: _currentElapsedDuration.inMilliseconds,
+        ),
+      );
+    }
     var rewardTotal = levelReward.coinsAwarded;
     var rewardedAdBonus = 0;
     if (mounted && !levelReward.firstCompletion) {
@@ -1096,6 +1554,27 @@ class _GameScreenState extends State<GameScreen>
           message: 'No coin reward on replay',
           duration: const Duration(milliseconds: 2000),
         ),
+      );
+    }
+    if (mounted &&
+        previousGhostBestMs > 0 &&
+        _currentElapsedDuration.inMilliseconds < previousGhostBestMs) {
+      unawaited(
+        GameToast.show(
+          context,
+          type: GameToastType.achievement,
+          title: 'New Best',
+          message: 'You beat your ghost!',
+          duration: const Duration(milliseconds: 2100),
+        ),
+      );
+    }
+    final didBeatGhost = previousGhostBestMs > 0 &&
+        _currentElapsedDuration.inMilliseconds < previousGhostBestMs;
+    if (_isLiveDuelMode) {
+      await _runCompletionStep(
+        'liveDuel.reportFinish',
+        () => _reportLiveDuelFinish(_currentElapsedDuration.inMilliseconds),
       );
     }
     final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
@@ -1124,35 +1603,64 @@ class _GameScreenState extends State<GameScreen>
       }
     }
     if (mounted) {
-      rewardedAdBonus = await _maybeGrantRewardedAdBonus();
+      rewardedAdBonus = await _runCompletionStep<int>(
+            'ads.rewardedBonus',
+            () => _maybeGrantRewardedAdBonus(),
+            fallback: 0,
+          ) ??
+          0;
       rewardTotal += rewardedAdBonus;
       _showCoinDelta(rewardTotal);
     }
-    await widget.statsService.recordLevelCompleted(
-      mode: SolveMode.campaign,
-      difficulty: level.difficulty,
-      solveTimeMs: _currentElapsedDuration.inMilliseconds,
-      hintsUsed: _hintsUsed,
-      rewindsUsed: _rewindsUsed,
+    await _runCompletionStep(
+      'stats.recordLevelCompleted',
+      () => widget.statsService.recordLevelCompleted(
+        mode: SolveMode.campaign,
+        difficulty: level.difficulty,
+        solveTimeMs: _currentElapsedDuration.inMilliseconds,
+        hintsUsed: _hintsUsed,
+        rewindsUsed: _rewindsUsed,
+      ),
     );
-    await widget.coinsService.updateProfileProgress(
-      highestLevelReached: widget.levelIndex,
-      playTimeSecondsDelta: _currentElapsedDuration.inSeconds,
-      gameWon: true,
-      solveMs: _currentElapsedDuration.inMilliseconds,
+    await _runCompletionStep(
+      'coins.updateProfileProgress',
+      () => widget.coinsService.updateProfileProgress(
+        highestLevelReached: widget.levelIndex,
+        playTimeSecondsDelta: _currentElapsedDuration.inSeconds,
+        gameWon: true,
+        solveMs: _currentElapsedDuration.inMilliseconds,
+      ),
     );
-    final unlocked = await widget.achievementsService.evaluateAfterCompletion(
-      mode: SolveMode.campaign,
-      difficulty: level.difficulty,
-      solveTimeMs: _currentElapsedDuration.inMilliseconds,
-      hintsUsed: _hintsUsed,
-      rewindsUsed: _rewindsUsed,
-    );
+    final unlocked = await _runCompletionStep<List<AchievementDef>>(
+          'achievements.evaluateAfterCompletion',
+          () => widget.achievementsService.evaluateAfterCompletion(
+            mode: SolveMode.campaign,
+            difficulty: level.difficulty,
+            solveTimeMs: _currentElapsedDuration.inMilliseconds,
+            hintsUsed: _hintsUsed,
+            rewindsUsed: _rewindsUsed,
+          ),
+          fallback: const <AchievementDef>[],
+        ) ??
+        const <AchievementDef>[];
+    AchievementDef? ghostAchievementUnlocked;
+    if (didBeatGhost) {
+      ghostAchievementUnlocked = await _runCompletionStep<AchievementDef?>(
+        'achievements.unlockById(beat_the_ghost)',
+        () => widget.achievementsService.unlockById('beat_the_ghost'),
+      );
+    }
+    final ghostDef = ghostAchievementUnlocked;
+    final unlockedNow = <AchievementDef>[
+      ...unlocked,
+      if (ghostDef != null && !unlocked.any((a) => a.id == ghostDef.id))
+        ghostDef,
+    ];
     if (!mounted) {
       return;
     }
-    if (unlocked.isNotEmpty) {
-      final first = unlocked.first;
+    if (unlockedNow.isNotEmpty) {
+      final first = unlockedNow.first;
       unawaited(
         GameToast.show(
           context,
@@ -1172,65 +1680,64 @@ class _GameScreenState extends State<GameScreen>
         rewindsUsed: _rewindsUsed,
       ),
     );
-    await widget.progressService.setBestScoreIfHigher(
-      widget.packId,
-      widget.levelIndex,
-      breakdown.finalScore,
+    await _runCompletionStep(
+      'progress.setBestScoreIfHigher',
+      () => widget.progressService.setBestScoreIfHigher(
+        widget.packId,
+        widget.levelIndex,
+        breakdown.finalScore,
+      ),
     );
-    await widget.leaderboardService.addPuzzleAttempt(
-      PuzzleAttempt(
-        runId: widget.leaderboardService.createRunId(),
-        packId: widget.packId,
-        levelIndex: widget.levelIndex,
-        timeMs: _currentElapsedDuration.inMilliseconds,
-        hintsUsed: _hintsUsed,
-        rewindsUsed: _rewindsUsed,
-        score: breakdown.finalScore,
-        createdAtIso: DateTime.now().toIso8601String(),
-        playerName: 'You',
+    await _runCompletionStep(
+      'leaderboard.addPuzzleAttempt',
+      () => widget.leaderboardService.addPuzzleAttempt(
+        PuzzleAttempt(
+          runId: widget.leaderboardService.createRunId(),
+          packId: widget.packId,
+          levelIndex: widget.levelIndex,
+          timeMs: _currentElapsedDuration.inMilliseconds,
+          hintsUsed: _hintsUsed,
+          rewindsUsed: _rewindsUsed,
+          score: breakdown.finalScore,
+          createdAtIso: DateTime.now().toIso8601String(),
+          playerName: 'You',
+        ),
       ),
     );
     final stars = _computeStars();
-    try {
-      await _socialLeaderboardService.submitLevelResult(
-        levelId: levelId,
-        bestTimeMs: _currentElapsedDuration.inMilliseconds,
-        moves: _status.path.length,
-        stars: stars,
+    if (!_isLiveDuelMode) {
+      await _runCompletionStep(
+        'socialLeaderboard.submitLevelResult',
+        () => _socialLeaderboardService.submitLevelResult(
+          levelId: levelId,
+          bestTimeMs: _currentElapsedDuration.inMilliseconds,
+          moves: _status.path.length,
+          stars: stars,
+        ),
       );
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[game] submitLevelResult failed for $levelId: $e');
-      }
-    }
-    try {
-      await _socialLeaderboardService.persistCompletedLevel(
-        levelId: levelId,
-        bestTimeMs: _currentElapsedDuration.inMilliseconds,
-        moves: _status.path.length,
-        stars: stars,
-        highestLevelReached: widget.levelIndex,
+      await _runCompletionStep(
+        'socialLeaderboard.persistCompletedLevel',
+        () => _socialLeaderboardService.persistCompletedLevel(
+          levelId: levelId,
+          bestTimeMs: _currentElapsedDuration.inMilliseconds,
+          moves: _status.path.length,
+          stars: stars,
+          highestLevelReached: widget.levelIndex,
+        ),
       );
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[game] persistCompletedLevel failed for $levelId: $e');
-      }
     }
 
     if (currentUid.trim().isNotEmpty && rewardTotal > 0) {
-      try {
-        await _walletHistoryService.addTransaction(
+      await _runCompletionStep(
+        'walletHistory.addTransaction',
+        () => _walletHistoryService.addTransaction(
           uid: currentUid,
           type: 'reward',
           amount: rewardTotal,
           source: 'level_complete',
           referenceId: levelId,
-        );
-      } catch (e) {
-        if (kDebugMode) {
-          debugPrint('[game] wallet history write failed for $levelId: $e');
-        }
-      }
+        ),
+      );
     }
     if (!mounted) {
       return;
@@ -1245,26 +1752,30 @@ class _GameScreenState extends State<GameScreen>
         .averageTimeMsForDifficulty(level.difficulty)
         ?.round();
     final hasNext = widget.levelIndex < _packLevelCount;
-    final action = await context.push<String>(
-      '/victory',
-      extra: VictoryScreenArgs(
-        zipNumber: widget.levelIndex,
-        headline: defaultVictoryHeadline(breakdown.finalScore),
-        timeText: _elapsedText,
-        averageText: _formatMs(average),
-        streak: widget.progressService.getDailyStreak(),
-        primaryLabel: hasNext ? 'Next Level' : 'Play Again',
-        primaryActionId: hasNext ? 'next' : 'replay',
-        accentColor: gameTheme.pathColor,
-        coinsEarned: rewardTotal,
-        adBonusCoins: rewardedAdBonus,
-        levelId: levelId,
-        shareText:
-            'I solved Zip #${widget.levelIndex} in $_elapsedText. Score ${breakdown.finalScore}.',
-        copyText:
-            'Zip #${widget.levelIndex} - $_elapsedText - Streak ${widget.progressService.getDailyStreak()} 🔥',
-      ),
-    );
+    final action = await _runCompletionStep<String?>(
+          'navigation.pushVictory',
+          () => context.push<String>(
+            '/victory',
+            extra: VictoryScreenArgs(
+              zipNumber: widget.levelIndex,
+              headline: defaultVictoryHeadline(breakdown.finalScore),
+              timeText: _elapsedText,
+              averageText: _formatMs(average),
+              streak: widget.progressService.getDailyStreak(),
+              primaryLabel: hasNext ? 'Next Level' : 'Play Again',
+              primaryActionId: hasNext ? 'next' : 'replay',
+              accentColor: gameTheme.pathColor,
+              coinsEarned: rewardTotal,
+              adBonusCoins: rewardedAdBonus,
+              levelId: levelId,
+              shareText:
+                  'I solved Zip #${widget.levelIndex} in $_elapsedText. Score ${breakdown.finalScore}.',
+              copyText:
+                  'Zip #${widget.levelIndex} - $_elapsedText - Streak ${widget.progressService.getDailyStreak()} 🔥',
+            ),
+          ),
+        ) ??
+        'fallback_nav';
 
     if (!mounted) {
       return;
@@ -1287,9 +1798,23 @@ class _GameScreenState extends State<GameScreen>
           _rewindsUsed = 0;
           _mistakesUsed = 0;
           _runStartedAt = DateTime.now();
+          _ghostPlaybackStartedAt = _runStartedAt;
+          _recordedGhostFrames = <GhostFrame>[];
+          _lastRecordedGhostSampleMs = -1;
+          _lastRecordedGhostPos = null;
           _elapsedAtSolve = null;
           _showCelebration = false;
         });
+        if (!_isLiveDuelMode && !_isFriendChallengeMode) {
+          _recordGhostFrame(const <int>[], force: true);
+          unawaited(_loadGhostRunForLevel(_currentLevelId));
+        }
+        break;
+      case 'fallback_nav':
+        setState(() {
+          _showCelebration = false;
+        });
+        context.go('/play');
         break;
       default:
         setState(() {
@@ -1303,7 +1828,7 @@ class _GameScreenState extends State<GameScreen>
   }
 
   Future<int> _maybeGrantRewardedAdBonus() async {
-    const bonusCoins = 15;
+    const bonusCoins = AdsService.automaticAdRewardCoins;
     final eligible = widget.levelIndex % 3 == 0;
     if (!eligible || !mounted) {
       return 0;
@@ -1317,10 +1842,12 @@ class _GameScreenState extends State<GameScreen>
       return 0;
     }
 
-    final outcome = await _rewardedAdService.showRewardedAd(context);
+    final earned = await _adsService.showRewardedAd(() async {
+      await widget.coinsService.addCoins(bonusCoins);
+    });
     if (!mounted) return 0;
 
-    if (!outcome.available || !outcome.shown) {
+    if (!earned) {
       unawaited(
         GameToast.show(
           context,
@@ -1332,20 +1859,6 @@ class _GameScreenState extends State<GameScreen>
       );
       return 0;
     }
-    if (!outcome.earned) {
-      unawaited(
-        GameToast.show(
-          context,
-          type: GameToastType.info,
-          title: 'Bonus not earned',
-          message: 'Ad was not completed.',
-          duration: const Duration(milliseconds: 1800),
-        ),
-      );
-      return 0;
-    }
-
-    await widget.coinsService.addCoins(bonusCoins);
     if (!mounted) return bonusCoins;
     unawaited(
       GameToast.show(
@@ -1359,17 +1872,187 @@ class _GameScreenState extends State<GameScreen>
     return bonusCoins;
   }
 
+  Future<void> _handleManualWatchAd() async {
+    const bonusCoins = AdsService.manualAdRewardCoins;
+    if (!mounted) return;
+    if (_manualAdBusy) return;
+    setState(() {
+      _manualAdBusy = true;
+    });
+    try {
+      final quota = await _adsService.getManualAdQuota();
+      if (!mounted) return;
+      if (quota.limitReached) {
+        await _refreshManualAdQuota();
+        unawaited(
+          GameToast.show(
+            context,
+            type: GameToastType.info,
+            title: 'Daily limit reached',
+            message: 'No more ads available today',
+            duration: const Duration(milliseconds: 1800),
+          ),
+        );
+        return;
+      }
+      if (quota.cooldownActive) {
+        await _refreshManualAdQuota();
+        unawaited(
+          GameToast.show(
+            context,
+            type: GameToastType.info,
+            title: 'Please wait',
+            message:
+                'Next ad in ${_formatDurationShort(quota.cooldownRemaining)}',
+            duration: const Duration(milliseconds: 1800),
+          ),
+        );
+        return;
+      }
+
+      final earned = await _adsService.showRewardedAd(() async {
+        final grant = await _adsService.grantManualAdReward();
+        await widget.coinsService.syncCoinsFromRemote(grant.newCoinsBalance);
+      });
+      if (!mounted) return;
+      await _refreshManualAdQuota();
+
+      if (!earned) {
+        unawaited(
+          GameToast.show(
+            context,
+            type: GameToastType.info,
+            title: 'Rewarded ad unavailable',
+            message: 'Please try again in a moment.',
+            duration: const Duration(milliseconds: 1800),
+          ),
+        );
+        return;
+      }
+
+      unawaited(
+        GameToast.show(
+          context,
+          type: GameToastType.coins,
+          title: 'Ad reward',
+          message: '+$bonusCoins coins',
+          duration: const Duration(milliseconds: 1900),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _manualAdBusy = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _showAdDiagnostics() async {
+    if (!mounted) return;
+    final hasAd = _adsService.hasRewardedAd;
+    final isLoading = _adsService.isLoadingRewardedAd;
+    await showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF111827),
+          title: const Text(
+            'Rewarded Ad Status',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+          ),
+          content: Text(
+            'Loaded: ${hasAd ? 'YES' : 'NO'}\nLoading: ${isLoading ? 'YES' : 'NO'}',
+            style: const TextStyle(color: Color(0xFFCBD5E1)),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+            FilledButton(
+              onPressed: () async {
+                await _adsService.loadRewardedAd();
+                if (!context.mounted) return;
+                Navigator.of(context).pop();
+                if (!mounted) return;
+                unawaited(
+                  GameToast.show(
+                    this.context,
+                    type: GameToastType.info,
+                    title: 'Ad reload requested',
+                    message: 'Trying to load a rewarded ad.',
+                    duration: const Duration(milliseconds: 1500),
+                  ),
+                );
+              },
+              child: const Text('Reload'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _refreshManualAdQuota() async {
+    try {
+      final quota = await _adsService.getManualAdQuota();
+      if (!mounted) return;
+      setState(() {
+        _manualAdsWatchedToday = quota.watchedToday;
+        _manualAdsDailyLimit = quota.maxDailyAds;
+        _manualAdsLimitReached = quota.limitReached;
+        _manualAdCooldownRemaining = quota.cooldownRemaining;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[ADS] quota refresh failed: $e');
+      }
+    }
+  }
+
+  String _formatDurationShort(Duration value) {
+    final totalSeconds = value.inSeconds < 0 ? 0 : value.inSeconds;
+    final minutes = (totalSeconds ~/ 60).toString().padLeft(2, '0');
+    final seconds = (totalSeconds % 60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
+
   int get _hintsLeft {
     final left = _maxHintsPerLevel - _hintsUsed;
     return left < 0 ? 0 : left;
   }
 
   int get _packLevelCount {
-    final precomputed = PackLevelRepository.instance.totalLevelsSync(widget.packId);
+    final precomputed =
+        PackLevelRepository.instance.totalLevelsSync(widget.packId);
     if (precomputed > 0) {
       return precomputed;
     }
     return displayedLevelCount;
+  }
+
+  Future<T?> _runCompletionStep<T>(
+    String name,
+    Future<T> Function() action, {
+    T? fallback,
+    Duration timeout = const Duration(seconds: 6),
+  }) async {
+    try {
+      return await action().timeout(timeout);
+    } on TimeoutException catch (e, st) {
+      debugPrint('[game][complete] step=$name timeout: $e');
+      if (kDebugMode) {
+        debugPrintStack(stackTrace: st);
+      }
+      return fallback;
+    } catch (e, st) {
+      debugPrint('[game][complete] step=$name failed: $e');
+      if (kDebugMode) {
+        debugPrintStack(stackTrace: st);
+      }
+      return fallback;
+    }
   }
 
   String get _elapsedText {
@@ -1405,6 +2088,120 @@ class _GameScreenState extends State<GameScreen>
     return TrailCatalog.resolveByTrailId(widget.coinsService.selectedTrail);
   }
 
+  bool get _isLiveDuelMode => widget.liveDuelArgs != null;
+
+  bool get _isFriendChallengeMode => widget.friendChallengeArgs != null;
+
+  String get _currentLevelId => '${widget.packId}_${widget.levelIndex}';
+
+  String get _ghostUid {
+    final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
+    if (uid.isNotEmpty) return uid;
+    return 'guest';
+  }
+
+  bool _isGhostEnabledForLevel(String levelId) {
+    return levelId.trim().isNotEmpty;
+  }
+
+  void _toggleGhostMode() {
+    setState(() {
+      _ghostEnabled = !_ghostEnabled;
+      _ghostModeSessionEnabled = _ghostEnabled;
+    });
+  }
+
+  String _formatGhostTime(int ms) {
+    if (ms <= 0) return '--.--s';
+    final seconds = ms / 1000.0;
+    return '${seconds.toStringAsFixed(2)}s';
+  }
+
+  Future<void> _loadGhostRunForLevel(String levelId) async {
+    if (_isLiveDuelMode) return;
+    if (!_isGhostEnabledForLevel(levelId)) {
+      if (mounted) {
+        setState(() {
+          _ghostRun = null;
+        });
+      }
+      return;
+    }
+    final run =
+        await _ghostService.loadBestRun(uid: _ghostUid, levelId: levelId);
+    if (!mounted) return;
+    setState(() {
+      _ghostRun = run;
+    });
+  }
+
+  void _recordGhostFrame(List<int> path, {bool force = false}) {
+    if (_isLiveDuelMode) return;
+    final level = _level;
+    if (level == null || path.isEmpty) return;
+    final startedAt = _runStartedAt;
+    if (startedAt == null) return;
+    if (!_isGhostEnabledForLevel(_currentLevelId)) return;
+
+    final nowMs = DateTime.now().difference(startedAt).inMilliseconds;
+    final pos = _normalizedCellCenter(path.last, level.width, level.height);
+    final minDeltaMs = force ? 0 : 24;
+    final elapsedDelta = nowMs - _lastRecordedGhostSampleMs;
+    final movedEnough = _lastRecordedGhostPos == null ||
+        (pos - _lastRecordedGhostPos!).distance > 0.0005;
+    if (!force && elapsedDelta < minDeltaMs && !movedEnough) {
+      return;
+    }
+
+    _recordedGhostFrames.add(
+      GhostFrame(
+        timeMs: nowMs,
+        x: pos.dx,
+        y: pos.dy,
+      ),
+    );
+    _lastRecordedGhostSampleMs = nowMs;
+    _lastRecordedGhostPos = pos;
+  }
+
+  Offset _normalizedCellCenter(int cellIndex, int width, int height) {
+    final row = cellIndex ~/ width;
+    final col = cellIndex % width;
+    final x = (col + 0.5) / width;
+    final y = (row + 0.5) / height;
+    return Offset(x.clamp(0.0, 1.0), y.clamp(0.0, 1.0));
+  }
+
+  Future<void> _persistGhostIfBest({
+    required String levelId,
+    required int elapsedMs,
+  }) async {
+    if (!_isGhostEnabledForLevel(levelId) || elapsedMs <= 0) return;
+    if (_recordedGhostFrames.length < 2) {
+      final fallbackPath = _status.path;
+      if (fallbackPath.isEmpty) return;
+      _recordGhostFrame(fallbackPath, force: true);
+    }
+    if (_recordedGhostFrames.length < 2) return;
+
+    final run = GhostRun(
+      levelId: levelId,
+      totalTimeMs: elapsedMs,
+      boardWidth: _level?.width ?? 0,
+      boardHeight: _level?.height ?? 0,
+      frames: List<GhostFrame>.unmodifiable(_recordedGhostFrames),
+    );
+    final improved = await _ghostService.saveBestRunIfBetter(
+      uid: _ghostUid,
+      run: run,
+    );
+    if (improved && mounted) {
+      setState(() {
+        _ghostRun = run;
+      });
+    }
+  }
+
   int _computeStars() {
     if (_hintsUsed == 0 && _rewindsUsed == 0 && _mistakesUsed == 0) {
       return 3;
@@ -1414,6 +2211,585 @@ class _GameScreenState extends State<GameScreen>
     }
     return 1;
   }
+
+  void _persistInProgressLevel(List<int> path) {
+    final startedAt = _runStartedAt ?? DateTime.now();
+    final snapshot = InProgressLevelSnapshot(
+      path: List<int>.unmodifiable(path),
+      startedAtMs: startedAt.millisecondsSinceEpoch,
+      hintsUsed: _hintsUsed,
+      rewindsUsed: _rewindsUsed,
+      mistakesUsed: _mistakesUsed,
+    );
+    unawaited(
+      widget.progressService.saveInProgressLevel(
+        packId: widget.packId,
+        levelIndex: widget.levelIndex,
+        snapshot: snapshot,
+      ),
+    );
+  }
+
+  void _attachLiveMatchListener() {
+    if (!_isLiveDuelMode) return;
+    final args = widget.liveDuelArgs!;
+    _liveMatchSub?.cancel();
+    _liveMatchSub = _liveDuelService.watchMatch(args.matchId).listen((match) {
+      if (!mounted) return;
+      if (match == null) return;
+      final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
+      final opponentUid = match.opponentUid(uid);
+      final opponent = opponentUid.isEmpty ? null : match.players[opponentUid];
+      final opponentName = (opponent?.username.trim().isNotEmpty == true)
+          ? opponent!.username.trim()
+          : 'Opponent';
+      final opponentState = _duelStateLabel(opponent?.state);
+      setState(() {
+        _duelOpponentName = opponentName;
+        _duelOpponentState = opponentState;
+        _liveWinnerResolved = match.winnerUid.trim().isNotEmpty;
+        _liveLostBeforeFinish = _liveWinnerResolved &&
+            match.winnerUid.trim() != uid &&
+            !_completionHandled;
+      });
+      _attachLiveTrailListener(opponentUid);
+      if (match.isTerminal) {
+        unawaited(
+          _liveDuelService.clearRealtimeTrail(
+            matchId: args.matchId,
+            state: 'stopped',
+          ),
+        );
+      }
+      unawaited(_maybeAnnounceLiveWinner(match));
+    });
+  }
+
+  void _attachLiveTrailListener(String opponentUid) {
+    if (!_isLiveDuelMode) return;
+    final normalizedOpponent = opponentUid.trim();
+    if (normalizedOpponent.isEmpty) {
+      _liveTrailSub?.cancel();
+      _liveTrailSub = null;
+      _liveTrailSubscribedUid = '';
+      if (_duelOpponentPath.isNotEmpty && mounted) {
+        setState(() {
+          _duelOpponentPath = const <int>[];
+        });
+      }
+      return;
+    }
+    if (_liveTrailSubscribedUid == normalizedOpponent &&
+        _liveTrailSub != null) {
+      return;
+    }
+    _liveTrailSub?.cancel();
+    _liveTrailSubscribedUid = normalizedOpponent;
+    _liveTrailSub = _liveDuelService
+        .watchRealtimeTrail(
+      matchId: widget.liveDuelArgs!.matchId,
+      uid: normalizedOpponent,
+    )
+        .listen((trail) {
+      if (!mounted) return;
+      final nextPath = trail?.pathCells ?? const <int>[];
+      if (listEquals(nextPath, _duelOpponentPath)) return;
+      setState(() {
+        _duelOpponentPath = List<int>.unmodifiable(nextPath);
+      });
+    });
+  }
+
+  void _scheduleLiveTrailPublish(
+    List<int> path, {
+    String state = 'drawing',
+  }) {
+    if (!_isLiveDuelMode) return;
+    final signature = path.join(',');
+    if (signature == _lastLiveTrailPublishedSignature &&
+        state == _pendingLiveTrailState) {
+      return;
+    }
+    _pendingLiveTrailPath = List<int>.unmodifiable(path);
+    _pendingLiveTrailState = state;
+    _pendingLiveTrailSignature = signature;
+    _liveTrailPublishTimer ??=
+        Timer(const Duration(milliseconds: 120), _flushLiveTrailPublish);
+
+    final nowMs = DateTime.now().millisecondsSinceEpoch;
+    if (nowMs - _lastLiveTrailPublishedAtMs >= 120) {
+      _flushLiveTrailPublish();
+    }
+  }
+
+  void _flushLiveTrailPublish([Timer? _]) {
+    if (!_isLiveDuelMode) return;
+    _liveTrailPublishTimer?.cancel();
+    _liveTrailPublishTimer = null;
+
+    final signature = _pendingLiveTrailSignature;
+    if (signature.isEmpty) return;
+    if (signature == _lastLiveTrailPublishedSignature) return;
+
+    _lastLiveTrailPublishedAtMs = DateTime.now().millisecondsSinceEpoch;
+    _lastLiveTrailPublishedSignature = signature;
+    _liveTrailPublishVersion++;
+
+    unawaited(
+      _liveDuelService.publishRealtimeTrail(
+        matchId: widget.liveDuelArgs!.matchId,
+        pathCells: _pendingLiveTrailPath,
+        state: _pendingLiveTrailState,
+        pathVersion: _liveTrailPublishVersion,
+      ),
+    );
+  }
+
+  Future<void> _maybeAnnounceLiveWinner(LiveMatch match) async {
+    if (!mounted) return;
+    final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
+    if (uid.isEmpty) return;
+    final winnerUid = match.winnerUid.trim();
+    if (winnerUid.isEmpty) return;
+    final key = '${match.id}:$winnerUid';
+    if (_liveWinnerAnnouncementKey == key) return;
+    _liveWinnerAnnouncementKey = key;
+    final won = winnerUid == uid;
+    _showLiveResultOverlay(
+      won ? 'YOU WON!' : 'YOU LOST',
+      subtitle: won
+          ? 'You finished first in the duel.'
+          : '${_duelOpponentName.toUpperCase()} WON!',
+    );
+    await GameToast.show(
+      context,
+      type: GameToastType.social,
+      title: won ? 'YOU WON!' : 'YOU LOST',
+      message: won
+          ? 'You finished first in the duel.'
+          : '${_duelOpponentName.toUpperCase()} WON!',
+      duration: const Duration(milliseconds: 2200),
+    );
+  }
+
+  void _showLiveResultOverlay(String title, {String subtitle = ''}) {
+    _liveResultOverlayTimer?.cancel();
+    if (!mounted) return;
+    setState(() {
+      _liveResultOverlayText = subtitle.isEmpty ? title : '$title\n$subtitle';
+      _liveResultOverlayVisible = true;
+    });
+    _liveResultOverlayTimer = Timer(const Duration(milliseconds: 1700), () {
+      if (!mounted) return;
+      setState(() {
+        _liveResultOverlayVisible = false;
+      });
+    });
+  }
+
+  Future<void> _reportLiveDuelFinish(int elapsedMs) async {
+    if (!_isLiveDuelMode || _liveFinishReported || elapsedMs <= 0) return;
+    try {
+      await _liveDuelService.reportFinish(
+        matchId: widget.liveDuelArgs!.matchId,
+        elapsedMsFromStart: elapsedMs,
+      );
+      _liveFinishReported = true;
+      final refreshed =
+          await _liveDuelService.getMatch(widget.liveDuelArgs!.matchId);
+      if (!mounted || refreshed == null) return;
+      await _showLiveDuelResultSheet(refreshed, elapsedMs);
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint(
+            '[duel] report finish failed match=${widget.liveDuelArgs!.matchId}: $e');
+      }
+    }
+  }
+
+  Future<void> _showLiveDuelResultSheet(LiveMatch match, int elapsedMs) async {
+    if (!mounted) return;
+    final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
+    if (match.status != LiveMatchStatus.finished) {
+      await GameToast.show(
+        context,
+        type: GameToastType.info,
+        title: 'Live duel',
+        message:
+            'Finished in ${_formatGhostTime(elapsedMs)}. Waiting result...',
+        duration: const Duration(milliseconds: 1900),
+      );
+      return;
+    }
+    final opponentUid = match.opponentUid(uid);
+    final myPlayer = match.players[uid];
+    final opponentPlayer = match.players[opponentUid];
+    final winnerUid = match.winnerUid.trim();
+    final reason = match.reason.trim();
+    final myAbandoned = myPlayer?.state == LiveMatchPlayerState.abandoned;
+    final oppAbandoned =
+        opponentPlayer?.state == LiveMatchPlayerState.abandoned;
+
+    String title = 'Live duel result';
+    String message = 'Draw';
+    if (myAbandoned) {
+      title = 'Defeat';
+      message = 'You abandoned';
+    } else if (oppAbandoned) {
+      title = 'Victory';
+      message = 'Opponent abandoned';
+    } else if (winnerUid.isEmpty) {
+      title = 'Draw';
+      message = reason == 'both_abandoned' ? 'Duel cancelled' : 'Draw';
+    } else if (winnerUid == uid) {
+      title = 'Victory';
+      message = 'You won the duel';
+    } else {
+      title = 'Defeat';
+      message = 'You lost the duel';
+    }
+
+    if (!mounted) return;
+    await showModalBottomSheet<void>(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        var rematchBusy = false;
+        var sendingEmote = false;
+        return StatefulBuilder(
+          builder: (context, setLocalState) {
+            return SafeArea(
+              top: false,
+              child: Container(
+                margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF1A2A45), Color(0xFF111C33)],
+                  ),
+                  border: Border.all(color: const Color(0xFF355687)),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      message,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Color(0xFFAED2FF),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    _duelResultRow(
+                      'Your time',
+                      _formatGhostTime(
+                        (myPlayer?.finishedAtMsFromStart ?? 0) > 0
+                            ? (myPlayer?.finishedAtMsFromStart ?? 0)
+                            : elapsedMs,
+                      ),
+                    ),
+                    _duelResultRow(
+                      'Opponent time',
+                      _formatGhostTime(
+                          opponentPlayer?.finishedAtMsFromStart ?? 0),
+                    ),
+                    _duelResultRow('Level', match.levelId),
+                    _duelResultRow(
+                      'Opponent',
+                      opponentPlayer?.username.trim().isNotEmpty == true
+                          ? opponentPlayer!.username.trim()
+                          : 'Player',
+                    ),
+                    const SizedBox(height: 12),
+                    _buildDuelEmoteFeed(match.id),
+                    const SizedBox(height: 8),
+                    _buildDuelEmoteTray(
+                      matchId: match.id,
+                      sending: sendingEmote,
+                      onSendingChanged: (value) =>
+                          setLocalState(() => sendingEmote = value),
+                    ),
+                    const SizedBox(height: 14),
+                    FilledButton(
+                      onPressed: rematchBusy
+                          ? null
+                          : () async {
+                              setLocalState(() => rematchBusy = true);
+                              try {
+                                final created =
+                                    await _liveDuelService.createRematch(
+                                  previousMatchId: match.id,
+                                );
+                                if (!sheetContext.mounted) return;
+                                Navigator.of(sheetContext).pop();
+                                if (!mounted) return;
+                                context.go('/live-duel/${created.matchId}');
+                              } catch (e) {
+                                if (!sheetContext.mounted) return;
+                                setLocalState(() => rematchBusy = false);
+                                var err = 'Could not create rematch';
+                                final txt = e.toString();
+                                if (txt.contains('ALREADY_IN_ACTIVE_DUEL')) {
+                                  err = 'Finish your active duel first';
+                                } else if (txt
+                                    .contains('TARGET_IN_ACTIVE_DUEL')) {
+                                  err = 'Opponent is busy in another duel';
+                                }
+                                ScaffoldMessenger.of(sheetContext).showSnackBar(
+                                  SnackBar(content: Text(err)),
+                                );
+                              }
+                            },
+                      child:
+                          Text(rematchBusy ? 'Creating rematch...' : 'Rematch'),
+                    ),
+                    const SizedBox(height: 8),
+                    OutlinedButton(
+                      onPressed: () => Navigator.of(sheetContext).pop(),
+                      child: const Text('Back'),
+                    ),
+                    const SizedBox(height: 6),
+                    TextButton(
+                      onPressed: () {
+                        final info =
+                            LiveDuelService.parseLevelRouteInfo(match.levelId);
+                        if (info == null) {
+                          Navigator.of(sheetContext).pop();
+                          return;
+                        }
+                        Navigator.of(sheetContext).pop();
+                        if (!mounted) return;
+                        context.go('/play/${info.packId}/${info.levelIndex}');
+                      },
+                      child: const Text('Play level normally'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildDuelEmoteFeed(String matchId) {
+    final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
+    return StreamBuilder<List<LiveMatchEmote>>(
+      stream: _liveDuelService.watchMatchEmotes(matchId, limit: 10),
+      builder: (context, snapshot) {
+        final rows = snapshot.data ?? const <LiveMatchEmote>[];
+        if (rows.isEmpty) {
+          return const SizedBox.shrink();
+        }
+        return Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: rows.take(4).map((emote) {
+            final def = _duelEmoteById(emote.emoteId);
+            final mine = emote.sentByUid == uid;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: mine
+                    ? const Color(0xFF1D3960).withOpacity(0.88)
+                    : const Color(0xFF25334B).withOpacity(0.88),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color:
+                      mine ? const Color(0xFF63A2FF) : const Color(0xFF4D607D),
+                ),
+              ),
+              child: Text(
+                '${def.glyph} ${mine ? "You" : _duelOpponentName}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            );
+          }).toList(growable: false),
+        );
+      },
+    );
+  }
+
+  Widget _buildDuelEmoteTray({
+    required String matchId,
+    required bool sending,
+    required ValueChanged<bool> onSendingChanged,
+  }) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      alignment: WrapAlignment.center,
+      children: _duelEmotes.map((emote) {
+        return InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: sending
+              ? null
+              : () async {
+                  onSendingChanged(true);
+                  try {
+                    await _sendDuelEmote(matchId: matchId, emoteId: emote.id);
+                  } finally {
+                    onSendingChanged(false);
+                  }
+                },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 140),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1A2A43),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0xFF3F5E88)),
+            ),
+            child: Text(
+              '${emote.glyph} ${emote.label}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        );
+      }).toList(growable: false),
+    );
+  }
+
+  Future<void> _sendDuelEmote({
+    required String matchId,
+    required String emoteId,
+  }) async {
+    final nowMs = DateTime.now().millisecondsSinceEpoch;
+    final lastMs = _duelEmoteLastSentAtMs[matchId] ?? 0;
+    if (lastMs > 0 && nowMs - lastMs < 1600) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Emote cooldown'),
+          duration: Duration(milliseconds: 900),
+        ),
+      );
+      return;
+    }
+    try {
+      await _liveDuelService.sendMatchEmote(
+        matchId: matchId,
+        emoteId: emoteId,
+      );
+      _duelEmoteLastSentAtMs[matchId] = nowMs;
+    } catch (e) {
+      if (!mounted) return;
+      var msg = 'Could not send emote';
+      if (e.toString().contains('EMOTE_COOLDOWN')) {
+        msg = 'Emote cooldown';
+      } else if (e.toString().contains('EMOTES_DISABLED')) {
+        msg = 'Emotes available after duel result';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(msg),
+          duration: const Duration(milliseconds: 1000),
+        ),
+      );
+    }
+  }
+
+  List<_DuelEmoteDef> get _duelEmotes => const <_DuelEmoteDef>[
+        _DuelEmoteDef(id: 'laugh', label: 'Laugh', glyph: '😂'),
+        _DuelEmoteDef(id: 'cool', label: 'Cool', glyph: '😎'),
+        _DuelEmoteDef(id: 'wow', label: 'Wow', glyph: '😮'),
+        _DuelEmoteDef(id: 'cry', label: 'Cry', glyph: '😢'),
+        _DuelEmoteDef(id: 'clap', label: 'Clap', glyph: '👏'),
+        _DuelEmoteDef(id: 'heart', label: 'Heart', glyph: '❤️'),
+      ];
+
+  _DuelEmoteDef _duelEmoteById(String id) {
+    for (final item in _duelEmotes) {
+      if (item.id == id) return item;
+    }
+    return const _DuelEmoteDef(id: 'wow', label: 'Wow', glyph: '😮');
+  }
+
+  Widget _duelResultRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Color(0xFF9FB4D7),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _duelStateLabel(LiveMatchPlayerState? state) {
+    switch (state) {
+      case LiveMatchPlayerState.finished:
+        return 'Finished';
+      case LiveMatchPlayerState.abandoned:
+        return 'Abandoned';
+      case LiveMatchPlayerState.playing:
+        return 'Drawing...';
+      case LiveMatchPlayerState.ready:
+        return 'Ready';
+      case LiveMatchPlayerState.joined:
+        return 'Joined';
+      case LiveMatchPlayerState.invited:
+        return 'Invited';
+      case null:
+        return 'Waiting...';
+    }
+  }
+}
+
+class _DuelEmoteDef {
+  const _DuelEmoteDef({
+    required this.id,
+    required this.label,
+    required this.glyph,
+  });
+
+  final String id;
+  final String label;
+  final String glyph;
 }
 
 class _InLevelRankRowData {
@@ -1511,7 +2887,8 @@ class _InLevelRankRow extends StatelessWidget {
         color: highlighted ? const Color(0x1A4A7CFF) : const Color(0xFF1A2538),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: highlighted ? const Color(0xFF5D8CFF) : const Color(0xFF32445F),
+          color:
+              highlighted ? const Color(0xFF5D8CFF) : const Color(0xFF32445F),
         ),
       ),
       child: Row(
@@ -1753,12 +3130,14 @@ class _GlassBoardShell extends StatelessWidget {
                 borderRadius: BorderRadius.circular(34),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF4C6FFF).withOpacity(isDark ? 0.12 : 0.07),
+                    color: const Color(0xFF4C6FFF)
+                        .withOpacity(isDark ? 0.12 : 0.07),
                     blurRadius: 52,
                     spreadRadius: 10,
                   ),
                   BoxShadow(
-                    color: const Color(0xFF1B2442).withOpacity(isDark ? 0.42 : 0.2),
+                    color: const Color(0xFF1B2442)
+                        .withOpacity(isDark ? 0.42 : 0.2),
                     blurRadius: 70,
                     spreadRadius: 16,
                   ),
@@ -1877,6 +3256,7 @@ class _GameplayHeader extends StatelessWidget {
     required this.walletCoins,
     required this.onRankingTap,
     required this.onWalletTap,
+    this.showRanking = true,
   });
 
   final String levelText;
@@ -1885,6 +3265,7 @@ class _GameplayHeader extends StatelessWidget {
   final int walletCoins;
   final VoidCallback onRankingTap;
   final VoidCallback onWalletTap;
+  final bool showRanking;
 
   @override
   Widget build(BuildContext context) {
@@ -1924,18 +3305,279 @@ class _GameplayHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        IconButton(
-          onPressed: onRankingTap,
-          tooltip: 'Friends ranking',
-          style: IconButton.styleFrom(
-            backgroundColor: const Color(0xFF243044),
-            foregroundColor: const Color(0xFFFFD166),
-          ),
-          icon: const Icon(Icons.emoji_events_rounded),
-        ),
+        if (showRanking)
+          IconButton(
+            onPressed: onRankingTap,
+            tooltip: 'Friends ranking',
+            style: IconButton.styleFrom(
+              backgroundColor: const Color(0xFF243044),
+              foregroundColor: const Color(0xFFFFD166),
+            ),
+            icon: const Icon(Icons.emoji_events_rounded),
+          )
+        else
+          const SizedBox(width: 40),
         const SizedBox(width: 8),
         _WalletPill(coins: walletCoins, onTap: onWalletTap),
       ],
+    );
+  }
+}
+
+class _GhostRaceInfoBar extends StatelessWidget {
+  const _GhostRaceInfoBar({
+    required this.bestTimeText,
+    required this.enabled,
+    required this.onToggle,
+  });
+
+  final String bestTimeText;
+  final bool enabled;
+  final VoidCallback onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF182338),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF334155)),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.visibility_rounded,
+            size: 16,
+            color: Color(0xFF8FB5FF),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Ghost best: $bestTimeText',
+              style: const TextStyle(
+                color: Color(0xFFD7E5FF),
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: onToggle,
+            style: TextButton.styleFrom(
+              visualDensity: VisualDensity.compact,
+              minimumSize: const Size(86, 30),
+            ),
+            child: Text(
+              enabled ? 'Ghost: ON' : 'Ghost: OFF',
+              style: TextStyle(
+                color:
+                    enabled ? const Color(0xFF6DD6FF) : const Color(0xFF8FA6CF),
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GhostPendingInfoBar extends StatelessWidget {
+  const _GhostPendingInfoBar({
+    required this.enabled,
+    required this.onToggle,
+  });
+
+  final bool enabled;
+  final VoidCallback onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF182338),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF334155)),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.visibility_rounded,
+            size: 16,
+            color: Color(0xFF8FB5FF),
+          ),
+          const SizedBox(width: 8),
+          const Expanded(
+            child: Text(
+              'Ghost available after first completion',
+              style: TextStyle(
+                color: Color(0xFFB8C8E8),
+                fontWeight: FontWeight.w600,
+                fontSize: 12.5,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: onToggle,
+            style: TextButton.styleFrom(
+              visualDensity: VisualDensity.compact,
+              minimumSize: const Size(86, 30),
+            ),
+            child: Text(
+              enabled ? 'Ghost: ON' : 'Ghost: OFF',
+              style: TextStyle(
+                color:
+                    enabled ? const Color(0xFF6DD6FF) : const Color(0xFF8FA6CF),
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FriendChallengeInfoBar extends StatelessWidget {
+  const _FriendChallengeInfoBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF28314C), Color(0xFF1B2238)],
+        ),
+        border: Border.all(color: const Color(0xFF4A5E8A)),
+      ),
+      child: const Row(
+        children: [
+          Icon(
+            Icons.sports_score_rounded,
+            color: Color(0xFF89E6FF),
+            size: 18,
+          ),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Friendly Challenge',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+          Text(
+            'No ranking impact',
+            style: TextStyle(
+              color: Color(0xFFB8CAE8),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LiveDuelStatusBar extends StatelessWidget {
+  const _LiveDuelStatusBar({
+    required this.opponentName,
+    required this.opponentState,
+  });
+
+  final String opponentName;
+  final String opponentState;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF173152), Color(0xFF112640)],
+        ),
+        border: Border.all(color: const Color(0xFF2F5D93)),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.sports_martial_arts_rounded,
+            color: Color(0xFF7DE2FF),
+            size: 18,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'VS $opponentName',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            opponentState,
+            style: const TextStyle(
+              color: Color(0xFFA6D8FF),
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LiveDuelResolvedBanner extends StatelessWidget {
+  const _LiveDuelResolvedBanner({
+    required this.text,
+  });
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF20293B),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF4C5E7D)),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.info_outline_rounded,
+            size: 15,
+            color: Color(0xFFB8CAE8),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: Color(0xFFD6E4FF),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -2000,7 +3642,7 @@ class _GameActionButton extends StatefulWidget {
   });
 
   final String label;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final bool outlined;
   final bool visuallyEnabled;
   final Color backgroundColor;
@@ -2040,10 +3682,14 @@ class _GameActionButtonState extends State<_GameActionButton> {
         ),
         child: InkWell(
           borderRadius: BorderRadius.circular(18),
-          onTap: widget.onTap,
-          onTapDown: (_) => setState(() => _scale = 0.97),
-          onTapUp: (_) => setState(() => _scale = 1),
-          onTapCancel: () => setState(() => _scale = 1),
+          onTap: widget.visuallyEnabled ? widget.onTap : null,
+          onTapDown: widget.visuallyEnabled
+              ? (_) => setState(() => _scale = 0.97)
+              : null,
+          onTapUp:
+              widget.visuallyEnabled ? (_) => setState(() => _scale = 1) : null,
+          onTapCancel:
+              widget.visuallyEnabled ? () => setState(() => _scale = 1) : null,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
             child: Center(

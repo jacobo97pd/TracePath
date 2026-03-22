@@ -41,7 +41,8 @@ class InboxService {
   }
 
   Stream<List<InboxItem>> watchInbox([String? uid]) async* {
-    final targetUid = (uid ?? '').trim().isEmpty ? await _requireUid() : uid!.trim();
+    final targetUid =
+        (uid ?? '').trim().isEmpty ? await _requireUid() : uid!.trim();
     yield* _inboxRef(targetUid)
         .orderBy('createdAt', descending: true)
         .snapshots()
@@ -53,7 +54,8 @@ class InboxService {
   }
 
   Stream<int> watchUnreadCount({String? uid}) async* {
-    final targetUid = (uid ?? '').trim().isEmpty ? await _requireUid() : uid!.trim();
+    final targetUid =
+        (uid ?? '').trim().isEmpty ? await _requireUid() : uid!.trim();
     yield* _inboxRef(targetUid)
         .where('read', isEqualTo: false)
         .snapshots()
@@ -105,7 +107,9 @@ class InboxService {
     switch (value) {
       case 'friend_request':
       case 'friend_accept':
+      case 'friend_challenge':
       case 'level_challenge':
+      case 'live_duel_invite':
       case 'system_news':
         return value;
       default:

@@ -37,21 +37,44 @@ class SocialLeaderboardService {
       final currentSnap = await tx.get(scoreRef);
       final currentData = currentSnap.data() ?? <String, dynamic>{};
       final currentBest = LeaderboardEntry.readInt(currentData['bestTimeMs']);
+      final currentFirst = LeaderboardEntry.readInt(
+        currentData['firstClearTimeMs'],
+      );
+      final currentRanking = LeaderboardEntry.readInt(
+        currentData['rankingTimeMs'],
+      );
+      final currentPersonal = LeaderboardEntry.readInt(
+        currentData['personalBestTimeMs'],
+      );
       final currentMoves = LeaderboardEntry.readInt(currentData['moves']);
-      final betterByTime = !currentSnap.exists ||
-          currentBest <= 0 ||
-          bestTimeMs < currentBest;
+      final resolvedFirstFromLegacy = currentFirst > 0
+          ? currentFirst
+          : (currentRanking > 0
+              ? currentRanking
+              : (currentBest > 0 ? currentBest : bestTimeMs));
+      final rankingTimeMs =
+          resolvedFirstFromLegacy > 0 ? resolvedFirstFromLegacy : bestTimeMs;
+      final personalBestMs = currentSnap.exists
+          ? (() {
+              final base = currentPersonal > 0
+                  ? currentPersonal
+                  : (currentBest > 0 ? currentBest : bestTimeMs);
+              if (base <= 0) return bestTimeMs;
+              if (bestTimeMs <= 0) return base;
+              return bestTimeMs < base ? bestTimeMs : base;
+            })()
+          : bestTimeMs;
       final betterByMoves = currentSnap.exists &&
-          currentBest > 0 &&
-          bestTimeMs == currentBest &&
+          rankingTimeMs > 0 &&
+          bestTimeMs == rankingTimeMs &&
           (currentMoves <= 0 || (moves > 0 && moves < currentMoves));
-      if (!betterByTime && !betterByMoves) return;
 
       tx.set(
         scoreRef,
         <String, dynamic>{
           'uid': normalizedUid,
-          'playerName': playerName.trim().isEmpty ? 'Player' : playerName.trim(),
+          'playerName':
+              playerName.trim().isEmpty ? 'Player' : playerName.trim(),
           'username': username.trim(),
           'photoUrl': photoUrl.trim(),
           'avatarId': avatarId.trim().isEmpty ? 'default' : avatarId.trim(),
@@ -60,9 +83,19 @@ class SocialLeaderboardService {
           'equippedTrailId':
               equippedTrailId.trim().isEmpty ? 'none' : equippedTrailId.trim(),
           'levelId': normalizedLevelId,
-          'bestTimeMs': bestTimeMs,
-          'moves': moves,
-          'stars': stars,
+          // Keep ranking immutable as first clear once set.
+          'bestTimeMs': rankingTimeMs,
+          'firstClearTimeMs': rankingTimeMs,
+          'rankingTimeMs': rankingTimeMs,
+          // Personal best can improve and is consumed by self-improvement modes.
+          'personalBestTimeMs': personalBestMs,
+          'moves': !currentSnap.exists
+              ? moves
+              : (betterByMoves ? moves : currentMoves),
+          'stars': !currentSnap.exists
+              ? stars
+              : max(LeaderboardEntry.readInt(currentData['stars']), stars),
+          if (!currentSnap.exists) 'firstClearAt': FieldValue.serverTimestamp(),
           'updatedAt': FieldValue.serverTimestamp(),
         },
         SetOptions(merge: true),
@@ -87,11 +120,12 @@ class SocialLeaderboardService {
             ? (userData['playerName'] as String).trim()
             : 'Player';
     final username = (userData['username'] as String?)?.trim() ?? '';
-    final photoUrl = (userData['photoUrl'] as String?)?.trim().isNotEmpty == true
-        ? (userData['photoUrl'] as String).trim()
-        : ((userData['photoURL'] as String?)?.trim().isNotEmpty == true
-            ? (userData['photoURL'] as String).trim()
-            : (FirebaseAuth.instance.currentUser?.photoURL ?? '').trim());
+    final photoUrl =
+        (userData['photoUrl'] as String?)?.trim().isNotEmpty == true
+            ? (userData['photoUrl'] as String).trim()
+            : ((userData['photoURL'] as String?)?.trim().isNotEmpty == true
+                ? (userData['photoURL'] as String).trim()
+                : (FirebaseAuth.instance.currentUser?.photoURL ?? '').trim());
     final avatarId =
         ((userData['avatarId'] as String?)?.trim().isNotEmpty == true)
             ? (userData['avatarId'] as String).trim()
@@ -156,6 +190,11 @@ class SocialLeaderboardService {
       final completedSnap = await tx.get(completedRef);
       final current = completedSnap.data() ?? <String, dynamic>{};
       final currentBest = LeaderboardEntry.readInt(current['bestTimeMs']);
+      final currentFirst =
+          LeaderboardEntry.readInt(current['firstClearTimeMs']);
+      final currentPersonal = LeaderboardEntry.readInt(
+        current['personalBestTimeMs'],
+      );
       final currentMoves = LeaderboardEntry.readInt(current['moves']);
       final betterByTime = !completedSnap.exists ||
           currentBest <= 0 ||
@@ -171,6 +210,24 @@ class SocialLeaderboardService {
       };
       if (!completedSnap.exists) {
         payload['completedAt'] = FieldValue.serverTimestamp();
+        payload['firstClearTimeMs'] = bestTimeMs;
+      }
+      final effectiveFirst = currentFirst > 0
+          ? currentFirst
+          : (currentBest > 0 ? currentBest : bestTimeMs);
+      if (effectiveFirst > 0) {
+        payload['firstClearTimeMs'] = effectiveFirst;
+      }
+      final effectivePersonal = (() {
+        final base = currentPersonal > 0
+            ? currentPersonal
+            : (currentBest > 0 ? currentBest : bestTimeMs);
+        if (base <= 0) return bestTimeMs;
+        if (bestTimeMs <= 0) return base;
+        return bestTimeMs < base ? bestTimeMs : base;
+      })();
+      if (effectivePersonal > 0) {
+        payload['personalBestTimeMs'] = effectivePersonal;
       }
       if (betterByTime || betterByMoves) {
         payload['bestTimeMs'] = bestTimeMs;
@@ -198,15 +255,18 @@ class SocialLeaderboardService {
     final currentHighest = LeaderboardEntry.readInt(
       currentUser['highestLevelReached'],
     );
-    final currentFastest = LeaderboardEntry.readInt(currentUser['fastestSolveMs']);
+    final currentFastest =
+        LeaderboardEntry.readInt(currentUser['fastestSolveMs']);
 
     final nextFastest = bestTimeMs <= 0
         ? currentFastest
-        : (currentFastest <= 0 ? bestTimeMs : (bestTimeMs < currentFastest ? bestTimeMs : currentFastest));
-    final nextHighest = highestLevelReached != null &&
-            highestLevelReached > currentHighest
-        ? highestLevelReached
-        : currentHighest;
+        : (currentFastest <= 0
+            ? bestTimeMs
+            : (bestTimeMs < currentFastest ? bestTimeMs : currentFastest));
+    final nextHighest =
+        highestLevelReached != null && highestLevelReached > currentHighest
+            ? highestLevelReached
+            : currentHighest;
 
     if (kDebugMode) {
       debugPrint(
@@ -246,7 +306,8 @@ class SocialLeaderboardService {
     final items = snap.docs
         .map((doc) => LeaderboardEntry.fromFirestore(doc.data()))
         .toList(growable: false);
-    final filtered = items.where((e) => e.uid.trim().isNotEmpty).toList(growable: false);
+    final filtered =
+        items.where((e) => e.uid.trim().isNotEmpty).toList(growable: false);
     return filtered;
   }
 
@@ -286,7 +347,9 @@ class SocialLeaderboardService {
     final items = snap.docs
         .map((doc) => LeaderboardEntry.fromFirestore(doc.data()))
         .toList(growable: false);
-    final filtered = items.where((e) => e.bestTimeMs > 0).toList(growable: false)
+    final filtered = items
+        .where((e) => e.bestTimeMs > 0)
+        .toList(growable: false)
       ..sort(_compareEntries);
     return filtered;
   }
@@ -335,7 +398,9 @@ class SocialLeaderboardService {
     if (allowed.isEmpty) return const <LeaderboardEntry>[];
 
     final all = await getTopScores(normalized, limit: 200);
-    final filtered = all.where((e) => allowed.contains(e.uid)).toList(growable: false)
+    final filtered = all
+        .where((e) => allowed.contains(e.uid))
+        .toList(growable: false)
       ..sort(_compareEntries);
     if (kDebugMode) {
       debugPrint(
@@ -415,11 +480,12 @@ class SocialLeaderboardService {
         ((userData['playerName'] as String?)?.trim().isNotEmpty == true)
             ? (userData['playerName'] as String).trim()
             : 'Player';
-    final photoUrl = (userData['photoUrl'] as String?)?.trim().isNotEmpty == true
-        ? (userData['photoUrl'] as String).trim()
-        : ((userData['photoURL'] as String?)?.trim().isNotEmpty == true
-            ? (userData['photoURL'] as String).trim()
-            : (FirebaseAuth.instance.currentUser?.photoURL ?? '').trim());
+    final photoUrl =
+        (userData['photoUrl'] as String?)?.trim().isNotEmpty == true
+            ? (userData['photoUrl'] as String).trim()
+            : ((userData['photoURL'] as String?)?.trim().isNotEmpty == true
+                ? (userData['photoURL'] as String).trim()
+                : (FirebaseAuth.instance.currentUser?.photoURL ?? '').trim());
     final avatarId =
         ((userData['avatarId'] as String?)?.trim().isNotEmpty == true)
             ? (userData['avatarId'] as String).trim()

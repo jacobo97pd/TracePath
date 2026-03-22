@@ -12,6 +12,7 @@ import 'skin_catalog_service.dart';
 import 'shop/coin_pack.dart';
 import 'shop/coin_pack_catalog_service.dart';
 import 'shop_image_preloader.dart';
+import 'services/iap_service.dart';
 import 'services/user_inventory_service.dart';
 import 'trail/trail_catalog.dart';
 import 'trail/trail_skin.dart';
@@ -45,9 +46,38 @@ class ShopScreen extends StatefulWidget {
     CoinTrailDef(
         id: 'trail_speed_force', name: 'SpeedForceTrail', costCoins: 1450),
     CoinTrailDef(id: 'trail_sith', name: 'Sith', costCoins: 650),
-    CoinTrailDef(id: 'trail_comic', name: 'ComicTrail', costCoins: 900),
+    CoinTrailDef(
+      id: 'trail_comic_spiderverse_v2',
+      name: 'ComicSpiderverseTrailV2',
+      costCoins: 1680,
+    ),
+    CoinTrailDef(
+      id: 'trail_comic_spiderverse_rebuilt',
+      name: 'ComicSpiderverseLegend',
+      costCoins: 1980,
+    ),
     CoinTrailDef(id: 'trail_punk_riff', name: 'PunkRiffTrail', costCoins: 1250),
+    CoinTrailDef(
+      id: 'trail_punk_riff_verdant',
+      name: 'PunkRiff Verdant',
+      costCoins: 1320,
+    ),
+    CoinTrailDef(
+      id: 'trail_punk_riff_ember',
+      name: 'PunkRiff Ember',
+      costCoins: 1320,
+    ),
+    CoinTrailDef(
+      id: 'trail_punk_riff_prism',
+      name: 'PunkRiff Prism',
+      costCoins: 1390,
+    ),
     CoinTrailDef(id: 'trail_graffiti', name: 'GraffitiTrail', costCoins: 1320),
+    CoinTrailDef(
+      id: 'trail_urban_graffiti',
+      name: 'UrbanGraffitiTrail',
+      costCoins: 1480,
+    ),
     CoinTrailDef(
       id: 'trail_halftone_explosion',
       name: 'HalftoneExplosionTrail',
@@ -64,6 +94,11 @@ class ShopScreen extends StatefulWidget {
       costCoins: 1490,
     ),
     CoinTrailDef(id: 'trail_web', name: 'WebTrail', costCoins: 950),
+    CoinTrailDef(
+      id: 'trail_web_legendary',
+      name: 'WebTrailLegendary',
+      costCoins: 1850,
+    ),
     CoinTrailDef(id: 'trail_ink_brush', name: 'InkBrushTrail', costCoins: 1000),
     CoinTrailDef(
       id: 'trail_ink_brush_crimson',
@@ -82,6 +117,49 @@ class ShopScreen extends StatefulWidget {
     CoinTrailDef(
         id: 'trail_binary_rain', name: 'BinaryRainTrail', costCoins: 1580),
   ];
+
+  static const Map<String, String> _trailDescriptions = <String, String>{
+    'trail_classic': 'Balanced default trail for clean runs.',
+    'trail_smoke': 'Soft drifting smoke with subtle motion.',
+    'trail_fire': 'Hot ember line with flame accents.',
+    'trail_laser': 'Sharp focused beam with crisp glow.',
+    'trail_plasma': 'Charged plasma ribbon with inner flow.',
+    'trail_glitch': 'Digital distortion with RGB glitching.',
+    'trail_ink': 'Liquid ink stroke with organic edge.',
+    'trail_magma': 'Molten core with volcanic crust vibes.',
+    'trail_ice': 'Cold crystalline trace with frosty sparkles.',
+    'trail_galaxy': 'Nebula stream with cosmic highlights.',
+    'trail_speed_force': 'High-energy streak with speed bursts.',
+    'trail_sith': 'Dark red saber-style trail.',
+    'trail_comic_spiderverse_v2':
+        'Comic multiverse style with chromatic punch.',
+    'trail_comic_spiderverse_rebuilt':
+        'Premium comic variant tuned for bold readability.',
+    'trail_punk_riff': 'Neon punk wave with high attitude.',
+    'trail_punk_riff_verdant':
+        'Punk riff variant in acid green and lime tones.',
+    'trail_punk_riff_ember':
+        'Punk riff variant with hot red-orange energy.',
+    'trail_punk_riff_prism':
+        'Punk riff multicolor mix with high contrast accents.',
+    'trail_graffiti': 'Street-art line with spray accents.',
+    'trail_urban_graffiti':
+        'Heavy spray-paint feel with layered stamps.',
+    'trail_halftone_explosion': 'Pop-art halftone impacts on movement.',
+    'trail_sticker_bomb': 'Sticker collage aesthetic with playful chaos.',
+    'trail_glitch_print': 'Printed glitch texture with RGB offsets.',
+    'trail_web': 'Silk-thread web trail with subtle depth.',
+    'trail_web_legendary': 'Legendary web with premium VFX layers.',
+    'trail_ink_brush': 'Expressive brush stroke with painterly flow.',
+    'trail_ink_brush_crimson': 'Crimson ink brush for dramatic runs.',
+    'trail_electric_arc': 'Electric arc chain with energetic crackle.',
+    'trail_golden_thread': 'Refined gold filament with premium shimmer.',
+    'trail_golden_aura': 'Golden aura trail with regal glow.',
+    'trail_holiday_spark': 'Festive sparkle line with seasonal tones.',
+    'trail_upside': 'Dark upside-style trace with eerie pulse.',
+    'trail_binary_rain': 'Data stream look with digital cadence.',
+  };
+
   @override
   State<ShopScreen> createState() => _ShopScreenState();
 }
@@ -122,8 +200,11 @@ class _ShopScreenState extends State<ShopScreen> {
   final UserInventoryService _inventoryService = UserInventoryService();
   final CoinPackCatalogService _coinPackCatalogService =
       CoinPackCatalogService();
+  late final IapService _iapService =
+      IapService(coinsService: widget.coinsService);
   late Future<CoinPackCatalogResult> _coinPacksFuture;
   late Future<UserInventoryState> _inventoryStateFuture;
+  String _lastIapSummaryFingerprint = '';
 
   @override
   void initState() {
@@ -133,15 +214,27 @@ class _ShopScreenState extends State<ShopScreen> {
         reason: 'boot_fast_fallback',
       ),
     );
+    final fallbackPacks = _coinPackCatalogService
+        .localFallbackResult(reason: 'boot_fast_fallback')
+        .packs;
+    unawaited(_iapService.refreshCatalog(fallbackPacks));
     _inventoryStateFuture = _inventoryService.getInventoryState();
     unawaited(_refreshCoinPacksInBackground());
     unawaited(_refreshInventoryInBackground());
+  }
+
+  @override
+  void dispose() {
+    _iapService.dispose();
+    super.dispose();
   }
 
   Future<void> _refreshCoinPacksInBackground() async {
     final result = await _coinPackCatalogService.fetchPacks(
       timeout: const Duration(seconds: 3),
     );
+    await _iapService.refreshCatalog(result.packs);
+    _logIapSummaryIfNeeded(result.packs, reason: 'refresh_background');
     if (!mounted) return;
     setState(() {
       _coinPacksFuture = Future<CoinPackCatalogResult>.value(result);
@@ -160,17 +253,18 @@ class _ShopScreenState extends State<ShopScreen> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation:
-          Listenable.merge([widget.coinsService, widget.skinCatalogService]),
+      animation: Listenable.merge([
+        widget.coinsService,
+        widget.skinCatalogService,
+        _iapService,
+      ]),
       builder: (context, _) {
-        final skins = widget.skinCatalogService.items
-            .where((item) {
-              final id = item.id.trim().toLowerCase();
-              return id != 'pointer_default' &&
-                  id != 'pointer-default' &&
-                  id != 'default';
-            })
-            .map((item) {
+        final skins = widget.skinCatalogService.items.where((item) {
+          final id = item.id.trim().toLowerCase();
+          return id != 'pointer_default' &&
+              id != 'pointer-default' &&
+              id != 'default';
+        }).map((item) {
           final previewRaw = _gridPreviewRawPath(item);
           final previewResolved = _resolveForRender(previewRaw);
           final fullResolved = _resolveForRender(item.fullImagePath);
@@ -277,9 +371,8 @@ class _ShopScreenState extends State<ShopScreen> {
           ...widget.coinsService.ownedSkins,
           if (inventory != null) ...inventory.ownedSkinIds.map(_toLocalSkinId),
         };
-        final equippedFromRemote = inventory == null
-            ? ''
-            : _toLocalSkinId(inventory.equippedSkinId);
+        final equippedFromRemote =
+            inventory == null ? '' : _toLocalSkinId(inventory.equippedSkinId);
         final equippedId = equippedFromRemote.isEmpty
             ? widget.coinsService.selectedSkin
             : equippedFromRemote;
@@ -501,12 +594,12 @@ class _ShopScreenState extends State<ShopScreen> {
               onPressed: selected
                   ? null
                   : (owned || canBuy)
-                  ? () => _onSkinAction(
-                        skin: skin,
-                        owned: owned,
-                        cost: cost,
-                      )
-                  : null,
+                      ? () => _onSkinAction(
+                            skin: skin,
+                            owned: owned,
+                            cost: cost,
+                          )
+                      : null,
               style: FilledButton.styleFrom(
                 backgroundColor: const Color(0xFF2563EB),
                 disabledBackgroundColor: const Color(0xFF23334F),
@@ -532,7 +625,8 @@ class _ShopScreenState extends State<ShopScreen> {
     required bool owned,
     required int cost,
   }) async {
-    final fullResolved = await _resolveFullUrlForSkin(skin.id, context: 'equip');
+    final fullResolved =
+        await _resolveFullUrlForSkin(skin.id, context: 'equip');
     await widget.coinsService.registerSkinAsset(skin.id, fullResolved);
 
     if (owned) {
@@ -729,6 +823,14 @@ class _ShopScreenState extends State<ShopScreen> {
   }
 
   Widget _buildTrailsTab(BuildContext context) {
+    final knownTrailIds = TrailCatalog.all.map((t) => t.id).toSet();
+    final missingInCatalog = ShopScreen._coinTrails
+        .where((t) => !knownTrailIds.contains(t.id))
+        .map((t) => t.id)
+        .toList(growable: false);
+    if (kDebugMode && missingInCatalog.isNotEmpty) {
+      debugPrint('[shop][trail] Missing in TrailCatalog: $missingInCatalog');
+    }
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
       children: [
@@ -740,9 +842,14 @@ class _ShopScreenState extends State<ShopScreen> {
           final cost = trail.costCoins ?? 0;
           final canBuy = !owned && widget.coinsService.coins >= cost;
           final preview = TrailCatalog.resolveByTrailId(trail.id);
+          final displayName = trail.name.trim().isEmpty ? preview.name : trail.name.trim();
+          final description = ShopScreen._trailDescriptions[trail.id]?.trim().isNotEmpty == true
+              ? ShopScreen._trailDescriptions[trail.id]!.trim()
+              : 'Unique visual style for your path trace.';
           return _TrailShopCard(
             key: ValueKey<String>('trail-${trail.id}'),
-            trailName: trail.name,
+            trailName: displayName,
+            trailDescription: description,
             owned: owned,
             selected: selected,
             cost: cost,
@@ -755,7 +862,7 @@ class _ShopScreenState extends State<ShopScreen> {
               await widget.coinsService.selectTrail(trail.id);
               if (!mounted) return;
               await _showTrailUnlockBanner(
-                trailName: trail.name,
+                trailName: displayName,
                 preview: preview,
               );
             },
@@ -825,42 +932,128 @@ class _ShopScreenState extends State<ShopScreen> {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               _showShopErrorPopup(
                 title: 'No coin packs available',
-                message: 'New packs will appear here soon.',
+                message:
+                    'Store products are not available right now. Please try again later.',
               );
             });
           }
           return _buildCoinPackInlineInfo(
             context,
             title: 'No coin packs available',
-            subtitle: 'New packs will appear here soon.',
+            subtitle:
+                'Store products are not available right now. Please try again later.',
             onRetry: _reloadCoinPacks,
           );
         }
+        _logIapSummaryIfNeeded(packs, reason: 'build_coin_packs_tab');
         _didShowCoinPackLoadError = false;
         _didShowCoinPackEmptyInfo = false;
+        final iapState = _iapService.state;
+        final iapMessage = _iapService.message.trim();
         return ListView(
           padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
           children: [
-            const SectionHeader(title: 'Coin Packs'),
-            const SizedBox(height: 6),
-            const Text(
-              'Choose the best bundle for your progress.',
-              style: TextStyle(
-                color: Color(0xFF9FB0D3),
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
+            Row(
+              children: [
+                const Expanded(child: SectionHeader(title: 'Coin Packs')),
+                TextButton.icon(
+                  onPressed: () => unawaited(_iapService.restorePurchases()),
+                  icon: const Icon(Icons.restore_rounded, size: 16),
+                  label: const Text('Restore'),
+                ),
+              ],
             ),
+            const SizedBox(height: 6),
+            if (_iapService.isStoreLoading)
+              const Text(
+                'Loading store products...',
+                style: TextStyle(
+                  color: Color(0xFF9FB0D3),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              )
+            else if (_iapService.isStoreUnavailable ||
+                _iapService.isStoreError ||
+                iapState == IapStoreState.idle)
+              Text(
+                iapMessage.isEmpty
+                    ? 'Store products are not available right now. Please try again later.'
+                    : iapMessage,
+                style: const TextStyle(
+                  color: Color(0xFFFFB4A9),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              )
+            else
+              const Text(
+                'Choose the best bundle for your progress.',
+                style: TextStyle(
+                  color: Color(0xFF9FB0D3),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            if (_iapService.notFoundIds.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                'Missing products: ${_iapService.notFoundIds.join(', ')}',
+                style: const TextStyle(
+                  color: Color(0xFFB8C7E6),
+                  fontSize: 11,
+                ),
+              ),
+            ],
             const SizedBox(height: 12),
+            if (_iapService.pendingProductId.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF122036),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFF2A3A57)),
+                ),
+                child: const Row(
+                  children: [
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Processing purchase...',
+                        style: TextStyle(
+                          color: Color(0xFFD7E6FF),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            if (_iapService.isStoreUnavailable || _iapService.isStoreError) ...[
+              _buildCoinPackInlineInfo(
+                context,
+                title: 'Store unavailable',
+                subtitle:
+                    'You can still browse all coin packs. Purchases are disabled right now.',
+                onRetry: _reloadCoinPacks,
+              ),
+              const SizedBox(height: 10),
+            ],
             Builder(
               builder: (context) {
                 final width = MediaQuery.of(context).size.width;
                 final veryNarrow = width < 360;
                 final isNarrow = width < 390;
                 final crossAxisCount = veryNarrow ? 1 : 2;
-                final childAspectRatio = veryNarrow
-                    ? 1.95
-                    : (isNarrow ? 0.64 : 0.72);
+                final childAspectRatio =
+                    veryNarrow ? 1.75 : (isNarrow ? 0.60 : 0.64);
                 return GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -873,9 +1066,15 @@ class _ShopScreenState extends State<ShopScreen> {
                   itemCount: packs.length,
                   itemBuilder: (context, idx) {
                     final pack = packs[idx];
+                    final available = _iapService.isPackAvailable(pack);
                     return CoinPackCard(
                       pack: pack,
                       assetPath: _coinPackAssetPath(pack),
+                      priceText: _iapService.displayPriceForPack(pack),
+                      enabled: available &&
+                          _iapService.pendingProductId.isEmpty &&
+                          _iapService.isStoreReady,
+                      loading: _iapService.isPackPending(pack),
                       onBuy: () => unawaited(_onBuyCoinPack(pack)),
                     );
                   },
@@ -957,6 +1156,11 @@ class _ShopScreenState extends State<ShopScreen> {
         timeout: const Duration(seconds: 3),
       );
     });
+    unawaited(() async {
+      final result = await _coinPacksFuture;
+      await _iapService.refreshCatalog(result.packs);
+      _logIapSummaryIfNeeded(result.packs, reason: 'reload');
+    }());
   }
 
   Future<void> _showShopErrorPopup({
@@ -974,8 +1178,7 @@ class _ShopScreenState extends State<ShopScreen> {
         ),
         title: Row(
           children: [
-            const Icon(Icons.error_outline_rounded,
-                color: Color(0xFFFF8A80)),
+            const Icon(Icons.error_outline_rounded, color: Color(0xFFFF8A80)),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -1020,15 +1223,18 @@ class _ShopScreenState extends State<ShopScreen> {
   }
 
   Future<void> _onBuyCoinPack(CoinPack pack) async {
-    final result = await widget.coinsService.buyCoinPack(pack);
+    debugPrint('[SHOP] coin pack tap packId=${pack.id}');
+    debugPrint(
+      '[SHOP-IAP] pre-buy state available=${_iapService.storeAvailable} ready=${_iapService.isStoreReady} loading=${_iapService.isStoreLoading} error=${_iapService.isStoreError} unavailable=${_iapService.isStoreUnavailable}',
+    );
+    debugPrint(
+      '[SHOP-IAP] pre-buy mapping packId=${pack.id} productId=${_iapService.debugProductIdForPack(pack)} mapped=${_iapService.isPackAvailable(pack)}',
+    );
+    final result = await _iapService.buyPack(pack);
     if (!mounted) return;
     if (result.status == BuyCoinPackStatus.success) {
-      final added = result.addedCoins > 0
-          ? result.addedCoins
-          : (pack.totalCoins > 0 ? pack.totalCoins : (pack.coins + pack.bonusCoins));
+      final added = result.addedCoins;
       if (added > 0) {
-        await widget.coinsService.applyCoinPackPurchase(pack);
-        if (!mounted) return;
         _showCoinPackGainFeedback(added);
       }
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1048,7 +1254,9 @@ class _ShopScreenState extends State<ShopScreen> {
           style: TextStyle(color: Colors.white),
         ),
         content: Text(
-          result.message.isEmpty ? 'Purchases coming soon' : result.message,
+          result.message.isEmpty
+              ? 'Store products are not available right now. Please try again later.'
+              : result.message,
           style: const TextStyle(color: Color(0xFF9FB0D3)),
         ),
         actions: [
@@ -1059,6 +1267,32 @@ class _ShopScreenState extends State<ShopScreen> {
         ],
       ),
     );
+  }
+
+  void _logIapSummaryIfNeeded(List<CoinPack> packs, {required String reason}) {
+    final productIds = packs
+        .map((p) => _iapService.debugProductIdForPack(p))
+        .where((id) => id.trim().isNotEmpty)
+        .toList(growable: false)
+      ..sort();
+    final loadedIds = _iapService.loadedProductIds.toList(growable: false)
+      ..sort();
+    final missing = _iapService.notFoundIds.toList(growable: false)..sort();
+    final fingerprint = [
+      _iapService.storeAvailable.toString(),
+      _iapService.state.name,
+      productIds.join(','),
+      loadedIds.join(','),
+      missing.join(','),
+    ].join('|');
+    if (fingerprint == _lastIapSummaryFingerprint) return;
+    _lastIapSummaryFingerprint = fingerprint;
+    debugPrint('[SHOP] IAP debug summary ($reason)');
+    debugPrint('[SHOP] store available: ${_iapService.storeAvailable}');
+    debugPrint('[SHOP] loaded products count: ${loadedIds.length}');
+    debugPrint('[SHOP] loaded product IDs: ${loadedIds.join(", ")}');
+    debugPrint('[SHOP] missing product IDs: ${missing.join(", ")}');
+    _iapService.debugLogShopSummary(packs);
   }
 
   void _showCoinPackGainFeedback(int amount) {
@@ -2002,7 +2236,11 @@ class _PurchaseBannerToastState extends State<_PurchaseBannerToast>
                 return Opacity(
                   opacity: _fade.value,
                   child: Transform.translate(
-                    offset: Offset(_slideX.value * MediaQuery.of(context).size.width * 0.82, 0),
+                    offset: Offset(
+                        _slideX.value *
+                            MediaQuery.of(context).size.width *
+                            0.82,
+                        0),
                     child: Transform.scale(
                       scale: _scale.value,
                       child: Container(
@@ -2120,7 +2358,8 @@ class _PurchaseBannerToastState extends State<_PurchaseBannerToast>
                             Text(
                               'Unlocked and equipped',
                               style: TextStyle(
-                                color: const Color(0xFFA8B5D3).withOpacity(0.95),
+                                color:
+                                    const Color(0xFFA8B5D3).withOpacity(0.95),
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -2387,7 +2626,8 @@ class _TrailUnlockToastState extends State<_TrailUnlockToast>
                             Text(
                               'Unlocked and equipped',
                               style: TextStyle(
-                                color: const Color(0xFFA8B5D3).withOpacity(0.95),
+                                color:
+                                    const Color(0xFFA8B5D3).withOpacity(0.95),
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -2405,13 +2645,13 @@ class _TrailUnlockToastState extends State<_TrailUnlockToast>
       ],
     );
   }
-
 }
 
 class _TrailShopCard extends StatelessWidget {
   const _TrailShopCard({
     super.key,
     required this.trailName,
+    required this.trailDescription,
     required this.owned,
     required this.selected,
     required this.cost,
@@ -2422,6 +2662,7 @@ class _TrailShopCard extends StatelessWidget {
   });
 
   final String trailName;
+  final String trailDescription;
   final bool owned;
   final bool selected;
   final int cost;
@@ -2432,6 +2673,11 @@ class _TrailShopCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final safeTrailName =
+        trailName.trim().isNotEmpty ? trailName.trim() : preview.name.trim();
+    final safeDescription = trailDescription.trim().isNotEmpty
+        ? trailDescription.trim()
+        : 'Unique visual style for your path trace.';
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
@@ -2456,32 +2702,38 @@ class _TrailShopCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
+          Text(
+            safeTrailName,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            safeDescription,
+            style: const TextStyle(
+              color: Color(0xFFB5C4E3),
+              fontSize: 12,
+              height: 1.2,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 8),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      trailName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      owned ? 'Owned' : '$cost coins',
-                      style: const TextStyle(
-                        color: Color(0xFF9FB0D3),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  owned ? 'Owned' : '$cost coins',
+                  style: const TextStyle(
+                    color: Color(0xFFB5C4E3),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               const SizedBox(width: 10),
@@ -2504,13 +2756,15 @@ class _TrailShopCard extends StatelessWidget {
       style: FilledButton.styleFrom(
         visualDensity: VisualDensity.compact,
         minimumSize: const Size(84, 34),
+        disabledForegroundColor: const Color(0xFFC7D5EE),
+        disabledBackgroundColor: const Color(0xFF2A354B),
       ),
       onPressed: owned
           ? onEquip
           : canBuy
               ? () => unawaited(onBuy())
               : null,
-      child: Text(owned ? 'Equip' : 'Buy'),
+      child: Text(owned ? 'Equip' : 'Buy $cost'),
     );
   }
 }
@@ -2596,22 +2850,29 @@ class _TrailPreviewPainter extends CustomPainter {
     )..layout(maxWidth: 52);
     tp.paint(canvas, const Offset(12, 12));
 
-    if (skin.renderType == TrailRenderType.web) {
+    if (skin.renderType == TrailRenderType.web ||
+        skin.renderType == TrailRenderType.webLegendary) {
       for (var i = 0; i < 6; i++) {
         final t = i / 5.0;
         final p = _sample(path, size, t);
         if (p == null) continue;
+        final tint = skin.renderType == TrailRenderType.webLegendary
+            ? (i.isEven ? const Color(0xFFFF5BBE) : const Color(0xFF6EE7FF))
+            : Colors.white;
         canvas.drawLine(
           p + Offset(0, -size.height * 0.08),
           p + Offset(0, size.height * 0.08),
           Paint()
             ..strokeWidth = 1.4
-            ..color = Colors.white.withOpacity(0.55),
+            ..color = tint.withOpacity(0.55),
         );
       }
     }
 
     if (skin.renderType == TrailRenderType.comic ||
+        skin.renderType == TrailRenderType.comicSpiderverseV2 ||
+        skin.renderType == TrailRenderType.comicSpiderverseRebuilt ||
+        skin.renderType == TrailRenderType.comicSpiderverse ||
         skin.renderType == TrailRenderType.electricArc ||
         skin.renderType == TrailRenderType.plasma) {
       const dots = 7;

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../widgets/ui/app_card.dart';
+
 class GameCard extends StatelessWidget {
   const GameCard({
     super.key,
@@ -14,30 +16,10 @@ class GameCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final card = Container(
+    return AppCard(
       padding: padding,
-      decoration: BoxDecoration(
-        color: const Color(0xFF1F2937),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF334155), width: 1),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x4D000000),
-            blurRadius: 18,
-            offset: Offset(0, 10),
-          ),
-        ],
-      ),
+      onTap: onTap,
       child: child,
-    );
-    if (onTap == null) return card;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: onTap,
-        child: card,
-      ),
     );
   }
 }

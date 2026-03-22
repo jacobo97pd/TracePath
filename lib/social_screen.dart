@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'models/friend_profile.dart';
 import 'models/leaderboard_entry.dart';
 import 'services/friends_service.dart';
+import 'services/friend_challenge_service.dart';
 import 'services/leaderboard_service.dart';
 import 'services/user_profile_service.dart';
 import 'ui/avatar_utils.dart';
@@ -31,6 +32,8 @@ class _SocialScreenState extends State<SocialScreen> {
   static const String _firestoreDatabaseId = 'tracepath-database';
 
   final FriendsService _friendsService = FriendsService();
+  final FriendChallengeService _friendChallengeService =
+      FriendChallengeService();
   final SocialLeaderboardService _leaderboardService =
       SocialLeaderboardService();
   final UserProfileService _profileService = UserProfileService();
@@ -45,8 +48,7 @@ class _SocialScreenState extends State<SocialScreen> {
   final Map<String, Future<String?>> _skinPreviewInflight =
       <String, Future<String?>>{};
   final Map<String, Future<_LeaderboardPresentationData>>
-      _presentationInflight =
-      <String, Future<_LeaderboardPresentationData>>{};
+      _presentationInflight = <String, Future<_LeaderboardPresentationData>>{};
 
   late Future<List<FriendProfile>> _friendsFuture;
   late Future<List<LeaderboardEntry>> _leaderboardFuture;
@@ -116,17 +118,21 @@ class _SocialScreenState extends State<SocialScreen> {
           stream: _leaderboardService.watchGlobalTopScores(limit: 10),
           builder: (context, rankSnapshot) {
             final entries = rankSnapshot.data ?? const <LeaderboardEntry>[];
-            final bestTime = entries.isEmpty ? '--:--' : _formatMs(entries.first.bestTimeMs);
+            final bestTime =
+                entries.isEmpty ? '--:--' : _formatMs(entries.first.bestTimeMs);
             final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
-            final myRank = currentUid.isEmpty
-                ? 0
-                : _rankForUidByTime(entries, currentUid);
+            final myRank =
+                currentUid.isEmpty ? 0 : _rankForUidByTime(entries, currentUid);
             return Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(24),
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF1A2950), Color(0xFF15264A), Color(0xFF141E39)],
+                  colors: [
+                    Color(0xFF1A2950),
+                    Color(0xFF15264A),
+                    Color(0xFF141E39)
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -216,7 +222,7 @@ class _SocialScreenState extends State<SocialScreen> {
           const SizedBox(height: 10),
           _InputActionRow(
             controller: _friendIdCtrl,
-            hint: 'Friend username or UID',
+            hint: 'Friend username, email or UID',
             buttonLabel: 'Add',
             icon: Icons.person_add_alt_1_rounded,
             onTap: _addFriend,
@@ -230,7 +236,8 @@ class _SocialScreenState extends State<SocialScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _SectionTitle(title: 'Friends', subtitle: 'Your rivals and teammates'),
+        const _SectionTitle(
+            title: 'Friends', subtitle: 'Your rivals and teammates'),
         const SizedBox(height: 10),
         StreamBuilder<List<FriendProfile>>(
           stream: _friendsService.watchFriends(),
@@ -425,7 +432,11 @@ class _SocialScreenState extends State<SocialScreen> {
     final value = _friendIdCtrl.text.trim();
     if (value.isEmpty) return;
     try {
-      await _friendsService.sendFriendRequestByUsername(value);
+      if (value.contains('@')) {
+        await _friendsService.sendFriendRequestByEmail(value);
+      } else {
+        await _friendsService.sendFriendRequestByUsername(value);
+      }
       _friendIdCtrl.clear();
       if (!mounted) return;
       unawaited(
@@ -442,8 +453,9 @@ class _SocialScreenState extends State<SocialScreen> {
         debugPrint('[social] addFriend primary error=$e');
       }
       final primary = e.toString().toUpperCase();
-      final shouldTryUid = primary.contains('FRIEND_USERNAME_NOT_FOUND') ||
-          primary.contains('FRIEND_NOT_FOUND');
+      final shouldTryUid = !value.contains('@') &&
+          (primary.contains('FRIEND_USERNAME_NOT_FOUND') ||
+              primary.contains('FRIEND_NOT_FOUND'));
 
       if (shouldTryUid) {
         if (!mounted) return;
@@ -468,7 +480,10 @@ class _SocialScreenState extends State<SocialScreen> {
           if (combined.contains('SELF_ADD') ||
               combined.contains('INVALID_FRIEND_UID')) {
             message = "You can't add yourself";
+          } else if (combined.contains('FRIEND_EMAIL_INVALID')) {
+            message = 'Invalid email format';
           } else if (combined.contains('FRIEND_USERNAME_NOT_FOUND') ||
+              combined.contains('FRIEND_EMAIL_NOT_FOUND') ||
               combined.contains('FRIEND_NOT_FOUND')) {
             message = 'User not found';
           } else if (combined.contains('ALREADY_FRIENDS')) {
@@ -479,7 +494,8 @@ class _SocialScreenState extends State<SocialScreen> {
             message = 'This user already sent you a request';
           } else if (combined.contains('AUTH_REQUIRED')) {
             message = 'You need to be signed in';
-          } else if ((e is FirebaseException && e.code == 'permission-denied') ||
+          } else if ((e is FirebaseException &&
+                  e.code == 'permission-denied') ||
               (e2 is FirebaseException && e2.code == 'permission-denied')) {
             message = 'Firestore rules blocked this action';
           }
@@ -501,6 +517,8 @@ class _SocialScreenState extends State<SocialScreen> {
       if (primary.contains('SELF_ADD') ||
           primary.contains('INVALID_FRIEND_UID')) {
         message = "You can't add yourself";
+      } else if (primary.contains('FRIEND_EMAIL_INVALID')) {
+        message = 'Invalid email format';
       } else if (primary.contains('ALREADY_FRIENDS')) {
         message = 'You are already friends';
       } else if (primary.contains('REQUEST_ALREADY_SENT')) {
@@ -512,6 +530,7 @@ class _SocialScreenState extends State<SocialScreen> {
       } else if (e is FirebaseException && e.code == 'permission-denied') {
         message = 'Firestore rules blocked this action';
       } else if (primary.contains('FRIEND_USERNAME_NOT_FOUND') ||
+          primary.contains('FRIEND_EMAIL_NOT_FOUND') ||
           primary.contains('FRIEND_NOT_FOUND')) {
         message = 'User not found';
       }
@@ -545,7 +564,6 @@ class _SocialScreenState extends State<SocialScreen> {
       );
       return;
     }
-
     final friend = await showModalBottomSheet<FriendProfile>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -616,7 +634,9 @@ class _SocialScreenState extends State<SocialScreen> {
                                   backgroundColor: const Color(0xFF2A3E63),
                                   child: Text(
                                     f.displayName.isNotEmpty
-                                        ? f.displayName.substring(0, 1).toUpperCase()
+                                        ? f.displayName
+                                            .substring(0, 1)
+                                            .toUpperCase()
                                         : 'P',
                                     style: const TextStyle(
                                       color: Colors.white,
@@ -627,7 +647,8 @@ class _SocialScreenState extends State<SocialScreen> {
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         f.displayName,
@@ -636,19 +657,20 @@ class _SocialScreenState extends State<SocialScreen> {
                                           fontWeight: FontWeight.w700,
                                         ),
                                       ),
-                                      const Text(
-                                        'Send level challenge',
+                                      Text(
+                                        'Send random friendly challenge',
                                         style: TextStyle(
-                                          color: Color(0xFF9EB0D2),
+                                          color: const Color(0xFF9EB0D2),
                                           fontSize: 12,
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                                const Icon(
+                                Icon(
                                   Icons.send_rounded,
-                                  color: Color(0xFFA9C4FF),
+                                  color: const Color(0xFFA9C4FF),
                                 ),
                               ],
                             ),
@@ -667,30 +689,43 @@ class _SocialScreenState extends State<SocialScreen> {
     if (!mounted || friend == null) return;
 
     try {
-      await _friendsService.sendLevelChallenge(
-        toUid: friend.uid,
-        levelId: 'all_1',
+      if (kDebugMode) {
+        debugPrint('Challenge button pressed from [social]');
+      }
+      final currentUid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
+      if (currentUid.isEmpty) {
+        throw StateError('AUTH_REQUIRED');
+      }
+      await _friendChallengeService.createRandomFriendChallenge(
+        challengerUid: currentUid,
+        challengedUid: friend.uid,
+        sourceScreen: 'social',
       );
       if (!mounted) return;
       unawaited(
         GameToast.show(
           context,
           type: GameToastType.social,
-          title: 'Challenge Sent',
-          message: 'Challenge sent to ${friend.displayName}.',
-          duration: const Duration(milliseconds: 1600),
+          title: 'Challenge sent',
+          message: 'Random friendly challenge sent to ${friend.displayName}.',
+          duration: const Duration(milliseconds: 1700),
         ),
       );
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('[social] sendLevelChallenge failed toUid=${friend.uid} levelId=all_1 error=$e');
+        debugPrint(
+            '[social] send random friend challenge failed toUid=${friend.uid} error=$e');
       }
       if (!mounted) return;
       var message = 'Could not send challenge right now.';
       if (e is FirebaseException && e.code == 'permission-denied') {
         message = 'Challenge blocked by Firestore rules.';
+      } else if (e is FirebaseException && e.code == 'failed-precondition') {
+        message = 'Challenge setup is not ready yet. Try again in a moment.';
       } else if (e.toString().contains('AUTH_REQUIRED')) {
         message = 'You need to be signed in.';
+      } else if (e.toString().contains('NO_PUZZLES_AVAILABLE')) {
+        message = 'No puzzles available for challenge.';
       }
       unawaited(
         GameToast.show(
@@ -845,7 +880,9 @@ class _SocialScreenState extends State<SocialScreen> {
     }
 
     String? secondaryText;
-    if (username.isNotEmpty && playerName.isNotEmpty && username != playerName) {
+    if (username.isNotEmpty &&
+        playerName.isNotEmpty &&
+        username != playerName) {
       secondaryText = playerName;
     } else if (entry.moves > 0 || entry.stars > 0) {
       final parts = <String>[
@@ -956,7 +993,8 @@ class _SocialScreenState extends State<SocialScreen> {
         };
         Map<String, dynamic> data = const <String, dynamic>{};
         for (final candidate in idCandidates) {
-          final snap = await _db().collection('skins_catalog').doc(candidate).get();
+          final snap =
+              await _db().collection('skins_catalog').doc(candidate).get();
           final candidateData = snap.data() ?? const <String, dynamic>{};
           if (snap.exists && candidateData.isNotEmpty) {
             data = candidateData;
@@ -1584,7 +1622,8 @@ class _RankRow extends StatelessWidget {
   _MedalStyle _medalForIndex(int index) {
     if (index == 1) {
       return const _MedalStyle(
-        gradient: LinearGradient(colors: [Color(0xFFFFD978), Color(0xFFE7A819)]),
+        gradient:
+            LinearGradient(colors: [Color(0xFFFFD978), Color(0xFFE7A819)]),
         border: Color(0xFFFFE3A0),
         text: Color(0xFF4F3200),
         timeColor: Color(0xFFFFD56B),
@@ -1592,7 +1631,8 @@ class _RankRow extends StatelessWidget {
     }
     if (index == 2) {
       return const _MedalStyle(
-        gradient: LinearGradient(colors: [Color(0xFFE2E8F0), Color(0xFF94A3B8)]),
+        gradient:
+            LinearGradient(colors: [Color(0xFFE2E8F0), Color(0xFF94A3B8)]),
         border: Color(0xFFE6EEFF),
         text: Color(0xFF1E293B),
         timeColor: Color(0xFFBED2FF),
@@ -1600,7 +1640,8 @@ class _RankRow extends StatelessWidget {
     }
     if (index == 3) {
       return const _MedalStyle(
-        gradient: LinearGradient(colors: [Color(0xFFF4B183), Color(0xFFA66332)]),
+        gradient:
+            LinearGradient(colors: [Color(0xFFF4B183), Color(0xFFA66332)]),
         border: Color(0xFFF9C8A4),
         text: Color(0xFF3D1F08),
         timeColor: Color(0xFFD9B08C),
@@ -1723,7 +1764,8 @@ class _RankAvatarImageCandidate extends StatelessWidget {
       return Image.asset(
         url,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _RankAvatarFailureSignal(onFailed: onFailed),
+        errorBuilder: (_, __, ___) =>
+            _RankAvatarFailureSignal(onFailed: onFailed),
       );
     }
     if (url.startsWith('http://') || url.startsWith('https://')) {

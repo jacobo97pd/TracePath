@@ -12,13 +12,18 @@ import 'package:image/image.dart' as img;
 import 'engine/level.dart';
 import 'game_theme.dart';
 import 'trail/trail_catalog.dart';
+import 'trail/comic_spiderverse_trail_rebuilt.dart';
+import 'trail/comic_spiderverse_trail_v2.dart';
 import 'trail/trail_renderer.dart';
 import 'trail/trail_skin.dart';
+import 'trail/urban_graffiti_trail.dart';
 import 'ui/components/network_image_compat.dart';
 
 const bool kEnableSolvedDebugLogs = true;
 // ignore: constant_identifier_names
 const double PATH_WIDTH_RATIO = 0.85;
+const String kComicSpiderverseTrailBoardBackgroundAsset =
+    'assets/trails/comic_spiderverse/fondo_pantalla_trail_spiderverse.png';
 
 class GameBoardController extends ChangeNotifier {
   _GameBoardState? _state;
@@ -86,9 +91,8 @@ class GameBoardStatus {
   final bool solved;
 
   factory GameBoardStatus.fromPath(Level level, List<int> path) {
-    final maxNumber = level.numbers.values.isEmpty
-        ? 0
-        : level.numbers.values.reduce(max);
+    final maxNumber =
+        level.numbers.values.isEmpty ? 0 : level.numbers.values.reduce(max);
     final lastSequentialNumber = GameBoardRules.computeLastSequentialNumber(
       level,
       path,
@@ -238,9 +242,8 @@ class GameBoardRules {
   static Map<String, Object> solvedDebugData(Level level, List<int> path) {
     final totalCells = level.width * level.height;
     final noDuplicates = path.toSet().length == path.length;
-    final maxNumber = level.numbers.values.isEmpty
-        ? 0
-        : level.numbers.values.reduce(max);
+    final maxNumber =
+        level.numbers.values.isEmpty ? 0 : level.numbers.values.reduce(max);
     final lastSequentialNumber = computeLastSequentialNumber(level, path);
     final encountered = numberedCellsEncounteredInPath(level, path);
 
@@ -271,6 +274,9 @@ class GameBoard extends StatefulWidget {
     this.onStatusChanged,
     this.onInvalidMove,
     this.onChange,
+    this.initialPath = const <int>[],
+    this.opponentPath = const <int>[],
+    this.opponentTrailColor,
   });
 
   final Level level;
@@ -286,13 +292,15 @@ class GameBoard extends StatefulWidget {
   final ValueChanged<GameBoardStatus>? onStatusChanged;
   final ValueChanged<String>? onInvalidMove;
   final ValueChanged<GameBoardChange>? onChange;
+  final List<int> initialPath;
+  final List<int> opponentPath;
+  final Color? opponentTrailColor;
 
   @override
   State<GameBoard> createState() => _GameBoardState();
 }
 
-class _GameBoardState extends State<GameBoard>
-    with TickerProviderStateMixin {
+class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
   final List<int> _path = <int>[];
   late final AnimationController _transitionController;
   late final AnimationController _hintController;
@@ -316,6 +324,24 @@ class _GameBoardState extends State<GameBoard>
   bool _smokeAssetsLoaded = false;
   List<ui.Image> _punkIconImages = const <ui.Image>[];
   bool _punkIconsLoaded = false;
+  WebTrailSprites _webTrailSprites = const WebTrailSprites();
+  bool _webTrailAssetsLoaded = false;
+  WebLegendaryTrailSprites _webLegendaryTrailSprites =
+      const WebLegendaryTrailSprites();
+  bool _webLegendaryTrailAssetsLoaded = false;
+  ComicSpiderverseTrailSprites _comicSpiderverseTrailSprites =
+      const ComicSpiderverseTrailSprites();
+  bool _comicSpiderverseAssetsLoaded = false;
+  ComicSpiderverseRebuiltSprites _comicSpiderverseRebuiltTrailSprites =
+      const ComicSpiderverseRebuiltSprites();
+  bool _comicSpiderverseRebuiltAssetsLoaded = false;
+  UrbanGraffitiTrailSprites _urbanGraffitiTrailSprites =
+      const UrbanGraffitiTrailSprites();
+  bool _urbanGraffitiAssetsLoaded = false;
+  bool _didVerifyUrbanGraffitiAssets = false;
+  ui.Image? _comicSpiderverseBoardBackground;
+  bool _comicSpiderverseBoardBackgroundLoaded = false;
+  bool _didVerifyComicSpiderverseRebuiltAssets = false;
   List<_ComicSnapshotState> _comicSnapshots = const <_ComicSnapshotState>[];
   int _comicVisualFrame = 0;
   int _lastComicStepMs = 0;
@@ -338,9 +364,18 @@ class _GameBoardState extends State<GameBoard>
     _trailVfxController.addListener(_handleTrailTick);
     _hintController.addStatusListener(_handleHintAnimationStatus);
     _wallEdges = GameBoardRules.buildWallEdges(widget.level.walls);
+    _applyInitialPath();
     _syncPointerSkin();
     _syncSmokeAssets(force: true);
     _syncPunkIconAssets(force: true);
+    _syncWebTrailAssets(force: true);
+    _syncWebLegendaryTrailAssets(force: true);
+    _syncComicSpiderverseAssets(force: true);
+    _verifyComicSpiderverseRebuiltAssetSetOnce();
+    _syncComicSpiderverseRebuiltAssets(force: true);
+    _verifyUrbanGraffitiAssetSetOnce();
+    _syncUrbanGraffitiAssets(force: true);
+    _syncComicSpiderverseBoardBackground(force: true);
     widget.controller?._attach(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -364,6 +399,14 @@ class _GameBoardState extends State<GameBoard>
       _paintHintDirection = HintDirection.none;
       _paintHintSourceCell = null;
       _hintController.value = 0;
+      _applyInitialPath();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _emitPathState();
+        }
+      });
+    } else if (!listEquals(oldWidget.initialPath, widget.initialPath)) {
+      _applyInitialPath();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           _emitPathState();
@@ -376,6 +419,12 @@ class _GameBoardState extends State<GameBoard>
     if (oldWidget.trailSkin.id != widget.trailSkin.id) {
       _syncSmokeAssets();
       _syncPunkIconAssets();
+      _syncWebTrailAssets();
+      _syncWebLegendaryTrailAssets();
+      _syncComicSpiderverseAssets();
+      _syncComicSpiderverseRebuiltAssets();
+      _syncUrbanGraffitiAssets();
+      _syncComicSpiderverseBoardBackground();
     }
     if (oldWidget.trailSkin.id != widget.trailSkin.id &&
         widget.trailSkin.renderType != TrailRenderType.comic) {
@@ -413,18 +462,23 @@ class _GameBoardState extends State<GameBoard>
     } catch (_) {}
     final loaded = <ui.Image>[];
     for (final assetPath in smokeAssets) {
-      if (manifestKeys != null && !manifestKeys.contains(assetPath)) {
-        continue;
-      }
+      final manifestMiss =
+          manifestKeys != null && !manifestKeys.contains(assetPath);
       try {
         final bytes = await rootBundle.load(assetPath);
         final img = await decodeImageFromList(bytes.buffer.asUint8List());
+        if (manifestMiss) {
+          debugPrint(
+              '[TrailAssets][smoke] manifest miss but load OK: $assetPath');
+        }
         loaded.add(img);
-      } catch (_) {
-        // Optional asset: keep fallback rendering if missing.
+      } catch (e) {
+        debugPrint('[TrailAssets][smoke] load fail $assetPath -> $e');
       }
     }
     if (!mounted) return;
+    debugPrint(
+        '[TrailAssets][smoke] loaded ${loaded.length}/${smokeAssets.length}');
     setState(() {
       _smokePuffImages = List<ui.Image>.unmodifiable(loaded);
       _smokeAssetsLoaded = true;
@@ -461,9 +515,8 @@ class _GameBoardState extends State<GameBoard>
 
     final loaded = <ui.Image>[];
     for (final assetPath in iconAssets) {
-      if (manifestKeys != null && !manifestKeys.contains(assetPath)) {
-        continue;
-      }
+      final manifestMiss =
+          manifestKeys != null && !manifestKeys.contains(assetPath);
       try {
         final bytes = await rootBundle.load(assetPath);
         final raw = bytes.buffer.asUint8List();
@@ -487,17 +540,553 @@ class _GameBoardState extends State<GameBoard>
         }
 
         if (decoded != null) {
+          if (manifestMiss) {
+            debugPrint(
+              '[TrailAssets][punk_icons] manifest miss but load OK: $assetPath',
+            );
+          }
           loaded.add(decoded);
         }
-      } catch (_) {
-        // Optional: if icon decode fails on platform, render without icon particles.
+      } catch (e) {
+        debugPrint('[TrailAssets][punk_icons] load fail $assetPath -> $e');
       }
     }
     if (!mounted) return;
+    debugPrint(
+        '[TrailAssets][punk_icons] loaded ${loaded.length}/${iconAssets.length}');
     setState(() {
       _punkIconImages = List<ui.Image>.unmodifiable(loaded);
       _punkIconsLoaded = true;
     });
+  }
+
+  Future<void> _syncWebTrailAssets({bool force = false}) async {
+    final needsWeb = widget.trailSkin.renderType == TrailRenderType.web;
+    if (!needsWeb) {
+      if (_webTrailAssetsLoaded) {
+        setState(() {
+          _webTrailSprites = const WebTrailSprites();
+          _webTrailAssetsLoaded = false;
+        });
+      }
+      return;
+    }
+    if (_webTrailAssetsLoaded && !force) return;
+
+    const preferred = <String, String>{
+      'nodeBurst01': 'assets/trails/web_node_burst_01.png',
+      'nodeBurst02': 'assets/trails/web_node_burst_02.png',
+      // Reuse legendary assets as WebTrail sprite pack source.
+      'sparkle': 'assets/trails/web_trail_legendary/web_legendary_sparkle.png',
+      'microBridge':
+          'assets/trails/web_trail_legendary/web_legendary_micro_bridge.png',
+      'threadSoft':
+          'assets/trails/web_trail_legendary/web_legendary_highlight_streak.png',
+      'silkFragment':
+          'assets/trails/web_trail_legendary/web_legendary_energy_flick.png',
+      'highlightStreak':
+          'assets/trails/web_trail_legendary/web_legendary_highlight_streak.png',
+    };
+    const fallback = <String, String>{
+      'nodeBurst01': 'assets/trails/web_node_burst_01.png',
+      'nodeBurst02': 'assets/trails/web_node_burst_02.png',
+    };
+
+    Set<String>? manifestKeys;
+    try {
+      final rawManifest = await rootBundle.loadString('AssetManifest.json');
+      final decoded = jsonDecode(rawManifest);
+      if (decoded is Map<String, dynamic>) {
+        manifestKeys = decoded.keys.toSet();
+      }
+    } catch (_) {}
+
+    Future<ui.Image?> loadNamed(String key) async {
+      final candidates = <String>[
+        if (preferred.containsKey(key)) preferred[key]!,
+        if (fallback.containsKey(key)) fallback[key]!,
+      ];
+      for (final assetPath in candidates) {
+        final manifestMiss =
+            manifestKeys != null && !manifestKeys.contains(assetPath);
+        try {
+          final bytes = await rootBundle.load(assetPath);
+          if (manifestMiss) {
+            debugPrint(
+              '[TrailAssets][web] manifest miss but load OK: $assetPath',
+            );
+          }
+          return decodeImageFromList(bytes.buffer.asUint8List());
+        } catch (e) {
+          debugPrint('[TrailAssets][web] load fail $assetPath -> $e');
+        }
+      }
+      return null;
+    }
+
+    final nodeBurst01 = await loadNamed('nodeBurst01');
+    final nodeBurst02 = await loadNamed('nodeBurst02');
+    final sparkle = await loadNamed('sparkle');
+    final microBridge = await loadNamed('microBridge');
+    final threadSoft = await loadNamed('threadSoft');
+    final silkFragment = await loadNamed('silkFragment');
+    final highlightStreak = await loadNamed('highlightStreak');
+
+    if (!mounted) return;
+    final loadedCount = <ui.Image?>[
+      nodeBurst01,
+      nodeBurst02,
+      sparkle,
+      microBridge,
+      threadSoft,
+      silkFragment,
+      highlightStreak,
+    ].where((img) => img != null).length;
+    debugPrint('[TrailAssets][web] loaded $loadedCount/7');
+    setState(() {
+      _webTrailSprites = WebTrailSprites(
+        nodeBurst01: nodeBurst01,
+        nodeBurst02: nodeBurst02,
+        sparkle: sparkle,
+        microBridge: microBridge,
+        threadSoft: threadSoft,
+        silkFragment: silkFragment,
+        highlightStreak: highlightStreak,
+      );
+      _webTrailAssetsLoaded = true;
+    });
+  }
+
+  Future<void> _syncWebLegendaryTrailAssets({bool force = false}) async {
+    final needsLegendary =
+        widget.trailSkin.renderType == TrailRenderType.webLegendary;
+    if (!needsLegendary) {
+      if (_webLegendaryTrailAssetsLoaded) {
+        setState(() {
+          _webLegendaryTrailSprites = const WebLegendaryTrailSprites();
+          _webLegendaryTrailAssetsLoaded = false;
+        });
+      }
+      return;
+    }
+    if (_webLegendaryTrailAssetsLoaded && !force) return;
+
+    const preferred = <String, String>{
+      'nodeBurst01':
+          'assets/trails/web_trail_legendary/web_legendary_node_burst_01.png',
+      'nodeBurst02':
+          'assets/trails/web_trail_legendary/web_legendary_node_burst_02.png',
+      'sparkle': 'assets/trails/web_trail_legendary/web_legendary_sparkle.png',
+      'energyFlick':
+          'assets/trails/web_trail_legendary/web_legendary_energy_flick.png',
+      'microBridge':
+          'assets/trails/web_trail_legendary/web_legendary_micro_bridge.png',
+      'highlightStreak':
+          'assets/trails/web_trail_legendary/web_legendary_highlight_streak.png',
+      'halftonePatch':
+          'assets/trails/web_trail_legendary/web_legendary_halftone_patch.png',
+    };
+
+    Set<String>? manifestKeys;
+    try {
+      final rawManifest = await rootBundle.loadString('AssetManifest.json');
+      final decoded = jsonDecode(rawManifest);
+      if (decoded is Map<String, dynamic>) {
+        manifestKeys = decoded.keys.toSet();
+      }
+    } catch (_) {}
+
+    Future<ui.Image?> loadNamed(String key) async {
+      final assetPath = preferred[key];
+      if (assetPath == null) return null;
+      final manifestMiss =
+          manifestKeys != null && !manifestKeys.contains(assetPath);
+      try {
+        final bytes = await rootBundle.load(assetPath);
+        if (manifestMiss) {
+          debugPrint(
+            '[TrailAssets][web_legendary] manifest miss but load OK: $assetPath',
+          );
+        }
+        return decodeImageFromList(bytes.buffer.asUint8List());
+      } catch (e) {
+        debugPrint('[TrailAssets][web_legendary] load fail $assetPath -> $e');
+        return null;
+      }
+    }
+
+    final nodeBurst01 = await loadNamed('nodeBurst01');
+    final nodeBurst02 = await loadNamed('nodeBurst02');
+    final sparkle = await loadNamed('sparkle');
+    final energyFlick = await loadNamed('energyFlick');
+    final microBridge = await loadNamed('microBridge');
+    final highlightStreak = await loadNamed('highlightStreak');
+    final halftonePatch = await loadNamed('halftonePatch');
+
+    if (!mounted) return;
+    final loadedCount = <ui.Image?>[
+      nodeBurst01,
+      nodeBurst02,
+      sparkle,
+      energyFlick,
+      microBridge,
+      highlightStreak,
+      halftonePatch,
+    ].where((img) => img != null).length;
+    debugPrint('[TrailAssets][web_legendary] loaded $loadedCount/7');
+    setState(() {
+      _webLegendaryTrailSprites = WebLegendaryTrailSprites(
+        nodeBurst01: nodeBurst01,
+        nodeBurst02: nodeBurst02,
+        sparkle: sparkle,
+        energyFlick: energyFlick,
+        microBridge: microBridge,
+        highlightStreak: highlightStreak,
+        halftonePatch: halftonePatch,
+      );
+      _webLegendaryTrailAssetsLoaded = true;
+    });
+  }
+
+  Future<void> _syncComicSpiderverseAssets({bool force = false}) async {
+    final needs =
+        widget.trailSkin.renderType == TrailRenderType.comicSpiderverse ||
+            widget.trailSkin.renderType == TrailRenderType.comicSpiderverseV2;
+    if (!needs) {
+      if (_comicSpiderverseAssetsLoaded) {
+        setState(() {
+          _comicSpiderverseTrailSprites = const ComicSpiderverseTrailSprites();
+          _comicSpiderverseAssetsLoaded = false;
+        });
+      }
+      return;
+    }
+    if (_comicSpiderverseAssetsLoaded && !force) return;
+
+    const assets = ComicSpiderverseTrailV2.assetPaths;
+
+    Set<String>? manifestKeys;
+    try {
+      final rawManifest = await rootBundle.loadString('AssetManifest.json');
+      final decoded = jsonDecode(rawManifest);
+      if (decoded is Map<String, dynamic>) {
+        manifestKeys = decoded.keys.toSet();
+      }
+    } catch (_) {}
+
+    Future<ui.Image?> loadNamed(String key) async {
+      final assetPath = assets[key];
+      if (assetPath == null) return null;
+      final manifestMiss =
+          manifestKeys != null && !manifestKeys.contains(assetPath);
+      try {
+        final bytes = await rootBundle.load(assetPath);
+        if (manifestMiss) {
+          debugPrint(
+            '[TrailAssets][comic_spiderverse] manifest miss but load OK: $assetPath',
+          );
+        }
+        return decodeImageFromList(bytes.buffer.asUint8List());
+      } catch (e) {
+        debugPrint(
+            '[TrailAssets][comic_spiderverse] load fail $assetPath -> $e');
+        return null;
+      }
+    }
+
+    final glitchStreak = await loadNamed('glitchStreak');
+    final offsetShadow = await loadNamed('offsetShadow');
+    final frameSlice = await loadNamed('frameSlice');
+    final dotParticle = await loadNamed('dotParticle');
+    final starParticle = await loadNamed('starParticle');
+    final burst01 = await loadNamed('burst01');
+    final burst02 = await loadNamed('burst02');
+    final inkSplash01 = await loadNamed('inkSplash01');
+    final inkSplash02 = await loadNamed('inkSplash02');
+    final halftone01 = await loadNamed('halftone01');
+    final halftone02 = await loadNamed('halftone02');
+    final bubble01 = await loadNamed('bubble01');
+    final bubble02 = await loadNamed('bubble02');
+    final textPow = await loadNamed('textPow');
+    final textBzz = await loadNamed('textBzz');
+
+    if (!mounted) return;
+    final loadedCount = <ui.Image?>[
+      glitchStreak,
+      offsetShadow,
+      frameSlice,
+      dotParticle,
+      starParticle,
+      burst01,
+      burst02,
+      inkSplash01,
+      inkSplash02,
+      halftone01,
+      halftone02,
+      bubble01,
+      bubble02,
+      textPow,
+      textBzz,
+    ].where((img) => img != null).length;
+    debugPrint('[TrailAssets][comic_spiderverse] loaded $loadedCount/15');
+    setState(() {
+      _comicSpiderverseTrailSprites = ComicSpiderverseTrailSprites(
+        glitchStreak: glitchStreak,
+        offsetShadow: offsetShadow,
+        frameSlice: frameSlice,
+        dotParticle: dotParticle,
+        starParticle: starParticle,
+        burst01: burst01,
+        burst02: burst02,
+        inkSplash01: inkSplash01,
+        inkSplash02: inkSplash02,
+        halftone01: halftone01,
+        halftone02: halftone02,
+        bubble01: bubble01,
+        bubble02: bubble02,
+        textPow: textPow,
+        textBzz: textBzz,
+      );
+      _comicSpiderverseAssetsLoaded = true;
+    });
+  }
+
+  Future<void> _verifyComicSpiderverseRebuiltAssetSetOnce() async {
+    if (_didVerifyComicSpiderverseRebuiltAssets) return;
+    _didVerifyComicSpiderverseRebuiltAssets = true;
+    const assets = ComicSpiderverseTrailRebuilt.assetPaths;
+    for (final key in ComicSpiderverseTrailRebuilt.requiredAssetKeys) {
+      final assetPath = assets[key];
+      final fileName = assetPath?.split('/').last ?? key;
+      if (assetPath == null) {
+        debugPrint(
+          '[TrailAssets][comic_spiderverse_rebuilt] [MISSING] $fileName',
+        );
+        continue;
+      }
+      try {
+        final bytes = await rootBundle.load(assetPath);
+        await decodeImageFromList(bytes.buffer.asUint8List());
+        debugPrint(
+          '[TrailAssets][comic_spiderverse_rebuilt] [OK] $fileName loaded',
+        );
+      } catch (e) {
+        debugPrint(
+          '[TrailAssets][comic_spiderverse_rebuilt] [MISSING] $fileName -> $e',
+        );
+      }
+    }
+  }
+
+  Future<void> _syncComicSpiderverseRebuiltAssets({bool force = false}) async {
+    final needs =
+        widget.trailSkin.renderType == TrailRenderType.comicSpiderverseRebuilt;
+    if (!needs) {
+      if (_comicSpiderverseRebuiltAssetsLoaded) {
+        setState(() {
+          _comicSpiderverseRebuiltTrailSprites =
+              const ComicSpiderverseRebuiltSprites();
+          _comicSpiderverseRebuiltAssetsLoaded = false;
+        });
+      }
+      return;
+    }
+    if (_comicSpiderverseRebuiltAssetsLoaded && !force) return;
+
+    const assets = ComicSpiderverseTrailRebuilt.assetPaths;
+    Set<String>? manifestKeys;
+    try {
+      final rawManifest = await rootBundle.loadString('AssetManifest.json');
+      final decoded = jsonDecode(rawManifest);
+      if (decoded is Map<String, dynamic>) {
+        manifestKeys = decoded.keys.toSet();
+      }
+    } catch (_) {}
+
+    final loadedByKey = <String, ui.Image?>{};
+    for (final key in ComicSpiderverseTrailRebuilt.requiredAssetKeys) {
+      final assetPath = assets[key];
+      if (assetPath == null) {
+        debugPrint(
+            '[TrailAssets][comic_spiderverse_rebuilt] [MISSING] $key (no path)');
+        loadedByKey[key] = null;
+        continue;
+      }
+      final fileName = assetPath.split('/').last;
+      final inManifest =
+          manifestKeys == null || manifestKeys.contains(assetPath);
+      try {
+        final bytes = await rootBundle.load(assetPath);
+        final image = await decodeImageFromList(bytes.buffer.asUint8List());
+        loadedByKey[key] = image;
+        final suffix = inManifest ? '' : ' (manifest miss, load OK)';
+        debugPrint(
+          '[TrailAssets][comic_spiderverse_rebuilt] [OK] $fileName loaded$suffix',
+        );
+      } catch (e) {
+        loadedByKey[key] = null;
+        debugPrint(
+          '[TrailAssets][comic_spiderverse_rebuilt] [MISSING] $fileName -> $e',
+        );
+      }
+    }
+
+    if (!mounted) return;
+    final loadedCount = loadedByKey.values.where((img) => img != null).length;
+    debugPrint(
+      '[TrailAssets][comic_spiderverse_rebuilt] summary loaded $loadedCount/${ComicSpiderverseTrailRebuilt.requiredAssetKeys.length}',
+    );
+    setState(() {
+      _comicSpiderverseRebuiltTrailSprites = ComicSpiderverseRebuiltSprites(
+        glitchStreak: loadedByKey['glitchStreak'],
+        offsetShadow: loadedByKey['offsetShadow'],
+        frameSlice: loadedByKey['frameSlice'],
+        dotParticle: loadedByKey['dotParticle'],
+        starParticle: loadedByKey['starParticle'],
+        burst01: loadedByKey['burst01'],
+        burst02: loadedByKey['burst02'],
+        inkSplash01: loadedByKey['inkSplash01'],
+        inkSplash02: loadedByKey['inkSplash02'],
+        halftone01: loadedByKey['halftone01'],
+        halftone02: loadedByKey['halftone02'],
+        bubble01: loadedByKey['bubble01'],
+        bubble02: loadedByKey['bubble02'],
+        textPow: loadedByKey['textPow'],
+        textBzz: loadedByKey['textBzz'],
+      );
+      _comicSpiderverseRebuiltAssetsLoaded = true;
+    });
+  }
+
+  Future<void> _verifyUrbanGraffitiAssetSetOnce() async {
+    if (_didVerifyUrbanGraffitiAssets) return;
+    _didVerifyUrbanGraffitiAssets = true;
+    const assets = UrbanGraffitiTrail.assetPaths;
+    for (final key in UrbanGraffitiTrail.requiredAssetKeys) {
+      final assetPath = assets[key];
+      final fileName = assetPath?.split('/').last ?? key;
+      if (assetPath == null) {
+        debugPrint('[TrailAssets][urban_graffiti] [MISSING] $fileName');
+        continue;
+      }
+      try {
+        final bytes = await rootBundle.load(assetPath);
+        await decodeImageFromList(bytes.buffer.asUint8List());
+        debugPrint('[TrailAssets][urban_graffiti] [OK] $fileName loaded');
+      } catch (e) {
+        debugPrint('[TrailAssets][urban_graffiti] [MISSING] $fileName -> $e');
+      }
+    }
+  }
+
+  Future<void> _syncUrbanGraffitiAssets({bool force = false}) async {
+    final needs = widget.trailSkin.renderType == TrailRenderType.urbanGraffiti;
+    if (!needs) {
+      if (_urbanGraffitiAssetsLoaded) {
+        setState(() {
+          _urbanGraffitiTrailSprites = const UrbanGraffitiTrailSprites();
+          _urbanGraffitiAssetsLoaded = false;
+        });
+      }
+      return;
+    }
+    if (_urbanGraffitiAssetsLoaded && !force) return;
+
+    await _verifyUrbanGraffitiAssetSetOnce();
+
+    const assets = UrbanGraffitiTrail.assetPaths;
+    final loadedByKey = <String, ui.Image?>{};
+    for (final key in UrbanGraffitiTrail.requiredAssetKeys) {
+      final assetPath = assets[key];
+      if (assetPath == null) {
+        loadedByKey[key] = null;
+        continue;
+      }
+      try {
+        final bytes = await rootBundle.load(assetPath);
+        loadedByKey[key] =
+            await decodeImageFromList(bytes.buffer.asUint8List());
+      } catch (_) {
+        loadedByKey[key] = null;
+      }
+    }
+
+    if (!mounted) return;
+    final loadedCount = loadedByKey.values.where((img) => img != null).length;
+    debugPrint(
+      '[TrailAssets][urban_graffiti] summary loaded $loadedCount/${UrbanGraffitiTrail.requiredAssetKeys.length}',
+    );
+    setState(() {
+      _urbanGraffitiTrailSprites = UrbanGraffitiTrailSprites(
+        graffitiSplash: loadedByKey['graffitiSplash'],
+        graffitiTag01: loadedByKey['graffitiTag01'],
+        paintDrip: loadedByKey['paintDrip'],
+        spraySoft: loadedByKey['spraySoft'],
+      );
+      _urbanGraffitiAssetsLoaded = true;
+    });
+  }
+
+  bool _isComicSpiderverseTrail(TrailRenderType renderType) {
+    return renderType == TrailRenderType.comicSpiderverse ||
+        renderType == TrailRenderType.comicSpiderverseV2 ||
+        renderType == TrailRenderType.comicSpiderverseRebuilt;
+  }
+
+  Future<void> _syncComicSpiderverseBoardBackground(
+      {bool force = false}) async {
+    final needs = _isComicSpiderverseTrail(widget.trailSkin.renderType);
+    if (!needs) {
+      if (_comicSpiderverseBoardBackgroundLoaded ||
+          _comicSpiderverseBoardBackground != null) {
+        setState(() {
+          _comicSpiderverseBoardBackground = null;
+          _comicSpiderverseBoardBackgroundLoaded = false;
+        });
+      }
+      return;
+    }
+    if (_comicSpiderverseBoardBackgroundLoaded && !force) return;
+
+    Set<String>? manifestKeys;
+    try {
+      final rawManifest = await rootBundle.loadString('AssetManifest.json');
+      final decoded = jsonDecode(rawManifest);
+      if (decoded is Map<String, dynamic>) {
+        manifestKeys = decoded.keys.toSet();
+      }
+    } catch (_) {}
+
+    final manifestMiss = manifestKeys != null &&
+        !manifestKeys.contains(kComicSpiderverseTrailBoardBackgroundAsset);
+    try {
+      final bytes =
+          await rootBundle.load(kComicSpiderverseTrailBoardBackgroundAsset);
+      final image = await decodeImageFromList(bytes.buffer.asUint8List());
+      if (!mounted) return;
+      if (manifestMiss) {
+        debugPrint(
+          '[TrailAssets][comic_spiderverse_bg] manifest miss but load OK: $kComicSpiderverseTrailBoardBackgroundAsset',
+        );
+      } else {
+        debugPrint(
+          '[TrailAssets][comic_spiderverse_bg] loaded fondo_pantalla_trail_spiderverse.png',
+        );
+      }
+      setState(() {
+        _comicSpiderverseBoardBackground = image;
+        _comicSpiderverseBoardBackgroundLoaded = true;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      debugPrint(
+        '[TrailAssets][comic_spiderverse_bg] load fail $kComicSpiderverseTrailBoardBackgroundAsset -> $e',
+      );
+      setState(() {
+        _comicSpiderverseBoardBackground = null;
+        _comicSpiderverseBoardBackgroundLoaded = false;
+      });
+    }
   }
 
   @override
@@ -577,18 +1166,37 @@ class _GameBoardState extends State<GameBoard>
                             trailPhase: _trailVfxController.value,
                             visualPhase: _comicVisualFrame / 12,
                             visualFrame: _comicVisualFrame,
-                            comicSnapshots: _buildComicPainterSnapshots(cellSize),
+                            comicSnapshots:
+                                _buildComicPainterSnapshots(cellSize),
                             pointerImage: _pointerImage,
                             smokePuffImages: _smokePuffImages,
                             punkIconImages: _punkIconImages,
+                            webTrailSprites: _webTrailSprites,
+                            webLegendaryTrailSprites: _webLegendaryTrailSprites,
+                            comicSpiderverseTrailSprites:
+                                _comicSpiderverseTrailSprites,
+                            comicSpiderverseRebuiltTrailSprites:
+                                _comicSpiderverseRebuiltTrailSprites,
+                            urbanGraffitiTrailSprites:
+                                _urbanGraffitiTrailSprites,
+                            comicSpiderverseBoardBackground:
+                                _isComicSpiderverseTrail(
+                              widget.trailSkin.renderType,
+                            )
+                                    ? _comicSpiderverseBoardBackground
+                                    : null,
                             path: List<int>.unmodifiable(_path),
+                            opponentPath:
+                                List<int>.unmodifiable(widget.opponentPath),
+                            opponentTrailColor: widget.opponentTrailColor,
                             solved: status.solved,
                             hintDirection: HintDirection.none,
                             hintSourceCell: null,
                             hintOpacity: 0,
                             highlightedResumeCell: _highlightedResumeCell,
                             showErrorFlash: _showErrorFlash,
-                            appearingCells: List<int>.unmodifiable(_appearingCells),
+                            appearingCells:
+                                List<int>.unmodifiable(_appearingCells),
                             disappearingCells: List<int>.unmodifiable(
                               _disappearingCells,
                             ),
@@ -610,8 +1218,13 @@ class _GameBoardState extends State<GameBoard>
   }
 
   void _handleTrailTick() {
-    final steppedVisual = widget.trailSkin.renderType == TrailRenderType.comic ||
-        widget.trailSkin.renderType == TrailRenderType.punkRiff;
+    final steppedVisual =
+        widget.trailSkin.renderType == TrailRenderType.comic ||
+            widget.trailSkin.renderType == TrailRenderType.comicSpiderverse ||
+            widget.trailSkin.renderType == TrailRenderType.comicSpiderverseV2 ||
+            widget.trailSkin.renderType ==
+                TrailRenderType.comicSpiderverseRebuilt ||
+            widget.trailSkin.renderType == TrailRenderType.punkRiff;
     if (!steppedVisual) {
       if (_comicSnapshots.isNotEmpty || _comicVisualFrame != 0) {
         _comicSnapshots = const <_ComicSnapshotState>[];
@@ -621,7 +1234,21 @@ class _GameBoardState extends State<GameBoard>
       return;
     }
     final nowMs = DateTime.now().millisecondsSinceEpoch;
-    final stepMs = (1000 / widget.trailSkin.visualStepFps).round().clamp(24, 200);
+    int stepMs = (1000 / widget.trailSkin.visualStepFps).round().clamp(24, 200);
+    if (widget.trailSkin.renderType == TrailRenderType.comicSpiderverseV2) {
+      final cfg = widget.trailSkin.comicSpiderverseV2;
+      final jitterWindow = max(1, cfg.steppedFrameJitter * 2 + 1);
+      final jitter =
+          ((_comicVisualFrame * 17) % jitterWindow) - cfg.steppedFrameJitter;
+      stepMs = (cfg.steppedFrameMs + jitter).clamp(38, 46);
+    } else if (widget.trailSkin.renderType ==
+        TrailRenderType.comicSpiderverseRebuilt) {
+      final cfg = widget.trailSkin.comicSpiderverseRebuilt;
+      final jitterWindow = max(1, cfg.steppedFrameJitter * 2 + 1);
+      final jitter =
+          ((_comicVisualFrame * 23) % jitterWindow) - cfg.steppedFrameJitter;
+      stepMs = (cfg.steppedFrameMs + jitter).clamp(38, 46);
+    }
     if (_lastComicStepMs == 0 || nowMs - _lastComicStepMs >= stepMs) {
       _lastComicStepMs = nowMs;
       _comicVisualFrame += 1;
@@ -644,8 +1271,13 @@ class _GameBoardState extends State<GameBoard>
         _ComicSnapshotState(
           points: points,
           frame: _comicVisualFrame,
-          widthScale: const <double>[0.95, 1.03, 0.92, 1.07, 0.98]
-              [_comicVisualFrame % 5],
+          widthScale: const <double>[
+            0.95,
+            1.03,
+            0.92,
+            1.07,
+            0.98
+          ][_comicVisualFrame % 5],
           chromaOffset: offsetPattern[_comicVisualFrame % offsetPattern.length],
           createdAtMs: nowMs,
         ),
@@ -658,6 +1290,37 @@ class _GameBoardState extends State<GameBoard>
 
   GameBoardStatus get _currentStatus {
     return GameBoardStatus.fromPath(widget.level, _path);
+  }
+
+  void _applyInitialPath() {
+    final sanitized = _sanitizePathPrefix(widget.initialPath);
+    _path
+      ..clear()
+      ..addAll(sanitized);
+    _clearTransientState();
+    _resetAnimationState();
+  }
+
+  List<int> _sanitizePathPrefix(List<int> source) {
+    if (source.isEmpty) return const <int>[];
+    final valid = <int>[];
+    final maxCell = widget.level.width * widget.level.height;
+    for (final cell in source) {
+      if (cell < 0 || cell >= maxCell) {
+        break;
+      }
+      final canMove = GameBoardRules.canMoveToCell(
+        widget.level,
+        valid,
+        _wallEdges,
+        cell,
+      );
+      if (!canMove) {
+        break;
+      }
+      valid.add(cell);
+    }
+    return valid;
   }
 
   int? _computeHintSourceCell() {
@@ -943,7 +1606,8 @@ class _GameBoardState extends State<GameBoard>
       return;
     }
     if (kIsWeb &&
-        (targetPath.startsWith('http://') || targetPath.startsWith('https://'))) {
+        (targetPath.startsWith('http://') ||
+            targetPath.startsWith('https://'))) {
       if (!mounted) return;
       setState(() {
         _pointerImage = null;
@@ -1071,8 +1735,8 @@ class _GameBoardState extends State<GameBoard>
         _hintController.value <= 0) {
       return null;
     }
-    final pathColor = widget.pathColorOverride ??
-        widget.gameTheme.pathColorDarkVariant;
+    final pathColor =
+        widget.pathColorOverride ?? widget.gameTheme.pathColorDarkVariant;
     return IgnorePointer(
       child: CustomPaint(
         painter: _HintOverlayPainter(
@@ -1191,7 +1855,15 @@ class _GameBoardPainter extends CustomPainter {
     required this.pointerImage,
     required this.smokePuffImages,
     required this.punkIconImages,
+    required this.webTrailSprites,
+    required this.webLegendaryTrailSprites,
+    required this.comicSpiderverseTrailSprites,
+    required this.comicSpiderverseRebuiltTrailSprites,
+    required this.urbanGraffitiTrailSprites,
+    required this.comicSpiderverseBoardBackground,
     required this.path,
+    required this.opponentPath,
+    required this.opponentTrailColor,
     required this.solved,
     required this.hintDirection,
     required this.hintSourceCell,
@@ -1214,7 +1886,15 @@ class _GameBoardPainter extends CustomPainter {
   final ui.Image? pointerImage;
   final List<ui.Image> smokePuffImages;
   final List<ui.Image> punkIconImages;
+  final WebTrailSprites webTrailSprites;
+  final WebLegendaryTrailSprites webLegendaryTrailSprites;
+  final ComicSpiderverseTrailSprites comicSpiderverseTrailSprites;
+  final ComicSpiderverseRebuiltSprites comicSpiderverseRebuiltTrailSprites;
+  final UrbanGraffitiTrailSprites urbanGraffitiTrailSprites;
+  final ui.Image? comicSpiderverseBoardBackground;
   final List<int> path;
+  final List<int> opponentPath;
+  final Color? opponentTrailColor;
   final bool solved;
   final HintDirection hintDirection;
   final int? hintSourceCell;
@@ -1241,6 +1921,7 @@ class _GameBoardPainter extends CustomPainter {
         ..color = gameTheme.boardColor
         ..style = PaintingStyle.fill,
     );
+    _drawComicSpiderverseBoardBackground(canvas, boardRect);
 
     final baseFillColor = solved ? pathDarkColor : pathColor;
     final visitedFillPaint = Paint()..style = PaintingStyle.fill;
@@ -1265,8 +1946,8 @@ class _GameBoardPainter extends CustomPainter {
         cellSize,
         path.last,
         visitedFillPaint
-          ..color = Color.lerp(pathColor, Colors.white, 0.35)!
-              .withOpacity(0.36),
+          ..color =
+              Color.lerp(pathColor, Colors.white, 0.35)!.withOpacity(0.36),
       );
     }
 
@@ -1297,10 +1978,14 @@ class _GameBoardPainter extends CustomPainter {
 
     if (path.length > 1) {
       final markerRadius = cellSize * 0.24;
-      final markerClipPath = _buildMarkerClipPath(size, cellSize, markerRadius + 2);
+      final markerClipPath =
+          _buildMarkerClipPath(size, cellSize, markerRadius + 2);
       final liquidPoints = _buildAnimatedPathPoints(cellSize);
       final liquidPath = _buildSmoothPath(liquidPoints);
       final trailSkin = _resolvedTrailSkin(pathColor, pathDarkColor);
+      final nodeCenters = level.numbers.keys
+          .map((idx) => _centerForCell(idx, cellSize))
+          .toList(growable: false);
       final ctx = TrailRenderContext(
         canvas: canvas,
         boardRect: boardRect,
@@ -1316,9 +2001,15 @@ class _GameBoardPainter extends CustomPainter {
         solved: solved,
         clipPath: markerClipPath,
         nowSeconds: DateTime.now().microsecondsSinceEpoch / 1000000.0,
+        nodeCenters: nodeCenters,
         snapshots: comicSnapshots,
         smokeSprites: smokePuffImages,
         iconSprites: punkIconImages,
+        webSprites: webTrailSprites,
+        webLegendarySprites: webLegendaryTrailSprites,
+        comicSpiderverseSprites: comicSpiderverseTrailSprites,
+        comicSpiderverseRebuiltSprites: comicSpiderverseRebuiltTrailSprites,
+        urbanGraffitiSprites: urbanGraffitiTrailSprites,
       );
 
       canvas.save();
@@ -1326,6 +2017,29 @@ class _GameBoardPainter extends CustomPainter {
       TrailRenderer.paintBase(ctx);
       TrailRenderer.paintVfx(ctx);
       canvas.restore();
+    }
+
+    if (opponentPath.length > 1) {
+      final opponentPoints = opponentPath
+          .map((cell) => _centerForCell(cell, cellSize))
+          .toList(growable: false);
+      final opponentCurve = _buildSmoothPath(opponentPoints);
+      final baseColor = opponentTrailColor ?? const Color(0xFFE2538A);
+      final opponentGlow = Paint()
+        ..color = baseColor.withOpacity(0.22)
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..strokeWidth = cellSize * 0.72
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+      final opponentStroke = Paint()
+        ..color = baseColor.withOpacity(0.7)
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..strokeWidth = cellSize * 0.48;
+      canvas.drawPath(opponentCurve, opponentGlow);
+      canvas.drawPath(opponentCurve, opponentStroke);
     }
 
     if (hintDirection != HintDirection.none &&
@@ -1455,6 +2169,39 @@ class _GameBoardPainter extends CustomPainter {
     canvas.drawRect(rect, paint);
   }
 
+  void _drawComicSpiderverseBoardBackground(Canvas canvas, Rect boardRect) {
+    final image = comicSpiderverseBoardBackground;
+    if (image == null) return;
+
+    final imageWidth = image.width.toDouble();
+    final imageHeight = image.height.toDouble();
+    if (imageWidth <= 0 || imageHeight <= 0) return;
+
+    final imageAspect = imageWidth / imageHeight;
+    final boardAspect = boardRect.width / boardRect.height;
+
+    Rect src;
+    if (imageAspect > boardAspect) {
+      final srcWidth = imageHeight * boardAspect;
+      final left = (imageWidth - srcWidth) * 0.5;
+      src = Rect.fromLTWH(left, 0, srcWidth, imageHeight);
+    } else {
+      final srcHeight = imageWidth / boardAspect;
+      final top = (imageHeight - srcHeight) * 0.5;
+      src = Rect.fromLTWH(0, top, imageWidth, srcHeight);
+    }
+
+    canvas.drawImageRect(
+      image,
+      src,
+      boardRect,
+      Paint()
+        ..isAntiAlias = true
+        ..filterQuality = FilterQuality.high
+        ..color = Colors.white.withOpacity(0.3),
+    );
+  }
+
   void _drawPointerImage(Canvas canvas, double cellSize, int cell) {
     final image = pointerImage;
     if (image == null) {
@@ -1504,7 +2251,8 @@ class _GameBoardPainter extends CustomPainter {
   Offset _centerForCell(int cell, double cellSize) {
     final row = cell ~/ level.width;
     final col = cell % level.width;
-    return Offset((col * cellSize) + cellSize / 2, (row * cellSize) + cellSize / 2);
+    return Offset(
+        (col * cellSize) + cellSize / 2, (row * cellSize) + cellSize / 2);
   }
 
   Path _buildSmoothPath(List<Offset> points) {
@@ -1528,8 +2276,10 @@ class _GameBoardPainter extends CustomPainter {
       final prev = points[i - 1];
       final current = points[i];
       final next = points[i + 1];
-      final midpointA = Offset((prev.dx + current.dx) / 2, (prev.dy + current.dy) / 2);
-      final midpointB = Offset((current.dx + next.dx) / 2, (current.dy + next.dy) / 2);
+      final midpointA =
+          Offset((prev.dx + current.dx) / 2, (prev.dy + current.dy) / 2);
+      final midpointB =
+          Offset((current.dx + next.dx) / 2, (current.dy + next.dy) / 2);
       if (i == 1) {
         pathShape.lineTo(midpointA.dx, midpointA.dy);
       }
@@ -1544,7 +2294,8 @@ class _GameBoardPainter extends CustomPainter {
     return pathShape;
   }
 
-  Path _buildMarkerClipPath(Size size, double cellSize, double protectedRadius) {
+  Path _buildMarkerClipPath(
+      Size size, double cellSize, double protectedRadius) {
     final boardPath = Path()..addRect(Offset.zero & size);
     final markerHoles = Path();
     for (final entry in level.numbers.entries) {
@@ -1643,6 +2394,11 @@ class _GameBoardPainter extends CustomPainter {
       snapshotCount: trailSkin.snapshotCount,
       chromaOffsetPx: trailSkin.chromaOffsetPx,
       web: trailSkin.web,
+      webLegendary: trailSkin.webLegendary,
+      comicSpiderverse: trailSkin.comicSpiderverse,
+      comicSpiderverseV2: trailSkin.comicSpiderverseV2,
+      comicSpiderverseRebuilt: trailSkin.comicSpiderverseRebuilt,
+      urbanGraffiti: trailSkin.urbanGraffiti,
       ink: trailSkin.ink,
       arc: trailSkin.arc,
       golden: trailSkin.golden,
@@ -1663,7 +2419,19 @@ class _GameBoardPainter extends CustomPainter {
         oldDelegate.comicSnapshots != comicSnapshots ||
         oldDelegate.pointerImage != pointerImage ||
         oldDelegate.smokePuffImages != smokePuffImages ||
+        oldDelegate.punkIconImages != punkIconImages ||
+        oldDelegate.webTrailSprites != webTrailSprites ||
+        oldDelegate.webLegendaryTrailSprites != webLegendaryTrailSprites ||
+        oldDelegate.comicSpiderverseTrailSprites !=
+            comicSpiderverseTrailSprites ||
+        oldDelegate.comicSpiderverseRebuiltTrailSprites !=
+            comicSpiderverseRebuiltTrailSprites ||
+        oldDelegate.urbanGraffitiTrailSprites != urbanGraffitiTrailSprites ||
+        oldDelegate.comicSpiderverseBoardBackground !=
+            comicSpiderverseBoardBackground ||
         oldDelegate.path != path ||
+        oldDelegate.opponentPath != opponentPath ||
+        oldDelegate.opponentTrailColor != opponentTrailColor ||
         oldDelegate.solved != solved ||
         oldDelegate.hintDirection != hintDirection ||
         oldDelegate.hintSourceCell != hintSourceCell ||

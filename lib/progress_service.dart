@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,6 +20,8 @@ class ProgressService extends ChangeNotifier {
   static const String _endlessSolvedCountKey = 'endless_solved_count';
   static const String _totalHintsUsedKey = 'total_hints_used';
   static const String _totalRewindsUsedKey = 'total_rewinds_used';
+  static const String _worldCurrentLevelPrefix = 'world_current_level:';
+  static const String _inProgressLevelPrefix = 'in_progress_level:';
 
   final SharedPreferences _prefs;
   late Set<String> _completed;
@@ -35,11 +38,15 @@ class ProgressService extends ChangeNotifier {
   Future<void> markCompleted(String packId, int levelIndex) async {
     final key = _key(packId, levelIndex);
     if (_completed.contains(key)) {
+      await _setPackCurrentLevelIfHigher(packId, levelIndex + 1);
+      await clearInProgressLevel(packId, levelIndex);
       return;
     }
 
     _completed = {..._completed, key};
     await _prefs.setStringList(_completedKey, _completed.toList()..sort());
+    await clearInProgressLevel(packId, levelIndex);
+    await _setPackCurrentLevelIfHigher(packId, levelIndex + 1);
     _solvedByDifficultyCache = null;
     notifyListeners();
   }
@@ -285,6 +292,63 @@ class ProgressService extends ChangeNotifier {
     return 'endless_best_index_$difficulty';
   }
 
+  String _worldCurrentLevelKey(String packId) {
+    return '$_worldCurrentLevelPrefix$packId';
+  }
+
+  String _inProgressLevelKey(String packId, int levelIndex) {
+    return '$_inProgressLevelPrefix$packId:$levelIndex';
+  }
+
+  int getCurrentLevelForPack(String packId, {int fallback = 1}) {
+    final raw = _prefs.getInt(_worldCurrentLevelKey(packId));
+    if (raw == null || raw <= 0) return fallback;
+    return raw;
+  }
+
+  Future<void> setCurrentLevelForPack(String packId, int levelIndex) async {
+    final safeLevel = levelIndex <= 0 ? 1 : levelIndex;
+    final current = getCurrentLevelForPack(packId, fallback: 1);
+    if (safeLevel > current) {
+      await _prefs.setInt(_worldCurrentLevelKey(packId), safeLevel);
+      notifyListeners();
+    }
+  }
+
+  Future<void> _setPackCurrentLevelIfHigher(String packId, int levelIndex) async {
+    final safeLevel = levelIndex <= 0 ? 1 : levelIndex;
+    final current = getCurrentLevelForPack(packId, fallback: 1);
+    if (safeLevel > current) {
+      await _prefs.setInt(_worldCurrentLevelKey(packId), safeLevel);
+    }
+  }
+
+  InProgressLevelSnapshot? getInProgressLevel(String packId, int levelIndex) {
+    final raw = _prefs.getString(_inProgressLevelKey(packId, levelIndex));
+    if (raw == null || raw.trim().isEmpty) return null;
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map<String, dynamic>) return null;
+      return InProgressLevelSnapshot.fromJson(decoded);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> saveInProgressLevel({
+    required String packId,
+    required int levelIndex,
+    required InProgressLevelSnapshot snapshot,
+  }) async {
+    final key = _inProgressLevelKey(packId, levelIndex);
+    await _prefs.setString(key, jsonEncode(snapshot.toJson()));
+  }
+
+  Future<void> clearInProgressLevel(String packId, int levelIndex) async {
+    final key = _inProgressLevelKey(packId, levelIndex);
+    await _prefs.remove(key);
+  }
+
   int getBestScore(String packId, int levelIndex) {
     return getBestCampaignScore(packId, levelIndex);
   }
@@ -373,5 +437,63 @@ class ProgressService extends ChangeNotifier {
       return null;
     }
     return DateTime(year, month, day);
+  }
+}
+
+class InProgressLevelSnapshot {
+  const InProgressLevelSnapshot({
+    required this.path,
+    required this.startedAtMs,
+    required this.hintsUsed,
+    required this.rewindsUsed,
+    required this.mistakesUsed,
+  });
+
+  final List<int> path;
+  final int startedAtMs;
+  final int hintsUsed;
+  final int rewindsUsed;
+  final int mistakesUsed;
+
+  factory InProgressLevelSnapshot.fromJson(Map<String, dynamic> json) {
+    final pathRaw = json['path'];
+    final parsedPath = <int>[];
+    if (pathRaw is List) {
+      for (final item in pathRaw) {
+        if (item is num) {
+          parsedPath.add(item.toInt());
+          continue;
+        }
+        if (item is String) {
+          final parsed = int.tryParse(item);
+          if (parsed != null) {
+            parsedPath.add(parsed);
+          }
+        }
+      }
+    }
+    int readInt(Object? value) {
+      if (value is num) return value.toInt();
+      if (value is String) return int.tryParse(value) ?? 0;
+      return 0;
+    }
+
+    return InProgressLevelSnapshot(
+      path: List<int>.unmodifiable(parsedPath),
+      startedAtMs: readInt(json['startedAtMs']),
+      hintsUsed: readInt(json['hintsUsed']),
+      rewindsUsed: readInt(json['rewindsUsed']),
+      mistakesUsed: readInt(json['mistakesUsed']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'path': path,
+      'startedAtMs': startedAtMs,
+      'hintsUsed': hintsUsed,
+      'rewindsUsed': rewindsUsed,
+      'mistakesUsed': mistakesUsed,
+    };
   }
 }

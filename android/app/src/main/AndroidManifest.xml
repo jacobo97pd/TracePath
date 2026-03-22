@@ -5,6 +5,9 @@
         android:label="TracePath"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-1638901415672449~8895211997"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
