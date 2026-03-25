@@ -173,6 +173,7 @@ class FriendsService {
       'createdAt': FieldValue.serverTimestamp(),
     };
     final sentPayload = <String, dynamic>{
+      'fromUid': currentUid,
       'toUid': targetUid,
       'toUsername': targetUsername,
       'toPlayerName': targetPlayerName,
@@ -461,19 +462,17 @@ class FriendsService {
       batch.delete(senderSentRef);
       batch.delete(currentInboxRef);
       await batch.commit();
-    } on FirebaseException catch (e) {
-      if (kDebugMode) {
-        debugPrint(
-          '[friends] firestore error in acceptFriendRequest code=${e.code} message=${e.message}',
-        );
-      }
-      rethrow;
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint(
-            '[friends] accept request failed currentUid=$currentUid fromUid=$senderUid error=$e');
-      }
-      rethrow;
+    } on FirebaseException catch (e, st) {
+      debugPrint('FIRESTORE ERROR EN ACCEPT FRIEND');
+      debugPrint('code: ${e.code}');
+      debugPrint('message: ${e.message}');
+      debugPrint('stack: $st');
+      throw Exception('FIRESTORE_ERROR:${e.code}');
+    } catch (e, st) {
+      debugPrint('ERROR GENERICO EN ACCEPT FRIEND');
+      debugPrint('$e');
+      debugPrint('$st');
+      throw Exception('GENERIC_ERROR:$e');
     }
   }
 

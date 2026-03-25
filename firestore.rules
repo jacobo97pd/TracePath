@@ -51,13 +51,16 @@ service cloud.firestore {
 
       match /friends/{friendUid} {
         allow read, delete: if isSelf(uid);
-        allow create, update: if isSignedIn() && (
-          request.auth.uid == uid ||
+        allow create, update: if isSignedIn() &&
+          friendUid != uid &&
+          request.resource.data.uid == friendUid &&
           (
-            request.auth.uid == friendUid &&
-            request.resource.data.uid == friendUid
-          )
-        );
+            isSelf(uid) ||
+            (
+              request.auth.uid == friendUid &&
+              request.auth.uid != uid
+            )
+          );
       }
 
       match /incoming_requests/{fromUid} {
@@ -70,7 +73,11 @@ service cloud.firestore {
       }
 
       match /sent_requests/{targetUid} {
-        allow read, update, delete: if isSelf(uid);
+        allow read, update: if isSelf(uid);
+        allow delete: if isSelf(uid) || (
+          isSignedIn() &&
+          request.auth.uid == targetUid
+        );
         allow create: if isSelf(uid) &&
           targetUid != uid &&
           request.resource.data.fromUid == uid &&
@@ -81,7 +88,7 @@ service cloud.firestore {
       }
 
       match /inbox/{messageId} {
-        allow read, update, delete: if isSelf(uid);
+        allow read, delete: if isSelf(uid);
         allow create: if isSignedIn() && (
           request.auth.uid == uid ||
           (
@@ -89,6 +96,14 @@ service cloud.firestore {
             request.resource.data.fromUid == request.auth.uid &&
             isInboxTypeAllowed(request.resource.data.type)
           )
+        );
+        allow update: if isSelf(uid) || (
+          isSignedIn() &&
+          request.auth.uid != uid &&
+          request.resource.data.fromUid == request.auth.uid &&
+          resource.data.fromUid == request.auth.uid &&
+          isInboxTypeAllowed(request.resource.data.type) &&
+          isInboxTypeAllowed(resource.data.type)
         );
       }
 

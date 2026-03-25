@@ -825,19 +825,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         debugPrint(
             '[profile] acceptFriendRequest failed fromUid=$fromUid error=$e');
       }
-      var message = 'Could not accept friend request';
-      if (e.toString().contains('REQUEST_NOT_FOUND')) {
-        message = 'Request not found';
-      } else if (e is FirebaseException && e.code == 'permission-denied') {
-        message = 'Firestore rules blocked accept request';
-      } else if (e is FirebaseException && e.code.isNotEmpty) {
-        message = 'Accept failed: ${e.code}';
-      }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(message),
-          duration: Duration(milliseconds: 900),
+          content: Text(e.toString()),
+          duration: const Duration(seconds: 4),
         ),
       );
     }
