@@ -68,7 +68,6 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
           _error = null;
         });
         await _service.expireIfStale(match.id);
-        await _maybeAutoAccept(match);
         await _maybeAutoStart(match);
       },
       onError: (e) {
@@ -88,22 +87,6 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
     super.dispose();
   }
 
-  Future<void> _maybeAutoAccept(LiveMatch match) async {
-    if (_accepting) return;
-    final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
-    if (uid.isEmpty) return;
-    if (match.status != LiveMatchStatus.pending) return;
-    if (uid != match.invitedUid) return;
-    _accepting = true;
-    try {
-      await _service.acceptInvite(matchId: match.id);
-    } catch (_) {
-      // Keep screen active; user can retry from button if needed.
-    } finally {
-      _accepting = false;
-    }
-  }
-
   Future<void> _toggleReady(LiveMatch match) async {
     if (_readyBusy) return;
     final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
@@ -115,6 +98,18 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
       await _service.setReady(
         matchId: match.id,
         ready: !currentlyReady,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      var message = 'Could not update ready state';
+      final error = e.toString();
+      if (error.contains('INVITE_NOT_ACCEPTED')) {
+        message = 'Accept the duel invite first';
+      } else if (error.contains('MATCH_CLOSED')) {
+        message = 'This duel is already closed';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
       );
     } finally {
       if (mounted) {
@@ -261,6 +256,9 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
       case LiveMatchStatus.pending:
         final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
         final isInvited = uid == match.invitedUid;
+        final inviteNotAccepted = isInvited &&
+            (myPlayer == null ||
+                myPlayer.state == LiveMatchPlayerState.invited);
         final iAmReady = myPlayer?.state == LiveMatchPlayerState.ready;
         final opponentReady = opponent?.state == LiveMatchPlayerState.ready;
         final opponentJoined = opponent?.state == LiveMatchPlayerState.joined ||
@@ -312,18 +310,36 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
                 ),
               const SizedBox(height: 8),
               FilledButton(
-                onPressed: _readyBusy ? null : () => _toggleReady(match),
+                onPressed: (_readyBusy || inviteNotAccepted)
+                    ? null
+                    : () => _toggleReady(match),
                 child: Text(
                   _readyBusy ? 'Saving...' : (iAmReady ? 'Unready' : 'Ready'),
                 ),
               ),
+              if (inviteNotAccepted) ...[
+                const SizedBox(height: 8),
+                const Text(
+                  'Accept first, then mark Ready.',
+                  style: TextStyle(
+                    color: Color(0xFFAED2FF),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ],
           ),
         );
       case LiveMatchStatus.countdown:
         final leftMs = _countdownRemainingMs(match);
-        final n = (leftMs / 1000).ceil();
-        final text = leftMs <= 0 ? 'GO!' : '$n';
+        final text = leftMs > 2000
+            ? '3'
+            : leftMs > 1000
+                ? '2'
+                : leftMs > 0
+                    ? '1'
+                    : 'GO!';
         return Center(
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 180),

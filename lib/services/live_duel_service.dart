@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 
 import '../models/live_match.dart';
+import 'random_puzzle_service.dart';
 import 'inbox_service.dart';
 
 class LiveDuelCreateResult {
@@ -27,6 +28,22 @@ class LiveDuelService {
   static const Duration _playingTtl = Duration(minutes: 40);
   static const int _emoteCooldownMs = 1600;
   final InboxService _inboxService = InboxService();
+  final RandomPuzzleService _randomPuzzleService = RandomPuzzleService();
+
+  Future<LiveDuelCreateResult> createRandomInvite({
+    required String toUid,
+    String excludedLevelId = '',
+    String preferredLevelId = '',
+  }) async {
+    final selection = await _randomPuzzleService.selectRandomPuzzle(
+      excludedLevelId: excludedLevelId,
+      preferredLevelId: preferredLevelId,
+    );
+    if (selection == null) {
+      throw StateError('NO_PUZZLES_AVAILABLE');
+    }
+    return createInvite(toUid: toUid, levelId: selection.puzzleId);
+  }
 
   Future<LiveDuelCreateResult> createInvite({
     required String toUid,
@@ -91,7 +108,6 @@ class LiveDuelService {
     final matchRef = _db().collection('liveMatches').doc();
     final matchId = matchRef.id;
     final creatorPlayerRef = matchRef.collection('players').doc(fromUid);
-    final invitedPlayerRef = matchRef.collection('players').doc(targetUid);
     final challengerLabel =
         fromUsername.isNotEmpty ? '@$fromUsername' : fromPlayerName;
 
@@ -123,16 +139,6 @@ class LiveDuelService {
       'username': fromUsername,
       'avatarId': fromAvatarId,
       'state': 'joined',
-      'joinedAt': FieldValue.serverTimestamp(),
-      'finishedAtMsFromStart': 0,
-      'completed': false,
-      'resultPlace': 0,
-    });
-    await invitedPlayerRef.set(<String, dynamic>{
-      'uid': targetUid,
-      'username': '',
-      'avatarId': 'default',
-      'state': 'invited',
       'joinedAt': FieldValue.serverTimestamp(),
       'finishedAtMsFromStart': 0,
       'completed': false,
@@ -421,6 +427,8 @@ class LiveDuelService {
       final createdByUid = _readString(data['createdByUid']);
       final invitedUid = _readString(data['invitedUid']);
       final status = _readString(data['status']);
+      final playerSnap = await tx.get(playerRef);
+      final playerState = _readString(playerSnap.data()?['state']);
 
       if (uid != createdByUid && uid != invitedUid) {
         if (kDebugMode) {
@@ -447,6 +455,14 @@ class LiveDuelService {
           );
         }
         return;
+      }
+      if (ready &&
+          uid == invitedUid &&
+          playerState != 'joined' &&
+          playerState != 'ready' &&
+          playerState != 'playing' &&
+          playerState != 'finished') {
+        throw StateError('INVITE_NOT_ACCEPTED');
       }
 
       tx.set(
@@ -608,7 +624,7 @@ class LiveDuelService {
           'status': 'finished',
           'winnerUid': uid,
           'loserUid': opponentUid,
-          'reason': 'completed',
+          'reason': 'solved',
           'finishedAt': FieldValue.serverTimestamp(),
           'resultResolvedAt': FieldValue.serverTimestamp(),
         },
@@ -929,10 +945,26 @@ class LiveDuelService {
     final uid = await _requireUid();
     final previous = await getMatch(previousMatchId);
     if (previous == null) throw StateError('MATCH_NOT_FOUND');
+    if (!previous.playerUids.contains(uid)) {
+      throw StateError('MATCH_ACCESS_DENIED');
+    }
     final opponentUid = previous.opponentUid(uid);
     if (opponentUid.isEmpty) throw StateError('INVALID_DUEL_TARGET');
-    if (previous.levelId.trim().isEmpty) throw StateError('INVALID_LEVEL_ID');
-    return createInvite(toUid: opponentUid, levelId: previous.levelId);
+    final existing = await _findAnyActiveMatchBetween(
+      uidA: uid,
+      uidB: opponentUid,
+    );
+    if (existing != null) {
+      return LiveDuelCreateResult(
+        matchId: existing.id,
+        levelId: existing.levelId,
+      );
+    }
+    return createRandomInvite(
+      toUid: opponentUid,
+      excludedLevelId: previous.levelId,
+      preferredLevelId: previous.levelId,
+    );
   }
 
   Future<bool> isUserBusyInDuel(String uid) async {
@@ -1027,6 +1059,37 @@ class LiveDuelService {
         final match = await getMatch(doc.id);
         if (match != null) return match;
       }
+    }
+    return null;
+  }
+
+  Future<LiveMatch?> _findAnyActiveMatchBetween({
+    required String uidA,
+    required String uidB,
+  }) async {
+    final snap = await _db()
+        .collection('liveMatches')
+        .where('playerUids', arrayContains: uidA)
+        .limit(40)
+        .get();
+    for (final doc in snap.docs) {
+      final data = doc.data();
+      final status = _readString(data['status']);
+      if (status == 'finished' || status == 'cancelled') continue;
+      final createdAt = (data['createdAt'] as Timestamp?)?.toDate();
+      if (createdAt != null &&
+          DateTime.now().difference(createdAt).inHours >
+              _maxActiveMatchAgeHours) {
+        continue;
+      }
+      final uids = (data['playerUids'] as List? ?? const <dynamic>[])
+          .whereType<String>()
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .toList(growable: false);
+      if (!uids.contains(uidB)) continue;
+      final match = await getMatch(doc.id);
+      if (match != null) return match;
     }
     return null;
   }

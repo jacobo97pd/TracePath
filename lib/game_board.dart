@@ -277,6 +277,7 @@ class GameBoard extends StatefulWidget {
     this.initialPath = const <int>[],
     this.opponentPath = const <int>[],
     this.opponentTrailColor,
+    this.isInteractionLocked = false,
   });
 
   final Level level;
@@ -295,6 +296,7 @@ class GameBoard extends StatefulWidget {
   final List<int> initialPath;
   final List<int> opponentPath;
   final Color? opponentTrailColor;
+  final bool isInteractionLocked;
 
   @override
   State<GameBoard> createState() => _GameBoardState();
@@ -1120,24 +1122,34 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
             height: boardHeight,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTapUp: (details) => _handleCellTap(
-                _cellIndexForOffset(details.localPosition, maxWidth),
-              ),
-              onLongPressStart: (details) => _handleCellTap(
-                _cellIndexForOffset(details.localPosition, maxWidth),
-              ),
-              onPanStart: (details) {
-                _lastDragCell = null;
-                _handlePanCell(
-                  _cellIndexForOffset(details.localPosition, maxWidth),
-                );
-              },
-              onPanUpdate: (details) => _handlePanCell(
-                _cellIndexForOffset(details.localPosition, maxWidth),
-              ),
-              onPanEnd: (_) {
-                _lastDragCell = null;
-              },
+              onTapUp: widget.isInteractionLocked
+                  ? null
+                  : (details) => _handleCellTap(
+                        _cellIndexForOffset(details.localPosition, maxWidth),
+                      ),
+              onLongPressStart: widget.isInteractionLocked
+                  ? null
+                  : (details) => _handleCellTap(
+                        _cellIndexForOffset(details.localPosition, maxWidth),
+                      ),
+              onPanStart: widget.isInteractionLocked
+                  ? null
+                  : (details) {
+                      _lastDragCell = null;
+                      _handlePanCell(
+                        _cellIndexForOffset(details.localPosition, maxWidth),
+                      );
+                    },
+              onPanUpdate: widget.isInteractionLocked
+                  ? null
+                  : (details) => _handlePanCell(
+                        _cellIndexForOffset(details.localPosition, maxWidth),
+                      ),
+              onPanEnd: widget.isInteractionLocked
+                  ? null
+                  : (_) {
+                      _lastDragCell = null;
+                    },
               child: AnimatedBuilder(
                 animation: Listenable.merge(
                   <Listenable>[

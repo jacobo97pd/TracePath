@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 import 'network_burst_overlay.dart';
 import 'models/friend_profile.dart';
 import 'services/friends_service.dart';
 import 'services/friends_ranking_service.dart';
-import 'services/friend_challenge_service.dart';
+import 'services/live_duel_service.dart';
 import 'ui/components/friends_ranking_list.dart';
 import 'ui/components/game_button.dart';
 import 'ui/components/game_card.dart';
@@ -68,8 +69,7 @@ class _VictoryScreenState extends State<VictoryScreen>
     with TickerProviderStateMixin {
   final FriendsRankingService _friendsRankingService = FriendsRankingService();
   final FriendsService _friendsService = FriendsService();
-  final FriendChallengeService _friendChallengeService =
-      FriendChallengeService();
+  final LiveDuelService _liveDuelService = LiveDuelService();
   late Future<List<FriendsRankingRow>> _friendsRankingFuture;
   late final AnimationController _introController;
   late final AnimationController _ctaPulseController;
@@ -202,7 +202,7 @@ class _VictoryScreenState extends State<VictoryScreen>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Send random friendly challenge (level excluded: $levelId)',
+                  'Send a live duel invite with a random puzzle',
                   style:
                       const TextStyle(color: Color(0xFF9EB0D2), fontSize: 12),
                 ),
@@ -257,7 +257,7 @@ class _VictoryScreenState extends State<VictoryScreen>
                                         ),
                                       ),
                                       Text(
-                                        'Send random friendly challenge',
+                                        'Invite to a live 1v1 duel',
                                         style: const TextStyle(
                                           color: Color(0xFF9EB0D2),
                                           fontSize: 12,
@@ -290,27 +290,23 @@ class _VictoryScreenState extends State<VictoryScreen>
       if (kDebugMode) {
         debugPrint('Challenge button pressed from [victory]');
       }
-      final currentUid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
-      if (currentUid.isEmpty) {
-        throw StateError('AUTH_REQUIRED');
-      }
-      await _friendChallengeService.createRandomFriendChallenge(
-        challengerUid: currentUid,
-        challengedUid: friend.uid,
-        currentLevelId: levelId,
-        sourceScreen: 'victory',
+      final created = await _liveDuelService.createRandomInvite(
+        toUid: friend.uid,
+        excludedLevelId: levelId,
+        preferredLevelId: levelId,
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Random friendly challenge sent'),
+          content: Text('Live duel invite sent'),
           duration: Duration(milliseconds: 1100),
         ),
       );
+      context.go('/live-duel/${created.matchId}');
     } catch (e) {
       if (kDebugMode) {
         debugPrint(
-            '[victory] sendLevelChallenge failed toUid=${friend.uid} levelId=$levelId error=$e');
+            '[victory] sendLiveDuelInvite failed toUid=${friend.uid} levelId=$levelId error=$e');
       }
       if (!mounted) return;
       var message = 'Could not send challenge right now';
@@ -318,10 +314,12 @@ class _VictoryScreenState extends State<VictoryScreen>
         message = 'Challenge blocked by Firestore rules';
       } else if (e is FirebaseException && e.code == 'failed-precondition') {
         message = 'Challenge setup is not ready yet. Try again in a moment.';
-      } else if (e.toString().contains('AUTH_REQUIRED')) {
-        message = 'You need to be signed in';
+      } else if (e.toString().contains('ALREADY_IN_ACTIVE_DUEL')) {
+        message = 'Finish your active duel first';
+      } else if (e.toString().contains('TARGET_IN_ACTIVE_DUEL')) {
+        message = '${friend.displayName} is already in another duel';
       } else if (e.toString().contains('NO_PUZZLES_AVAILABLE')) {
-        message = 'No puzzles available for challenge';
+        message = 'No puzzles available for duel';
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

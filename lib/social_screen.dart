@@ -12,8 +12,8 @@ import 'package:go_router/go_router.dart';
 import 'models/friend_profile.dart';
 import 'models/leaderboard_entry.dart';
 import 'services/friends_service.dart';
-import 'services/friend_challenge_service.dart';
 import 'services/leaderboard_service.dart';
+import 'services/live_duel_service.dart';
 import 'services/user_profile_service.dart';
 import 'ui/avatar_utils.dart';
 import 'ui/components/game_button.dart';
@@ -32,8 +32,7 @@ class _SocialScreenState extends State<SocialScreen> {
   static const String _firestoreDatabaseId = 'tracepath-database';
 
   final FriendsService _friendsService = FriendsService();
-  final FriendChallengeService _friendChallengeService =
-      FriendChallengeService();
+  final LiveDuelService _liveDuelService = LiveDuelService();
   final SocialLeaderboardService _leaderboardService =
       SocialLeaderboardService();
   final UserProfileService _profileService = UserProfileService();
@@ -604,7 +603,7 @@ class _SocialScreenState extends State<SocialScreen> {
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  'Send an in-game reminder to play now',
+                  'Send a real-time live duel invite',
                   style: TextStyle(color: Color(0xFF9EB0D2), fontSize: 12),
                 ),
                 const SizedBox(height: 10),
@@ -658,7 +657,7 @@ class _SocialScreenState extends State<SocialScreen> {
                                         ),
                                       ),
                                       Text(
-                                        'Send random friendly challenge',
+                                        'Invite to a live 1v1 duel',
                                         style: TextStyle(
                                           color: const Color(0xFF9EB0D2),
                                           fontSize: 12,
@@ -692,29 +691,24 @@ class _SocialScreenState extends State<SocialScreen> {
       if (kDebugMode) {
         debugPrint('Challenge button pressed from [social]');
       }
-      final currentUid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
-      if (currentUid.isEmpty) {
-        throw StateError('AUTH_REQUIRED');
-      }
-      await _friendChallengeService.createRandomFriendChallenge(
-        challengerUid: currentUid,
-        challengedUid: friend.uid,
-        sourceScreen: 'social',
+      final created = await _liveDuelService.createRandomInvite(
+        toUid: friend.uid,
       );
       if (!mounted) return;
       unawaited(
         GameToast.show(
           context,
           type: GameToastType.social,
-          title: 'Challenge sent',
-          message: 'Random friendly challenge sent to ${friend.displayName}.',
+          title: 'Live duel invite sent',
+          message: 'Waiting for ${friend.displayName} to accept.',
           duration: const Duration(milliseconds: 1700),
         ),
       );
+      context.go('/live-duel/${created.matchId}');
     } catch (e) {
       if (kDebugMode) {
         debugPrint(
-            '[social] send random friend challenge failed toUid=${friend.uid} error=$e');
+            '[social] send live duel invite failed toUid=${friend.uid} error=$e');
       }
       if (!mounted) return;
       var message = 'Could not send challenge right now.';
@@ -722,10 +716,12 @@ class _SocialScreenState extends State<SocialScreen> {
         message = 'Challenge blocked by Firestore rules.';
       } else if (e is FirebaseException && e.code == 'failed-precondition') {
         message = 'Challenge setup is not ready yet. Try again in a moment.';
-      } else if (e.toString().contains('AUTH_REQUIRED')) {
-        message = 'You need to be signed in.';
+      } else if (e.toString().contains('ALREADY_IN_ACTIVE_DUEL')) {
+        message = 'Finish your current live duel first.';
+      } else if (e.toString().contains('TARGET_IN_ACTIVE_DUEL')) {
+        message = '${friend.displayName} is already in another live duel.';
       } else if (e.toString().contains('NO_PUZZLES_AVAILABLE')) {
-        message = 'No puzzles available for challenge.';
+        message = 'No puzzles available for live duel.';
       }
       unawaited(
         GameToast.show(

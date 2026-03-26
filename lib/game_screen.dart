@@ -146,6 +146,9 @@ class _GameScreenState extends State<GameScreen>
   String _pendingLiveTrailSignature = '';
   List<int> _pendingLiveTrailPath = const <int>[];
   String _pendingLiveTrailState = 'drawing';
+  bool _liveInteractionLocked = false;
+  String _liveResultSheetShownKey = '';
+  bool _liveResultSheetOpen = false;
   final Map<String, int> _duelEmoteLastSentAtMs = <String, int>{};
   String? _lastNearCompleteFeedbackKey;
   int _manualAdsWatchedToday = 0;
@@ -265,6 +268,9 @@ class _GameScreenState extends State<GameScreen>
       _liveLostBeforeFinish = false;
       _liveResultOverlayVisible = false;
       _liveResultOverlayText = '';
+      _liveInteractionLocked = _isLiveDuelMode;
+      _liveResultSheetShownKey = '';
+      _liveResultSheetOpen = false;
       _elapsedAtSolve = null;
       if (!_isLiveDuelMode && !_isFriendChallengeMode) {
         _recordGhostFrame(_status.path, force: true);
@@ -514,6 +520,7 @@ class _GameScreenState extends State<GameScreen>
       brightness: brightness,
     );
     final isDark = brightness == Brightness.dark;
+    final duelControlsLocked = _isLiveDuelMode && _liveInteractionLocked;
 
     return Scaffold(
       backgroundColor: const Color(0xFF05070C),
@@ -554,8 +561,7 @@ class _GameScreenState extends State<GameScreen>
                     if (_liveLostBeforeFinish) ...[
                       const SizedBox(height: 8),
                       const _LiveDuelResolvedBanner(
-                        text:
-                            'Winner already resolved. You can finish for your time.',
+                        text: 'Duel finished. Board locked.',
                       ),
                     ],
                     const SizedBox(height: 10),
@@ -611,6 +617,8 @@ class _GameScreenState extends State<GameScreen>
                                             : const <int>[],
                                         opponentTrailColor:
                                             const Color(0xFFE2538A),
+                                        isInteractionLocked: _isLiveDuelMode &&
+                                            _liveInteractionLocked,
                                         onInvalidMove: (_) {
                                           setState(() {
                                             _mistakesUsed++;
@@ -647,7 +655,7 @@ class _GameScreenState extends State<GameScreen>
                       Expanded(
                         child: _GameActionButton(
                           label: 'Undo',
-                          onTap: _handleUndo,
+                          onTap: duelControlsLocked ? null : _handleUndo,
                           backgroundColor: isDark
                               ? const Color(0xFF2B2B2F)
                               : const Color(0xFFEDEDED),
@@ -660,7 +668,7 @@ class _GameScreenState extends State<GameScreen>
                       Expanded(
                         child: _GameActionButton(
                           label: 'Restart',
-                          onTap: _handleReset,
+                          onTap: duelControlsLocked ? null : _handleReset,
                           outlined: true,
                           borderColor: const Color(0xFF6B6E76),
                           foregroundColor: isDark
@@ -674,7 +682,7 @@ class _GameScreenState extends State<GameScreen>
                           label: _unlimitedHintsForTesting
                               ? 'Hint (INF)'
                               : 'Hint ($_hintsLeft)',
-                          onTap: _handleHint,
+                          onTap: duelControlsLocked ? null : _handleHint,
                           outlined: true,
                           visuallyEnabled:
                               _unlimitedHintsForTesting || _hintsLeft > 0,
@@ -1371,7 +1379,11 @@ class _GameScreenState extends State<GameScreen>
       }
       _completionHandled = true;
       HapticFeedback.heavyImpact();
-      _startCelebrationAndShowDialog();
+      if (_isLiveDuelMode) {
+        unawaited(_showCompletionDialog());
+      } else {
+        _startCelebrationAndShowDialog();
+      }
     }
   }
 
@@ -1435,6 +1447,27 @@ class _GameScreenState extends State<GameScreen>
       return;
     }
     final levelId = '${widget.packId}_${widget.levelIndex}';
+    if (_isLiveDuelMode) {
+      final elapsedMs = _currentElapsedDuration.inMilliseconds;
+      await _runCompletionStep(
+        'liveDuel.reportFinish',
+        () => _reportLiveDuelFinish(elapsedMs),
+      );
+      if (!mounted) return;
+      setState(() {
+        _showCelebration = false;
+      });
+      unawaited(
+        GameToast.show(
+          context,
+          type: GameToastType.social,
+          title: 'Time!',
+          message: 'Waiting for duel result...',
+          duration: const Duration(milliseconds: 1400),
+        ),
+      );
+      return;
+    }
     if (_isFriendChallengeMode) {
       await _runCompletionStep(
         'friendChallenge.markCompleted',
@@ -1571,12 +1604,6 @@ class _GameScreenState extends State<GameScreen>
     }
     final didBeatGhost = previousGhostBestMs > 0 &&
         _currentElapsedDuration.inMilliseconds < previousGhostBestMs;
-    if (_isLiveDuelMode) {
-      await _runCompletionStep(
-        'liveDuel.reportFinish',
-        () => _reportLiveDuelFinish(_currentElapsedDuration.inMilliseconds),
-      );
-    }
     final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
     if (currentUid.trim().isNotEmpty) {
       try {
@@ -2244,13 +2271,17 @@ class _GameScreenState extends State<GameScreen>
           ? opponent!.username.trim()
           : 'Opponent';
       final opponentState = _duelStateLabel(opponent?.state);
+      final winnerUid = match.winnerUid.trim();
+      final interactionLocked = match.status != LiveMatchStatus.playing ||
+          winnerUid.isNotEmpty ||
+          match.isTerminal;
       setState(() {
         _duelOpponentName = opponentName;
         _duelOpponentState = opponentState;
-        _liveWinnerResolved = match.winnerUid.trim().isNotEmpty;
-        _liveLostBeforeFinish = _liveWinnerResolved &&
-            match.winnerUid.trim() != uid &&
-            !_completionHandled;
+        _liveWinnerResolved = winnerUid.isNotEmpty;
+        _liveLostBeforeFinish =
+            _liveWinnerResolved && winnerUid != uid && !_completionHandled;
+        _liveInteractionLocked = interactionLocked;
       });
       _attachLiveTrailListener(opponentUid);
       if (match.isTerminal) {
@@ -2261,8 +2292,29 @@ class _GameScreenState extends State<GameScreen>
           ),
         );
       }
-      unawaited(_maybeAnnounceLiveWinner(match));
+      if (match.status == LiveMatchStatus.finished) {
+        unawaited(_handleLiveMatchFinished(match));
+      }
     });
+  }
+
+  Future<void> _handleLiveMatchFinished(LiveMatch match) async {
+    if (!mounted) return;
+    if (_liveResultSheetOpen) return;
+    final key = '${match.id}:${match.winnerUid.trim()}:${match.reason.trim()}';
+    if (_liveResultSheetShownKey == key) return;
+    _liveResultSheetShownKey = key;
+    await _maybeAnnounceLiveWinner(match);
+    if (!mounted) return;
+    _liveResultSheetOpen = true;
+    try {
+      await _showLiveDuelResultSheet(
+        match,
+        _currentElapsedDuration.inMilliseconds,
+      );
+    } finally {
+      _liveResultSheetOpen = false;
+    }
   }
 
   void _attachLiveTrailListener(String opponentUid) {
@@ -2356,18 +2408,18 @@ class _GameScreenState extends State<GameScreen>
     _liveWinnerAnnouncementKey = key;
     final won = winnerUid == uid;
     _showLiveResultOverlay(
-      won ? 'YOU WON!' : 'YOU LOST',
+      won ? 'YOU WON!' : 'YOU LOST ;(',
       subtitle: won
           ? 'You finished first in the duel.'
-          : '${_duelOpponentName.toUpperCase()} WON!',
+          : 'Your friend finished first.',
     );
     await GameToast.show(
       context,
       type: GameToastType.social,
-      title: won ? 'YOU WON!' : 'YOU LOST',
+      title: won ? 'YOU WON!' : 'YOU LOST ;(',
       message: won
           ? 'You finished first in the duel.'
-          : '${_duelOpponentName.toUpperCase()} WON!',
+          : 'Your friend finished first.',
       duration: const Duration(milliseconds: 2200),
     );
   }
@@ -2395,10 +2447,6 @@ class _GameScreenState extends State<GameScreen>
         elapsedMsFromStart: elapsedMs,
       );
       _liveFinishReported = true;
-      final refreshed =
-          await _liveDuelService.getMatch(widget.liveDuelArgs!.matchId);
-      if (!mounted || refreshed == null) return;
-      await _showLiveDuelResultSheet(refreshed, elapsedMs);
     } catch (e) {
       if (kDebugMode) {
         debugPrint(
@@ -2563,23 +2611,12 @@ class _GameScreenState extends State<GameScreen>
                     ),
                     const SizedBox(height: 8),
                     OutlinedButton(
-                      onPressed: () => Navigator.of(sheetContext).pop(),
-                      child: const Text('Back'),
-                    ),
-                    const SizedBox(height: 6),
-                    TextButton(
                       onPressed: () {
-                        final info =
-                            LiveDuelService.parseLevelRouteInfo(match.levelId);
-                        if (info == null) {
-                          Navigator.of(sheetContext).pop();
-                          return;
-                        }
                         Navigator.of(sheetContext).pop();
                         if (!mounted) return;
-                        context.go('/play/${info.packId}/${info.levelIndex}');
+                        context.go('/play');
                       },
-                      child: const Text('Play level normally'),
+                      child: const Text('Leave'),
                     ),
                   ],
                 ),
