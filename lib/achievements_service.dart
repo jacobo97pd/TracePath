@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'progress_service.dart';
@@ -43,10 +44,20 @@ class AchievementsService extends ChangeNotifier {
   }) {
     _load();
     _persistenceService = persistenceService ?? AchievementPersistenceService();
-    _authSub = FirebaseAuth.instance.authStateChanges().listen((user) {
-      _hydrationFuture = _hydrateForUid(user?.uid);
-    });
-    _hydrationFuture = _hydrateForUid(FirebaseAuth.instance.currentUser?.uid);
+    final auth = _firebaseAuthOrNull;
+    if (auth != null) {
+      _authSub = auth.authStateChanges().listen((user) {
+        _hydrationFuture = _hydrateForUid(user?.uid);
+      });
+      _hydrationFuture = _hydrateForUid(auth.currentUser?.uid);
+    } else {
+      _hydrationFuture = _hydrateForUid(null);
+      if (kDebugMode) {
+        debugPrint(
+          '[achievements] Firebase not configured; using local-only achievements state',
+        );
+      }
+    }
   }
 
   static const String _storageKeyBase = 'achievements_unlocked_at';
@@ -103,6 +114,15 @@ class AchievementsService extends ChangeNotifier {
   final Map<String, int> _unlockedAtMs = <String, int>{};
   String? _activeUid;
   Future<void> _hydrationFuture = Future<void>.value();
+
+  FirebaseAuth? get _firebaseAuthOrNull {
+    try {
+      if (Firebase.apps.isEmpty) return null;
+      return FirebaseAuth.instance;
+    } catch (_) {
+      return null;
+    }
+  }
 
   List<AchievementState> get states {
     return definitions.map((def) {

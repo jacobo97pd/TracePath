@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,7 +15,15 @@ class AuthService extends ChangeNotifier {
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: <String>['email', 'profile'],
   );
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  FirebaseAuth? get _firebaseAuthOrNull {
+    try {
+      if (Firebase.apps.isEmpty) return null;
+      return FirebaseAuth.instance;
+    } catch (_) {
+      return null;
+    }
+  }
 
   static const _modeKey = 'auth_mode_v1';
   static const _nameKey = 'auth_name_v1';
@@ -46,7 +55,7 @@ class AuthService extends ChangeNotifier {
     _displayName = _prefs.getString(_nameKey);
     _email = _prefs.getString(_emailKey);
     _avatarUrl = _prefs.getString(_avatarKey);
-    final user = _firebaseAuth.currentUser;
+    final user = _firebaseAuthOrNull?.currentUser;
     if (user != null) {
       _mode = AuthMode.google;
       _displayName = user.displayName ?? _displayName ?? user.email?.split('@').first;
@@ -67,12 +76,16 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<String?> signInWithGoogle() async {
+    final firebaseAuth = _firebaseAuthOrNull;
+    if (firebaseAuth == null) {
+      return 'Firebase no configurado en este dispositivo. Añade GoogleService-Info.plist (iOS) y google-services.json (Android).';
+    }
     try {
       debugPrint('TRACE google sign in start');
       if (kIsWeb) {
         final provider = GoogleAuthProvider()
           ..setCustomParameters({'prompt': 'select_account'});
-        final credential = await _firebaseAuth.signInWithPopup(provider);
+        final credential = await firebaseAuth.signInWithPopup(provider);
         final user = credential.user;
         debugPrint('TRACE web popup user: ${user?.uid}');
         if (user == null) return 'Google login failed';
@@ -87,14 +100,14 @@ class AuthService extends ChangeNotifier {
           debugPrint('TRACE google sign in cancelled by user');
           return 'Login canceled';
         }
-        final auth = await account.authentication;
-        debugPrint('TRACE accessToken: ${auth.accessToken != null}');
-        debugPrint('TRACE idToken: ${auth.idToken != null}');
+        final googleAuth = await account.authentication;
+        debugPrint('TRACE accessToken: ${googleAuth.accessToken != null}');
+        debugPrint('TRACE idToken: ${googleAuth.idToken != null}');
         final credential = GoogleAuthProvider.credential(
-          accessToken: auth.accessToken,
-          idToken: auth.idToken,
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
         );
-        final result = await _firebaseAuth.signInWithCredential(credential);
+        final result = await firebaseAuth.signInWithCredential(credential);
         final user = result.user;
         debugPrint('TRACE firebase sign in OK: ${user?.uid}');
         _mode = AuthMode.google;
@@ -113,15 +126,18 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<void> signOut() async {
+    final firebaseAuth = _firebaseAuthOrNull;
     if (_mode == AuthMode.google) {
       if (!kIsWeb) {
         try {
           await _googleSignIn.signOut();
         } catch (_) {}
       }
-      try {
-        await _firebaseAuth.signOut();
-      } catch (_) {}
+      if (firebaseAuth != null) {
+        try {
+          await firebaseAuth.signOut();
+        } catch (_) {}
+      }
     }
     _mode = AuthMode.none;
     _displayName = null;

@@ -121,11 +121,18 @@ class CoinsService extends ChangeNotifier {
     _lastSyncedUid = _prefs.getString(_lastSyncedUidKey);
 
     _coinsController.add(_coins);
-    _authSub = FirebaseAuth.instance.authStateChanges().listen((user) {
-      unawaited(_onAuthUserChanged(user));
-    });
-    unawaited(_ensureAuthenticatedUser());
-    unawaited(_onAuthUserChanged(FirebaseAuth.instance.currentUser));
+    final auth = _firebaseAuthOrNull;
+    if (auth != null) {
+      _authSub = auth.authStateChanges().listen((user) {
+        unawaited(_onAuthUserChanged(user));
+      });
+      unawaited(_ensureAuthenticatedUser());
+      unawaited(_onAuthUserChanged(auth.currentUser));
+    } else if (kDebugMode) {
+      debugPrint(
+        '[coins] Firebase not configured; remote sync disabled (local-only mode)',
+      );
+    }
   }
 
   static const String _coinsKey = 'coins_balance';
@@ -182,6 +189,25 @@ class CoinsService extends ChangeNotifier {
   StreamSubscription<User?>? _authSub;
   Timer? _remoteRetryTimer;
   bool _syncInProgress = false;
+
+  bool get _isFirebaseConfigured {
+    try {
+      return Firebase.apps.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  FirebaseAuth? get _firebaseAuthOrNull {
+    if (!_isFirebaseConfigured) return null;
+    try {
+      return FirebaseAuth.instance;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  User? get _firebaseUserOrNull => _firebaseAuthOrNull?.currentUser;
 
   int get coins => _coins;
   Future<int> getCoins() async => _coins;
@@ -304,7 +330,7 @@ class CoinsService extends ChangeNotifier {
           coinsAwarded: 0, firstCompletion: false);
     }
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _firebaseUserOrNull;
     if (user == null) {
       if (_claimedLevelRewards.contains(normalizedLevelId)) {
         if (kDebugMode) {
@@ -473,8 +499,8 @@ class CoinsService extends ChangeNotifier {
   Future<List<LegacyLevelRewardGap>> detectLegacyLevelRewardGaps({
     String? uid,
   }) async {
-    final resolvedUid =
-        (uid ?? FirebaseAuth.instance.currentUser?.uid ?? '').trim();
+    if (!_isFirebaseConfigured) return const <LegacyLevelRewardGap>[];
+    final resolvedUid = (uid ?? _firebaseUserOrNull?.uid ?? '').trim();
     if (resolvedUid.isEmpty) return const <LegacyLevelRewardGap>[];
     final userRef = _usersDocRef(resolvedUid);
     final completedSnap = await userRef.collection('completed_levels').get();
@@ -512,8 +538,8 @@ class CoinsService extends ChangeNotifier {
     String? uid,
     String source = 'legacy_manual_reconcile',
   }) async {
-    final resolvedUid =
-        (uid ?? FirebaseAuth.instance.currentUser?.uid ?? '').trim();
+    if (!_isFirebaseConfigured) return 0;
+    final resolvedUid = (uid ?? _firebaseUserOrNull?.uid ?? '').trim();
     if (resolvedUid.isEmpty) return 0;
     final normalized = levelIds
         .map((id) => id.trim())
@@ -580,7 +606,7 @@ class CoinsService extends ChangeNotifier {
     required String purchaseStatus,
     String verificationData = '',
   }) async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _firebaseUserOrNull;
     if (user == null) return 0;
 
     final amount =
@@ -675,7 +701,7 @@ class CoinsService extends ChangeNotifier {
     bool? gameWon,
     int? solveMs,
   }) async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _firebaseUserOrNull;
     if (user == null) return;
     try {
       final ref = _usersDocRef(user.uid);
@@ -818,8 +844,8 @@ class CoinsService extends ChangeNotifier {
   }
 
   Future<void> _ensureAuthenticatedUser() async {
-    final auth = FirebaseAuth.instance;
-    if (auth.currentUser != null) return;
+    final auth = _firebaseAuthOrNull;
+    if (auth == null || auth.currentUser != null) return;
     try {
       if (kDebugMode) {
         debugPrint('[coins] No auth user; signing in anonymously...');
@@ -1018,7 +1044,7 @@ class CoinsService extends ChangeNotifier {
       final ref = _usersDocRef(uid);
       final snap = await ref.get();
       final ts = FieldValue.serverTimestamp();
-      final authUser = FirebaseAuth.instance.currentUser;
+      final authUser = _firebaseUserOrNull;
       if (snap.exists) {
         final existing = snap.data() ?? <String, dynamic>{};
         final missing = UserModel.missingFieldsForExisting(
@@ -1163,7 +1189,7 @@ class CoinsService extends ChangeNotifier {
   }
 
   Future<void> _syncCoinsToRemoteSilently() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _firebaseUserOrNull;
     if (user == null || _syncInProgress) return;
     _syncInProgress = true;
     try {
@@ -1212,6 +1238,7 @@ class CoinsService extends ChangeNotifier {
   }
 
   void _scheduleRemoteRetry() {
+    if (!_isFirebaseConfigured) return;
     _remoteRetryTimer?.cancel();
     _remoteRetryTimer = Timer(const Duration(seconds: 8), () {
       unawaited(_syncCoinsToRemoteSilently());
@@ -1263,7 +1290,7 @@ class CoinsService extends ChangeNotifier {
     String? skinId,
     String? trailId,
   }) async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _firebaseUserOrNull;
     if (user == null) return;
     final payload = <String, dynamic>{
       'updatedAt': FieldValue.serverTimestamp(),
@@ -1285,7 +1312,7 @@ class CoinsService extends ChangeNotifier {
     String skinId, {
     required String source,
   }) async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _firebaseUserOrNull;
     if (user == null) return;
     final canonical = _remoteSkinId(skinId);
     try {
@@ -1306,7 +1333,7 @@ class CoinsService extends ChangeNotifier {
     String trailId, {
     required String source,
   }) async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _firebaseUserOrNull;
     if (user == null) return;
     final canonical = _remoteTrailId(trailId);
     try {
@@ -1408,6 +1435,9 @@ class CoinsService extends ChangeNotifier {
   }
 
   FirebaseFirestore _activeFirestore() {
+    if (!_isFirebaseConfigured) {
+      throw StateError('Firebase not configured');
+    }
     try {
       return FirebaseFirestore.instanceFor(
         app: Firebase.app(),
@@ -1419,6 +1449,9 @@ class CoinsService extends ChangeNotifier {
   }
 
   String _activeFirestoreName() {
+    if (!_isFirebaseConfigured) {
+      return '(firebase-disabled)';
+    }
     try {
       FirebaseFirestore.instanceFor(
         app: Firebase.app(),

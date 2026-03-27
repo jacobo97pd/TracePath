@@ -76,8 +76,10 @@ Future<void> main() async {
   } else {
     try {
       await Firebase.initializeApp();
-    } catch (_) {
-      // Android/iOS native config may be added later (google-services.json / plist).
+    } catch (e, st) {
+      // Keep app startup alive in local-only mode when native Firebase files are missing.
+      debugPrint('[Firebase] initializeApp failed on native platform: $e');
+      debugPrintStack(stackTrace: st);
     }
   }
   final prefs = await SharedPreferences.getInstance();
