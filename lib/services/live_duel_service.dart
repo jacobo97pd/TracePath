@@ -214,7 +214,17 @@ class LiveDuelService {
     final normalizedId = matchId.trim();
     if (normalizedId.isEmpty) throw StateError('INVALID_MATCH_ID');
     final matchRef = _db().collection('liveMatches').doc(normalizedId);
-    await expireIfStale(normalizedId);
+    try {
+      await expireIfStale(normalizedId);
+    } catch (e) {
+      // Stale cleanup should not block the core accept flow.
+      if (kDebugMode) {
+        debugPrint(
+          '[live-duel] accept precheck stale-scan failed (non-blocking) '
+          'match=$normalizedId uid=$uid error=$e',
+        );
+      }
+    }
     final playerRef = matchRef.collection('players').doc(uid);
     final userRef = _db().collection('users').doc(uid);
     final userSnap = await userRef.get();
@@ -229,11 +239,22 @@ class LiveDuelService {
       final matchSnap = await tx.get(matchRef);
       if (!matchSnap.exists) throw StateError('MATCH_NOT_FOUND');
       final data = matchSnap.data() ?? <String, dynamic>{};
-      invitedUid = _readString(data['invitedUid']);
-      createdByUid = _readString(data['createdByUid']);
+      invitedUid = _readString(data['invitedUid'],
+          fallback: _readString(data['playerBUid']));
+      createdByUid = _readString(data['createdByUid'],
+          fallback: _readString(data['playerAUid']));
       levelId = _readString(data['levelId']);
       final status = _readString(data['status']);
-      if (uid != invitedUid && uid != createdByUid) {
+      final participants = (data['playerUids'] as List?)
+              ?.whereType<String>()
+              .map((e) => e.trim())
+              .where((e) => e.isNotEmpty)
+              .toList(growable: false) ??
+          const <String>[];
+      final isParticipant = uid == invitedUid ||
+          uid == createdByUid ||
+          participants.contains(uid);
+      if (!isParticipant) {
         if (kDebugMode) {
           debugPrint(
             '[live-duel] accept denied: uid not participant '
@@ -290,26 +311,34 @@ class LiveDuelService {
       final label = username.isNotEmpty
           ? '@$username'
           : _readString(userData['playerName'], fallback: 'Player');
-      await _inboxService.addInboxItem(
-        uid: createdByUid,
-        type: 'system_news',
-        title: 'Duel invite accepted',
-        body: '$label accepted your live duel invite.',
-        status: 'accepted',
-        extraData: <String, dynamic>{
-          'fromUid': uid,
-          'fromUsername': username,
-          'fromPlayerName':
-              _readString(userData['playerName'], fallback: 'Player'),
-          'fromAvatarId': avatarId,
-          'ctaType': 'open_live_duel',
-          'ctaPayload': normalizedId,
-          'liveMatchId': normalizedId,
-          'levelId': levelId,
-          'relatedType': 'live_duel_invite',
-        },
-        messageId: 'live_duel_accept_${normalizedId}_$uid',
-      );
+      try {
+        await _inboxService.addInboxItem(
+          uid: createdByUid,
+          type: 'system_news',
+          title: 'Duel invite accepted',
+          body: '$label accepted your live duel invite.',
+          status: 'accepted',
+          extraData: <String, dynamic>{
+            'fromUid': uid,
+            'fromUsername': username,
+            'fromPlayerName':
+                _readString(userData['playerName'], fallback: 'Player'),
+            'fromAvatarId': avatarId,
+            'liveMatchId': normalizedId,
+            'levelId': levelId,
+            'relatedType': 'live_duel_invite',
+          },
+          messageId: 'live_duel_accept_${normalizedId}_$uid',
+        );
+      } catch (e) {
+        // Secondary notification should not block accepting the duel.
+        if (kDebugMode) {
+          debugPrint(
+            '[live-duel] accept notify failed (non-blocking) '
+            'match=$normalizedId to=$createdByUid error=$e',
+          );
+        }
+      }
     }
   }
 
@@ -399,8 +428,6 @@ class LiveDuelService {
           'fromUsername': username,
           'fromPlayerName': playerName,
           'fromAvatarId': avatarId,
-          'ctaType': 'open_social',
-          'ctaPayload': '/social',
           'liveMatchId': normalizedId,
           'levelId': levelId,
           'relatedType': 'live_duel_invite',

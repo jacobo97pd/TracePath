@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -22,7 +23,10 @@ class LiveDuelScreen extends StatefulWidget {
 class _LiveDuelScreenState extends State<LiveDuelScreen> {
   final LiveDuelService _service = LiveDuelService();
   StreamSubscription<LiveMatch?>? _sub;
+  StreamSubscription<List<LiveMatchEmote>>? _emoteSub;
   Timer? _ticker;
+  Timer? _heroEmoteTimer;
+  OverlayEntry? _heroEmoteEntry;
   LiveMatch? _match;
   Object? _error;
   bool _loading = true;
@@ -32,6 +36,9 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
   bool _readyBusy = false;
   bool _ensurePlayingBusy = false;
   int _lastEmoteSentAtMs = 0;
+  String _heroIncomingEmoteMatchId = '';
+  String _heroIncomingEmoteLastId = '';
+  bool _heroIncomingEmotePrimed = false;
 
   @override
   void initState() {
@@ -67,6 +74,11 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
           _loading = false;
           _error = null;
         });
+        if (match.status == LiveMatchStatus.finished) {
+          _attachIncomingEmoteListener(match.id);
+        } else {
+          _detachIncomingEmoteListener(clearUi: true);
+        }
         await _service.expireIfStale(match.id);
         await _maybeAutoStart(match);
       },
@@ -83,7 +95,9 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
   @override
   void dispose() {
     _sub?.cancel();
+    _emoteSub?.cancel();
     _ticker?.cancel();
+    _clearHeroIncomingEmoteOverlay();
     super.dispose();
   }
 
@@ -161,6 +175,171 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
     );
   }
 
+  void _attachIncomingEmoteListener(String matchId) {
+    final normalized = matchId.trim();
+    if (normalized.isEmpty) return;
+    if (_heroIncomingEmoteMatchId == normalized && _emoteSub != null) return;
+    _detachIncomingEmoteListener(clearUi: false);
+    _heroIncomingEmoteMatchId = normalized;
+    _heroIncomingEmotePrimed = false;
+    _emoteSub = _service.watchMatchEmotes(normalized, limit: 6).listen((items) {
+      if (!mounted) return;
+      final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
+      if (uid.isEmpty) return;
+      final firstSnapshot = !_heroIncomingEmotePrimed;
+      if (firstSnapshot) {
+        _heroIncomingEmotePrimed = true;
+      }
+      if (items.isEmpty) return;
+      LiveMatchEmote? incoming;
+      for (final item in items) {
+        final senderUid = item.sentByUid.trim();
+        if (senderUid.isEmpty || senderUid == uid) continue;
+        incoming = item;
+        break;
+      }
+      if (incoming == null) return;
+      if (firstSnapshot) {
+        _heroIncomingEmoteLastId = incoming.id;
+        return;
+      }
+      if (incoming.id == _heroIncomingEmoteLastId) return;
+      _heroIncomingEmoteLastId = incoming.id;
+      _showIncomingEmoteHero(incoming);
+    });
+  }
+
+  void _detachIncomingEmoteListener({bool clearUi = false}) {
+    _emoteSub?.cancel();
+    _emoteSub = null;
+    _heroIncomingEmoteMatchId = '';
+    _heroIncomingEmotePrimed = false;
+    if (clearUi) {
+      _clearHeroIncomingEmoteOverlay();
+    }
+  }
+
+  void _showIncomingEmoteHero(LiveMatchEmote emote) {
+    if (!mounted) return;
+    final sender = emote.senderUsername.trim().isNotEmpty
+        ? emote.senderUsername.trim()
+        : 'Opponent';
+    _showHeroIncomingEmoteOverlay(
+      glyph: _emoteGlyph(emote.emoteId),
+      sender: sender,
+      eventId: _heroIncomingEmoteLastId,
+    );
+  }
+
+  void _showHeroIncomingEmoteOverlay({
+    required String glyph,
+    required String sender,
+    required String eventId,
+  }) {
+    if (!mounted) return;
+    final overlay = Overlay.of(context, rootOverlay: true);
+    _clearHeroIncomingEmoteOverlay();
+    _heroEmoteEntry = OverlayEntry(
+      builder: (overlayContext) {
+        final shortest =
+            MediaQuery.of(overlayContext).size.shortestSide.clamp(320.0, 560.0);
+        final compact = shortest < 390;
+        final emojiSize = compact ? 120.0 : 148.0;
+        return Positioned.fill(
+          child: IgnorePointer(
+            child: Material(
+              color: Colors.transparent,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Container(color: Colors.black.withOpacity(0.46)),
+                  Center(
+                    child: ZoomIn(
+                      key: ValueKey<String>('hero_incoming_emote_$eventId'),
+                      duration: const Duration(milliseconds: 260),
+                      child: BounceInDown(
+                        duration: const Duration(milliseconds: 420),
+                        child: Container(
+                          margin: EdgeInsets.symmetric(
+                            horizontal: compact ? 24 : 34,
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: compact ? 22 : 28,
+                            vertical: compact ? 16 : 20,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF0E1E33).withOpacity(0.95),
+                            borderRadius: BorderRadius.circular(
+                              compact ? 22 : 26,
+                            ),
+                            border: Border.all(
+                              color: const Color(0xFF71E1FF),
+                              width: 1.2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    const Color(0xFF5FD8FF).withOpacity(0.42),
+                                blurRadius: compact ? 24 : 30,
+                                offset: const Offset(0, 12),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                glyph,
+                                style: TextStyle(
+                                  fontSize: emojiSize,
+                                  height: 1,
+                                  shadows: const [
+                                    Shadow(
+                                      color: Color(0xFF79E7FF),
+                                      blurRadius: 22,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (sender.trim().isNotEmpty) ...[
+                                SizedBox(height: compact ? 6 : 8),
+                                Text(
+                                  '$sender reacted',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: const Color(0xFFD8EEFF),
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: compact ? 15 : 17,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    overlay.insert(_heroEmoteEntry!);
+    _heroEmoteTimer = Timer(const Duration(milliseconds: 1450), () {
+      _clearHeroIncomingEmoteOverlay();
+    });
+  }
+
+  void _clearHeroIncomingEmoteOverlay() {
+    _heroEmoteTimer?.cancel();
+    _heroEmoteTimer = null;
+    _heroEmoteEntry?.remove();
+    _heroEmoteEntry = null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final match = _match;
@@ -176,81 +355,270 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
         title: const Text('Live Duel'),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: _loading
-              ? const Center(child: CircularProgressIndicator())
-              : _error != null
-                  ? _ErrorCard(
-                      message: 'Live duel unavailable right now.',
-                      detail: _error.toString(),
-                    )
-                  : match == null
-                      ? const _ErrorCard(
-                          message: 'Match not found',
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compact =
+                constraints.maxHeight < 760 || constraints.maxWidth < 390;
+            final dense =
+                constraints.maxHeight < 680 || constraints.maxWidth < 360;
+            final horizontalPadding = compact ? 10.0 : 14.0;
+            final verticalPadding = dense ? 6.0 : (compact ? 8.0 : 10.0);
+            final sectionGap = compact ? 6.0 : 9.0;
+            final centerGap = compact ? 8.0 : 10.0;
+            final minHeight = constraints.maxHeight - (verticalPadding * 2);
+            return Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: horizontalPadding,
+                vertical: verticalPadding,
+              ),
+              child: _loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _error != null
+                      ? _ErrorCard(
+                          message: 'Live duel unavailable right now.',
+                          detail: _error.toString(),
                         )
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            _HeaderCard(
-                              title: title,
-                              subtitle: match.levelId,
+                      : match == null
+                          ? const _ErrorCard(
+                              message: 'Match not found',
+                            )
+                          : Stack(
+                              children: [
+                                SingleChildScrollView(
+                                  child: ConstrainedBox(
+                                    constraints:
+                                        BoxConstraints(minHeight: minHeight),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        _HeaderCard(
+                                          title: title,
+                                          subtitle: match.levelId,
+                                          compact: compact,
+                                        ),
+                                        SizedBox(height: sectionGap),
+                                        _PlayerRow(
+                                          label: 'You',
+                                          username:
+                                              myPlayer?.username.isNotEmpty ==
+                                                      true
+                                                  ? myPlayer!.username
+                                                  : 'Player',
+                                          state: myPlayer?.state ??
+                                              LiveMatchPlayerState.joined,
+                                          compact: compact,
+                                        ),
+                                        SizedBox(height: compact ? 6 : 8),
+                                        _PlayerRow(
+                                          label: 'Opponent',
+                                          username:
+                                              opponent?.username.isNotEmpty ==
+                                                      true
+                                                  ? opponent!.username
+                                                  : 'Waiting player...',
+                                          state: opponent?.state ??
+                                              LiveMatchPlayerState.invited,
+                                          compact: compact,
+                                        ),
+                                        SizedBox(height: centerGap),
+                                        _buildCenter(
+                                          match,
+                                          myPlayer: myPlayer,
+                                          opponent: opponent,
+                                          compact: compact,
+                                          dense: dense,
+                                        ),
+                                        SizedBox(height: sectionGap),
+                                        OutlinedButton(
+                                          onPressed: () async {
+                                            final active = _match;
+                                            if (active != null &&
+                                                active.status ==
+                                                    LiveMatchStatus.pending &&
+                                                uid == active.invitedUid) {
+                                              await _service.declineInvite(
+                                                matchId: active.id,
+                                              );
+                                            } else {
+                                              await _service.markAbandoned(
+                                                  widget.matchId);
+                                            }
+                                            if (!context.mounted) return;
+                                            context.go('/play');
+                                          },
+                                          style: OutlinedButton.styleFrom(
+                                            minimumSize: Size.fromHeight(
+                                              compact ? 40 : 44,
+                                            ),
+                                            visualDensity: compact
+                                                ? const VisualDensity(
+                                                    horizontal: -1,
+                                                    vertical: -1,
+                                                  )
+                                                : null,
+                                          ),
+                                          child: const Text('Leave duel'),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Positioned.fill(
+                                  child: IgnorePointer(
+                                    child: _buildLiveHeroOverlay(
+                                      match: match,
+                                      compact: compact,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 12),
-                            _PlayerRow(
-                              label: 'You',
-                              username: myPlayer?.username.isNotEmpty == true
-                                  ? myPlayer!.username
-                                  : 'Player',
-                              state: myPlayer?.state ??
-                                  LiveMatchPlayerState.joined,
-                            ),
-                            const SizedBox(height: 8),
-                            _PlayerRow(
-                              label: 'Opponent',
-                              username: opponent?.username.isNotEmpty == true
-                                  ? opponent!.username
-                                  : 'Waiting player...',
-                              state: opponent?.state ??
-                                  LiveMatchPlayerState.invited,
-                            ),
-                            const SizedBox(height: 16),
-                            Expanded(
-                              child: _buildCenter(
-                                match,
-                                myPlayer: myPlayer,
-                                opponent: opponent,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            OutlinedButton(
-                              onPressed: () async {
-                                final active = _match;
-                                if (active != null &&
-                                    active.status == LiveMatchStatus.pending &&
-                                    uid == active.invitedUid) {
-                                  await _service.declineInvite(
-                                    matchId: active.id,
-                                  );
-                                } else {
-                                  await _service.markAbandoned(widget.matchId);
-                                }
-                                if (!context.mounted) return;
-                                context.go('/play');
-                              },
-                              child: const Text('Leave duel'),
-                            ),
-                          ],
-                        ),
+            );
+          },
         ),
       ),
     );
+  }
+
+  Widget _buildLiveHeroOverlay({
+    required LiveMatch match,
+    required bool compact,
+  }) {
+    final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
+    if (uid.isEmpty) return const SizedBox.shrink();
+    if (match.status == LiveMatchStatus.countdown) {
+      final leftMs = _countdownRemainingMs(match);
+      final text = leftMs > 2000
+          ? '3'
+          : leftMs > 1000
+              ? '2'
+              : leftMs > 0
+                  ? '1'
+                  : 'GO!';
+      return Align(
+        alignment: Alignment.center,
+        child: BounceInDown(
+          key: ValueKey<String>('hero_countdown_$text'),
+          duration: Duration(milliseconds: text == 'GO!' ? 380 : 300),
+          child: ZoomIn(
+            duration: Duration(milliseconds: text == 'GO!' ? 320 : 260),
+            delay: const Duration(milliseconds: 40),
+            child: Transform.translate(
+              offset: Offset(0, text == 'GO!' ? -14 : -8),
+              child: Text(
+                text,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: text == 'GO!'
+                      ? const Color(0xFFA8F4FF)
+                      : const Color(0xFF8AE7FF),
+                  fontSize: compact ? 112 : 136,
+                  fontWeight: FontWeight.w900,
+                  height: 1,
+                  letterSpacing: text == 'GO!' ? 1.5 : 0.9,
+                  shadows: [
+                    Shadow(
+                      color: const Color(0xFF59DFFF)
+                          .withOpacity(text == 'GO!' ? 0.66 : 0.46),
+                      blurRadius: text == 'GO!' ? 34 : 22,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    if (match.status == LiveMatchStatus.finished) {
+      final me = match.players[uid];
+      final opponentUid = match.opponentUid(uid);
+      final opp = match.players[opponentUid];
+      final winnerUid = match.winnerUid.trim();
+      final myAbandoned = me?.state == LiveMatchPlayerState.abandoned;
+      final oppAbandoned = opp?.state == LiveMatchPlayerState.abandoned;
+      final draw = winnerUid.isEmpty;
+      final won = winnerUid == uid;
+      final emoji = myAbandoned
+          ? '\u{1F622}'
+          : oppAbandoned
+              ? '\u{1F3C6}'
+              : draw
+                  ? '\u{1F91D}'
+                  : (won ? '\u{1F3C6}' : '\u{1F622}');
+      final title = myAbandoned
+          ? 'YOU ABANDONED'
+          : oppAbandoned
+              ? 'YOU WIN!'
+              : draw
+                  ? 'DRAW'
+                  : (won ? 'YOU WIN!' : 'YOU LOST');
+      final glow = won || oppAbandoned
+          ? const Color(0xFF6CF0C2)
+          : const Color(0xFFFF79A8);
+      return Align(
+        alignment: Alignment.center,
+        child: Transform.translate(
+          offset: const Offset(0, -16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              BounceInDown(
+                key: ValueKey<String>('hero_result_emoji_${match.id}_$emoji'),
+                duration: const Duration(milliseconds: 420),
+                child: Text(
+                  emoji,
+                  style: TextStyle(
+                    fontSize: compact ? 96 : 118,
+                    height: 1,
+                    shadows: [
+                      Shadow(
+                        color: glow.withOpacity(0.56),
+                        blurRadius: compact ? 22 : 30,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: compact ? 2 : 4),
+              FadeInUp(
+                key: ValueKey<String>('hero_result_title_${match.id}_$title'),
+                duration: const Duration(milliseconds: 360),
+                delay: const Duration(milliseconds: 90),
+                from: 16,
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: compact ? 30 : 36,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.6,
+                    shadows: [
+                      Shadow(
+                        color: glow.withOpacity(0.42),
+                        blurRadius: compact ? 14 : 18,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    return const SizedBox.shrink();
   }
 
   Widget _buildCenter(
     LiveMatch match, {
     required LiveMatchPlayer? myPlayer,
     required LiveMatchPlayer? opponent,
+    required bool compact,
+    required bool dense,
   }) {
     switch (match.status) {
       case LiveMatchStatus.pending:
@@ -263,37 +631,43 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
         final opponentReady = opponent?.state == LiveMatchPlayerState.ready;
         final opponentJoined = opponent?.state == LiveMatchPlayerState.joined ||
             opponent?.state == LiveMatchPlayerState.ready;
-        return Center(
+        return Align(
+          alignment: Alignment.topCenter,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.hourglass_top_rounded,
-                  size: 44, color: Color(0xFF8FB9FF)),
-              const SizedBox(height: 10),
+              Icon(
+                Icons.hourglass_top_rounded,
+                size: compact ? 38 : 44,
+                color: const Color(0xFF8FB9FF),
+              ),
+              SizedBox(height: compact ? 8 : 10),
               Text(
                 isInvited
                     ? 'Invitation received'
                     : 'Waiting for your friend to join...',
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: compact ? 16 : 18,
                   fontWeight: FontWeight.w800,
                 ),
+                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: compact ? 8 : 10),
               Text(
                 opponentJoined
                     ? (opponentReady
                         ? 'Opponent is ready'
                         : 'Opponent joined, waiting ready')
                     : 'Opponent has not joined yet',
-                style: const TextStyle(
+                style: TextStyle(
                   color: Color(0xFFAED2FF),
-                  fontSize: 13,
+                  fontSize: compact ? 12 : 13,
                   fontWeight: FontWeight.w600,
                 ),
+                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: compact ? 10 : 12),
               if (isInvited)
                 FilledButton(
                   onPressed: _accepting
@@ -306,24 +680,36 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
                             if (mounted) setState(() => _accepting = false);
                           }
                         },
+                  style: FilledButton.styleFrom(
+                    minimumSize: Size(compact ? 148 : 172, compact ? 40 : 44),
+                    visualDensity: compact
+                        ? const VisualDensity(horizontal: -1, vertical: -1)
+                        : null,
+                  ),
                   child: Text(_accepting ? 'Accepting...' : 'Accept duel'),
                 ),
-              const SizedBox(height: 8),
+              SizedBox(height: compact ? 6 : 8),
               FilledButton(
                 onPressed: (_readyBusy || inviteNotAccepted)
                     ? null
                     : () => _toggleReady(match),
+                style: FilledButton.styleFrom(
+                  minimumSize: Size(compact ? 126 : 148, compact ? 40 : 44),
+                  visualDensity: compact
+                      ? const VisualDensity(horizontal: -1, vertical: -1)
+                      : null,
+                ),
                 child: Text(
                   _readyBusy ? 'Saving...' : (iAmReady ? 'Unready' : 'Ready'),
                 ),
               ),
               if (inviteNotAccepted) ...[
-                const SizedBox(height: 8),
-                const Text(
+                SizedBox(height: compact ? 6 : 8),
+                Text(
                   'Accept first, then mark Ready.',
                   style: TextStyle(
                     color: Color(0xFFAED2FF),
-                    fontSize: 12,
+                    fontSize: compact ? 11 : 12,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -340,35 +726,50 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
                 : leftMs > 0
                     ? '1'
                     : 'GO!';
-        return Center(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 180),
-            transitionBuilder: (child, animation) => ScaleTransition(
-              scale: Tween<double>(begin: 0.86, end: 1).animate(animation),
-              child: FadeTransition(opacity: animation, child: child),
+        return Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: compact ? 10 : 12,
+              vertical: compact ? 8 : 10,
+            ),
+            decoration: BoxDecoration(
+              color: const Color(0xFF142744),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFF345E93)),
             ),
             child: Text(
-              text,
-              key: ValueKey<String>(text),
-              style: const TextStyle(
-                color: Color(0xFF7DE2FF),
-                fontSize: 72,
-                fontWeight: FontWeight.w900,
+              text == 'GO!' ? 'GO!' : 'Starting in $text...',
+              style: TextStyle(
+                color: const Color(0xFFAED2FF),
+                fontSize: compact ? 12.5 : 13.5,
+                fontWeight: FontWeight.w800,
               ),
             ),
           ),
         );
       case LiveMatchStatus.playing:
-        return const Center(
-          child: Text(
-            'Starting match...',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        return Align(
+          alignment: Alignment.topCenter,
+          child: Padding(
+            padding: EdgeInsets.only(top: compact ? 6 : 8),
+            child: Text(
+              'Starting match...',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: compact ? 14 : 15,
+              ),
+            ),
           ),
         );
       case LiveMatchStatus.finished:
-        return _buildFinished(match);
+        return _buildFinished(match, compact: compact, dense: dense);
       case LiveMatchStatus.cancelled:
-        return _buildCancelled(match);
+        return Align(
+          alignment: Alignment.topCenter,
+          child: _buildCancelled(match),
+        );
     }
   }
 
@@ -388,7 +789,11 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
     }
   }
 
-  Widget _buildFinished(LiveMatch match) {
+  Widget _buildFinished(
+    LiveMatch match, {
+    required bool compact,
+    required bool dense,
+  }) {
     final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
     final opponentUid = match.opponentUid(uid);
     final me = match.players[uid];
@@ -401,133 +806,120 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
     final title = myAbandoned
         ? 'You abandoned'
         : oppAbandoned
-            ? 'Opponent abandoned'
+            ? 'You won \u{1F642}'
             : draw
                 ? 'Draw'
-                : (won ? 'Victory' : 'Defeat');
+                : (won ? 'You won \u{1F642}' : 'Defeat');
     final subtitle = myAbandoned
         ? 'Defeat by abandon'
         : oppAbandoned
             ? 'Win by abandon'
             : (won ? 'You won the duel' : (draw ? 'No winner' : 'You lost'));
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          title,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 28,
-            fontWeight: FontWeight.w900,
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        compact ? 10 : 12,
+        compact ? 8 : 10,
+        compact ? 10 : 12,
+        compact ? 10 : 12,
+      ),
+      decoration: BoxDecoration(
+        color: const Color(0xFF132238).withOpacity(0.9),
+        borderRadius: BorderRadius.circular(compact ? 12 : 14),
+        border: Border.all(color: const Color(0xFF2E4A72)),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(height: compact ? 2 : 4),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: compact ? 20 : 23,
+              fontWeight: FontWeight.w900,
+            ),
           ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          subtitle,
-          textAlign: TextAlign.center,
-          style: const TextStyle(color: Color(0xFFAED2FF)),
-        ),
-        const SizedBox(height: 14),
-        _resultRow('Your time', _formatTime(me?.finishedAtMsFromStart ?? 0)),
-        _resultRow(
-            'Opponent',
-            (opp?.username.trim().isNotEmpty == true)
-                ? opp!.username.trim()
-                : 'Player'),
-        _resultRow(
-          'Opponent time',
-          _formatTime(opp?.finishedAtMsFromStart ?? 0),
-        ),
-        const SizedBox(height: 10),
-        _buildEmoteFeed(match.id),
-        const SizedBox(height: 8),
-        _buildEmoteTray(match.id),
-        const SizedBox(height: 12),
-        FilledButton(
-          onPressed: _rematchBusy
-              ? null
-              : () async {
-                  setState(() => _rematchBusy = true);
-                  try {
-                    final created =
-                        await _service.createRematch(previousMatchId: match.id);
-                    if (!mounted) return;
-                    context.go('/live-duel/${created.matchId}');
-                  } catch (e) {
-                    if (!mounted) return;
-                    setState(() => _rematchBusy = false);
-                    var msg = 'Could not create rematch';
-                    final txt = e.toString();
-                    if (txt.contains('TARGET_IN_ACTIVE_DUEL')) {
-                      msg = 'Opponent is busy in another duel';
-                    } else if (txt.contains('ALREADY_IN_ACTIVE_DUEL')) {
-                      msg = 'Finish your active duel first';
+          SizedBox(height: compact ? 3 : 5),
+          Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: const Color(0xFFAED2FF),
+              fontSize: compact ? 11.5 : 12.5,
+            ),
+          ),
+          SizedBox(height: compact ? 8 : 10),
+          _resultRow('Your time', _formatTime(me?.finishedAtMsFromStart ?? 0)),
+          _resultRow(
+              'Opponent',
+              (opp?.username.trim().isNotEmpty == true)
+                  ? opp!.username.trim()
+                  : 'Player'),
+          _resultRow(
+            'Opponent time',
+            _formatTime(opp?.finishedAtMsFromStart ?? 0),
+          ),
+          SizedBox(height: compact ? 6 : 8),
+          _buildEmoteTray(match.id),
+          SizedBox(height: compact ? 8 : 10),
+          FilledButton(
+            onPressed: _rematchBusy
+                ? null
+                : () async {
+                    setState(() => _rematchBusy = true);
+                    try {
+                      final created = await _service.createRematch(
+                          previousMatchId: match.id);
+                      if (!mounted) return;
+                      context.go('/live-duel/${created.matchId}');
+                    } catch (e) {
+                      if (!mounted) return;
+                      setState(() => _rematchBusy = false);
+                      var msg = 'Could not create rematch';
+                      final txt = e.toString();
+                      if (txt.contains('TARGET_IN_ACTIVE_DUEL')) {
+                        msg = 'Opponent is busy in another duel';
+                      } else if (txt.contains('ALREADY_IN_ACTIVE_DUEL')) {
+                        msg = 'Finish your active duel first';
+                      }
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text(msg)));
                     }
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text(msg)));
-                  }
-                },
-          child: Text(_rematchBusy ? 'Creating rematch...' : 'Rematch'),
-        ),
-        const SizedBox(height: 8),
-        OutlinedButton(
-          onPressed: () => context.go('/play'),
-          child: const Text('Back'),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEmoteFeed(String matchId) {
-    final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
-    return StreamBuilder<List<LiveMatchEmote>>(
-      stream: _service.watchMatchEmotes(matchId, limit: 8),
-      builder: (context, snapshot) {
-        final items = snapshot.data ?? const <LiveMatchEmote>[];
-        if (items.isEmpty) return const SizedBox.shrink();
-        return Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: items.take(4).map((e) {
-            final mine = e.sentByUid == uid;
-            final glyph = _emoteGlyph(e.emoteId);
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: mine
-                    ? const Color(0xFF1E3658).withOpacity(0.9)
-                    : const Color(0xFF24334B).withOpacity(0.9),
-                borderRadius: BorderRadius.circular(11),
-                border: Border.all(
-                  color:
-                      mine ? const Color(0xFF68A3FF) : const Color(0xFF486182),
-                ),
-              ),
-              child: Text(
-                '$glyph ${mine ? "You" : "Opponent"}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            );
-          }).toList(growable: false),
-        );
-      },
+                  },
+            style: FilledButton.styleFrom(
+              minimumSize: Size.fromHeight(compact ? 40 : 44),
+              visualDensity: compact
+                  ? const VisualDensity(horizontal: -1, vertical: -1)
+                  : null,
+            ),
+            child: Text(_rematchBusy ? 'Creating rematch...' : 'Rematch'),
+          ),
+          SizedBox(height: dense ? 4 : 6),
+          OutlinedButton(
+            onPressed: () => context.go('/play'),
+            style: OutlinedButton.styleFrom(
+              minimumSize: Size.fromHeight(compact ? 40 : 44),
+              visualDensity: compact
+                  ? const VisualDensity(horizontal: -1, vertical: -1)
+                  : null,
+            ),
+            child: const Text('Back'),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildEmoteTray(String matchId) {
     const emotes = <MapEntry<String, String>>[
-      MapEntry('laugh', '😂'),
-      MapEntry('cool', '😎'),
-      MapEntry('wow', '😮'),
-      MapEntry('cry', '😢'),
-      MapEntry('clap', '👏'),
-      MapEntry('heart', '❤️'),
+      MapEntry('laugh', '\u{1F602}'),
+      MapEntry('cool', '\u{1F60E}'),
+      MapEntry('wow', '\u{1F62E}'),
+      MapEntry('cry', '\u{1F622}'),
+      MapEntry('clap', '\u{1F44F}'),
+      MapEntry('heart', '\u{2764}\u{FE0F}'),
     ];
     return Wrap(
       spacing: 8,
@@ -557,18 +949,18 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
   String _emoteGlyph(String emoteId) {
     switch (emoteId) {
       case 'laugh':
-        return '😂';
+        return '\u{1F602}';
       case 'cool':
-        return '😎';
+        return '\u{1F60E}';
       case 'cry':
-        return '😢';
+        return '\u{1F622}';
       case 'clap':
-        return '👏';
+        return '\u{1F44F}';
       case 'heart':
-        return '❤️';
+        return '\u{2764}\u{FE0F}';
       case 'wow':
       default:
-        return '😮';
+        return '\u{1F62E}';
     }
   }
 
@@ -590,6 +982,11 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
     try {
       await _service.sendMatchEmote(matchId: matchId, emoteId: emoteId);
       _lastEmoteSentAtMs = nowMs;
+      _showHeroIncomingEmoteOverlay(
+        glyph: _emoteGlyph(emoteId),
+        sender: '',
+        eventId: 'local_${nowMs}_$emoteId',
+      );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -610,7 +1007,13 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
             : reason == 'playing_timeout'
                 ? 'Match timed out'
                 : 'Duel cancelled';
-    return Center(
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16253A),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF2E4B72)),
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -618,18 +1021,25 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
             'Duel cancelled',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             message,
-            style: const TextStyle(color: Color(0xFFAED2FF)),
+            style: const TextStyle(
+              color: Color(0xFFAED2FF),
+              fontSize: 12.5,
+            ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           OutlinedButton(
             onPressed: () => context.go('/play'),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(40),
+              visualDensity: const VisualDensity(horizontal: -1, vertical: -1),
+            ),
             child: const Text('Back'),
           ),
         ],
@@ -674,17 +1084,19 @@ class _HeaderCard extends StatelessWidget {
   const _HeaderCard({
     required this.title,
     required this.subtitle,
+    this.compact = false,
   });
 
   final String title;
   final String subtitle;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(compact ? 12 : 14),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(compact ? 14 : 16),
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -697,18 +1109,18 @@ class _HeaderCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
-              fontSize: 19,
+              fontSize: compact ? 17 : 19,
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: compact ? 2 : 4),
           Text(
             subtitle,
-            style: const TextStyle(
+            style: TextStyle(
               color: Color(0xFF9DB3D8),
-              fontSize: 13,
+              fontSize: compact ? 12 : 13,
             ),
           ),
         ],
@@ -722,45 +1134,53 @@ class _PlayerRow extends StatelessWidget {
     required this.label,
     required this.username,
     required this.state,
+    this.compact = false,
   });
 
   final String label;
   final String username;
   final LiveMatchPlayerState state;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 10 : 12,
+        vertical: compact ? 8 : 10,
+      ),
       decoration: BoxDecoration(
         color: const Color(0xFF152339),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(compact ? 10 : 12),
         border: Border.all(color: const Color(0xFF2D4566)),
       ),
       child: Row(
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               color: Color(0xFF9FB4D7),
               fontWeight: FontWeight.w700,
+              fontSize: compact ? 12.5 : 13.5,
             ),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: compact ? 8 : 10),
           Expanded(
             child: Text(
               username,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w800,
+                fontSize: compact ? 13 : 14,
               ),
             ),
           ),
           Text(
             _stateLabel(state),
-            style: const TextStyle(
+            style: TextStyle(
               color: Color(0xFF7DE2FF),
               fontWeight: FontWeight.w700,
+              fontSize: compact ? 12 : 13,
             ),
           ),
         ],

@@ -25,6 +25,7 @@ class InboxItem {
     required this.fromAvatarId,
     required this.ctaType,
     required this.ctaPayload,
+    required this.relatedType,
   });
 
   final String id;
@@ -40,11 +41,14 @@ class InboxItem {
   final String fromAvatarId;
   final String ctaType;
   final String ctaPayload;
+  final String relatedType;
 
   bool get isPendingFriendRequest =>
       type == InboxItemType.friendRequest && status == 'pending';
 
-  bool get hasCta => ctaType.isNotEmpty;
+  bool get hasCta =>
+      ctaType.isNotEmpty &&
+      relatedType.trim().toLowerCase() != 'live_duel_invite';
 
   String get senderDisplayName {
     if (fromUsername.trim().isNotEmpty) return fromUsername.trim();
@@ -71,6 +75,7 @@ class InboxItem {
       fromAvatarId: (data['fromAvatarId'] as String?)?.trim() ?? 'default',
       ctaType: (data['ctaType'] as String?)?.trim() ?? '',
       ctaPayload: (data['ctaPayload'] as String?)?.trim() ?? '',
+      relatedType: (data['relatedType'] as String?)?.trim() ?? '',
     );
   }
 

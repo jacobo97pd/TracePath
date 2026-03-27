@@ -615,7 +615,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 StreamBuilder<List<InboxItem>>(
                   stream: _inboxService.watchInbox(),
                   builder: (context, snapshot) {
-                    final inboxItems = snapshot.data ?? const <InboxItem>[];
+                    final inboxItems = (snapshot.data ?? const <InboxItem>[])
+                        .where((e) => e.type != InboxItemType.liveDuelInvite)
+                        .toList(growable: false);
                     final unreadCount = inboxItems
                         .where((e) => !e.read || e.isPendingFriendRequest)
                         .length;
@@ -2347,6 +2349,8 @@ class _AchievementMedalCard extends StatelessWidget {
         return Icons.bolt_rounded;
       case 'beat_the_ghost':
         return Icons.nightlight_round;
+      case 'versus_20':
+        return Icons.sports_martial_arts_rounded;
       default:
         return Icons.emoji_events_rounded;
     }
@@ -2360,6 +2364,8 @@ class _AchievementMedalCard extends StatelessWidget {
         return const Color(0xFFFFD761);
       case 'beat_the_ghost':
         return const Color(0xFF67E8F9);
+      case 'versus_20':
+        return const Color(0xFF34D399);
       case 'streak_7':
       case 'daily_habit':
         return const Color(0xFF60A5FA);

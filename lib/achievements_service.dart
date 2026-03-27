@@ -103,6 +103,11 @@ class AchievementsService extends ChangeNotifier {
       title: 'Beat the Ghost',
       description: 'Beat your personal ghost in a replay',
     ),
+    AchievementDef(
+      id: 'versus_20',
+      title: '20 Versus',
+      description: 'Play 20 live duels against friends',
+    ),
   ];
 
   final SharedPreferences _prefs;
@@ -220,6 +225,8 @@ class AchievementsService extends ChangeNotifier {
         return difficulty == 5 && hintsUsed == 0 && rewindsUsed == 0;
       case 'speedrunner':
         return solveTimeMs < speedrunnerThresholdMs;
+      case 'versus_20':
+        return _progressService.totalVersusPlayed >= 20;
       default:
         return false;
     }

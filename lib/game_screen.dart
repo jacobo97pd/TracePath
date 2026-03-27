@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -75,6 +76,7 @@ class _GameScreenState extends State<GameScreen>
   static const int _maxHintsPerLevel = 3;
   static const bool _unlimitedHintsForTesting = true;
   static const String _firestoreDatabaseId = 'tracepath-database';
+  static const bool _showLiveEmoteDebugHud = false;
   static bool _ghostModeSessionEnabled = true;
 
   final GameBoardController _boardController = GameBoardController();
@@ -128,6 +130,7 @@ class _GameScreenState extends State<GameScreen>
   bool _ghostEnabled = _ghostModeSessionEnabled;
   StreamSubscription<LiveMatch?>? _liveMatchSub;
   StreamSubscription<LiveMatchRealtimeTrail?>? _liveTrailSub;
+  StreamSubscription<List<LiveMatchEmote>>? _liveEmoteSub;
   String _duelOpponentName = 'Opponent';
   String _duelOpponentState = 'Waiting...';
   String _liveTrailSubscribedUid = '';
@@ -137,7 +140,10 @@ class _GameScreenState extends State<GameScreen>
   bool _liveWinnerResolved = false;
   bool _liveLostBeforeFinish = false;
   bool _liveResultOverlayVisible = false;
-  String _liveResultOverlayText = '';
+  String _liveResultOverlayTitle = '';
+  String _liveResultOverlaySubtitle = '';
+  String _liveResultOverlayEmoji = '';
+  bool _liveResultOverlayWin = false;
   Timer? _liveResultOverlayTimer;
   Timer? _liveTrailPublishTimer;
   int _liveTrailPublishVersion = 0;
@@ -149,6 +155,12 @@ class _GameScreenState extends State<GameScreen>
   bool _liveInteractionLocked = false;
   String _liveResultSheetShownKey = '';
   bool _liveResultSheetOpen = false;
+  String _liveIncomingEmoteMatchId = '';
+  String _liveIncomingEmoteLastId = '';
+  bool _liveIncomingEmotePrimed = false;
+  Timer? _liveIncomingEmoteTimer;
+  OverlayEntry? _liveIncomingEmoteEntry;
+  final List<String> _liveEmoteDebugLines = <String>[];
   final Map<String, int> _duelEmoteLastSentAtMs = <String, int>{};
   String? _lastNearCompleteFeedbackKey;
   int _manualAdsWatchedToday = 0;
@@ -193,11 +205,13 @@ class _GameScreenState extends State<GameScreen>
     _clockTimer?.cancel();
     _coinRewardTimer?.cancel();
     _liveResultOverlayTimer?.cancel();
+    _clearLiveIncomingEmoteOverlay(log: false);
     _liveTrailPublishTimer?.cancel();
     _pathColorController.dispose();
     _boardController.dispose();
     _liveMatchSub?.cancel();
     _liveTrailSub?.cancel();
+    _liveEmoteSub?.cancel();
     if (_isLiveDuelMode) {
       unawaited(
         _liveDuelService.clearRealtimeTrail(
@@ -267,7 +281,15 @@ class _GameScreenState extends State<GameScreen>
       _liveWinnerResolved = false;
       _liveLostBeforeFinish = false;
       _liveResultOverlayVisible = false;
-      _liveResultOverlayText = '';
+      _liveResultOverlayTitle = '';
+      _liveResultOverlaySubtitle = '';
+      _liveResultOverlayEmoji = '';
+      _liveResultOverlayWin = false;
+      _clearLiveIncomingEmoteOverlay(log: false);
+      _liveIncomingEmoteLastId = '';
+      _liveIncomingEmotePrimed = false;
+      _liveIncomingEmoteMatchId = '';
+      _liveEmoteDebugLines.clear();
       _liveInteractionLocked = _isLiveDuelMode;
       _liveResultSheetShownKey = '';
       _liveResultSheetOpen = false;
@@ -427,13 +449,13 @@ class _GameScreenState extends State<GameScreen>
         return (
           'Alphabet Mode',
           'Connect cells in alphabetical order following the path clues.',
-          'A → B → C → D',
+          'A -> B -> C -> D',
         );
       case 'alphabet_reverse':
         return (
           'Reverse Alphabet Mode',
           'Connect cells in reverse alphabetical order.',
-          'Z → Y → X → W',
+          'Z -> Y -> X -> W',
         );
       case 'multiples':
         return (
@@ -451,13 +473,13 @@ class _GameScreenState extends State<GameScreen>
         return (
           'Roman Numerals Mode',
           'Follow the sequence of roman numerals in order.',
-          'I → II → III → IV',
+          'I -> II -> III -> IV',
         );
       default:
         return (
           'Variant Mode',
           'Follow the clue sequence in the correct order.',
-          '1 → 2 → 3',
+          '1 -> 2 -> 3',
         );
     }
   }
@@ -525,347 +547,340 @@ class _GameScreenState extends State<GameScreen>
     return Scaffold(
       backgroundColor: const Color(0xFF05070C),
       body: SafeArea(
-        child: Stack(
-          children: [
-            const Positioned.fill(child: _GameplayAtmosphereBackground()),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _GameplayHeader(
-                    levelText: 'Level ${widget.levelIndex} / $_packLevelCount',
-                    timerText: _elapsedText,
-                    onBack: () {
-                      if (context.canPop()) {
-                        context.pop();
-                      } else {
-                        context.go('/');
-                      }
-                    },
-                    walletCoins: widget.coinsService.coins,
-                    onRankingTap: _openFriendsRankingSheet,
-                    onWalletTap: () => context.go('/shop'),
-                    showRanking: !_isFriendChallengeMode,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final liveCompact = _isLiveDuelMode &&
+                (constraints.maxHeight < 860 || constraints.maxWidth < 420);
+            final liveDense = _isLiveDuelMode &&
+                (constraints.maxHeight < 760 || constraints.maxWidth < 380);
+            final contentHorizontalPadding = liveCompact ? 14.0 : 18.0;
+            final contentTopPadding =
+                liveDense ? 8.0 : (_isLiveDuelMode ? 10.0 : 14.0);
+            final contentBottomPadding = liveCompact ? 14.0 : 18.0;
+            final sectionGap = liveCompact ? 10.0 : 14.0;
+            final compactGap = liveCompact ? 8.0 : 10.0;
+            final actionButtonGap = liveCompact ? 8.0 : 12.0;
+            final boardPadding = liveCompact ? 11.0 : 14.0;
+            final infoGap = liveCompact ? 4.0 : 6.0;
+            final overlayTopMargin = liveDense ? 0.0 : 0.0;
+            final overlayMaxWidth = liveCompact ? 320.0 : 380.0;
+            final overlayEmoji = _liveResultOverlayEmoji.trim().isNotEmpty
+                ? _liveResultOverlayEmoji
+                : (_liveResultOverlayWin ? '\u{1F3C6}' : '\u{1F622}');
+            final overlayBorder = _liveResultOverlayWin
+                ? const Color(0xFF59E0B0)
+                : const Color(0xFFFF86AE);
+            final overlayGlow = _liveResultOverlayWin
+                ? const Color(0xFF3FD8AE)
+                : const Color(0xFFFF6B9A);
+            final overlayGradientColors = _liveResultOverlayWin
+                ? const [Color(0xFF15363F), Color(0xFF102730)]
+                : const [Color(0xFF3A1C33), Color(0xFF2A1425)];
+            return Stack(
+              children: [
+                const Positioned.fill(child: _GameplayAtmosphereBackground()),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    contentHorizontalPadding,
+                    contentTopPadding,
+                    contentHorizontalPadding,
+                    contentBottomPadding,
                   ),
-                  const SizedBox(height: 14),
-                  if (_isFriendChallengeMode) ...[
-                    const _FriendChallengeInfoBar(),
-                    const SizedBox(height: 10),
-                  ],
-                  if (_isLiveDuelMode) ...[
-                    _LiveDuelStatusBar(
-                      opponentName: _duelOpponentName,
-                      opponentState: _duelOpponentState,
-                    ),
-                    if (_liveLostBeforeFinish) ...[
-                      const SizedBox(height: 8),
-                      const _LiveDuelResolvedBanner(
-                        text: 'Duel finished. Board locked.',
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _GameplayHeader(
+                        levelText:
+                            'Level ${widget.levelIndex} / $_packLevelCount',
+                        timerText: _elapsedText,
+                        onBack: () {
+                          if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.go('/');
+                          }
+                        },
+                        walletCoins: widget.coinsService.coins,
+                        onRankingTap: _openFriendsRankingSheet,
+                        onWalletTap: () => context.go('/shop'),
+                        showRanking: !_isFriendChallengeMode,
+                        compact: liveCompact,
                       ),
-                    ],
-                    const SizedBox(height: 10),
-                  ],
-                  if (!_isLiveDuelMode && !_isFriendChallengeMode) ...[
-                    if (_ghostRun != null)
-                      _GhostRaceInfoBar(
-                        bestTimeText: _formatGhostTime(_ghostRun!.totalTimeMs),
-                        enabled: _ghostEnabled,
-                        onToggle: _toggleGhostMode,
-                      )
-                    else
-                      _GhostPendingInfoBar(
-                        enabled: _ghostEnabled,
-                        onToggle: _toggleGhostMode,
-                      ),
-                    const SizedBox(height: 10),
-                  ],
-                  Expanded(
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 640),
-                        child: _GlassBoardShell(
-                          isDark: isDark,
-                          child: Padding(
-                            padding: const EdgeInsets.all(14),
-                            child: AspectRatio(
-                              aspectRatio: 1,
-                              child: AnimatedBuilder(
-                                animation: _pathColorController,
-                                builder: (context, child) {
-                                  final pathColor =
-                                      _currentPathColor(brightness) ??
-                                          gameTheme.pathColor;
-                                  return Stack(
-                                    fit: StackFit.expand,
-                                    children: [
-                                      GameBoard(
-                                        controller: _boardController,
-                                        level: level,
-                                        initialPath: _initialPath,
-                                        gameTheme: gameTheme,
-                                        pathColorOverride: pathColor,
-                                        trailSkin: _activeTrailSkin,
-                                        pointerAssetPath: widget
-                                            .coinsService.selectedSkinAssetPath,
-                                        hintDirection: _hintDirection,
-                                        hintVisible: _hintVisible,
-                                        onStatusChanged: _handleStatusChanged,
-                                        onChange: _handleBoardChange,
-                                        opponentPath: _isLiveDuelMode
-                                            ? _duelOpponentPath
-                                            : const <int>[],
-                                        opponentTrailColor:
-                                            const Color(0xFFE2538A),
-                                        isInteractionLocked: _isLiveDuelMode &&
-                                            _liveInteractionLocked,
-                                        onInvalidMove: (_) {
-                                          setState(() {
-                                            _mistakesUsed++;
-                                          });
-                                          _clearHint();
-                                          HapticFeedback.mediumImpact();
-                                        },
-                                      ),
-                                      if (_ghostRun != null &&
-                                          _ghostPlaybackStartedAt != null &&
-                                          _ghostEnabled &&
-                                          _isGhostEnabledForLevel(
-                                            _currentLevelId,
-                                          ))
-                                        Positioned.fill(
-                                          child: GhostReplayOverlay(
-                                            run: _ghostRun!,
-                                            startedAt: _ghostPlaybackStartedAt!,
+                      SizedBox(height: sectionGap),
+                      if (_isFriendChallengeMode) ...[
+                        const _FriendChallengeInfoBar(),
+                        SizedBox(height: compactGap),
+                      ],
+                      if (_isLiveDuelMode) ...[
+                        _LiveDuelStatusBar(
+                          opponentName: _duelOpponentName,
+                          opponentState: _duelOpponentState,
+                          compact: liveCompact,
+                        ),
+                        if (_liveLostBeforeFinish) ...[
+                          SizedBox(height: liveCompact ? 6 : 8),
+                          _LiveDuelResolvedBanner(
+                            text: 'Duel finished. Board locked.',
+                            compact: liveCompact,
+                          ),
+                        ],
+                        SizedBox(height: compactGap),
+                      ],
+                      if (!_isLiveDuelMode && !_isFriendChallengeMode) ...[
+                        if (_ghostRun != null)
+                          _GhostRaceInfoBar(
+                            bestTimeText:
+                                _formatGhostTime(_ghostRun!.totalTimeMs),
+                            enabled: _ghostEnabled,
+                            onToggle: _toggleGhostMode,
+                          )
+                        else
+                          _GhostPendingInfoBar(
+                            enabled: _ghostEnabled,
+                            onToggle: _toggleGhostMode,
+                          ),
+                        const SizedBox(height: 10),
+                      ],
+                      Expanded(
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 640),
+                            child: _GlassBoardShell(
+                              isDark: isDark,
+                              child: Padding(
+                                padding: EdgeInsets.all(boardPadding),
+                                child: AspectRatio(
+                                  aspectRatio: 1,
+                                  child: AnimatedBuilder(
+                                    animation: _pathColorController,
+                                    builder: (context, child) {
+                                      final pathColor =
+                                          _currentPathColor(brightness) ??
+                                              gameTheme.pathColor;
+                                      return Stack(
+                                        fit: StackFit.expand,
+                                        children: [
+                                          GameBoard(
+                                            controller: _boardController,
+                                            level: level,
+                                            initialPath: _initialPath,
+                                            gameTheme: gameTheme,
+                                            pathColorOverride: pathColor,
+                                            trailSkin: _activeTrailSkin,
+                                            pointerAssetPath: widget
+                                                .coinsService
+                                                .selectedSkinAssetPath,
+                                            hintDirection: _hintDirection,
+                                            hintVisible: _hintVisible,
+                                            onStatusChanged:
+                                                _handleStatusChanged,
+                                            onChange: _handleBoardChange,
+                                            opponentPath: _isLiveDuelMode
+                                                ? _duelOpponentPath
+                                                : const <int>[],
+                                            opponentTrailColor:
+                                                const Color(0xFFE2538A),
+                                            isInteractionLocked:
+                                                _isLiveDuelMode &&
+                                                    _liveInteractionLocked,
+                                            onInvalidMove: (_) {
+                                              setState(() {
+                                                _mistakesUsed++;
+                                              });
+                                              _clearHint();
+                                              HapticFeedback.mediumImpact();
+                                            },
                                           ),
-                                        ),
-                                    ],
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _GameActionButton(
-                          label: 'Undo',
-                          onTap: duelControlsLocked ? null : _handleUndo,
-                          backgroundColor: isDark
-                              ? const Color(0xFF2B2B2F)
-                              : const Color(0xFFEDEDED),
-                          foregroundColor: isDark
-                              ? const Color(0xFFE8E8EB)
-                              : const Color(0xFF222222),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _GameActionButton(
-                          label: 'Restart',
-                          onTap: duelControlsLocked ? null : _handleReset,
-                          outlined: true,
-                          borderColor: const Color(0xFF6B6E76),
-                          foregroundColor: isDark
-                              ? const Color(0xFFE8E8EB)
-                              : const Color(0xFF222222),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _GameActionButton(
-                          label: _unlimitedHintsForTesting
-                              ? 'Hint (INF)'
-                              : 'Hint ($_hintsLeft)',
-                          onTap: duelControlsLocked ? null : _handleHint,
-                          outlined: true,
-                          visuallyEnabled:
-                              _unlimitedHintsForTesting || _hintsLeft > 0,
-                          borderColor: gameTheme.pathColor,
-                          foregroundColor: gameTheme.pathColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _GameActionButton(
-                          label:
-                              'Watch Ad (${_manualAdsWatchedToday} / $_manualAdsDailyLimit)',
-                          onTap: (_manualAdBusy ||
-                                  _manualAdsLimitReached ||
-                                  _manualAdCooldownRemaining > Duration.zero)
-                              ? null
-                              : () => unawaited(_handleManualWatchAd()),
-                          outlined: true,
-                          borderColor: const Color(0xFFFFD166),
-                          foregroundColor: const Color(0xFFFFD166),
-                          visuallyEnabled: !_manualAdsLimitReached &&
-                              _manualAdCooldownRemaining <= Duration.zero,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _GameActionButton(
-                          label: 'Ad Status',
-                          onTap: () => unawaited(_showAdDiagnostics()),
-                          outlined: true,
-                          borderColor: const Color(0xFF60A5FA),
-                          foregroundColor: const Color(0xFF93C5FD),
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (_manualAdsLimitReached) ...[
-                    const SizedBox(height: 6),
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Daily limit reached. No more ads available today.',
-                        style: TextStyle(
-                          color: Color(0xFF94A3B8),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ] else if (_manualAdCooldownRemaining > Duration.zero) ...[
-                    const SizedBox(height: 6),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Next ad in ${_formatDurationShort(_manualAdCooldownRemaining)}',
-                        style: const TextStyle(
-                          color: Color(0xFF94A3B8),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            Positioned.fill(
-              child: CelebrationOverlay(
-                visible: _showCelebration,
-                duration: const Duration(milliseconds: 1150),
-                accentColor: gameTheme.pathColor,
-                isDark: isDark,
-                loop: true,
-              ),
-            ),
-            Positioned.fill(
-              child: IgnorePointer(
-                child: SafeArea(
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: AnimatedOpacity(
-                      duration: const Duration(milliseconds: 220),
-                      opacity: _coinRewardVisible ? 1 : 0,
-                      child: AnimatedSlide(
-                        duration: const Duration(milliseconds: 320),
-                        curve: Curves.easeOutCubic,
-                        offset: _coinRewardOffset,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 18,
-                            vertical: 11,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF14532D).withOpacity(0.96),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFF4ADE80)),
-                            boxShadow: [
-                              BoxShadow(
-                                color:
-                                    const Color(0xFF22C55E).withOpacity(0.28),
-                                blurRadius: 16,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.check_circle_rounded,
-                                color: Color(0xFFD1FAE5),
-                                size: 18,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'LEVEL COMPLETE! ${_coinRewardAmount >= 0 ? '+' : ''}$_coinRewardAmount',
-                                style: const TextStyle(
-                                  color: Color(0xFFEFFEF5),
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 14,
-                                  letterSpacing: 0.3,
+                                          if (_ghostRun != null &&
+                                              _ghostPlaybackStartedAt != null &&
+                                              _ghostEnabled &&
+                                              _isGhostEnabledForLevel(
+                                                _currentLevelId,
+                                              ))
+                                            Positioned.fill(
+                                              child: GhostReplayOverlay(
+                                                run: _ghostRun!,
+                                                startedAt:
+                                                    _ghostPlaybackStartedAt!,
+                                              ),
+                                            ),
+                                        ],
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned.fill(
-              child: IgnorePointer(
-                child: SafeArea(
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: AnimatedSlide(
-                      duration: const Duration(milliseconds: 220),
-                      curve: Curves.easeOutCubic,
-                      offset: _liveResultOverlayVisible
-                          ? Offset.zero
-                          : const Offset(0, -0.35),
-                      child: AnimatedOpacity(
-                        duration: const Duration(milliseconds: 180),
-                        opacity: _liveResultOverlayVisible ? 1 : 0,
-                        child: Container(
-                          margin: const EdgeInsets.only(top: 14),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            gradient: const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [Color(0xFF1D2F4F), Color(0xFF12233D)],
+                      SizedBox(height: sectionGap),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _GameActionButton(
+                              label: 'Undo',
+                              onTap: duelControlsLocked ? null : _handleUndo,
+                              backgroundColor: isDark
+                                  ? const Color(0xFF2B2B2F)
+                                  : const Color(0xFFEDEDED),
+                              foregroundColor: isDark
+                                  ? const Color(0xFFE8E8EB)
+                                  : const Color(0xFF222222),
                             ),
-                            border: Border.all(color: const Color(0xFF5F9BFF)),
-                            boxShadow: [
-                              BoxShadow(
-                                color:
-                                    const Color(0xFF5F9BFF).withOpacity(0.24),
-                                blurRadius: 18,
-                                spreadRadius: 2,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
                           ),
+                          SizedBox(width: actionButtonGap),
+                          Expanded(
+                            child: _GameActionButton(
+                              label: 'Restart',
+                              onTap: duelControlsLocked ? null : _handleReset,
+                              outlined: true,
+                              borderColor: const Color(0xFF6B6E76),
+                              foregroundColor: isDark
+                                  ? const Color(0xFFE8E8EB)
+                                  : const Color(0xFF222222),
+                            ),
+                          ),
+                          SizedBox(width: actionButtonGap),
+                          Expanded(
+                            child: _GameActionButton(
+                              label: _unlimitedHintsForTesting
+                                  ? 'Hint (INF)'
+                                  : 'Hint ($_hintsLeft)',
+                              onTap: duelControlsLocked ? null : _handleHint,
+                              outlined: true,
+                              visuallyEnabled:
+                                  _unlimitedHintsForTesting || _hintsLeft > 0,
+                              borderColor: gameTheme.pathColor,
+                              foregroundColor: gameTheme.pathColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: compactGap),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _GameActionButton(
+                              label:
+                                  'Watch Ad (${_manualAdsWatchedToday} / $_manualAdsDailyLimit)',
+                              onTap: (_manualAdBusy ||
+                                      _manualAdsLimitReached ||
+                                      _manualAdCooldownRemaining >
+                                          Duration.zero)
+                                  ? null
+                                  : () => unawaited(_handleManualWatchAd()),
+                              outlined: true,
+                              borderColor: const Color(0xFFFFD166),
+                              foregroundColor: const Color(0xFFFFD166),
+                              visuallyEnabled: !_manualAdsLimitReached &&
+                                  _manualAdCooldownRemaining <= Duration.zero,
+                            ),
+                          ),
+                          SizedBox(width: actionButtonGap),
+                          Expanded(
+                            child: _GameActionButton(
+                              label: 'Ad Status',
+                              onTap: () => unawaited(_showAdDiagnostics()),
+                              outlined: true,
+                              borderColor: const Color(0xFF60A5FA),
+                              foregroundColor: const Color(0xFF93C5FD),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (_manualAdsLimitReached) ...[
+                        SizedBox(height: infoGap),
+                        const Align(
+                          alignment: Alignment.centerLeft,
                           child: Text(
-                            _liveResultOverlayText,
-                            textAlign: TextAlign.center,
+                            'Daily limit reached. No more ads available today.',
+                            style: TextStyle(
+                              color: Color(0xFF94A3B8),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ] else if (_manualAdCooldownRemaining >
+                          Duration.zero) ...[
+                        SizedBox(height: infoGap),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Next ad in ${_formatDurationShort(_manualAdCooldownRemaining)}',
                             style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w900,
-                              fontSize: 16,
-                              height: 1.25,
-                              letterSpacing: 0.2,
+                              color: Color(0xFF94A3B8),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                Positioned.fill(
+                  child: CelebrationOverlay(
+                    visible: _showCelebration,
+                    duration: const Duration(milliseconds: 1150),
+                    accentColor: gameTheme.pathColor,
+                    isDark: isDark,
+                    loop: true,
+                  ),
+                ),
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: SafeArea(
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 220),
+                          opacity: _coinRewardVisible ? 1 : 0,
+                          child: AnimatedSlide(
+                            duration: const Duration(milliseconds: 320),
+                            curve: Curves.easeOutCubic,
+                            offset: _coinRewardOffset,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 18,
+                                vertical: 11,
+                              ),
+                              decoration: BoxDecoration(
+                                color:
+                                    const Color(0xFF14532D).withOpacity(0.96),
+                                borderRadius: BorderRadius.circular(12),
+                                border:
+                                    Border.all(color: const Color(0xFF4ADE80)),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF22C55E)
+                                        .withOpacity(0.28),
+                                    blurRadius: 16,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.check_circle_rounded,
+                                    color: Color(0xFFD1FAE5),
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'LEVEL COMPLETE! ${_coinRewardAmount >= 0 ? '+' : ''}$_coinRewardAmount',
+                                    style: const TextStyle(
+                                      color: Color(0xFFEFFEF5),
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 14,
+                                      letterSpacing: 0.3,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -873,9 +888,153 @@ class _GameScreenState extends State<GameScreen>
                     ),
                   ),
                 ),
-              ),
-            ),
-          ],
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: SafeArea(
+                      child: Stack(
+                        children: [
+                          AnimatedOpacity(
+                            duration: const Duration(milliseconds: 170),
+                            opacity: _liveResultOverlayVisible ? 1 : 0,
+                            child: Container(
+                              color: Colors.black.withOpacity(0.22),
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.center,
+                            child: AnimatedSlide(
+                              duration: const Duration(milliseconds: 260),
+                              curve: Curves.easeOutBack,
+                              offset: _liveResultOverlayVisible
+                                  ? Offset.zero
+                                  : const Offset(0, 0.24),
+                              child: AnimatedOpacity(
+                                duration: const Duration(milliseconds: 180),
+                                opacity: _liveResultOverlayVisible ? 1 : 0,
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: overlayMaxWidth + 34,
+                                  ),
+                                  child: Container(
+                                    margin:
+                                        EdgeInsets.only(top: overlayTopMargin),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: liveCompact ? 20 : 26,
+                                      vertical: liveCompact ? 14 : 18,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(
+                                        liveCompact ? 20 : 24,
+                                      ),
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: overlayGradientColors,
+                                      ),
+                                      border: Border.all(color: overlayBorder),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: overlayGlow.withOpacity(0.36),
+                                          blurRadius: liveCompact ? 26 : 34,
+                                          spreadRadius: 3,
+                                          offset: const Offset(0, 12),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        BounceInDown(
+                                          key: ValueKey<String>(
+                                            'live_overlay_emoji_${_liveResultOverlayTitle}_$overlayEmoji',
+                                          ),
+                                          duration:
+                                              const Duration(milliseconds: 460),
+                                          child: Text(
+                                            overlayEmoji,
+                                            style: TextStyle(
+                                              fontSize: liveCompact ? 92 : 114,
+                                              height: 1,
+                                              shadows: [
+                                                Shadow(
+                                                  color: overlayGlow
+                                                      .withOpacity(0.52),
+                                                  blurRadius:
+                                                      liveCompact ? 22 : 30,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: liveCompact ? 2 : 4),
+                                        FadeInUp(
+                                          key: ValueKey<String>(
+                                            'live_overlay_title_${_liveResultOverlayTitle}',
+                                          ),
+                                          duration:
+                                              const Duration(milliseconds: 340),
+                                          delay:
+                                              const Duration(milliseconds: 80),
+                                          from: 12,
+                                          child: Text(
+                                            _liveResultOverlayTitle,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w900,
+                                              fontSize: liveCompact ? 30 : 36,
+                                              height: 1.08,
+                                              letterSpacing: 0.3,
+                                            ),
+                                          ),
+                                        ),
+                                        if (_liveResultOverlaySubtitle
+                                            .isNotEmpty)
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              top: liveCompact ? 3 : 6,
+                                            ),
+                                            child: FadeInUp(
+                                              key: ValueKey<String>(
+                                                'live_overlay_subtitle_${_liveResultOverlayTitle}',
+                                              ),
+                                              duration: const Duration(
+                                                milliseconds: 320,
+                                              ),
+                                              delay: const Duration(
+                                                milliseconds: 140,
+                                              ),
+                                              from: 10,
+                                              child: Text(
+                                                _liveResultOverlaySubtitle,
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  color:
+                                                      const Color(0xFFD7E6FF),
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize:
+                                                      liveCompact ? 13 : 14,
+                                                  height: 1.2,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                _buildLiveEmoteDebugHud(),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -1798,7 +1957,7 @@ class _GameScreenState extends State<GameScreen>
               shareText:
                   'I solved Zip #${widget.levelIndex} in $_elapsedText. Score ${breakdown.finalScore}.',
               copyText:
-                  'Zip #${widget.levelIndex} - $_elapsedText - Streak ${widget.progressService.getDailyStreak()} 🔥',
+                  'Zip #${widget.levelIndex} - $_elapsedText - Streak ${widget.progressService.getDailyStreak()} \u{1F525}',
             ),
           ),
         ) ??
@@ -2293,9 +2452,284 @@ class _GameScreenState extends State<GameScreen>
         );
       }
       if (match.status == LiveMatchStatus.finished) {
+        _pushLiveEmoteDebug('match finished: emotes enabled');
+        _attachLiveIncomingEmoteListener(matchId: match.id);
+      } else {
+        _pushLiveEmoteDebug('match status=${match.status.name}: emotes off');
+        _detachLiveIncomingEmoteListener(clearUi: true);
+      }
+      if (match.status == LiveMatchStatus.finished) {
         unawaited(_handleLiveMatchFinished(match));
       }
     });
+  }
+
+  void _pushLiveEmoteDebug(String message) {
+    if (!_showLiveEmoteDebugHud || !mounted) return;
+    final now = DateTime.now();
+    final stamp =
+        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
+    final line = '[$stamp] $message';
+    setState(() {
+      _liveEmoteDebugLines.add(line);
+      if (_liveEmoteDebugLines.length > 6) {
+        _liveEmoteDebugLines.removeRange(0, _liveEmoteDebugLines.length - 6);
+      }
+    });
+  }
+
+  Widget _buildLiveEmoteDebugHud() {
+    if (!_showLiveEmoteDebugHud || _liveEmoteDebugLines.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return Positioned(
+      top: 8,
+      left: 8,
+      right: 8,
+      child: IgnorePointer(
+        child: SafeArea(
+          bottom: false,
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xCC0B1220),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFF4A6A94)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'LIVE EMOTE DEBUG',
+                      style: TextStyle(
+                        color: Color(0xFF9FD0FF),
+                        fontWeight: FontWeight.w800,
+                        fontSize: 11,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    ..._liveEmoteDebugLines.map(
+                      (line) => Text(
+                        line,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFFE2EEFF),
+                          fontSize: 10.5,
+                          height: 1.2,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _attachLiveIncomingEmoteListener({
+    required String matchId,
+  }) {
+    if (!_isLiveDuelMode) return;
+    final normalizedMatch = matchId.trim();
+    if (normalizedMatch.isEmpty) return;
+    if (_liveIncomingEmoteMatchId == normalizedMatch && _liveEmoteSub != null) {
+      _pushLiveEmoteDebug('listener already attached match=$normalizedMatch');
+      return;
+    }
+    _detachLiveIncomingEmoteListener(clearUi: false);
+    _liveIncomingEmoteMatchId = normalizedMatch;
+    _liveIncomingEmotePrimed = false;
+    _pushLiveEmoteDebug('attach listener match=$normalizedMatch');
+    _liveEmoteSub = _liveDuelService
+        .watchMatchEmotes(normalizedMatch, limit: 6)
+        .listen((items) {
+      if (!mounted) return;
+      final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
+      if (uid.isEmpty) return;
+      _pushLiveEmoteDebug(
+        'snapshot items=${items.length} winnerResolved=$_liveWinnerResolved',
+      );
+      if (!_liveWinnerResolved) return;
+      final firstSnapshot = !_liveIncomingEmotePrimed;
+      if (firstSnapshot) {
+        _liveIncomingEmotePrimed = true;
+      }
+      if (items.isEmpty) return;
+      LiveMatchEmote? latestIncoming;
+      for (final item in items) {
+        final senderUid = item.sentByUid.trim();
+        if (senderUid.isEmpty || senderUid == uid) continue;
+        latestIncoming = item;
+        break;
+      }
+      if (latestIncoming == null) {
+        _pushLiveEmoteDebug('incoming skipped: all emotes are mine/empty');
+        return;
+      }
+      if (firstSnapshot) {
+        _liveIncomingEmoteLastId = latestIncoming.id;
+        _pushLiveEmoteDebug(
+            'primed with existing emote id=${latestIncoming.id}');
+        return;
+      }
+      if (latestIncoming.id == _liveIncomingEmoteLastId) {
+        _pushLiveEmoteDebug('incoming duplicate id=${latestIncoming.id}');
+        return;
+      }
+      _liveIncomingEmoteLastId = latestIncoming.id;
+      _pushLiveEmoteDebug(
+        'incoming emote id=${latestIncoming.id} from=${latestIncoming.sentByUid.trim()}',
+      );
+      _showIncomingLiveEmote(latestIncoming);
+    });
+  }
+
+  void _detachLiveIncomingEmoteListener({bool clearUi = false}) {
+    _liveEmoteSub?.cancel();
+    _liveEmoteSub = null;
+    _liveIncomingEmoteMatchId = '';
+    _liveIncomingEmotePrimed = false;
+    _pushLiveEmoteDebug('detach listener clearUi=$clearUi');
+    if (clearUi) {
+      _clearLiveIncomingEmoteOverlay(log: false);
+    }
+  }
+
+  void _showIncomingLiveEmote(LiveMatchEmote emote) {
+    if (!mounted) return;
+    final def = _duelEmoteById(emote.emoteId);
+    final sender = emote.senderUsername.trim().isNotEmpty
+        ? emote.senderUsername.trim()
+        : _duelOpponentName;
+    _pushLiveEmoteDebug('show overlay glyph=${def.glyph} sender=$sender');
+    _showIncomingLiveEmoteOverlay(
+      glyph: def.glyph,
+      sender: sender,
+      eventId: _liveIncomingEmoteLastId,
+    );
+  }
+
+  void _showIncomingLiveEmoteOverlay({
+    required String glyph,
+    required String sender,
+    required String eventId,
+  }) {
+    if (!mounted) return;
+    final overlay = Overlay.of(context, rootOverlay: true);
+    _clearLiveIncomingEmoteOverlay();
+    _liveIncomingEmoteEntry = OverlayEntry(
+      builder: (overlayContext) {
+        final shortest =
+            MediaQuery.of(overlayContext).size.shortestSide.clamp(320.0, 560.0);
+        final compact = shortest < 390;
+        final emojiSize = compact ? 120.0 : 148.0;
+        return Positioned.fill(
+          child: IgnorePointer(
+            child: Material(
+              color: Colors.transparent,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Container(color: Colors.black.withOpacity(0.46)),
+                  Center(
+                    child: ZoomIn(
+                      key: ValueKey<String>('incoming_live_emote_$eventId'),
+                      duration: const Duration(milliseconds: 260),
+                      child: BounceInDown(
+                        duration: const Duration(milliseconds: 420),
+                        child: Container(
+                          margin: EdgeInsets.symmetric(
+                            horizontal: compact ? 24 : 34,
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: compact ? 22 : 28,
+                            vertical: compact ? 16 : 20,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF0E1E33).withOpacity(0.95),
+                            borderRadius: BorderRadius.circular(
+                              compact ? 22 : 26,
+                            ),
+                            border: Border.all(
+                              color: const Color(0xFF71E1FF),
+                              width: 1.2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    const Color(0xFF5FD8FF).withOpacity(0.42),
+                                blurRadius: compact ? 24 : 30,
+                                offset: const Offset(0, 12),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                glyph,
+                                style: TextStyle(
+                                  fontSize: emojiSize,
+                                  height: 1,
+                                  shadows: const [
+                                    Shadow(
+                                      color: Color(0xFF79E7FF),
+                                      blurRadius: 22,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (sender.trim().isNotEmpty) ...[
+                                SizedBox(height: compact ? 6 : 8),
+                                Text(
+                                  '$sender reacted',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: const Color(0xFFD8EEFF),
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: compact ? 15 : 17,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    overlay.insert(_liveIncomingEmoteEntry!);
+    _liveIncomingEmoteTimer = Timer(const Duration(milliseconds: 1450), () {
+      _clearLiveIncomingEmoteOverlay();
+    });
+  }
+
+  void _clearLiveIncomingEmoteOverlay({bool log = true}) {
+    _liveIncomingEmoteTimer?.cancel();
+    _liveIncomingEmoteTimer = null;
+    _liveIncomingEmoteEntry?.remove();
+    _liveIncomingEmoteEntry = null;
+    if (log) {
+      _pushLiveEmoteDebug('overlay hidden');
+    }
   }
 
   Future<void> _handleLiveMatchFinished(LiveMatch match) async {
@@ -2304,6 +2738,29 @@ class _GameScreenState extends State<GameScreen>
     final key = '${match.id}:${match.winnerUid.trim()}:${match.reason.trim()}';
     if (_liveResultSheetShownKey == key) return;
     _liveResultSheetShownKey = key;
+    final countedVersus = await _runCompletionStep<bool>(
+          'progress.recordVersusMatchPlayed',
+          () => widget.progressService.recordVersusMatchPlayed(match.id),
+          fallback: false,
+        ) ??
+        false;
+    if (countedVersus) {
+      final versusUnlocked = await _runCompletionStep<AchievementDef?>(
+        'achievements.unlockById(versus_20)',
+        () => widget.achievementsService.unlockById('versus_20'),
+      );
+      if (versusUnlocked != null && mounted) {
+        unawaited(
+          GameToast.show(
+            context,
+            type: GameToastType.achievement,
+            title: 'Achievement Unlocked',
+            message: versusUnlocked.title,
+            duration: const Duration(milliseconds: 2300),
+          ),
+        );
+      }
+    }
     await _maybeAnnounceLiveWinner(match);
     if (!mounted) return;
     _liveResultSheetOpen = true;
@@ -2412,6 +2869,8 @@ class _GameScreenState extends State<GameScreen>
       subtitle: won
           ? 'You finished first in the duel.'
           : 'Your friend finished first.',
+      emoji: won ? '\u{1F3C6}' : '\u{1F622}',
+      won: won,
     );
     await GameToast.show(
       context,
@@ -2424,14 +2883,22 @@ class _GameScreenState extends State<GameScreen>
     );
   }
 
-  void _showLiveResultOverlay(String title, {String subtitle = ''}) {
+  void _showLiveResultOverlay(
+    String title, {
+    String subtitle = '',
+    String emoji = '',
+    required bool won,
+  }) {
     _liveResultOverlayTimer?.cancel();
     if (!mounted) return;
     setState(() {
-      _liveResultOverlayText = subtitle.isEmpty ? title : '$title\n$subtitle';
+      _liveResultOverlayTitle = title;
+      _liveResultOverlaySubtitle = subtitle;
+      _liveResultOverlayEmoji = emoji;
+      _liveResultOverlayWin = won;
       _liveResultOverlayVisible = true;
     });
-    _liveResultOverlayTimer = Timer(const Duration(milliseconds: 1700), () {
+    _liveResultOverlayTimer = Timer(const Duration(milliseconds: 1950), () {
       if (!mounted) return;
       setState(() {
         _liveResultOverlayVisible = false;
@@ -2484,13 +2951,13 @@ class _GameScreenState extends State<GameScreen>
       title = 'Defeat';
       message = 'You abandoned';
     } else if (oppAbandoned) {
-      title = 'Victory';
+      title = 'You won \u{1F642}';
       message = 'Opponent abandoned';
     } else if (winnerUid.isEmpty) {
       title = 'Draw';
       message = reason == 'both_abandoned' ? 'Duel cancelled' : 'Draw';
     } else if (winnerUid == uid) {
-      title = 'Victory';
+      title = 'You won \u{1F642}';
       message = 'You won the duel';
     } else {
       title = 'Defeat';
@@ -2567,8 +3034,6 @@ class _GameScreenState extends State<GameScreen>
                           : 'Player',
                     ),
                     const SizedBox(height: 12),
-                    _buildDuelEmoteFeed(match.id),
-                    const SizedBox(height: 8),
                     _buildDuelEmoteTray(
                       matchId: match.id,
                       sending: sendingEmote,
@@ -2623,49 +3088,6 @@ class _GameScreenState extends State<GameScreen>
               ),
             );
           },
-        );
-      },
-    );
-  }
-
-  Widget _buildDuelEmoteFeed(String matchId) {
-    final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
-    return StreamBuilder<List<LiveMatchEmote>>(
-      stream: _liveDuelService.watchMatchEmotes(matchId, limit: 10),
-      builder: (context, snapshot) {
-        final rows = snapshot.data ?? const <LiveMatchEmote>[];
-        if (rows.isEmpty) {
-          return const SizedBox.shrink();
-        }
-        return Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: rows.take(4).map((emote) {
-            final def = _duelEmoteById(emote.emoteId);
-            final mine = emote.sentByUid == uid;
-            return AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: mine
-                    ? const Color(0xFF1D3960).withOpacity(0.88)
-                    : const Color(0xFF25334B).withOpacity(0.88),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color:
-                      mine ? const Color(0xFF63A2FF) : const Color(0xFF4D607D),
-                ),
-              ),
-              child: Text(
-                '${def.glyph} ${mine ? "You" : _duelOpponentName}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            );
-          }).toList(growable: false),
         );
       },
     );
@@ -2737,7 +3159,15 @@ class _GameScreenState extends State<GameScreen>
         emoteId: emoteId,
       );
       _duelEmoteLastSentAtMs[matchId] = nowMs;
+      final def = _duelEmoteById(emoteId);
+      _showIncomingLiveEmoteOverlay(
+        glyph: def.glyph,
+        sender: '',
+        eventId: 'local_${nowMs}_$emoteId',
+      );
+      _pushLiveEmoteDebug('send emote ok id=$emoteId');
     } catch (e) {
+      _pushLiveEmoteDebug('send emote fail id=$emoteId error=$e');
       if (!mounted) return;
       var msg = 'Could not send emote';
       if (e.toString().contains('EMOTE_COOLDOWN')) {
@@ -2755,19 +3185,19 @@ class _GameScreenState extends State<GameScreen>
   }
 
   List<_DuelEmoteDef> get _duelEmotes => const <_DuelEmoteDef>[
-        _DuelEmoteDef(id: 'laugh', label: 'Laugh', glyph: '😂'),
-        _DuelEmoteDef(id: 'cool', label: 'Cool', glyph: '😎'),
-        _DuelEmoteDef(id: 'wow', label: 'Wow', glyph: '😮'),
-        _DuelEmoteDef(id: 'cry', label: 'Cry', glyph: '😢'),
-        _DuelEmoteDef(id: 'clap', label: 'Clap', glyph: '👏'),
-        _DuelEmoteDef(id: 'heart', label: 'Heart', glyph: '❤️'),
+        _DuelEmoteDef(id: 'laugh', label: 'Laugh', glyph: '\u{1F602}'),
+        _DuelEmoteDef(id: 'cool', label: 'Cool', glyph: '\u{1F60E}'),
+        _DuelEmoteDef(id: 'wow', label: 'Wow', glyph: '\u{1F62E}'),
+        _DuelEmoteDef(id: 'cry', label: 'Cry', glyph: '\u{1F622}'),
+        _DuelEmoteDef(id: 'clap', label: 'Clap', glyph: '\u{1F44F}'),
+        _DuelEmoteDef(id: 'heart', label: 'Heart', glyph: '\u{2764}\u{FE0F}'),
       ];
 
   _DuelEmoteDef _duelEmoteById(String id) {
     for (final item in _duelEmotes) {
       if (item.id == id) return item;
     }
-    return const _DuelEmoteDef(id: 'wow', label: 'Wow', glyph: '😮');
+    return const _DuelEmoteDef(id: 'wow', label: 'Wow', glyph: '\u{1F62E}');
   }
 
   Widget _duelResultRow(String label, String value) {
@@ -3294,6 +3724,7 @@ class _GameplayHeader extends StatelessWidget {
     required this.onRankingTap,
     required this.onWalletTap,
     this.showRanking = true,
+    this.compact = false,
   });
 
   final String levelText;
@@ -3303,9 +3734,14 @@ class _GameplayHeader extends StatelessWidget {
   final VoidCallback onRankingTap;
   final VoidCallback onWalletTap;
   final bool showRanking;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
+    final iconSize = compact ? 20.0 : 24.0;
+    final levelFont = compact ? 14.0 : 15.0;
+    final timerFont = compact ? 12.0 : 13.0;
+    final gap = compact ? 8.0 : 10.0;
     return Row(
       children: [
         IconButton(
@@ -3313,35 +3749,38 @@ class _GameplayHeader extends StatelessWidget {
           style: IconButton.styleFrom(
             backgroundColor: const Color(0xFF222734),
             foregroundColor: Colors.white,
+            visualDensity: compact
+                ? const VisualDensity(horizontal: -2, vertical: -2)
+                : null,
           ),
-          icon: const Icon(Icons.arrow_back_rounded),
+          icon: Icon(Icons.arrow_back_rounded, size: iconSize),
         ),
-        const SizedBox(width: 10),
+        SizedBox(width: gap),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 levelText,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
-                  fontSize: 15,
+                  fontSize: levelFont,
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 2),
+              SizedBox(height: compact ? 1 : 2),
               Text(
                 timerText,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Color(0xFF9FB0D3),
-                  fontSize: 13,
+                  fontSize: timerFont,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: compact ? 6 : 8),
         if (showRanking)
           IconButton(
             onPressed: onRankingTap,
@@ -3349,12 +3788,15 @@ class _GameplayHeader extends StatelessWidget {
             style: IconButton.styleFrom(
               backgroundColor: const Color(0xFF243044),
               foregroundColor: const Color(0xFFFFD166),
+              visualDensity: compact
+                  ? const VisualDensity(horizontal: -2, vertical: -2)
+                  : null,
             ),
-            icon: const Icon(Icons.emoji_events_rounded),
+            icon: Icon(Icons.emoji_events_rounded, size: compact ? 20 : 24),
           )
         else
-          const SizedBox(width: 40),
-        const SizedBox(width: 8),
+          SizedBox(width: compact ? 34 : 40),
+        SizedBox(width: compact ? 6 : 8),
         _WalletPill(coins: walletCoins, onTap: onWalletTap),
       ],
     );
@@ -3528,17 +3970,22 @@ class _LiveDuelStatusBar extends StatelessWidget {
   const _LiveDuelStatusBar({
     required this.opponentName,
     required this.opponentState,
+    this.compact = false,
   });
 
   final String opponentName;
   final String opponentState;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 10 : 12,
+        vertical: compact ? 8 : 10,
+      ),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(compact ? 12 : 14),
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -3548,29 +3995,31 @@ class _LiveDuelStatusBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.sports_martial_arts_rounded,
             color: Color(0xFF7DE2FF),
-            size: 18,
+            size: compact ? 16 : 18,
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: compact ? 6 : 8),
           Expanded(
             child: Text(
               'VS $opponentName',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w800,
+                fontSize: compact ? 13 : 14,
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: compact ? 6 : 8),
           Text(
             opponentState,
-            style: const TextStyle(
+            style: TextStyle(
               color: Color(0xFFA6D8FF),
               fontWeight: FontWeight.w700,
+              fontSize: compact ? 12 : 13,
             ),
           ),
         ],
@@ -3582,33 +4031,38 @@ class _LiveDuelStatusBar extends StatelessWidget {
 class _LiveDuelResolvedBanner extends StatelessWidget {
   const _LiveDuelResolvedBanner({
     required this.text,
+    this.compact = false,
   });
 
   final String text;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 10 : 12,
+        vertical: compact ? 7 : 8,
+      ),
       decoration: BoxDecoration(
         color: const Color(0xFF20293B),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(compact ? 10 : 12),
         border: Border.all(color: const Color(0xFF4C5E7D)),
       ),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.info_outline_rounded,
-            size: 15,
-            color: Color(0xFFB8CAE8),
+            size: compact ? 14 : 15,
+            color: const Color(0xFFB8CAE8),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: compact ? 6 : 8),
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Color(0xFFD6E4FF),
-                fontSize: 12,
+                fontSize: compact ? 11.5 : 12,
                 fontWeight: FontWeight.w600,
               ),
             ),

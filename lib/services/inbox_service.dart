@@ -59,7 +59,16 @@ class InboxService {
     yield* _inboxRef(targetUid)
         .where('read', isEqualTo: false)
         .snapshots()
-        .map((snap) => snap.docs.length);
+        .map((snap) {
+      var count = 0;
+      for (final doc in snap.docs) {
+        final data = doc.data();
+        final type = (data['type'] as String?)?.trim().toLowerCase() ?? '';
+        if (type == 'live_duel_invite') continue;
+        count++;
+      }
+      return count;
+    });
   }
 
   Future<void> markAsRead({

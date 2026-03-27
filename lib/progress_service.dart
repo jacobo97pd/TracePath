@@ -20,6 +20,8 @@ class ProgressService extends ChangeNotifier {
   static const String _endlessSolvedCountKey = 'endless_solved_count';
   static const String _totalHintsUsedKey = 'total_hints_used';
   static const String _totalRewindsUsedKey = 'total_rewinds_used';
+  static const String _versusPlayedCountKey = 'versus_played_count';
+  static const String _versusRecordedMatchIdsKey = 'versus_recorded_match_ids';
   static const String _worldCurrentLevelPrefix = 'world_current_level:';
   static const String _inProgressLevelPrefix = 'in_progress_level:';
 
@@ -69,6 +71,10 @@ class ProgressService extends ChangeNotifier {
 
   int get totalRewindsUsed {
     return _prefs.getInt(_totalRewindsUsedKey) ?? 0;
+  }
+
+  int get totalVersusPlayed {
+    return _prefs.getInt(_versusPlayedCountKey) ?? 0;
   }
 
   int get bestDailyStreak {
@@ -230,6 +236,26 @@ class ProgressService extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<bool> recordVersusMatchPlayed(String matchId) async {
+    final normalizedMatchId = matchId.trim();
+    if (normalizedMatchId.isEmpty) return false;
+
+    final recordedIds =
+        _prefs.getStringList(_versusRecordedMatchIdsKey) ?? const <String>[];
+    if (recordedIds.contains(normalizedMatchId)) {
+      return false;
+    }
+
+    final nextIds = <String>[...recordedIds, normalizedMatchId];
+    if (nextIds.length > 300) {
+      nextIds.removeRange(0, nextIds.length - 300);
+    }
+    await _prefs.setStringList(_versusRecordedMatchIdsKey, nextIds);
+    await _prefs.setInt(_versusPlayedCountKey, totalVersusPlayed + 1);
+    notifyListeners();
+    return true;
+  }
+
   int? getEndlessRunSeed(int difficulty) {
     return _prefs.getInt(_endlessSeedKey(difficulty));
   }
@@ -315,7 +341,8 @@ class ProgressService extends ChangeNotifier {
     }
   }
 
-  Future<void> _setPackCurrentLevelIfHigher(String packId, int levelIndex) async {
+  Future<void> _setPackCurrentLevelIfHigher(
+      String packId, int levelIndex) async {
     final safeLevel = levelIndex <= 0 ? 1 : levelIndex;
     final current = getCurrentLevelForPack(packId, fallback: 1);
     if (safeLevel > current) {

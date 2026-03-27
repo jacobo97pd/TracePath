@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,6 +27,7 @@ import 'editor/editor_nuevos_page.dart';
 import 'leaderboard_service.dart';
 import 'models/live_match.dart';
 import 'models/friend_challenge.dart';
+import 'models/inbox_item.dart';
 import 'nav_shell_scaffold.dart';
 import 'notification_service.dart';
 import 'profile_screen.dart';
@@ -44,6 +46,8 @@ import 'startup_splash_gate.dart';
 import 'storage_paths.dart';
 import 'pack_level_repository.dart';
 import 'services/ads_service.dart';
+import 'services/inbox_service.dart';
+import 'services/live_duel_service.dart';
 import 'ui/components/coin_reward_overlay.dart';
 
 // Temporary diagnostics switch:
@@ -162,8 +166,11 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   bool _warmupQueued = false;
   final Set<String> _warmedShopPaths = <String>{};
+  final GlobalKey<NavigatorState> _rootNavigatorKey =
+      GlobalKey<NavigatorState>();
 
   late final GoRouter _router = GoRouter(
+    navigatorKey: _rootNavigatorKey,
     routes: [
       GoRoute(
         path: '/',
@@ -499,14 +506,256 @@ class _MyAppState extends State<MyApp> {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       builder: (context, child) {
-        return Stack(
+        final content = Stack(
           fit: StackFit.expand,
           children: [
             if (child != null) child,
             const CoinRewardOverlay(),
           ],
         );
+        return _GlobalLiveInvitePopupHost(
+          router: _router,
+          navigatorKey: _rootNavigatorKey,
+          child: content,
+        );
       },
     );
+  }
+}
+
+enum _GlobalLiveInviteAction {
+  accept,
+  decline,
+}
+
+class _GlobalLiveInvitePopupHost extends StatefulWidget {
+  const _GlobalLiveInvitePopupHost({
+    required this.child,
+    required this.router,
+    required this.navigatorKey,
+  });
+
+  final Widget child;
+  final GoRouter router;
+  final GlobalKey<NavigatorState> navigatorKey;
+
+  @override
+  State<_GlobalLiveInvitePopupHost> createState() =>
+      _GlobalLiveInvitePopupHostState();
+}
+
+class _GlobalLiveInvitePopupHostState
+    extends State<_GlobalLiveInvitePopupHost> {
+  final InboxService _inboxService = InboxService();
+  final LiveDuelService _liveDuelService = LiveDuelService();
+  StreamSubscription<List<InboxItem>>? _inboxSub;
+  StreamSubscription<User?>? _authSub;
+  final Set<String> _handledInviteIds = <String>{};
+  String _activeUid = '';
+  bool _dialogOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _authSub = FirebaseAuth.instance.authStateChanges().listen((user) {
+      final uid = user?.uid.trim() ?? '';
+      _bindInbox(uid);
+    });
+    _bindInbox(FirebaseAuth.instance.currentUser?.uid.trim() ?? '');
+  }
+
+  @override
+  void dispose() {
+    _inboxSub?.cancel();
+    _authSub?.cancel();
+    super.dispose();
+  }
+
+  void _bindInbox(String uid) {
+    final normalizedUid = uid.trim();
+    if (normalizedUid == _activeUid) return;
+    _activeUid = normalizedUid;
+    _inboxSub?.cancel();
+    if (normalizedUid.isEmpty) return;
+    _inboxSub = _inboxService.watchInbox(normalizedUid).listen(
+          _handleInboxItems,
+          onError: (_) {},
+        );
+  }
+
+  void _handleInboxItems(List<InboxItem> items) {
+    if (!mounted || _dialogOpen) return;
+    InboxItem? next;
+    for (final item in items) {
+      if (item.type != InboxItemType.liveDuelInvite) continue;
+      if (item.status.trim().toLowerCase() != 'pending') continue;
+      if (_handledInviteIds.contains(item.id)) continue;
+      if (item.ctaPayload.trim().isEmpty) continue;
+      next = item;
+      break;
+    }
+    if (next == null) return;
+    _handledInviteIds.add(next.id);
+    unawaited(_showInvitePopup(next));
+  }
+
+  Future<void> _showInvitePopup(InboxItem item) async {
+    if (!mounted) return;
+    final navContext = widget.navigatorKey.currentContext;
+    final messengerState =
+        navContext != null ? ScaffoldMessenger.maybeOf(navContext) : null;
+    if (navContext == null) {
+      if (kDebugMode) {
+        debugPrint(
+          '[live-invite-popup] navigator context unavailable '
+          'inviteId=${item.id} matchId=${item.ctaPayload}',
+        );
+      }
+      return;
+    }
+    _dialogOpen = true;
+    try {
+      final action = await showDialog<_GlobalLiveInviteAction>(
+        context: navContext,
+        barrierDismissible: false,
+        useRootNavigator: true,
+        builder: (ctx) {
+          final from = item.senderDisplayName;
+          return AlertDialog(
+            backgroundColor: const Color(0xFF111C33),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+              side: const BorderSide(color: Color(0xFF355687)),
+            ),
+            title: const Text(
+              'Live Duel Invite',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+            ),
+            content: Text(
+              '$from challenged you to a live duel.\nDo you want to accept?',
+              style: const TextStyle(color: Color(0xFFD3E5FF)),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () =>
+                    Navigator.of(ctx).pop(_GlobalLiveInviteAction.decline),
+                child: const Text('Decline'),
+              ),
+              FilledButton(
+                onPressed: () =>
+                    Navigator.of(ctx).pop(_GlobalLiveInviteAction.accept),
+                child: const Text('Accept'),
+              ),
+            ],
+          );
+        },
+      );
+      if (!mounted || action == null) return;
+      final matchId = item.ctaPayload.trim();
+      if (action == _GlobalLiveInviteAction.accept) {
+        await _liveDuelService.acceptInvite(
+          matchId: matchId,
+          inboxMessageId: item.id,
+        );
+        if (!mounted) return;
+        widget.router.go('/live-duel/$matchId');
+        return;
+      }
+      await _liveDuelService.declineInvite(
+        matchId: matchId,
+        inboxMessageId: item.id,
+      );
+    } on FirebaseException catch (e) {
+      if (!mounted) return;
+      if (kDebugMode) {
+        debugPrint(
+          '[live-invite-popup] firestore error '
+          'code=${e.code} message=${e.message} '
+          'inviteId=${item.id} matchId=${item.ctaPayload}',
+        );
+      }
+      final txt = '${e.code} ${e.message ?? ''}';
+      var msg = 'Could not process live invite';
+      var shouldDropInvite = false;
+      if (txt.contains('MATCH_NOT_FOUND')) {
+        msg = 'Invite is no longer available';
+        shouldDropInvite = true;
+      } else if (txt.contains('MATCH_CLOSED')) {
+        msg = 'This duel is already closed';
+        shouldDropInvite = true;
+      } else if (txt.contains('MATCH_ACCESS_DENIED')) {
+        msg = 'Invite is not valid for this account';
+        shouldDropInvite = true;
+      } else if (txt.contains('INVALID_MATCH_ID')) {
+        msg = 'Invite payload is invalid';
+        shouldDropInvite = true;
+      } else if (e.code == 'permission-denied') {
+        msg = 'Permissions blocked this invite action';
+      } else if (e.code == 'unavailable' || e.code == 'deadline-exceeded') {
+        msg = 'Network issue while processing invite';
+      }
+      if (shouldDropInvite) {
+        try {
+          await _inboxService.deleteInboxItem(
+            uid: _activeUid,
+            messageId: item.id,
+          );
+        } catch (_) {}
+      }
+      if (!mounted) return;
+      messengerState?.showSnackBar(
+        SnackBar(
+          content: Text(msg),
+          duration: const Duration(milliseconds: 1200),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      if (kDebugMode) {
+        debugPrint(
+          '[live-invite-popup] error '
+          'inviteId=${item.id} matchId=${item.ctaPayload} error=$e',
+        );
+      }
+      final txt = e.toString();
+      var msg = 'Could not process live invite';
+      var shouldDropInvite = false;
+      if (txt.contains('MATCH_NOT_FOUND')) {
+        msg = 'Invite is no longer available';
+        shouldDropInvite = true;
+      } else if (txt.contains('MATCH_CLOSED')) {
+        msg = 'This duel is already closed';
+        shouldDropInvite = true;
+      } else if (txt.contains('MATCH_ACCESS_DENIED')) {
+        msg = 'Invite is not valid for this account';
+        shouldDropInvite = true;
+      } else if (txt.contains('INVALID_MATCH_ID')) {
+        msg = 'Invite payload is invalid';
+        shouldDropInvite = true;
+      }
+      if (shouldDropInvite) {
+        try {
+          await _inboxService.deleteInboxItem(
+            uid: _activeUid,
+            messageId: item.id,
+          );
+        } catch (_) {}
+      }
+      if (!mounted) return;
+      messengerState?.showSnackBar(
+        SnackBar(
+          content: Text(msg),
+          duration: const Duration(milliseconds: 1200),
+        ),
+      );
+    } finally {
+      _dialogOpen = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
   }
 }

@@ -40,7 +40,8 @@ class HomeScreen extends StatelessWidget {
         final highestReached = highestReachedRaw > 0 ? highestReachedRaw : 1;
         final nextSuggestedLevel = highestReached <= 1 ? 1 : highestReached;
         final equippedSkin = coinsService.selectedSkinAssetPath;
-        final isDefaultSkinSelected = isDefaultSkinId(coinsService.selectedSkin);
+        final isDefaultSkinSelected =
+            isDefaultSkinId(coinsService.selectedSkin);
         final googleAvatarUrl = _resolveGoogleAvatarUrl();
 
         return Scaffold(
@@ -116,12 +117,6 @@ class HomeScreen extends StatelessWidget {
                       dailySolved: dailySolved,
                       onProfileTap: () => context.go('/profile'),
                     ),
-                    const SizedBox(height: 10),
-                    _ProfileShortcutCard(
-                      playerName: 'Player',
-                      streak: streak,
-                      onTap: () => context.go('/profile'),
-                    ),
                   ],
                 ),
               ),
@@ -156,7 +151,8 @@ class HomeScreen extends StatelessWidget {
                 context,
                 type: GameToastType.social,
                 title: 'Invite Ready',
-                message: 'Invite copied. Share it on WhatsApp, email, or any app.',
+                message:
+                    'Invite copied. Share it on WhatsApp, email, or any app.',
                 duration: const Duration(milliseconds: 1800),
               ),
             );
@@ -426,6 +422,7 @@ class _HeroBanner extends StatelessWidget {
     );
   }
 }
+
 class _PrimaryPlayCta extends StatelessWidget {
   const _PrimaryPlayCta({required this.onTap});
 
@@ -528,7 +525,8 @@ class _ContinueCard extends StatelessWidget {
               color: const Color(0xFF243044),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.play_arrow_rounded, color: Color(0xFF8AA8FF)),
+            child:
+                const Icon(Icons.play_arrow_rounded, color: Color(0xFF8AA8FF)),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -546,7 +544,7 @@ class _ContinueCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   solved > 0
-                      ? 'Level $nextLevel · Pick up where you left off'
+                      ? 'Level $nextLevel Â· Pick up where you left off'
                       : 'Start your first run',
                   style: const TextStyle(
                     color: Color(0xFF9BA8C3),
@@ -731,6 +729,7 @@ class _ProgressDashboard extends StatelessWidget {
     );
   }
 }
+
 class _MetricCard extends StatelessWidget {
   const _MetricCard({
     required this.title,
@@ -814,63 +813,6 @@ class _DailySummaryCard extends StatelessWidget {
   }
 }
 
-class _ProfileShortcutCard extends StatelessWidget {
-  const _ProfileShortcutCard({
-    required this.playerName,
-    required this.streak,
-    required this.onTap,
-  });
-
-  final String playerName;
-  final int streak;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GameCard(
-      onTap: onTap,
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: const Color(0xFF243044),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(Icons.person_rounded, color: Color(0xFF8AA8FF)),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  playerName,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'Streak: $streak · Open your profile',
-                  style: const TextStyle(
-                    color: Color(0xFF9BA8C3),
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Icon(Icons.chevron_right_rounded, color: Color(0xFFB8C4DE)),
-        ],
-      ),
-    );
-  }
-}
-
 class _SectionTitle extends StatelessWidget {
   const _SectionTitle({
     required this.title,
@@ -935,7 +877,8 @@ class _EquippedSkinImage extends StatelessWidget {
       }
     }
     if (kIsWeb) {
-      return const Icon(Icons.image_not_supported_outlined, color: Colors.white70);
+      return const Icon(Icons.image_not_supported_outlined,
+          color: Colors.white70);
     }
     return Image.file(
       File(path),
@@ -1023,5 +966,3 @@ class _InviteFriendsPromoDialog extends StatelessWidget {
     );
   }
 }
-
-
