@@ -1,11 +1,9 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import 'coins_service.dart';
@@ -13,7 +11,6 @@ import 'progress_service.dart';
 import 'ui/avatar_utils.dart';
 import 'ui/components/coin_display.dart';
 import 'ui/components/game_card.dart';
-import 'ui/components/game_toast.dart';
 import 'ui/components/network_image_compat.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -98,7 +95,6 @@ class HomeScreen extends StatelessWidget {
                       onDaily: () => context.go('/daily'),
                       onLevels: () => context.go('/play'),
                       onSocial: () => context.go('/social'),
-                      onDuelFriends: () => _showInviteFriendsPopup(context),
                     ),
                     const SizedBox(height: 22),
                     const _SectionTitle(
@@ -121,64 +117,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _showInviteFriendsPopup(BuildContext context) async {
-    debugPrint('[home] Duel Friends tapped');
-    debugPrint('[home] Invite popup opened');
-    await showGeneralDialog<void>(
-      context: context,
-      barrierLabel: 'Invite friends',
-      barrierDismissible: true,
-      barrierColor: const Color(0xCC020817),
-      transitionDuration: const Duration(milliseconds: 260),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return _InviteFriendsPromoDialog(
-          onInvite: () async {
-            debugPrint('[home] Invite CTA tapped');
-            const inviteText =
-                "Join me on TracePath! Let's compete on the leaderboard. "
-                'https://tracepath.app/invite';
-            await Clipboard.setData(const ClipboardData(text: inviteText));
-            if (!context.mounted) return;
-            Navigator.of(context).pop();
-            unawaited(
-              GameToast.show(
-                context,
-                type: GameToastType.social,
-                title: 'Invite Ready',
-                message:
-                    'Invite copied. Share it on WhatsApp, email, or any app.',
-                duration: const Duration(milliseconds: 1800),
-              ),
-            );
-          },
-          onMaybeLater: () {
-            debugPrint('[home] Maybe later tapped');
-            Navigator.of(context).pop();
-          },
-          onGoToSocial: () {
-            debugPrint('[home] Go to Social tapped');
-            Navigator.of(context).pop();
-            context.go('/social');
-          },
-        );
-      },
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        final curved = CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeOutCubic,
-          reverseCurve: Curves.easeInCubic,
-        );
-        return FadeTransition(
-          opacity: curved,
-          child: ScaleTransition(
-            scale: Tween<double>(begin: 0.92, end: 1).animate(curved),
-            child: child,
           ),
         );
       },
@@ -566,13 +504,11 @@ class _QuickAccessGrid extends StatelessWidget {
     required this.onDaily,
     required this.onLevels,
     required this.onSocial,
-    required this.onDuelFriends,
   });
 
   final VoidCallback onDaily;
   final VoidCallback onLevels;
   final VoidCallback onSocial;
-  final VoidCallback onDuelFriends;
 
   @override
   Widget build(BuildContext context) {
@@ -597,13 +533,6 @@ class _QuickAccessGrid extends StatelessWidget {
           title: 'Social',
           subtitle: 'Friends, inbox and multiplayer',
           onTap: onSocial,
-        ),
-        const SizedBox(height: 10),
-        _QuickCard(
-          icon: Icons.emoji_events_outlined,
-          title: 'Duel Friends',
-          subtitle: 'Social rankings and challenges',
-          onTap: onDuelFriends,
         ),
       ],
     );
@@ -885,84 +814,6 @@ class _EquippedSkinImage extends StatelessWidget {
       fit: BoxFit.cover,
       errorBuilder: (_, __, ___) =>
           const Icon(Icons.broken_image_outlined, color: Colors.white70),
-    );
-  }
-}
-
-class _InviteFriendsPromoDialog extends StatelessWidget {
-  const _InviteFriendsPromoDialog({
-    required this.onInvite,
-    required this.onMaybeLater,
-    required this.onGoToSocial,
-  });
-
-  final Future<void> Function() onInvite;
-  final VoidCallback onMaybeLater;
-  final VoidCallback onGoToSocial;
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
-            child: GameCard(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Invite friend and earn 200 coins!',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Challenge your friends, climb the leaderboard, and get rewarded when they join TracePath.',
-                    style: TextStyle(
-                      color: Color(0xFFBFCDE8),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: onInvite,
-                      icon: const Icon(Icons.share_rounded),
-                      label: const Text('Invite Friend'),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: onMaybeLater,
-                          child: const Text('Maybe later'),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextButton(
-                          onPressed: onGoToSocial,
-                          child: const Text('Go to Social'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

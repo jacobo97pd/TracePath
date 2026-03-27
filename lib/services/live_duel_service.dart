@@ -998,6 +998,37 @@ class LiveDuelService {
     return _hasActiveMatch(uid);
   }
 
+  Stream<List<LiveMatch>> watchMyActiveMatches() async* {
+    final uid = await _requireUid();
+    yield* _db()
+        .collection('liveMatches')
+        .where('playerUids', arrayContains: uid)
+        .snapshots()
+        .asyncMap((snap) async {
+      final matches = <LiveMatch>[];
+      for (final doc in snap.docs) {
+        final data = doc.data();
+        final status = _readString(data['status']);
+        if (status == 'finished' || status == 'cancelled') continue;
+        final playersSnap = await doc.reference.collection('players').get();
+        final players = <String, LiveMatchPlayer>{};
+        for (final p in playersSnap.docs) {
+          players[p.id] = LiveMatchPlayer.fromFirestore(p.data());
+        }
+        final match =
+            LiveMatch.fromFirestore(id: doc.id, data: data, players: players);
+        if (!match.playerUids.contains(uid)) continue;
+        matches.add(match);
+      }
+      matches.sort((a, b) {
+        final at = a.createdAt?.millisecondsSinceEpoch ?? 0;
+        final bt = b.createdAt?.millisecondsSinceEpoch ?? 0;
+        return bt.compareTo(at);
+      });
+      return matches;
+    });
+  }
+
   Future<Map<String, bool>> busyMapForUids(List<String> uids) async {
     final out = <String, bool>{};
     for (final uid in uids) {

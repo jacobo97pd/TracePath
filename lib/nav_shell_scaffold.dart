@@ -29,9 +29,23 @@ class _NavShellScaffoldState extends State<NavShellScaffold>
   static final InboxService _inboxService = InboxService();
 
   static const List<_TabItem> _tabs = <_TabItem>[
-    _TabItem(id: 'home', route: '/home', label: 'Home', icon: Icons.home_rounded),
-    _TabItem(id: 'shop', route: '/shop', label: 'Shop', icon: Icons.storefront_rounded),
-    _TabItem(id: 'cards', route: '/cards', label: 'Cards', icon: Icons.style_rounded),
+    _TabItem(
+        id: 'home', route: '/home', label: 'Home', icon: Icons.home_rounded),
+    _TabItem(
+        id: 'shop',
+        route: '/shop',
+        label: 'Shop',
+        icon: Icons.storefront_rounded),
+    _TabItem(
+        id: 'duel',
+        route: '/duel',
+        label: 'Duel',
+        icon: Icons.flash_on_rounded),
+    _TabItem(
+        id: 'cards',
+        route: '/cards',
+        label: 'Cards',
+        icon: Icons.style_rounded),
     _TabItem(
         id: 'profile',
         route: '/profile',
@@ -70,7 +84,7 @@ class _NavShellScaffoldState extends State<NavShellScaffold>
     ),
     _PlayModeItem(
       id: 'duels',
-      route: '/social',
+      route: '/duel',
       label: 'Duels',
       icon: Icons.flash_on_rounded,
       angleDeg: 20,
@@ -111,8 +125,9 @@ class _NavShellScaffoldState extends State<NavShellScaffold>
   @override
   Widget build(BuildContext context) {
     final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
-    final unreadStream =
-        uid.isEmpty ? Stream<int>.value(0) : _inboxService.watchUnreadCount(uid: uid);
+    final unreadStream = uid.isEmpty
+        ? Stream<int>.value(0)
+        : _inboxService.watchUnreadCount(uid: uid);
     return ValueListenableBuilder<bool>(
       valueListenable: startupSplashVisible,
       builder: (context, splashShowing, _) {
@@ -137,7 +152,8 @@ class _NavShellScaffoldState extends State<NavShellScaffold>
                       children: [
                         Padding(
                           padding: EdgeInsets.only(
-                            bottom: _routeNeedsBottomClearance(widget.state.uri.path)
+                            bottom: _routeNeedsBottomClearance(
+                                    widget.state.uri.path)
                                 ? _playBottomOffset +
                                     _playButtonSize +
                                     MediaQuery.of(context).padding.bottom +
@@ -158,14 +174,15 @@ class _NavShellScaffoldState extends State<NavShellScaffold>
                                 child: AnimatedBuilder(
                                   animation: _radialController,
                                   builder: (context, _) {
-                                    final opacity = Curves.easeOut
-                                            .transform(_radialController.value) *
+                                    final opacity = Curves.easeOut.transform(
+                                            _radialController.value) *
                                         0.24;
                                     return Stack(
                                       fit: StackFit.expand,
                                       children: [
                                         Container(
-                                          color: Colors.black.withOpacity(opacity),
+                                          color:
+                                              Colors.black.withOpacity(opacity),
                                         ),
                                         BackdropFilter(
                                           filter: ImageFilter.blur(
@@ -182,7 +199,8 @@ class _NavShellScaffoldState extends State<NavShellScaffold>
                             ),
                           Positioned.fill(
                             child: IgnorePointer(
-                              ignoring: !(_radialOpen || _radialController.value > 0),
+                              ignoring:
+                                  !(_radialOpen || _radialController.value > 0),
                               child: AnimatedBuilder(
                                 animation: _radialController,
                                 builder: (context, _) {
@@ -242,12 +260,17 @@ class _NavShellScaffoldState extends State<NavShellScaffold>
       ),
       child: Row(
         children: [
-          _buildTabButton(context, _tabs[0], _routeMatches(path, '/home'), unreadCount),
-          _buildTabButton(context, _tabs[1], _routeMatches(path, '/shop'), unreadCount),
-          const SizedBox(width: _playButtonSize + 18),
-          _buildTabButton(context, _tabs[2], _routeMatches(path, '/cards'), unreadCount),
           _buildTabButton(
-              context, _tabs[3], _routeMatches(path, '/profile'), unreadCount),
+              context, _tabs[0], _routeMatches(path, '/home'), unreadCount),
+          _buildTabButton(
+              context, _tabs[1], _routeMatches(path, '/shop'), unreadCount),
+          const SizedBox(width: _playButtonSize + 18),
+          _buildTabButton(
+              context, _tabs[2], _routeMatches(path, '/duel'), unreadCount),
+          _buildTabButton(
+              context, _tabs[3], _routeMatches(path, '/cards'), unreadCount),
+          _buildTabButton(
+              context, _tabs[4], _routeMatches(path, '/profile'), unreadCount),
         ],
       ),
     );
@@ -473,7 +496,8 @@ class _NavShellScaffoldState extends State<NavShellScaffold>
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF4AB9FF).withOpacity(hovered ? 0.4 : 0.14),
+                        color: const Color(0xFF4AB9FF)
+                            .withOpacity(hovered ? 0.4 : 0.14),
                         blurRadius: hovered ? 15 : 9,
                         spreadRadius: hovered ? 1.2 : 0.2,
                       ),
@@ -586,7 +610,8 @@ class _NavShellScaffoldState extends State<NavShellScaffold>
   static bool _routeNeedsBottomClearance(String path) {
     return _routeMatches(path, '/play') ||
         _routeMatches(path, '/daily') ||
-        _routeMatches(path, '/social');
+        _routeMatches(path, '/social') ||
+        _routeMatches(path, '/duel');
   }
 }
 

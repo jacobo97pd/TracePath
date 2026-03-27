@@ -18,6 +18,7 @@ import 'cards_collection_screen.dart';
 import 'coins_service.dart';
 import 'curate_batch_screen.dart';
 import 'daily_screen.dart';
+import 'duel_screen.dart';
 import 'game_screen.dart';
 import 'home_screen.dart';
 import 'live_duel_screen.dart';
@@ -238,6 +239,10 @@ class _MyAppState extends State<MyApp> {
               statsService: widget.statsService,
               achievementsService: widget.achievementsService,
             ),
+          ),
+          GoRoute(
+            path: '/duel',
+            builder: (context, state) => const DuelScreen(),
           ),
           GoRoute(
             path: '/profile',
