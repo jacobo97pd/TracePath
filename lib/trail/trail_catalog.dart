@@ -244,6 +244,106 @@ class TrailCatalog {
     ),
   );
 
+  static const TrailSkinConfig galaxyReveal = TrailSkinConfig(
+    id: 'trail_galaxy_reveal',
+    name: 'GalaxyRevealTrail',
+    renderType: TrailRenderType.galaxyReveal,
+    primaryColor: Color(0xFFCFF6FF),
+    secondaryColor: Color(0xFF6CC8FF),
+    thickness: 1.12,
+    opacity: 1.0,
+    glow: true,
+    effectIntensity: 1.0,
+    galaxyReveal: GalaxyRevealConfig(
+      radius: 0.42,
+      softness: 0.38,
+      enableGlow: false,
+      enableSparkles: false,
+      enableBloom: false,
+      textureAsset: 'assets/galaxy_trail/galaxy_trail.webp',
+    ),
+  );
+
+  static const TrailSkinConfig comicTrailReveal = TrailSkinConfig(
+    id: 'comic_trail_reveal',
+    name: 'ComicTrailReveal',
+    renderType: TrailRenderType.galaxyReveal,
+    primaryColor: Color(0xFFF4F8FF),
+    secondaryColor: Color(0xFF8EC4FF),
+    thickness: 1.12,
+    opacity: 1.0,
+    glow: true,
+    effectIntensity: 1.0,
+    galaxyReveal: GalaxyRevealConfig(
+      radius: 0.42,
+      softness: 0.38,
+      enableGlow: false,
+      enableSparkles: false,
+      enableBloom: false,
+      textureAsset: 'assets/galaxy_trail/comic_trail_reveal.webp',
+    ),
+  );
+
+  static const TrailSkinConfig electricTrailReveal = TrailSkinConfig(
+    id: 'electric_trail_reveal',
+    name: 'ElectricTrailReveal',
+    renderType: TrailRenderType.galaxyReveal,
+    primaryColor: Color(0xFFE9F7FF),
+    secondaryColor: Color(0xFF6AD5FF),
+    thickness: 1.12,
+    opacity: 1.0,
+    glow: true,
+    effectIntensity: 1.0,
+    galaxyReveal: GalaxyRevealConfig(
+      radius: 0.42,
+      softness: 0.38,
+      enableGlow: false,
+      enableSparkles: false,
+      enableBloom: false,
+      textureAsset: 'assets/galaxy_trail/electric_trail_reveal.webp',
+    ),
+  );
+
+  static const TrailSkinConfig goldenTrailReveal = TrailSkinConfig(
+    id: 'golden_trail_reveal',
+    name: 'GoldenTrailReveal',
+    renderType: TrailRenderType.galaxyReveal,
+    primaryColor: Color(0xFFFFF4CF),
+    secondaryColor: Color(0xFFFFCC57),
+    thickness: 1.12,
+    opacity: 1.0,
+    glow: true,
+    effectIntensity: 1.0,
+    galaxyReveal: GalaxyRevealConfig(
+      radius: 0.42,
+      softness: 0.38,
+      enableGlow: false,
+      enableSparkles: false,
+      enableBloom: false,
+      textureAsset: 'assets/galaxy_trail/golden_trail_reveal.webp',
+    ),
+  );
+
+  static const TrailSkinConfig graffitiTrailReveal = TrailSkinConfig(
+    id: 'graffiti_trail_reveal',
+    name: 'GraffitiTrailReveal',
+    renderType: TrailRenderType.galaxyReveal,
+    primaryColor: Color(0xFFEAF6FF),
+    secondaryColor: Color(0xFF7EDCFF),
+    thickness: 1.12,
+    opacity: 1.0,
+    glow: true,
+    effectIntensity: 1.0,
+    galaxyReveal: GalaxyRevealConfig(
+      radius: 0.42,
+      softness: 0.38,
+      enableGlow: false,
+      enableSparkles: false,
+      enableBloom: false,
+      textureAsset: 'assets/galaxy_trail/graffiti_trail_reveal.webp',
+    ),
+  );
+
   static const TrailSkinConfig speedForce = TrailSkinConfig(
     id: 'trail_speed_force',
     name: 'SpeedForceTrail',
@@ -933,6 +1033,11 @@ class TrailCatalog {
     magma,
     ice,
     galaxy,
+    galaxyReveal,
+    comicTrailReveal,
+    electricTrailReveal,
+    goldenTrailReveal,
+    graffitiTrailReveal,
     speedForce,
     sith,
     comicSpiderverseV2,

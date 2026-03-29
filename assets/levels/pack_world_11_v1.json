@@ -1,7 +1,7 @@
 {
   "packId": "world_11",
   "version": "pack_world_11_v1",
-  "count": 25,
+  "count": 29,
   "world": 11,
   "levels": [
     {
@@ -3301,6 +3301,273 @@
         "variant": "classic",
         "canonical_hash": "a70e93d26809e923f95e83a6d58c90ab880938a45a5b7ce25609b284279c8ad5",
         "imported_from": "c:\\Users\\jacob\\Downloads\\niveles_linkedin_editor.json"
+      }
+    },
+    {
+      "id": "linkedin-editor-ext-11",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 2,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 3,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 4,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 5,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 6,
+          "x": 3,
+          "y": 2
+        },
+        {
+          "n": 7,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 8,
+          "x": 4,
+          "y": 2
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d2",
+      "source": "linkedin_editor_external",
+      "source_pack": "niveles_linkedin_editor.json",
+      "source_origin": "linkedin_editor_external",
+      "variant": "classic",
+      "canonical_hash": "de39315ec2f2c986f89b712e4682cfbaa5bbfdaf2cac3c1d6c2c9114ee0f4be9",
+      "meta": {
+        "source_pack": "niveles_linkedin_editor.json",
+        "source_origin": "linkedin_editor_external",
+        "variant": "classic",
+        "canonical_hash": "de39315ec2f2c986f89b712e4682cfbaa5bbfdaf2cac3c1d6c2c9114ee0f4be9",
+        "imported_at": "2026-03-29T21:46:37Z"
+      }
+    },
+    {
+      "id": "linkedin-editor-ext-15",
+      "size": {
+        "w": 7,
+        "h": 7
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 6,
+          "y": 2
+        },
+        {
+          "n": 2,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 3,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 4,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 6,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 7,
+          "x": 0,
+          "y": 4
+        },
+        {
+          "n": 8,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 9,
+          "x": 5,
+          "y": 3
+        },
+        {
+          "n": 10,
+          "x": 4,
+          "y": 4
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d3",
+      "source": "linkedin_editor_external",
+      "source_pack": "niveles_linkedin_editor.json",
+      "source_origin": "linkedin_editor_external",
+      "variant": "classic",
+      "canonical_hash": "4e74e5895882aedc52c4302e4f98e81551b850a07a2ff4ea50e0d9a90f334eb9",
+      "meta": {
+        "source_pack": "niveles_linkedin_editor.json",
+        "source_origin": "linkedin_editor_external",
+        "variant": "classic",
+        "canonical_hash": "4e74e5895882aedc52c4302e4f98e81551b850a07a2ff4ea50e0d9a90f334eb9",
+        "imported_at": "2026-03-29T21:46:37Z"
+      }
+    },
+    {
+      "id": "linkedin-editor-ext-27",
+      "size": {
+        "w": 7,
+        "h": 7
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 2,
+          "x": 4,
+          "y": 3
+        },
+        {
+          "n": 3,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "n": 4,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 5,
+          "x": 1,
+          "y": 2
+        },
+        {
+          "n": 6,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 7,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 8,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 9,
+          "x": 3,
+          "y": 2
+        },
+        {
+          "n": 10,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 11,
+          "x": 5,
+          "y": 3
+        },
+        {
+          "n": 12,
+          "x": 3,
+          "y": 5
+        },
+        {
+          "n": 13,
+          "x": 1,
+          "y": 3
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d3",
+      "source": "linkedin_editor_external",
+      "source_pack": "niveles_linkedin_editor.json",
+      "source_origin": "linkedin_editor_external",
+      "variant": "classic",
+      "canonical_hash": "d4585023e426eb420e0d36ddb679ee2f5073d4c0bd47e335854e4936f42d3eec",
+      "meta": {
+        "source_pack": "niveles_linkedin_editor.json",
+        "source_origin": "linkedin_editor_external",
+        "variant": "classic",
+        "canonical_hash": "d4585023e426eb420e0d36ddb679ee2f5073d4c0bd47e335854e4936f42d3eec",
+        "imported_at": "2026-03-29T21:46:37Z"
+      }
+    },
+    {
+      "id": "linkedin-editor-ext-32",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 2,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 3,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 4,
+          "x": 3,
+          "y": 1
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d2",
+      "source": "linkedin_editor_external",
+      "source_pack": "niveles_linkedin_editor.json",
+      "source_origin": "linkedin_editor_external",
+      "variant": "classic",
+      "canonical_hash": "4fc2cc4237f2ced1d1169871902ab626d11c963da9459ee9110accb26064c4fb",
+      "meta": {
+        "source_pack": "niveles_linkedin_editor.json",
+        "source_origin": "linkedin_editor_external",
+        "variant": "classic",
+        "canonical_hash": "4fc2cc4237f2ced1d1169871902ab626d11c963da9459ee9110accb26064c4fb",
+        "imported_at": "2026-03-29T21:46:37Z"
       }
     }
   ]

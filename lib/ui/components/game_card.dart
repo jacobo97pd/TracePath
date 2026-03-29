@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../widgets/ui/app_card.dart';
+import 'app_card.dart';
 
 class GameCard extends StatelessWidget {
   const GameCard({

@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:async';
@@ -16,6 +16,7 @@ import 'services/iap_service.dart';
 import 'services/user_inventory_service.dart';
 import 'trail/trail_catalog.dart';
 import 'trail/trail_skin.dart';
+import 'l10n/l10n.dart';
 import 'ui/components/coin_pack_card.dart';
 import 'ui/components/coin_display.dart';
 import 'ui/components/network_image_compat.dart';
@@ -43,6 +44,31 @@ class ShopScreen extends StatefulWidget {
     CoinTrailDef(id: 'trail_magma', name: 'MagmaTrail', costCoins: 980),
     CoinTrailDef(id: 'trail_ice', name: 'IceTrail', costCoins: 1020),
     CoinTrailDef(id: 'trail_galaxy', name: 'GalaxyTrail', costCoins: 1280),
+    CoinTrailDef(
+      id: 'trail_galaxy_reveal',
+      name: 'GalaxyRevealTrail',
+      costCoins: 1660,
+    ),
+    CoinTrailDef(
+      id: 'comic_trail_reveal',
+      name: 'ComicTrailReveal',
+      costCoins: 1720,
+    ),
+    CoinTrailDef(
+      id: 'electric_trail_reveal',
+      name: 'ElectricTrailReveal',
+      costCoins: 1760,
+    ),
+    CoinTrailDef(
+      id: 'golden_trail_reveal',
+      name: 'GoldenTrailReveal',
+      costCoins: 1820,
+    ),
+    CoinTrailDef(
+      id: 'graffiti_trail_reveal',
+      name: 'GraffitiTrailReveal',
+      costCoins: 1780,
+    ),
     CoinTrailDef(
         id: 'trail_speed_force', name: 'SpeedForceTrail', costCoins: 1450),
     CoinTrailDef(id: 'trail_sith', name: 'Sith', costCoins: 650),
@@ -129,6 +155,16 @@ class ShopScreen extends StatefulWidget {
     'trail_magma': 'Molten core with volcanic crust vibes.',
     'trail_ice': 'Cold crystalline trace with frosty sparkles.',
     'trail_galaxy': 'Nebula stream with cosmic highlights.',
+    'trail_galaxy_reveal':
+        'Reveal a static galaxy texture under your path as you move.',
+    'comic_trail_reveal':
+        'Reveal a static comic background texture under your path as you move.',
+    'electric_trail_reveal':
+        'Reveal a static electric storm texture under your path as you move.',
+    'golden_trail_reveal':
+        'Reveal a static molten gold texture under your path as you move.',
+    'graffiti_trail_reveal':
+        'Reveal a static neon graffiti texture under your path as you move.',
     'trail_speed_force': 'High-energy streak with speed bursts.',
     'trail_sith': 'Dark red saber-style trail.',
     'trail_comic_spiderverse_v2':
@@ -309,13 +345,13 @@ class _ShopScreenState extends State<ShopScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Text('Shop'),
+                  Text(context.l10n.shopTitle),
                 ],
               ),
               actions: [
                 if (kDebugMode)
                   IconButton(
-                    tooltip: 'Skin editor',
+                    tooltip: context.l10n.shopSkinEditorTooltip,
                     onPressed: () => context.push('/skin-editor'),
                     icon: const Icon(Icons.tune_rounded),
                   ),
@@ -333,15 +369,15 @@ class _ShopScreenState extends State<ShopScreen> {
                   ),
                 ),
               ],
-              bottom: const TabBar(
+              bottom: TabBar(
                 indicatorColor: Color(0xFF60A5FA),
                 indicatorWeight: 3,
                 labelColor: Color(0xFFFFFFFF),
                 unselectedLabelColor: Color(0xFF9FB0D3),
                 tabs: [
-                  Tab(text: 'Skins'),
-                  Tab(text: 'Trails'),
-                  Tab(text: 'Coin Packs'),
+                  Tab(text: context.l10n.shopTabSkins),
+                  Tab(text: context.l10n.shopTabTrails),
+                  Tab(text: context.l10n.shopTabCoinPacks),
                 ],
               ),
             ),
@@ -405,7 +441,7 @@ class _ShopScreenState extends State<ShopScreen> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Text(
-                  'Skins loaded: $visibleCount/${skins.length}',
+                  context.l10n.shopSkinsLoaded(visibleCount, skins.length),
                   style: const TextStyle(
                     color: Color(0xFF9FB0D3),
                     fontSize: 12,
@@ -414,7 +450,7 @@ class _ShopScreenState extends State<ShopScreen> {
                 ),
               ),
               if (featuredSkin != null) ...[
-                const SectionHeader(title: 'Featured Skin'),
+                SectionHeader(title: context.l10n.shopFeaturedSkin),
                 const SizedBox(height: 10),
                 _buildFeaturedSkinCard(
                   context: context,
@@ -425,7 +461,7 @@ class _ShopScreenState extends State<ShopScreen> {
                 ),
                 const SizedBox(height: 14),
               ],
-              const SectionHeader(title: 'Pointer Skins'),
+              SectionHeader(title: context.l10n.shopPointerSkins),
               const SizedBox(height: 10),
               GridView.builder(
                 shrinkWrap: true,
@@ -471,7 +507,7 @@ class _ShopScreenState extends State<ShopScreen> {
                         )
                       : OutlinedButton(
                           onPressed: () => _loadMoreSkins(skins),
-                          child: const Text('Load more'),
+                          child: Text(context.l10n.shopLoadMore),
                         ),
                 ),
               ],
@@ -496,10 +532,10 @@ class _ShopScreenState extends State<ShopScreen> {
     final rarityColor = _rarityColor(skin.rarity);
     final rarityLabel = _displayRarity(skin.rarity);
     final actionLabel = selected
-        ? 'Equipped'
+        ? context.l10n.shopEquipped
         : owned
-            ? 'Equip'
-            : 'Buy $cost';
+            ? context.l10n.shopEquip
+            : context.l10n.shopBuyCoins(cost);
     final imageCandidates = <String>[
       if ((skin.previewPath ?? '').trim().isNotEmpty) skin.previewPath!.trim(),
       if ((skin.assetPath ?? '').trim().isNotEmpty) skin.assetPath!.trim(),
@@ -823,10 +859,10 @@ class _ShopScreenState extends State<ShopScreen> {
   }
 
   Widget _buildTrailsTab(BuildContext context) {
-    final knownTrailIds = TrailCatalog.all.map((t) => t.id).toSet();
-    final missingInCatalog = ShopScreen._coinTrails
-        .where((t) => !knownTrailIds.contains(t.id))
-        .map((t) => t.id)
+    final entries = _effectiveTrailEntries(context);
+    final missingInCatalog = entries
+        .where((e) => !e.presentInCatalog)
+        .map((e) => e.id)
         .toList(growable: false);
     if (kDebugMode && missingInCatalog.isNotEmpty) {
       debugPrint('[shop][trail] Missing in TrailCatalog: $missingInCatalog');
@@ -836,40 +872,114 @@ class _ShopScreenState extends State<ShopScreen> {
       children: [
         const SectionHeader(title: 'Trail Effects'),
         const SizedBox(height: 10),
-        ...ShopScreen._coinTrails.map((trail) {
-          final owned = widget.coinsService.ownsTrail(trail.id);
-          final selected = widget.coinsService.selectedTrail == trail.id;
-          final cost = trail.costCoins ?? 0;
-          final canBuy = !owned && widget.coinsService.coins >= cost;
-          final preview = TrailCatalog.resolveByTrailId(trail.id);
-          final displayName = trail.name.trim().isEmpty ? preview.name : trail.name.trim();
-          final description = ShopScreen._trailDescriptions[trail.id]?.trim().isNotEmpty == true
-              ? ShopScreen._trailDescriptions[trail.id]!.trim()
-              : 'Unique visual style for your path trace.';
+        ...entries.map((entry) {
+          final owned = widget.coinsService.ownsTrail(entry.id);
+          final selected = widget.coinsService.selectedTrail == entry.id;
+          final cost = entry.costCoins ?? 0;
+          final canBuy =
+              entry.availableInShop && !owned && widget.coinsService.coins >= cost;
           return _TrailShopCard(
-            key: ValueKey<String>('trail-${trail.id}'),
-            trailName: displayName,
-            trailDescription: description,
+            key: ValueKey<String>('trail-${entry.id}'),
+            trailId: entry.id,
+            trailName: entry.displayName,
+            trailDescription: entry.description,
             owned: owned,
             selected: selected,
-            cost: cost,
+            cost: entry.costCoins,
             canBuy: canBuy,
-            preview: preview,
-            onEquip: () => widget.coinsService.selectTrail(trail.id),
+            preview: entry.preview,
+            availableInShop: entry.availableInShop,
+            onEquip: () => widget.coinsService.selectTrail(entry.id),
             onBuy: () async {
-              final ok = await widget.coinsService.purchaseCoinTrail(trail);
+              if (!entry.availableInShop) return;
+              final ok = await widget.coinsService.purchaseCoinTrail(
+                CoinTrailDef(
+                  id: entry.id,
+                  name: entry.displayName,
+                  costCoins: entry.costCoins,
+                ),
+              );
               if (!mounted || !ok) return;
-              await widget.coinsService.selectTrail(trail.id);
+              await widget.coinsService.selectTrail(entry.id);
               if (!mounted) return;
               await _showTrailUnlockBanner(
-                trailName: displayName,
-                preview: preview,
+                trailName: entry.displayName,
+                preview: entry.preview,
               );
             },
           );
         }),
       ],
     );
+  }
+
+  List<_TrailShopMeta> _effectiveTrailEntries(BuildContext context) {
+    final catalogById = <String, TrailSkinConfig>{
+      for (final t in TrailCatalog.all) t.id.trim(): t,
+    };
+    final out = <_TrailShopMeta>[];
+    final seen = <String>{};
+
+    for (final configured in ShopScreen._coinTrails) {
+      final id = configured.id.trim();
+      if (id.isEmpty || seen.contains(id)) continue;
+      seen.add(id);
+      final catalogEntry = catalogById[id];
+      final preview = catalogEntry ?? TrailCatalog.resolveByTrailId(id);
+      final configuredName = configured.name.trim();
+      final catalogName = preview.name.trim();
+      final displayName = configuredName.isNotEmpty
+          ? configuredName
+          : (catalogName.isNotEmpty ? catalogName : _humanizeTrailId(id));
+      final description = _resolveTrailDescription(id, context);
+      final hasPrice = configured.costCoins != null && configured.costCoins! >= 0;
+      out.add(
+        _TrailShopMeta(
+          id: id,
+          displayName: displayName,
+          description: description,
+          costCoins: configured.costCoins,
+          availableInShop: hasPrice,
+          presentInCatalog: catalogEntry != null,
+          preview: preview,
+        ),
+      );
+    }
+
+    for (final catalog in TrailCatalog.all) {
+      final id = catalog.id.trim();
+      if (id.isEmpty || seen.contains(id)) continue;
+      seen.add(id);
+      out.add(
+        _TrailShopMeta(
+          id: id,
+          displayName:
+              catalog.name.trim().isNotEmpty ? catalog.name.trim() : _humanizeTrailId(id),
+          description: _resolveTrailDescription(id, context),
+          costCoins: null,
+          availableInShop: false,
+          presentInCatalog: true,
+          preview: catalog,
+        ),
+      );
+    }
+    return out;
+  }
+
+  String _resolveTrailDescription(String trailId, BuildContext context) {
+    final configured = ShopScreen._trailDescriptions[trailId]?.trim() ?? '';
+    if (configured.isNotEmpty) return configured;
+    return context.l10n.shopDefaultTrailDescription;
+  }
+
+  String _humanizeTrailId(String id) {
+    final cleaned = id.trim().replaceFirst(RegExp(r'^trail_'), '');
+    if (cleaned.isEmpty) return 'Trail';
+    final words = cleaned.split('_').where((w) => w.isNotEmpty).toList();
+    if (words.isEmpty) return 'Trail';
+    return words
+        .map((w) => '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
+        .join(' ');
   }
 
   Future<void> _showTrailUnlockBanner({
@@ -2356,7 +2466,7 @@ class _PurchaseBannerToastState extends State<_PurchaseBannerToast>
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Unlocked and equipped',
+                              context.l10n.shopUnlockedAndEquipped,
                               style: TextStyle(
                                 color:
                                     const Color(0xFFA8B5D3).withOpacity(0.95),
@@ -2592,7 +2702,7 @@ class _TrailUnlockToastState extends State<_TrailUnlockToast>
                                     ),
                                   ),
                                   child: Text(
-                                    'NEW TRAIL',
+                                    context.l10n.shopNewTrail,
                                     style: TextStyle(
                                       color: accent,
                                       fontSize: 11,
@@ -2624,7 +2734,7 @@ class _TrailUnlockToastState extends State<_TrailUnlockToast>
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Unlocked and equipped',
+                              context.l10n.shopUnlockedAndEquipped,
                               style: TextStyle(
                                 color:
                                     const Color(0xFFA8B5D3).withOpacity(0.95),
@@ -2650,34 +2760,48 @@ class _TrailUnlockToastState extends State<_TrailUnlockToast>
 class _TrailShopCard extends StatelessWidget {
   const _TrailShopCard({
     super.key,
+    required this.trailId,
     required this.trailName,
     required this.trailDescription,
     required this.owned,
     required this.selected,
     required this.cost,
     required this.canBuy,
+    required this.availableInShop,
     required this.preview,
     required this.onEquip,
     required this.onBuy,
   });
 
+  final String trailId;
   final String trailName;
   final String trailDescription;
   final bool owned;
   final bool selected;
-  final int cost;
+  final int? cost;
   final bool canBuy;
+  final bool availableInShop;
   final TrailSkinConfig preview;
   final VoidCallback onEquip;
   final Future<void> Function() onBuy;
 
   @override
   Widget build(BuildContext context) {
-    final safeTrailName =
+    final resolvedName =
         trailName.trim().isNotEmpty ? trailName.trim() : preview.name.trim();
+    final safeTrailName = resolvedName.isNotEmpty
+        ? resolvedName
+        : _humanizeTrailId(trailId);
     final safeDescription = trailDescription.trim().isNotEmpty
         ? trailDescription.trim()
-        : 'Unique visual style for your path trace.';
+        : _missingDescriptionLabel(context);
+    final hasValidPrice = cost != null && cost! >= 0;
+    final statusText = owned
+        ? context.l10n.shopOwned
+        : (availableInShop && hasValidPrice)
+            ? context.l10n.shopCoinsAmount(cost ?? 0)
+            : _missingPriceLabel(context);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
@@ -2694,7 +2818,7 @@ class _TrailShopCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             child: Container(
               width: double.infinity,
-              height: 88,
+              height: 92,
               color: const Color(0xFF0B1222),
               child: CustomPaint(
                 painter: _TrailPreviewPainter(skin: preview),
@@ -2723,20 +2847,27 @@ class _TrailShopCard extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 8),
-          Row(
+          const SizedBox(height: 9),
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 10,
+            runSpacing: 8,
             children: [
-              Expanded(
+              SizedBox(
+                width: 140,
                 child: Text(
-                  owned ? 'Owned' : '$cost coins',
+                  statusText,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Color(0xFFB5C4E3),
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
+                    height: 1.2,
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
               _buildActionButton(context),
             ],
           ),
@@ -2747,9 +2878,9 @@ class _TrailShopCard extends StatelessWidget {
 
   Widget _buildActionButton(BuildContext context) {
     if (selected) {
-      return const Chip(
+      return Chip(
         visualDensity: VisualDensity.compact,
-        label: Text('Equipped'),
+        label: Text(context.l10n.shopEquipped),
       );
     }
     return FilledButton.tonal(
@@ -2761,12 +2892,65 @@ class _TrailShopCard extends StatelessWidget {
       ),
       onPressed: owned
           ? onEquip
-          : canBuy
+          : (availableInShop && canBuy)
               ? () => unawaited(onBuy())
               : null,
-      child: Text(owned ? 'Equip' : 'Buy $cost'),
+      child: Text(
+        owned
+            ? context.l10n.shopEquip
+            : availableInShop
+                ? context.l10n.shopBuyCoins(cost ?? 0)
+                : _unavailableButtonLabel(context),
+      ),
     );
   }
+
+  String _missingDescriptionLabel(BuildContext context) {
+    final language = Localizations.localeOf(context).languageCode.toLowerCase();
+    return language == 'es'
+        ? 'Sin descripción disponible'
+        : 'Description not available';
+  }
+
+  String _missingPriceLabel(BuildContext context) {
+    final language = Localizations.localeOf(context).languageCode.toLowerCase();
+    return language == 'es' ? 'Precio no disponible' : 'Price unavailable';
+  }
+
+  String _unavailableButtonLabel(BuildContext context) {
+    final language = Localizations.localeOf(context).languageCode.toLowerCase();
+    return language == 'es' ? 'No disponible' : 'Unavailable';
+  }
+
+  String _humanizeTrailId(String id) {
+    final cleaned = id.trim().replaceFirst(RegExp(r'^trail_'), '');
+    if (cleaned.isEmpty) return 'Trail';
+    final words = cleaned.split('_').where((w) => w.isNotEmpty).toList();
+    if (words.isEmpty) return 'Trail';
+    return words
+        .map((w) => '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
+        .join(' ');
+  }
+}
+
+class _TrailShopMeta {
+  const _TrailShopMeta({
+    required this.id,
+    required this.displayName,
+    required this.description,
+    required this.costCoins,
+    required this.availableInShop,
+    required this.presentInCatalog,
+    required this.preview,
+  });
+
+  final String id;
+  final String displayName;
+  final String description;
+  final int? costCoins;
+  final bool availableInShop;
+  final bool presentInCatalog;
+  final TrailSkinConfig preview;
 }
 
 class _TrailPreviewPainter extends CustomPainter {
@@ -2846,7 +3030,7 @@ class _TrailPreviewPainter extends CustomPainter {
       ),
       maxLines: 1,
       textDirection: TextDirection.ltr,
-      ellipsis: '…',
+      ellipsis: 'â€¦',
     )..layout(maxWidth: 52);
     tp.paint(canvas, const Offset(12, 12));
 
@@ -2902,3 +3086,4 @@ class _TrailPreviewPainter extends CustomPainter {
     return oldDelegate.skin.id != skin.id;
   }
 }
+

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'theme/app_colors.dart';
+import 'theme/app_text_styles.dart';
+
 class AppSpacing {
   const AppSpacing._();
 
@@ -12,139 +15,145 @@ class AppTheme {
   const AppTheme._();
 
   static ThemeData light() {
-    const fg = Color(0xFFF2F6FF);
-    const subtle = Color(0xFF9FB0CE);
-    const border = Color(0xFF334155);
     return ThemeData(
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: const Color(0xFF0F172A),
+      scaffoldBackgroundColor: AppColors.background,
+      primaryColor: AppColors.primary,
       colorScheme: const ColorScheme.dark(
-        primary: Color(0xFF3E79FF),
+        primary: AppColors.accent,
         onPrimary: Colors.white,
-        secondary: Color(0xFF3E79FF),
-        surface: Color(0xFF1E293B),
-        onSurface: fg,
+        secondary: AppColors.accentSecondary,
+        surface: AppColors.surface,
+        onSurface: AppColors.textPrimary,
       ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         centerTitle: true,
         elevation: 0,
         scrolledUnderElevation: 0,
-        backgroundColor: Color(0xFF0F172A),
-        foregroundColor: fg,
-        titleTextStyle: TextStyle(
-          fontSize: 19,
-          fontWeight: FontWeight.w700,
-          color: fg,
-        ),
+        backgroundColor: AppColors.background,
+        foregroundColor: AppColors.textPrimary,
+        titleTextStyle: AppTextStyles.title.copyWith(fontSize: 19),
       ),
       cardTheme: CardTheme(
-        color: const Color(0xFF1E293B),
+        color: AppColors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          side: const BorderSide(color: border, width: 1),
+          side: const BorderSide(color: AppColors.border, width: 1),
         ),
       ),
       listTileTheme: const ListTileThemeData(
-        iconColor: fg,
-        textColor: fg,
+        iconColor: AppColors.textPrimary,
+        textColor: AppColors.textPrimary,
       ),
-      dividerColor: border,
-      iconTheme: const IconThemeData(color: fg),
-      textTheme: const TextTheme(
-        titleLarge: TextStyle(color: fg, fontWeight: FontWeight.w700),
-        bodyMedium: TextStyle(color: subtle),
-      ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: Color(0xFF0F172A),
-        selectedItemColor: Color(0xFF7EA9FF),
-        unselectedItemColor: Color(0xFF7D8CA8),
-        selectedLabelStyle: TextStyle(fontWeight: FontWeight.w700),
+      dividerColor: AppColors.border,
+      iconTheme: const IconThemeData(color: AppColors.textPrimary),
+      textTheme: AppTextStyles.textTheme,
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: AppColors.primaryDark,
+        selectedItemColor: AppColors.accent,
+        unselectedItemColor: AppColors.textSecondary,
+        selectedLabelStyle: AppTextStyles.caption.copyWith(
+          color: AppColors.accent,
+          fontWeight: FontWeight.w700,
+        ),
+        unselectedLabelStyle: AppTextStyles.caption.copyWith(
+          color: AppColors.textSecondary,
+          fontWeight: FontWeight.w600,
+        ),
         type: BottomNavigationBarType.fixed,
         elevation: 0,
       ),
-      chipTheme: const ChipThemeData(
-        backgroundColor: Color(0xFF1E293B),
-        disabledColor: Color(0xFF212A39),
-        selectedColor: Color(0xFF1D2F57),
-        side: BorderSide(color: border),
-        labelStyle: TextStyle(color: fg),
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.surface,
+        disabledColor: AppColors.chipIdle,
+        selectedColor: AppColors.chipSelected,
+        side: const BorderSide(color: AppColors.border),
+        labelStyle: AppTextStyles.chip,
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: fg,
-          side: const BorderSide(color: border),
+          foregroundColor: AppColors.textPrimary,
+          side: const BorderSide(color: AppColors.border),
         ),
+      ),
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: <TargetPlatform, PageTransitionsBuilder>{
+          TargetPlatform.android: ZoomPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        },
       ),
     );
   }
 
   static ThemeData dark() {
-    const bg = Color(0xFF0F172A);
-    const surface = Color(0xFF1E293B);
-    const fg = Color(0xFFEAEAEA);
-    const subtle = Color(0xFFB6B6B6);
-    const border = Color(0xFF334155);
     return ThemeData(
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: bg,
+      scaffoldBackgroundColor: AppColors.background,
+      primaryColor: AppColors.primary,
       colorScheme: const ColorScheme.dark(
-        primary: Color(0xFF3E79FF),
+        primary: AppColors.accent,
         onPrimary: Colors.white,
-        secondary: Color(0xFF3E79FF),
-        surface: surface,
-        onSurface: fg,
+        secondary: AppColors.accentSecondary,
+        surface: AppColors.surface,
+        onSurface: AppColors.textPrimary,
       ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         centerTitle: true,
         elevation: 0,
         scrolledUnderElevation: 0,
-        backgroundColor: bg,
-        foregroundColor: fg,
-        titleTextStyle: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w700,
-          color: fg,
-        ),
+        backgroundColor: AppColors.background,
+        foregroundColor: AppColors.textPrimary,
+        titleTextStyle: AppTextStyles.title.copyWith(fontSize: 20),
       ),
       cardTheme: CardTheme(
-        color: surface,
+        color: AppColors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          side: const BorderSide(color: border, width: 1),
+          side: const BorderSide(color: AppColors.border, width: 1),
         ),
       ),
       listTileTheme: const ListTileThemeData(
-        iconColor: fg,
-        textColor: fg,
+        iconColor: AppColors.textPrimary,
+        textColor: AppColors.textPrimary,
       ),
-      dividerColor: border,
-      iconTheme: const IconThemeData(color: fg),
-      textTheme: const TextTheme(
-        titleLarge: TextStyle(color: fg, fontWeight: FontWeight.w700),
-        bodyMedium: TextStyle(color: subtle),
-      ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: bg,
-        selectedItemColor: Color(0xFF7EA9FF),
-        unselectedItemColor: Color(0xFF7D8CA8),
-        selectedLabelStyle: TextStyle(fontWeight: FontWeight.w700),
+      dividerColor: AppColors.border,
+      iconTheme: const IconThemeData(color: AppColors.textPrimary),
+      textTheme: AppTextStyles.textTheme,
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: AppColors.primaryDark,
+        selectedItemColor: AppColors.accent,
+        unselectedItemColor: AppColors.textSecondary,
+        selectedLabelStyle: AppTextStyles.caption.copyWith(
+          color: AppColors.accent,
+          fontWeight: FontWeight.w700,
+        ),
+        unselectedLabelStyle: AppTextStyles.caption.copyWith(
+          color: AppColors.textSecondary,
+          fontWeight: FontWeight.w600,
+        ),
         type: BottomNavigationBarType.fixed,
         elevation: 0,
       ),
-      chipTheme: const ChipThemeData(
-        backgroundColor: surface,
-        disabledColor: Color(0xFF222226),
-        selectedColor: Color(0xFF242428),
-        side: BorderSide(color: border),
-        labelStyle: TextStyle(color: fg),
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.surface,
+        disabledColor: AppColors.chipIdle,
+        selectedColor: AppColors.chipSelected,
+        side: const BorderSide(color: AppColors.border),
+        labelStyle: AppTextStyles.chip,
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: fg,
-          side: const BorderSide(color: border),
+          foregroundColor: AppColors.textPrimary,
+          side: const BorderSide(color: AppColors.border),
         ),
+      ),
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: <TargetPlatform, PageTransitionsBuilder>{
+          TargetPlatform.android: ZoomPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        },
       ),
     );
   }

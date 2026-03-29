@@ -1,8 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'services/app_firestore.dart';
 
 enum AuthMode { none, guest, google }
 
@@ -127,6 +130,22 @@ class AuthService extends ChangeNotifier {
 
   Future<void> signOut() async {
     final firebaseAuth = _firebaseAuthOrNull;
+    final uid = firebaseAuth?.currentUser?.uid.trim() ?? '';
+    if (uid.isNotEmpty) {
+      try {
+        await AppFirestore.instance().collection('users').doc(uid).set(
+          <String, dynamic>{
+            'isOnline': false,
+            'lastSeenAt': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('[presence] signOut offline write failed uid=$uid error=$e');
+        }
+      }
+    }
     if (_mode == AuthMode.google) {
       if (!kIsWeb) {
         try {

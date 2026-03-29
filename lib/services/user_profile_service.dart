@@ -33,7 +33,12 @@ class UserProfileService {
   Future<void> ensureCurrentUserProfile() async {
     final uid = await _requireUid();
     final ref = _usersRef().doc(uid);
-    final snap = await ref.get();
+    DocumentSnapshot<Map<String, dynamic>> snap;
+    try {
+      snap = await ref.get(const GetOptions(source: Source.server));
+    } catch (_) {
+      snap = await ref.get();
+    }
     final ts = FieldValue.serverTimestamp();
     if (!snap.exists) {
       final initial = UserModel.defaultFirestore(
@@ -41,6 +46,10 @@ class UserProfileService {
         createdAt: ts,
         updatedAt: ts,
       );
+      // Profile bootstrap must never initialize wallet fields.
+      initial.remove('coins');
+      initial.remove('lifetimeCoinsEarned');
+      initial.remove('lifetimeCoinsPurchased');
       final authEmail =
           (FirebaseAuth.instance.currentUser?.email ?? '').trim().toLowerCase();
       if (authEmail.isNotEmpty) {
@@ -80,11 +89,10 @@ class UserProfileService {
     if (!data.containsKey('usernameChangeCount') ||
         data['usernameChangeCount'] == null) {
       await ref.set(
-        UserModel.defaultFirestore(
-          uid: uid,
-          createdAt: ts,
-          updatedAt: ts,
-        )..['usernameChangeCount'] = 0,
+        <String, dynamic>{
+          'usernameChangeCount': 0,
+          'updatedAt': ts,
+        },
         SetOptions(merge: true),
       );
     }

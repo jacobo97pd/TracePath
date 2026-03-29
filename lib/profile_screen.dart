@@ -23,6 +23,7 @@ import 'skin_catalog_service.dart';
 import 'stats_service.dart';
 import 'trail/trail_catalog.dart';
 import 'trail/trail_skin.dart';
+import 'l10n/l10n.dart';
 import 'ui/avatar_utils.dart';
 import 'ui/components/coin_display.dart';
 import 'ui/components/game_card.dart';
@@ -71,6 +72,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         widget.authService,
       ]),
       builder: (context, _) {
+        final l10n = context.l10n;
         final selectedSkinId = widget.coinsService.selectedSkin;
         final selectedCatalogItem = _findSelectedCatalogItem(selectedSkinId);
         final isDefaultSkinSelected = isDefaultSkinId(selectedSkinId) ||
@@ -89,8 +91,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final authEmail =
             (authUser?.email ?? widget.authService.email ?? '').trim();
         final profileSubtitle = widget.authService.isGuest
-            ? 'Guest mode'
-            : (authEmail.isNotEmpty ? authEmail : 'Google account');
+            ? l10n.profileGuestMode
+            : (authEmail.isNotEmpty ? authEmail : l10n.profileGoogleAccount);
         final ownedSkins = widget.skinCatalogService.items
             .where((e) => widget.coinsService.ownsSkin(e.id))
             .toList(growable: false);
@@ -106,7 +108,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ? Padding(
                     padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
                     child: Tooltip(
-                      message: 'Logout',
+                      message: l10n.profileLogout,
                       child: Material(
                         color: Colors.transparent,
                         child: InkWell(
@@ -142,7 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   )
                 : null,
-            title: const Text('Profile'),
+            title: Text(l10n.tabProfile),
             actions: [
               Padding(
                 padding: const EdgeInsets.only(right: 12),
@@ -171,7 +173,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ((data['playerName'] as String?)?.trim().isNotEmpty ==
                                 true)
                             ? (data['playerName'] as String).trim()
-                            : (authName.isNotEmpty ? authName : 'Player');
+                            : (authName.isNotEmpty ? authName : l10n.homePlayerName);
                     final username =
                         (data['username'] as String?)?.trim() ?? '';
                     final highestLevelReached =
@@ -190,7 +192,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           widget.statsService.bestTimeMsForDifficulty(1) ?? 0,
                     );
                     final equippedSkinName =
-                        selectedCatalogItem?.name ?? 'Default';
+                        selectedCatalogItem?.name ?? l10n.profileDefaultName;
                     return Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(22),
@@ -298,7 +300,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 TextButton(
                                   onPressed: () => context.go('/shop'),
-                                  child: const Text('Shop'),
+                                  child: Text(l10n.shopTitle),
                                 ),
                               ],
                             ),
@@ -307,21 +309,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               children: [
                                 Expanded(
                                   child: _HeroStatChip(
-                                    label: 'Level',
+                                    label: l10n.profileLevelLabel,
                                     value: '$highestLevelReached',
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: _HeroStatChip(
-                                    label: 'Streak',
+                                    label: l10n.profileStreakLabel,
                                     value: '$currentStreak',
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: _HeroStatChip(
-                                    label: 'Best',
+                                    label: l10n.profileBestLabel,
                                     value: _formatMs(fastestSolveMs),
                                   ),
                                 ),
@@ -344,7 +346,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ),
                                 child: Text(
-                                  '🔥 Best streak: $bestStreak',
+                                  l10n.profileBestStreak(bestStreak),
                                   style: const TextStyle(
                                     color: Color(0xFFC9D8F9),
                                     fontSize: 12,
@@ -370,7 +372,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ),
                                 child: Text(
-                                  'Equipped Skin: $equippedSkinName',
+                                  l10n.profileEquippedSkin(equippedSkinName),
                                   style: const TextStyle(
                                     color: Color(0xFFC9D8F9),
                                     fontSize: 12,
@@ -391,7 +393,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   highestLevel: widget.statsService.totalCampaignSolved + 1,
                 ),
                 const SizedBox(height: 16),
-                const SectionHeader(title: 'Stats'),
+                SectionHeader(title: l10n.profileStatsTitle),
                 const SizedBox(height: 10),
                 StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                   stream: _currentUserDocStream(),
@@ -434,7 +436,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 SizedBox(
                                   width: cardWidth,
                                   child: _PremiumStatTile(
-                                    title: 'Levels Solved',
+                                    title: l10n.homeMetricLevelsSolved,
                                     value: '$totalLevelsCompleted',
                                     icon: Icons.check_circle_outline_rounded,
                                   ),
@@ -442,7 +444,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 SizedBox(
                                   width: cardWidth,
                                   child: _PremiumStatTile(
-                                    title: 'Games Played',
+                                    title: l10n.profileGamesPlayed,
                                     value: '$gamesPlayed',
                                     icon: Icons.sports_esports_rounded,
                                   ),
@@ -450,7 +452,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 SizedBox(
                                   width: cardWidth,
                                   child: _PremiumStatTile(
-                                    title: 'Best Time',
+                                    title: l10n.profileBestTime,
                                     value: _formatMs(fastestSolveMs),
                                     icon: Icons.bolt_rounded,
                                   ),
@@ -458,7 +460,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 SizedBox(
                                   width: cardWidth,
                                   child: _PremiumStatTile(
-                                    title: 'Highest Level',
+                                    title: l10n.homeMetricHighestLevel,
                                     value: '$highestLevelReached',
                                     icon: Icons.flag_rounded,
                                   ),
@@ -472,19 +474,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                const SectionHeader(title: 'Wardrobe'),
+                SectionHeader(title: l10n.profileVaultTitle),
                 const SizedBox(height: 10),
                 GameCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text(
+                        l10n.profileLockerTitle,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        l10n.profileLockerHint,
+                        style: TextStyle(
+                          color: Color(0xFF9CB1D8),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
                       Row(
                         children: [
                           Expanded(
                             child: _LoadoutMiniCard(
-                              title: 'Skin',
-                              name: selectedCatalogItem?.name ?? 'Default',
-                              tag: 'Equipped',
+                              title: l10n.shopTabSkins,
+                              name: selectedCatalogItem?.name ?? l10n.profileDefaultName,
+                              tag: l10n.shopEquipped,
                               icon: Icons.face_rounded,
                               preview: Container(
                                 decoration: BoxDecoration(
@@ -507,16 +527,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ),
                               ),
+                              onTap: () => _openInventoryVault(
+                                initialTab: 0,
+                                ownedSkins: ownedSkins,
+                                ownedTrails: ownedTrails,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: _LoadoutMiniCard(
-                              title: 'Trail',
+                              title: l10n.shopTabTrails,
                               name: TrailCatalog.resolveByTrailId(
                                       widget.coinsService.selectedTrail)
                                   .name,
-                              tag: 'Equipped',
+                              tag: l10n.shopEquipped,
                               icon: Icons.timeline_rounded,
                               preview: Container(
                                 decoration: BoxDecoration(
@@ -536,78 +561,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ),
                               ),
+                              onTap: () => _openInventoryVault(
+                                initialTab: 1,
+                                ownedSkins: ownedSkins,
+                                ownedTrails: ownedTrails,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'My Skins',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 15,
+                      const SizedBox(height: 12),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          onPressed: () => _openInventoryVault(
+                            initialTab: 0,
+                            ownedSkins: ownedSkins,
+                            ownedTrails: ownedTrails,
+                          ),
+                          icon: const Icon(Icons.inventory_2_rounded, size: 18),
+                          label: Text(l10n.profileOpenVault),
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      if (ownedSkins.isEmpty)
-                        const _WardrobeEmptyState(
-                          message: 'No owned skins yet.',
-                          icon: Icons.face_retouching_natural_rounded,
-                        )
-                      else
-                        SizedBox(
-                          height: 286,
-                          child: _SkinWardrobeCarousel(
-                            skins: ownedSkins,
-                            selectedSkinId: widget.coinsService.selectedSkin,
-                            resolveRenderablePath: (skin) =>
-                                _bestRenderableSkinPath(skin),
-                            onEquip: (skin) async {
-                              final fullPathRaw = skin.fullImagePath.trim();
-                              final resolved = await widget.skinCatalogService
-                                  .resolveDownloadUrl(
-                                fullPathRaw,
-                                context: 'profile-equip:${skin.id}',
-                              );
-                              final renderPath =
-                                  (resolved ?? '').trim().isNotEmpty
-                                      ? resolved!.trim()
-                                      : widget.skinCatalogService
-                                          .toRenderablePath(skin.imagePath);
-                              await widget.coinsService.registerSkinAsset(
-                                skin.id,
-                                renderPath,
-                              );
-                              await widget.coinsService.selectSkin(skin.id);
-                            },
-                          ),
-                        ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'My Trails',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 15,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      if (ownedTrails.isEmpty)
-                        const _WardrobeEmptyState(
-                          message: 'No owned trails yet.',
-                          icon: Icons.timeline_rounded,
-                        )
-                      else
-                        SizedBox(
-                          height: 228,
-                          child: _TrailWardrobeCarousel(
-                            trails: ownedTrails,
-                            selectedTrailId: widget.coinsService.selectedTrail,
-                            onEquip: (trail) =>
-                                widget.coinsService.selectTrail(trail.id),
-                          ),
-                        ),
                     ],
                   ),
                 ),
@@ -626,21 +601,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         SectionHeader(
                           title: unreadCount > 0
-                              ? 'Inbox ($unreadCount)'
-                              : 'Inbox',
+                              ? l10n.profileInboxWithCount(unreadCount)
+                              : l10n.profileInboxTitle,
                         ),
                         const SizedBox(height: 10),
                         if (snapshot.hasError)
-                          const _InboxEmptyCard(
-                            title: 'Inbox unavailable right now',
-                            subtitle: 'Please try again in a moment.',
+                          _InboxEmptyCard(
+                            title: l10n.profileInboxUnavailableTitle,
+                            subtitle: l10n.duelTryAgainLater,
                             icon: Icons.inbox_rounded,
                           )
                         else if (inboxItems.isEmpty)
-                          const _InboxEmptyCard(
-                            title: 'No messages yet',
-                            subtitle:
-                                'Friend requests, rewards and news will appear here.',
+                          _InboxEmptyCard(
+                            title: l10n.profileInboxEmptyTitle,
+                            subtitle: l10n.profileInboxEmptySubtitle,
                             icon: Icons.mark_email_unread_outlined,
                           )
                         else
@@ -720,6 +694,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (renderable.trim().isNotEmpty) return renderable.trim();
     }
     return '';
+  }
+
+  Future<void> _equipProfileSkin(SkinCatalogItem skin) async {
+    final fullPathRaw = skin.fullImagePath.trim();
+    final resolved = await widget.skinCatalogService.resolveDownloadUrl(
+      fullPathRaw,
+      context: 'profile-equip:${skin.id}',
+    );
+    final renderPath = (resolved ?? '').trim().isNotEmpty
+        ? resolved!.trim()
+        : widget.skinCatalogService.toRenderablePath(skin.imagePath);
+    await widget.coinsService.registerSkinAsset(
+      skin.id,
+      renderPath,
+    );
+    await widget.coinsService.selectSkin(skin.id);
+  }
+
+  Future<void> _equipProfileTrail(TrailSkinConfig trail) async {
+    await widget.coinsService.selectTrail(trail.id);
+  }
+
+  void _openInventoryVault({
+    required int initialTab,
+    required List<SkinCatalogItem> ownedSkins,
+    required List<TrailSkinConfig> ownedTrails,
+  }) {
+    final skinPreviewById = <String, String>{
+      for (final skin in ownedSkins) skin.id: _bestRenderableSkinPath(skin),
+    };
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(0.55),
+      builder: (_) {
+        return FractionallySizedBox(
+          heightFactor: 0.9,
+          child: _ProfileInventorySheet(
+            initialTab: initialTab.clamp(0, 1),
+            ownedSkins: ownedSkins,
+            ownedTrails: ownedTrails,
+            selectedSkinId: widget.coinsService.selectedSkin,
+            selectedTrailId: widget.coinsService.selectedTrail,
+            skinPreviewById: skinPreviewById,
+            skinCatalogService: widget.skinCatalogService,
+            onEquipSkin: _equipProfileSkin,
+            onEquipTrail: _equipProfileTrail,
+          ),
+        );
+      },
+    );
   }
 
   List<String> _avatarSkinCandidates(
@@ -1065,6 +1092,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _showSkinCardPreview(String selectedSkinId) async {
     final selectedCatalogItem =
         widget.skinCatalogService.getById(selectedSkinId);
+    final defaultEquipped = isDefaultSkinId(selectedSkinId) ||
+        selectedCatalogItem?.id == 'pointer_default';
+    if (defaultEquipped) {
+      if (!mounted) return;
+      await showDialog<void>(
+        context: context,
+        barrierColor: Colors.black.withOpacity(0.82),
+        builder: (context) => AlertDialog(
+          backgroundColor: const Color(0xFF111827),
+          title: const Text(
+            'Función no disponible',
+            style: TextStyle(color: Colors.white),
+          ),
+          content: const Text(
+            'Esta función solo está disponible cuando compres y equipes una skin.',
+            style: TextStyle(color: Color(0xFFB6C2DA)),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Entendido'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
     final cardPathRaw = (selectedCatalogItem?.cardPath ?? '').trim();
     final rarityBackAsset = _cardBackAssetForRarity(
         (selectedCatalogItem?.rarity ?? 'Common').trim());
@@ -1206,26 +1260,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _onLogoutPressed() async {
+    final l10n = context.l10n;
     final shouldLogout = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
             backgroundColor: const Color(0xFF111827),
-            title: const Text(
-              'Logout',
+            title: Text(
+              l10n.profileLogout,
               style: TextStyle(color: Colors.white),
             ),
-            content: const Text(
-              'Do you want to sign out?',
+            content: Text(
+              l10n.profileLogoutConfirm,
               style: TextStyle(color: Color(0xFFB6C2DA)),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancel'),
+                child: Text(l10n.profileCancel),
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Logout'),
+                child: Text(l10n.profileLogout),
               ),
             ],
           ),
@@ -1236,8 +1291,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (!mounted) return;
     context.go('/home');
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Signed out'),
+      SnackBar(
+        content: Text(l10n.profileSignedOut),
         duration: Duration(milliseconds: 900),
       ),
     );
@@ -1389,6 +1444,7 @@ class _LoadoutMiniCard extends StatelessWidget {
     required this.tag,
     required this.icon,
     required this.preview,
+    this.onTap,
   });
 
   final String title;
@@ -1396,65 +1452,741 @@ class _LoadoutMiniCard extends StatelessWidget {
   final String tag;
   final IconData icon;
   final Widget preview;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF141F33),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF324761)),
-      ),
-      padding: const EdgeInsets.all(10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 56, child: preview),
-          const SizedBox(height: 8),
-          Row(
+        child: Ink(
+          decoration: BoxDecoration(
+            color: const Color(0xFF141F33),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: const Color(0xFF324761)),
+          ),
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, color: const Color(0xFF9DB9FF), size: 14),
-              const SizedBox(width: 4),
+              SizedBox(height: 56, child: preview),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(icon, color: const Color(0xFF9DB9FF), size: 14),
+                  const SizedBox(width: 4),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Color(0xFF9CB1D8),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const Spacer(),
+                  if (onTap != null)
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      color: Color(0xFF8FA8D9),
+                      size: 16,
+                    ),
+                ],
+              ),
+              const SizedBox(height: 3),
               Text(
-                title,
+                name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  color: Color(0xFF9CB1D8),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1C3154),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  tag,
+                  style: const TextStyle(
+                    color: Color(0xFFD1DDF8),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 3),
-          Text(
-            name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileInventorySheet extends StatefulWidget {
+  const _ProfileInventorySheet({
+    required this.initialTab,
+    required this.ownedSkins,
+    required this.ownedTrails,
+    required this.selectedSkinId,
+    required this.selectedTrailId,
+    required this.skinPreviewById,
+    required this.skinCatalogService,
+    required this.onEquipSkin,
+    required this.onEquipTrail,
+  });
+
+  final int initialTab;
+  final List<SkinCatalogItem> ownedSkins;
+  final List<TrailSkinConfig> ownedTrails;
+  final String selectedSkinId;
+  final String selectedTrailId;
+  final Map<String, String> skinPreviewById;
+  final SkinCatalogService skinCatalogService;
+  final Future<void> Function(SkinCatalogItem skin) onEquipSkin;
+  final Future<void> Function(TrailSkinConfig trail) onEquipTrail;
+
+  @override
+  State<_ProfileInventorySheet> createState() => _ProfileInventorySheetState();
+}
+
+class _ProfileInventorySheetState extends State<_ProfileInventorySheet>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+  late final Map<String, String> _resolvedSkinPreviewById;
+  String? _focusSkinId;
+  String? _focusTrailId;
+  bool _isEquipping = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _resolvedSkinPreviewById = <String, String>{...widget.skinPreviewById};
+    _tabController = TabController(
+      length: 2,
+      initialIndex: widget.initialTab.clamp(0, 1),
+      vsync: this,
+    );
+    _focusSkinId = widget.selectedSkinId;
+    _focusTrailId = widget.selectedTrailId;
+    unawaited(_resolveMissingSkinPreviews());
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final focusedSkin = widget.ownedSkins.firstWhere(
+      (s) => s.id == (_focusSkinId ?? widget.selectedSkinId),
+      orElse: () => widget.ownedSkins.isNotEmpty
+          ? widget.ownedSkins.first
+          : const SkinCatalogItem(
+              id: 'default',
+              name: 'Default',
+              costCoins: 0,
             ),
-          ),
-          const SizedBox(height: 5),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1C3154),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(
-              tag,
-              style: const TextStyle(
-                color: Color(0xFFD1DDF8),
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
+    );
+    final focusedTrail = widget.ownedTrails.firstWhere(
+      (t) => t.id == (_focusTrailId ?? widget.selectedTrailId),
+      orElse: () => widget.ownedTrails.isNotEmpty
+          ? widget.ownedTrails.first
+          : TrailCatalog.classic,
+    );
+    return Container(
+      decoration: const BoxDecoration(
+        color: Color(0xFF0E172A),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+            Container(
+              width: 54,
+              height: 5,
+              decoration: BoxDecoration(
+                color: const Color(0xFF4E678F),
+                borderRadius: BorderRadius.circular(99),
               ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 8, 8),
+              child: Row(
+                children: [
+                  Text(
+                    context.l10n.profileVaultLockerTitle,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF13243D),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFF334D78)),
+                ),
+                child: TabBar(
+                  controller: _tabController,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  indicator: BoxDecoration(
+                    color: const Color(0xFF1D86FF),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  labelColor: Colors.white,
+                  unselectedLabelColor: const Color(0xFFAAC0E6),
+                  tabs: [
+                    Tab(text: context.l10n.shopTabSkins),
+                    Tab(text: context.l10n.shopTabTrails),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _InventorySkinsTab(
+                    items: widget.ownedSkins,
+                    selectedSkinId: widget.selectedSkinId,
+                    focusedSkinId: _focusSkinId ?? widget.selectedSkinId,
+                    skinPreviewById: _resolvedSkinPreviewById,
+                    onFocus: (id) => setState(() => _focusSkinId = id),
+                    onEquip: _isEquipping
+                        ? null
+                        : () async {
+                            final skin = focusedSkin;
+                            if (skin.id == widget.selectedSkinId) return;
+                            setState(() => _isEquipping = true);
+                            try {
+                              await widget.onEquipSkin(skin);
+                              if (!mounted) return;
+                              setState(() {
+                                _isEquipping = false;
+                                _focusSkinId = skin.id;
+                              });
+                            } finally {
+                              if (mounted) {
+                                setState(() => _isEquipping = false);
+                              }
+                            }
+                          },
+                  ),
+                  _InventoryTrailsTab(
+                    items: widget.ownedTrails,
+                    selectedTrailId: widget.selectedTrailId,
+                    focusedTrailId: _focusTrailId ?? widget.selectedTrailId,
+                    onFocus: (id) => setState(() => _focusTrailId = id),
+                    onEquip: _isEquipping
+                        ? null
+                        : () async {
+                            final trail = focusedTrail;
+                            if (trail.id == widget.selectedTrailId) return;
+                            setState(() => _isEquipping = true);
+                            try {
+                              await widget.onEquipTrail(trail);
+                              if (!mounted) return;
+                              setState(() {
+                                _isEquipping = false;
+                                _focusTrailId = trail.id;
+                              });
+                            } finally {
+                              if (mounted) {
+                                setState(() => _isEquipping = false);
+                              }
+                            }
+                          },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _resolveMissingSkinPreviews() async {
+    for (final skin in widget.ownedSkins) {
+      final current = (_resolvedSkinPreviewById[skin.id] ?? '').trim();
+      if (current.isNotEmpty) continue;
+
+      final candidates = <String>[
+        skin.previewImagePath,
+        skin.fullImagePath,
+        skin.cardImagePath,
+        skin.bannerImagePath,
+      ];
+      String resolved = '';
+      for (final raw in candidates) {
+        final trimmed = raw.trim();
+        if (trimmed.isEmpty) continue;
+        final fromCache = widget.skinCatalogService.toRenderablePath(trimmed).trim();
+        if (fromCache.startsWith('http://') ||
+            fromCache.startsWith('https://') ||
+            fromCache.startsWith('assets/') ||
+            fromCache.startsWith('data:image')) {
+          resolved = fromCache;
+          break;
+        }
+        final fetched = await widget.skinCatalogService.resolveDownloadUrl(
+          trimmed,
+          context: 'vault-preview:${skin.id}',
+        );
+        if ((fetched ?? '').trim().isNotEmpty) {
+          resolved = fetched!.trim();
+          break;
+        }
+      }
+      if (resolved.isEmpty) continue;
+      if (!mounted) return;
+      setState(() {
+        _resolvedSkinPreviewById[skin.id] = resolved;
+      });
+    }
+  }
+}
+
+class _InventorySkinsTab extends StatelessWidget {
+  const _InventorySkinsTab({
+    required this.items,
+    required this.selectedSkinId,
+    required this.focusedSkinId,
+    required this.skinPreviewById,
+    required this.onFocus,
+    required this.onEquip,
+  });
+
+  final List<SkinCatalogItem> items;
+  final String selectedSkinId;
+  final String focusedSkinId;
+  final Map<String, String> skinPreviewById;
+  final ValueChanged<String> onFocus;
+  final Future<void> Function()? onEquip;
+
+  @override
+  Widget build(BuildContext context) {
+    final focused = items.firstWhere(
+      (s) => s.id == focusedSkinId,
+      orElse: () => items.first,
+    );
+    final focusedIsEquipped = focused.id == selectedSkinId;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+      child: Column(
+        children: [
+          _InventoryPreviewCard(
+            title: focused.name,
+            subtitle: focusedIsEquipped
+                ? context.l10n.shopEquipped
+                : context.l10n.profileReadyToEquip,
+            preview: _InventorySkinPreview(
+              path: skinPreviewById[focused.id] ?? '',
+            ),
+            actionLabel: focusedIsEquipped
+                ? context.l10n.shopEquipped
+                : context.l10n.shopEquip,
+            actionEnabled: !focusedIsEquipped && onEquip != null,
+            onAction: onEquip,
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: GridView.builder(
+              itemCount: items.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 0.78,
+              ),
+              itemBuilder: (context, index) {
+                final skin = items[index];
+                final isEquipped = skin.id == selectedSkinId;
+                final isFocused = skin.id == focusedSkinId;
+                return _InventoryGridCard(
+                  name: skin.name,
+                  isEquipped: isEquipped,
+                  isFocused: isFocused,
+                  onTap: () => onFocus(skin.id),
+                  preview: _InventorySkinPreview(
+                    path: skinPreviewById[skin.id] ?? '',
+                  ),
+                );
+              },
             ),
           ),
         ],
       ),
     );
+  }
+}
+
+class _InventoryTrailsTab extends StatelessWidget {
+  const _InventoryTrailsTab({
+    required this.items,
+    required this.selectedTrailId,
+    required this.focusedTrailId,
+    required this.onFocus,
+    required this.onEquip,
+  });
+
+  final List<TrailSkinConfig> items;
+  final String selectedTrailId;
+  final String focusedTrailId;
+  final ValueChanged<String> onFocus;
+  final Future<void> Function()? onEquip;
+
+  @override
+  Widget build(BuildContext context) {
+    final focused = items.firstWhere(
+      (t) => t.id == focusedTrailId,
+      orElse: () => items.first,
+    );
+    final focusedIsEquipped = focused.id == selectedTrailId;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+      child: Column(
+        children: [
+          _InventoryPreviewCard(
+            title: focused.name,
+            subtitle: focusedIsEquipped
+                ? context.l10n.shopEquipped
+                : context.l10n.profileReadyToEquip,
+            preview: _InventoryTrailPreview(trail: focused),
+            actionLabel: focusedIsEquipped
+                ? context.l10n.shopEquipped
+                : context.l10n.shopEquip,
+            actionEnabled: !focusedIsEquipped && onEquip != null,
+            onAction: onEquip,
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: GridView.builder(
+              itemCount: items.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 0.78,
+              ),
+              itemBuilder: (context, index) {
+                final trail = items[index];
+                final isEquipped = trail.id == selectedTrailId;
+                final isFocused = trail.id == focusedTrailId;
+                return _InventoryGridCard(
+                  name: trail.name,
+                  isEquipped: isEquipped,
+                  isFocused: isFocused,
+                  onTap: () => onFocus(trail.id),
+                  preview: _InventoryTrailPreview(trail: trail),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InventoryPreviewCard extends StatelessWidget {
+  const _InventoryPreviewCard({
+    required this.title,
+    required this.subtitle,
+    required this.preview,
+    required this.actionLabel,
+    required this.actionEnabled,
+    this.onAction,
+  });
+
+  final String title;
+  final String subtitle;
+  final Widget preview;
+  final String actionLabel;
+  final bool actionEnabled;
+  final Future<void> Function()? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF182642), Color(0xFF11203A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        border: Border.all(color: const Color(0xFF34527E)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF1FAEFF).withOpacity(0.14),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          SizedBox(width: 84, height: 84, child: preview),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 15,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: Color(0xFFA8C0EA),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 34,
+                  child: ElevatedButton(
+                    onPressed: actionEnabled && onAction != null
+                        ? () => unawaited(onAction!.call())
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: actionEnabled
+                          ? const Color(0xFF2C9BFF)
+                          : const Color(0xFF273A56),
+                      foregroundColor: actionEnabled
+                          ? Colors.white
+                          : const Color(0xFFAFC6EA),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(actionLabel),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InventoryGridCard extends StatelessWidget {
+  const _InventoryGridCard({
+    required this.name,
+    required this.isEquipped,
+    required this.isFocused,
+    required this.onTap,
+    required this.preview,
+  });
+
+  final String name;
+  final bool isEquipped;
+  final bool isFocused;
+  final VoidCallback onTap;
+  final Widget preview;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedScale(
+      duration: const Duration(milliseconds: 140),
+      curve: Curves.easeOutCubic,
+      scale: isFocused ? 1.02 : 1.0,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: Ink(
+            decoration: BoxDecoration(
+              color: const Color(0xFF141F33),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: isFocused
+                    ? const Color(0xFF36B4FF)
+                    : const Color(0xFF304561),
+                width: isFocused ? 1.5 : 1.0,
+              ),
+            ),
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              children: [
+                Expanded(child: preview),
+                const SizedBox(height: 6),
+                Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: isEquipped
+                        ? const Color(0xFF21466A)
+                        : const Color(0xFF1B2D49),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    isEquipped
+                        ? context.l10n.shopEquipped
+                        : context.l10n.shopOwned,
+                    style: TextStyle(
+                      color: isEquipped
+                          ? const Color(0xFFCCEAFF)
+                          : const Color(0xFFAEC5E8),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _InventorySkinPreview extends StatelessWidget {
+  const _InventorySkinPreview({required this.path});
+
+  final String path;
+
+  @override
+  Widget build(BuildContext context) {
+    if (path.trim().isEmpty) {
+      return Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF0E1A2D),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: const Icon(Icons.face_rounded, color: Color(0xFF9CB4DC)),
+      );
+    }
+    if (path.startsWith('assets/')) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.asset(path, fit: BoxFit.cover),
+      );
+    }
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: buildNetworkImageCompat(
+        url: path,
+        fit: BoxFit.cover,
+        filterQuality: FilterQuality.medium,
+        fallback: Container(
+          color: const Color(0xFF0E1A2D),
+          child: const Icon(
+            Icons.broken_image_rounded,
+            color: Color(0xFF8FA8D1),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _InventoryTrailPreview extends StatelessWidget {
+  const _InventoryTrailPreview({required this.trail});
+
+  final TrailSkinConfig trail;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF0A1528),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFF2E4668)),
+      ),
+      child: CustomPaint(
+        painter: _InventoryTrailLinePainter(trail: trail),
+        child: const SizedBox.expand(),
+      ),
+    );
+  }
+}
+
+class _InventoryTrailLinePainter extends CustomPainter {
+  const _InventoryTrailLinePainter({required this.trail});
+
+  final TrailSkinConfig trail;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p1 = Offset(size.width * 0.08, size.height * 0.68);
+    final p2 = Offset(size.width * 0.36, size.height * 0.36);
+    final p3 = Offset(size.width * 0.66, size.height * 0.64);
+    final p4 = Offset(size.width * 0.92, size.height * 0.34);
+    final path = Path()
+      ..moveTo(p1.dx, p1.dy)
+      ..cubicTo(p2.dx, p2.dy, p3.dx, p3.dy, p4.dx, p4.dy);
+    final glow = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = size.shortestSide * 0.24
+      ..strokeCap = StrokeCap.round
+      ..color = trail.secondaryColor.withOpacity(0.22)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+    final core = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = size.shortestSide * 0.12
+      ..strokeCap = StrokeCap.round
+      ..shader = LinearGradient(
+        colors: [trail.primaryColor, trail.secondaryColor],
+      ).createShader(Rect.fromPoints(p1, p4));
+    canvas.drawPath(path, glow);
+    canvas.drawPath(path, core);
+  }
+
+  @override
+  bool shouldRepaint(covariant _InventoryTrailLinePainter oldDelegate) {
+    return oldDelegate.trail.id != trail.id;
   }
 }
 
@@ -1746,7 +2478,11 @@ class _SkinFlipCardState extends State<SkinFlipCard>
                       : Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 10),
                 ),
-                child: Text(widget.isEquipped ? 'Equipped' : 'Equip'),
+                child: Text(
+                  widget.isEquipped
+                      ? context.l10n.shopEquipped
+                      : context.l10n.shopEquip,
+                ),
               ),
             ),
           ],
@@ -1980,7 +2716,9 @@ class _TrailWardrobeCarouselState extends State<_TrailWardrobeCarousel> {
                             equipped ? const Color(0xFFD1DEF8) : Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 10),
                       ),
-                      child: Text(equipped ? 'Equipped' : 'Equip'),
+                      child: Text(
+                        equipped ? context.l10n.shopEquipped : context.l10n.shopEquip,
+                      ),
                     ),
                   ),
                 ],

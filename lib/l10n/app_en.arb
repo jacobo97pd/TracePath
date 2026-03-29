@@ -1,0 +1,261 @@
+{
+  "@@locale": "en",
+  "appTitle": "TracePath",
+  "victoryDataMissing": "Victory data missing",
+  "liveDuelInviteTitle": "Live Duel Invite",
+  "liveDuelInviteBody": "{from} challenged you to a live duel.\nDo you want to accept?",
+  "@liveDuelInviteBody": {
+    "placeholders": {
+      "from": {}
+    }
+  },
+  "decline": "Decline",
+  "accept": "Accept",
+  "liveInviteCouldNotProcess": "Could not process live invite",
+  "liveInviteNoLongerAvailable": "Invite is no longer available",
+  "liveInviteAlreadyClosed": "This duel is already closed",
+  "liveInviteInvalidAccount": "Invite is not valid for this account",
+  "liveInviteInvalidPayload": "Invite payload is invalid",
+  "liveInvitePermissionsBlocked": "Permissions blocked this invite action",
+  "liveInviteNetworkIssue": "Network issue while processing invite",
+  "tabHome": "Home",
+  "tabShop": "Shop",
+  "tabDuel": "Duel",
+  "tabCards": "Cards",
+  "tabProfile": "Profile",
+  "playModeWorlds": "Worlds",
+  "playModeDaily": "Daily",
+  "playModeRanked": "Ranked",
+  "playModeEvents": "Events",
+  "playModeDuels": "Duels",
+  "playButton": "Play",
+  "homePlayerName": "Player",
+  "homeTitle": "TracePath",
+  "homeStreakPill": "Streak {count}",
+  "@homeStreakPill": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeLevelPill": "Lv {count}",
+  "@homeLevelPill": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeTrainTitle": "Train your brain",
+  "homeTrainSubtitle": "Trace paths faster, improve precision, and climb every challenge.",
+  "homeStartSolving": "START SOLVING!",
+  "homeJumpToNextPuzzle": "Jump into your next puzzle",
+  "homeContinue": "Continue",
+  "homeContinueFirstRun": "Start your first run",
+  "homeContinueResumeLevel": "Level {level} · Pick up where you left off",
+  "@homeContinueResumeLevel": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "homeQuickAccessTitle": "Quick Access",
+  "homeQuickAccessSubtitle": "Jump directly into your favorite modes",
+  "homeQuickDailyTitle": "Daily Puzzle",
+  "homeQuickDailySubtitle": "One challenge each day",
+  "homeQuickLevelsTitle": "Levels",
+  "homeQuickLevelsSubtitle": "Choose any available level",
+  "homeQuickSocialTitle": "Social",
+  "homeQuickSocialSubtitle": "Friends, inbox and multiplayer",
+  "homeProgressTitle": "Progress",
+  "homeProgressSubtitle": "Your latest performance and momentum",
+  "homeMetricLevelsSolved": "Levels solved",
+  "homeMetricCurrentStreak": "Current streak",
+  "homeMetricBestStreak": "Best streak",
+  "homeMetricHighestLevel": "Highest level",
+  "homeDailySolved": "Daily puzzles solved: {count}",
+  "@homeDailySolved": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeViewProfile": "View profile",
+  "duelHubTitle": "Duel Hub",
+  "duelHubSubtitle": "Challenge friends and play live matches.",
+  "duelCreating": "Creating duel...",
+  "duelChallengeFriend": "Challenge a Friend",
+  "duelIncomingInvitesTitle": "Incoming Invites",
+  "duelIncomingInvitesSubtitle": "Accept or decline live duel requests",
+  "duelNoPendingInvitesTitle": "No pending invites",
+  "duelNoPendingInvitesSubtitle": "New challenges will appear here.",
+  "duelInviteLoadErrorTitle": "Could not load invites",
+  "duelTryAgainLater": "Try again in a moment.",
+  "duelActiveMatchesTitle": "Active Matches",
+  "duelActiveMatchesSubtitle": "Resume your current live duels",
+  "duelNoActiveTitle": "No active duels",
+  "duelNoActiveSubtitle": "Start a challenge to play live.",
+  "duelActiveLoadErrorTitle": "Could not load active matches",
+  "duelHistoryTitle": "History",
+  "duelHistorySubtitle": "Recent duel results",
+  "duelHistoryComingSoonTitle": "History coming soon",
+  "duelHistoryComingSoonSubtitle": "Your last duels will be shown here.",
+  "duelChooseFriend": "Choose a friend",
+  "duelCouldNotLoadFriends": "Could not load friends",
+  "duelNoFriendsYet": "No friends yet",
+  "duelInviteSentText": "sent you a live duel invite.",
+  "duelAcceptError": "Could not accept duel invite: {error}",
+  "@duelAcceptError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "duelDeclineError": "Could not decline duel invite: {error}",
+  "@duelDeclineError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "duelAccept": "Accept",
+  "duelResume": "Resume",
+  "duelStatusPending": "Pending",
+  "duelStatusCountdown": "Countdown",
+  "duelStatusPlaying": "Playing",
+  "duelStatusFinished": "Finished",
+  "duelStatusCancelled": "Cancelled",
+  "duelUnknownOpponent": "Unknown",
+  "duelVersusOpponent": "VS {name}",
+  "@duelVersusOpponent": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "duelLevelAndStatus": "Level: {level} · {status}",
+  "@duelLevelAndStatus": {
+    "placeholders": {
+      "level": {},
+      "status": {}
+    }
+  },
+  "duelErrorFinishCurrentFirst": "Finish your current live duel first.",
+  "duelErrorFriendBusy": "This friend is already in another duel.",
+  "duelErrorNoPuzzles": "No puzzles available right now.",
+  "duelErrorInvalidTarget": "Could not start duel with this friend.",
+  "duelErrorCreateInvite": "Could not create duel invite right now.",
+  "duelRemoveActiveTitle": "Remove active match",
+  "duelRemoveActiveBody": "This active match will be closed and removed from this list.",
+  "duelKeep": "Keep",
+  "duelRemove": "Remove",
+  "duelRemoving": "Removing...",
+  "duelRemovedActive": "Active match removed",
+  "duelRemoveError": "Could not remove match: {error}",
+  "@duelRemoveError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendChallengeTitle": "Friendly Challenge",
+  "friendChallengeUnavailable": "Challenge unavailable.",
+  "friendChallengePuzzle": "Puzzle: {puzzleId}",
+  "@friendChallengePuzzle": {
+    "placeholders": {
+      "puzzleId": {}
+    }
+  },
+  "friendChallengeMode": "Mode: {mode}",
+  "@friendChallengeMode": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "friendChallengePlayButton": "Play Friendly Challenge",
+  "shopTitle": "Shop",
+  "shopSkinEditorTooltip": "Skin editor",
+  "shopTabSkins": "Skins",
+  "shopTabTrails": "Trails",
+  "shopTabCoinPacks": "Coin Packs",
+  "shopSkinsLoaded": "Skins loaded: {visible}/{total}",
+  "@shopSkinsLoaded": {
+    "placeholders": {
+      "visible": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "shopFeaturedSkin": "Featured Skin",
+  "shopPointerSkins": "Pointer Skins",
+  "shopLoadMore": "Load more",
+  "shopOwned": "Owned",
+  "shopCoinsAmount": "{coins} coins",
+  "@shopCoinsAmount": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "shopEquipped": "Equipped",
+  "shopEquip": "Equip",
+  "shopBuyCoins": "Buy {coins}",
+  "@shopBuyCoins": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "shopNewTrail": "NEW TRAIL",
+  "shopUnlockedAndEquipped": "Unlocked and equipped",
+  "shopDefaultTrailDescription": "Unique visual style for your path trace.",
+  "profileGuestMode": "Guest mode",
+  "profileGoogleAccount": "Google account",
+  "profileLogout": "Logout",
+  "profileLogoutConfirm": "Do you want to sign out?",
+  "profileCancel": "Cancel",
+  "profileSignedOut": "Signed out",
+  "profileDefaultName": "Default",
+  "profileLevelLabel": "Level",
+  "profileStreakLabel": "Streak",
+  "profileBestLabel": "Best",
+  "profileBestStreak": "Best streak: {count}",
+  "@profileBestStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileEquippedSkin": "Equipped Skin: {name}",
+  "@profileEquippedSkin": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "profileStatsTitle": "Stats",
+  "profileGamesPlayed": "Games Played",
+  "profileBestTime": "Best Time",
+  "profileVaultTitle": "Vault",
+  "profileLockerTitle": "Locker",
+  "profileLockerHint": "Tap an equipped item to open inventory.",
+  "profileOpenVault": "Open Vault",
+  "profileInboxTitle": "Inbox",
+  "profileInboxWithCount": "Inbox ({count})",
+  "@profileInboxWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileInboxUnavailableTitle": "Inbox unavailable right now",
+  "profileInboxEmptyTitle": "No messages yet",
+  "profileInboxEmptySubtitle": "Friend requests, rewards and news will appear here.",
+  "profileVaultLockerTitle": "Vault / Locker",
+  "profileReadyToEquip": "Ready to equip"
+}

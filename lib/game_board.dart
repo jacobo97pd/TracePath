@@ -14,6 +14,7 @@ import 'game_theme.dart';
 import 'trail/trail_catalog.dart';
 import 'trail/comic_spiderverse_trail_rebuilt.dart';
 import 'trail/comic_spiderverse_trail_v2.dart';
+import 'trail/galaxy_reveal_trail.dart';
 import 'trail/trail_renderer.dart';
 import 'trail/trail_skin.dart';
 import 'trail/urban_graffiti_trail.dart';
@@ -24,6 +25,8 @@ const bool kEnableSolvedDebugLogs = true;
 const double PATH_WIDTH_RATIO = 0.85;
 const String kComicSpiderverseTrailBoardBackgroundAsset =
     'assets/trails/comic_spiderverse/fondo_pantalla_trail_spiderverse.png';
+// Safety switch: set to `true` to disable GalaxyReveal and render classic board-color trail.
+const bool kGalaxyRevealRollbackToBoardColor = false;
 
 class GameBoardController extends ChangeNotifier {
   _GameBoardState? _state;
@@ -343,6 +346,11 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
   bool _didVerifyUrbanGraffitiAssets = false;
   ui.Image? _comicSpiderverseBoardBackground;
   bool _comicSpiderverseBoardBackgroundLoaded = false;
+  final GalaxyRevealTrailController _galaxyRevealController =
+      GalaxyRevealTrailController();
+  ui.Image? _galaxyRevealTexture;
+  bool _galaxyRevealTextureLoaded = false;
+  String? _galaxyRevealTextureAssetPathLoaded;
   bool _didVerifyComicSpiderverseRebuiltAssets = false;
   List<_ComicSnapshotState> _comicSnapshots = const <_ComicSnapshotState>[];
   int _comicVisualFrame = 0;
@@ -378,6 +386,8 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
     _verifyUrbanGraffitiAssetSetOnce();
     _syncUrbanGraffitiAssets(force: true);
     _syncComicSpiderverseBoardBackground(force: true);
+    _syncGalaxyRevealTexture(force: true);
+    _syncGalaxyRevealProgressFromPath(forceRebuild: true);
     widget.controller?._attach(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -427,12 +437,17 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
       _syncComicSpiderverseRebuiltAssets();
       _syncUrbanGraffitiAssets();
       _syncComicSpiderverseBoardBackground();
+      _syncGalaxyRevealTexture();
+      _syncGalaxyRevealProgressFromPath(forceRebuild: true);
     }
     if (oldWidget.trailSkin.id != widget.trailSkin.id &&
         widget.trailSkin.renderType != TrailRenderType.comic) {
       _comicSnapshots = const <_ComicSnapshotState>[];
       _comicVisualFrame = 0;
       _lastComicStepMs = 0;
+    }
+    if (oldWidget.level != widget.level) {
+      _syncGalaxyRevealProgressFromPath(forceRebuild: true);
     }
     _syncHintVisualState(oldWidget);
   }
@@ -1066,6 +1081,8 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
           await rootBundle.load(kComicSpiderverseTrailBoardBackgroundAsset);
       final image = await decodeImageFromList(bytes.buffer.asUint8List());
       if (!mounted) return;
+      // Guard against async race: if trail changed while loading, do not apply.
+      if (!_isComicSpiderverseTrail(widget.trailSkin.renderType)) return;
       if (manifestMiss) {
         debugPrint(
           '[TrailAssets][comic_spiderverse_bg] manifest miss but load OK: $kComicSpiderverseTrailBoardBackgroundAsset',
@@ -1089,6 +1106,72 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
         _comicSpiderverseBoardBackgroundLoaded = false;
       });
     }
+  }
+
+  bool get _needsGalaxyRevealTrail =>
+      widget.trailSkin.renderType == TrailRenderType.galaxyReveal;
+
+  Future<void> _syncGalaxyRevealTexture({bool force = false}) async {
+    if (!_needsGalaxyRevealTrail) {
+      if (_galaxyRevealTextureLoaded ||
+          _galaxyRevealTexture != null ||
+          _galaxyRevealTextureAssetPathLoaded != null) {
+        setState(() {
+          _galaxyRevealTexture = null;
+          _galaxyRevealTextureLoaded = false;
+          _galaxyRevealTextureAssetPathLoaded = null;
+        });
+      }
+      return;
+    }
+    final targetAsset = widget.trailSkin.galaxyReveal.textureAsset;
+    if (_galaxyRevealTextureLoaded &&
+        !force &&
+        _galaxyRevealTextureAssetPathLoaded == targetAsset) {
+      return;
+    }
+    try {
+      final bytes = await rootBundle.load(targetAsset);
+      final image = await decodeImageFromList(bytes.buffer.asUint8List());
+      if (!mounted) return;
+      if (!_needsGalaxyRevealTrail) return;
+      if (widget.trailSkin.galaxyReveal.textureAsset != targetAsset) return;
+      if (kDebugMode) {
+        debugPrint(
+          'GALAXY IMAGE LOADED: ${image.width}x${image.height} asset=$targetAsset',
+        );
+      }
+      setState(() {
+        _galaxyRevealTexture = image;
+        _galaxyRevealTextureLoaded = true;
+        _galaxyRevealTextureAssetPathLoaded = targetAsset;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      debugPrint(
+        '[TrailAssets][galaxy_reveal] load fail $targetAsset -> $e',
+      );
+      setState(() {
+        _galaxyRevealTexture = null;
+        _galaxyRevealTextureLoaded = false;
+        _galaxyRevealTextureAssetPathLoaded = null;
+      });
+    }
+  }
+
+  void _syncGalaxyRevealProgressFromPath({bool forceRebuild = false}) {
+    if (!_needsGalaxyRevealTrail) {
+      _galaxyRevealController.reset();
+      return;
+    }
+    if (!forceRebuild && _path.isEmpty) return;
+    final unitPoints =
+        _path.map((cell) => _centerForCellUnit(cell)).toList(growable: false);
+    _galaxyRevealController.absorbPathUnit(
+      unitPoints,
+      enableSparkles: widget.trailSkin.galaxyReveal.enableSparkles,
+      nowSec: DateTime.now().microsecondsSinceEpoch / 1000000.0,
+    );
   }
 
   @override
@@ -1191,6 +1274,8 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
                                 _comicSpiderverseRebuiltTrailSprites,
                             urbanGraffitiTrailSprites:
                                 _urbanGraffitiTrailSprites,
+                            galaxyRevealTexture: _galaxyRevealTexture,
+                            galaxyRevealController: _galaxyRevealController,
                             comicSpiderverseBoardBackground:
                                 _isComicSpiderverseTrail(
                               widget.trailSkin.renderType,
@@ -1309,6 +1394,7 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
     _path
       ..clear()
       ..addAll(sanitized);
+    _syncGalaxyRevealProgressFromPath(forceRebuild: true);
     _clearTransientState();
     _resetAnimationState();
   }
@@ -1438,6 +1524,9 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
   }
 
   void _handleForwardMove(int cell) {
+    final previousUnit =
+        _path.isNotEmpty ? _centerForCellUnit(_path.last) : null;
+    final nextUnit = _centerForCellUnit(cell);
     setState(() {
       _path.add(cell);
       _clearTransientState();
@@ -1445,6 +1534,22 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
         appearing: <int>[cell],
         disappearing: const <int>[],
       );
+      if (_needsGalaxyRevealTrail) {
+        if (previousUnit == null) {
+          _galaxyRevealController.absorbPathUnit(
+            <Offset>[nextUnit],
+            enableSparkles: false,
+            nowSec: DateTime.now().microsecondsSinceEpoch / 1000000.0,
+          );
+        } else {
+          _galaxyRevealController.addSegmentUnit(
+            previousUnit,
+            nextUnit,
+            enableSparkles: widget.trailSkin.galaxyReveal.enableSparkles,
+            nowSec: DateTime.now().microsecondsSinceEpoch / 1000000.0,
+          );
+        }
+      }
     });
 
     widget.onCellAdded?.call(cell, List<int>.unmodifiable(_path));
@@ -1456,6 +1561,7 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
     final removedCell = _path.last;
     setState(() {
       _path.removeLast();
+      _syncGalaxyRevealProgressFromPath(forceRebuild: true);
       _clearTransientState();
       _startTransition(
         appearing: const <int>[],
@@ -1473,6 +1579,7 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
 
     setState(() {
       _path.removeRange(visitedIndex + 1, _path.length);
+      _syncGalaxyRevealProgressFromPath(forceRebuild: true);
       _clearTransientState();
       _highlightedResumeCell = cell;
       _startTransition(
@@ -1536,6 +1643,9 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
     final removedCells = List<int>.from(_path);
     setState(() {
       _path.clear();
+      if (_needsGalaxyRevealTrail) {
+        _galaxyRevealController.reset();
+      }
       _clearTransientState();
       _startTransition(
         appearing: const <int>[],
@@ -1554,6 +1664,7 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
     final removedCell = _path.last;
     setState(() {
       _path.removeLast();
+      _syncGalaxyRevealProgressFromPath(forceRebuild: true);
       _clearTransientState();
       _startTransition(
         appearing: const <int>[],
@@ -1872,6 +1983,8 @@ class _GameBoardPainter extends CustomPainter {
     required this.comicSpiderverseTrailSprites,
     required this.comicSpiderverseRebuiltTrailSprites,
     required this.urbanGraffitiTrailSprites,
+    required this.galaxyRevealTexture,
+    required this.galaxyRevealController,
     required this.comicSpiderverseBoardBackground,
     required this.path,
     required this.opponentPath,
@@ -1903,6 +2016,8 @@ class _GameBoardPainter extends CustomPainter {
   final ComicSpiderverseTrailSprites comicSpiderverseTrailSprites;
   final ComicSpiderverseRebuiltSprites comicSpiderverseRebuiltTrailSprites;
   final UrbanGraffitiTrailSprites urbanGraffitiTrailSprites;
+  final ui.Image? galaxyRevealTexture;
+  final GalaxyRevealTrailController galaxyRevealController;
   final ui.Image? comicSpiderverseBoardBackground;
   final List<int> path;
   final List<int> opponentPath;
@@ -1934,46 +2049,69 @@ class _GameBoardPainter extends CustomPainter {
         ..style = PaintingStyle.fill,
     );
     _drawComicSpiderverseBoardBackground(canvas, boardRect);
+    final isGalaxyRevealActive =
+        trailSkin.renderType == TrailRenderType.galaxyReveal &&
+            !kGalaxyRevealRollbackToBoardColor;
+    if (isGalaxyRevealActive &&
+        galaxyRevealTexture != null) {
+      final playableRect = boardRect.deflate(max(2.0, cellSize * 0.1));
+      GalaxyRevealTrailPainter(
+        boardRect: boardRect,
+        playableRect: playableRect,
+        cellSize: cellSize,
+        textureImage: galaxyRevealTexture!,
+        controller: galaxyRevealController,
+        config: trailSkin.galaxyReveal,
+        nowSec: DateTime.now().microsecondsSinceEpoch / 1000000.0,
+      ).paint(canvas, size);
+    }
 
-    final baseFillColor = solved ? pathDarkColor : pathColor;
+    final baseFillColor = trailSkin.renderType == TrailRenderType.galaxyReveal &&
+            kGalaxyRevealRollbackToBoardColor
+        ? gameTheme.boardColor
+        : (solved ? pathDarkColor : pathColor);
     final visitedFillPaint = Paint()..style = PaintingStyle.fill;
+    final useVisitedCellFill = trailSkin.renderType != TrailRenderType.galaxyReveal ||
+        kGalaxyRevealRollbackToBoardColor;
     final resumePaint = Paint()
       ..color = pathColor.withOpacity(0.34)
       ..style = PaintingStyle.stroke
       ..strokeWidth = max(2, cellSize * 0.08);
 
-    for (final cell in path) {
-      final alpha = appearingCells.contains(cell) ? transitionValue : 1.0;
-      _drawCellFill(
-        canvas,
-        cellSize,
-        cell,
-        visitedFillPaint..color = baseFillColor.withOpacity(0.25 * alpha),
-      );
-    }
-
-    if (path.isNotEmpty) {
-      _drawCellFill(
-        canvas,
-        cellSize,
-        path.last,
-        visitedFillPaint
-          ..color =
-              Color.lerp(pathColor, Colors.white, 0.35)!.withOpacity(0.36),
-      );
-    }
-
-    for (final cell in disappearingCells) {
-      final alpha = 1 - transitionValue;
-      if (alpha <= 0) {
-        continue;
+    if (useVisitedCellFill) {
+      for (final cell in path) {
+        final alpha = appearingCells.contains(cell) ? transitionValue : 1.0;
+        _drawCellFill(
+          canvas,
+          cellSize,
+          cell,
+          visitedFillPaint..color = baseFillColor.withOpacity(0.25 * alpha),
+        );
       }
-      _drawCellFill(
-        canvas,
-        cellSize,
-        cell,
-        visitedFillPaint..color = baseFillColor.withOpacity(0.25 * alpha),
-      );
+
+      if (path.isNotEmpty) {
+        _drawCellFill(
+          canvas,
+          cellSize,
+          path.last,
+          visitedFillPaint
+            ..color =
+                Color.lerp(pathColor, Colors.white, 0.35)!.withOpacity(0.36),
+        );
+      }
+
+      for (final cell in disappearingCells) {
+        final alpha = 1 - transitionValue;
+        if (alpha <= 0) {
+          continue;
+        }
+        _drawCellFill(
+          canvas,
+          cellSize,
+          cell,
+          visitedFillPaint..color = baseFillColor.withOpacity(0.25 * alpha),
+        );
+      }
     }
 
     if (highlightedResumeCell != null) {
@@ -2439,6 +2577,8 @@ class _GameBoardPainter extends CustomPainter {
         oldDelegate.comicSpiderverseRebuiltTrailSprites !=
             comicSpiderverseRebuiltTrailSprites ||
         oldDelegate.urbanGraffitiTrailSprites != urbanGraffitiTrailSprites ||
+        oldDelegate.galaxyRevealTexture != galaxyRevealTexture ||
+        oldDelegate.galaxyRevealController != galaxyRevealController ||
         oldDelegate.comicSpiderverseBoardBackground !=
             comicSpiderverseBoardBackground ||
         oldDelegate.path != path ||

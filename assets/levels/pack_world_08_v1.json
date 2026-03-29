@@ -1,7 +1,7 @@
 {
   "packId": "world_08",
   "version": "pack_world_08_v1",
-  "count": 25,
+  "count": 28,
   "world": 8,
   "levels": [
     {
@@ -3375,6 +3375,260 @@
         "variant": "classic",
         "canonical_hash": "e726d0a879033b8e45b9d227e13b8fe27ec161bdd91be26db17b97110df62e71",
         "imported_from": "c:\\Users\\jacob\\Downloads\\niveles_linkedin_editor.json"
+      }
+    },
+    {
+      "id": "linkedin-editor-ext-5",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 2,
+          "x": 4,
+          "y": 3
+        },
+        {
+          "n": 3,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 4,
+          "x": 3,
+          "y": 5
+        },
+        {
+          "n": 5,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 6,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 7,
+          "x": 2,
+          "y": 0
+        },
+        {
+          "n": 8,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 9,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 10,
+          "x": 1,
+          "y": 2
+        },
+        {
+          "n": 11,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 12,
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d2",
+      "source": "linkedin_editor_external",
+      "source_pack": "niveles_linkedin_editor.json",
+      "source_origin": "linkedin_editor_external",
+      "variant": "classic",
+      "canonical_hash": "0cf54388b2bebd3c59a9f36f96bd9fdeb808e67d81c657f9cbfe58c8a9fc9144",
+      "meta": {
+        "source_pack": "niveles_linkedin_editor.json",
+        "source_origin": "linkedin_editor_external",
+        "variant": "classic",
+        "canonical_hash": "0cf54388b2bebd3c59a9f36f96bd9fdeb808e67d81c657f9cbfe58c8a9fc9144",
+        "imported_at": "2026-03-29T21:46:37Z"
+      }
+    },
+    {
+      "id": "linkedin-editor-ext-17",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 2,
+          "x": 0,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 4,
+          "x": 5,
+          "y": 4
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d2",
+      "source": "linkedin_editor_external",
+      "source_pack": "niveles_linkedin_editor.json",
+      "source_origin": "linkedin_editor_external",
+      "variant": "classic",
+      "canonical_hash": "531e5ec998cc99e575c7a34b34074782ec2672a626d6b2a1a6ddd1ce99be4ab5",
+      "meta": {
+        "source_pack": "niveles_linkedin_editor.json",
+        "source_origin": "linkedin_editor_external",
+        "variant": "classic",
+        "canonical_hash": "531e5ec998cc99e575c7a34b34074782ec2672a626d6b2a1a6ddd1ce99be4ab5",
+        "imported_at": "2026-03-29T21:46:37Z"
+      }
+    },
+    {
+      "id": "linkedin-editor-ext-23",
+      "size": {
+        "w": 7,
+        "h": 7
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 2,
+          "x": 5,
+          "y": 4
+        },
+        {
+          "n": 3,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "n": 4,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 5,
+          "x": 3,
+          "y": 2
+        },
+        {
+          "n": 6,
+          "x": 3,
+          "y": 0
+        },
+        {
+          "n": 7,
+          "x": 1,
+          "y": 0
+        },
+        {
+          "n": 8,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 9,
+          "x": 1,
+          "y": 2
+        },
+        {
+          "n": 10,
+          "x": 1,
+          "y": 3
+        },
+        {
+          "n": 11,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 12,
+          "x": 1,
+          "y": 6
+        },
+        {
+          "n": 13,
+          "x": 1,
+          "y": 5
+        },
+        {
+          "n": 14,
+          "x": 3,
+          "y": 6
+        },
+        {
+          "n": 15,
+          "x": 3,
+          "y": 5
+        },
+        {
+          "n": 16,
+          "x": 5,
+          "y": 6
+        },
+        {
+          "n": 17,
+          "x": 5,
+          "y": 0
+        },
+        {
+          "n": 18,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 19,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 20,
+          "x": 5,
+          "y": 3
+        },
+        {
+          "n": 21,
+          "x": 3,
+          "y": 3
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d3",
+      "source": "linkedin_editor_external",
+      "source_pack": "niveles_linkedin_editor.json",
+      "source_origin": "linkedin_editor_external",
+      "variant": "classic",
+      "canonical_hash": "15e91c14c414da936ac5eb85cbe78c15d01376af46452e913088caefad939fc8",
+      "meta": {
+        "source_pack": "niveles_linkedin_editor.json",
+        "source_origin": "linkedin_editor_external",
+        "variant": "classic",
+        "canonical_hash": "15e91c14c414da936ac5eb85cbe78c15d01376af46452e913088caefad939fc8",
+        "imported_at": "2026-03-29T21:46:37Z"
       }
     }
   ]

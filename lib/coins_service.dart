@@ -119,6 +119,7 @@ class CoinsService extends ChangeNotifier {
     _unsyncedLifetimePurchased = _prefs.getInt(_unsyncedPurchasedKey) ?? 0;
     _unsyncedLevelsCompleted = _prefs.getInt(_unsyncedLevelsCompletedKey) ?? 0;
     _lastSyncedUid = _prefs.getString(_lastSyncedUidKey);
+    _dropStalePendingSyncStateAtStartup();
 
     _coinsController.add(_coins);
     final auth = _firebaseAuthOrNull;
@@ -208,6 +209,27 @@ class CoinsService extends ChangeNotifier {
   }
 
   User? get _firebaseUserOrNull => _firebaseAuthOrNull?.currentUser;
+
+  void _dropStalePendingSyncStateAtStartup() {
+    if (_unsyncedDelta == 0 &&
+        _unsyncedLifetimeEarned == 0 &&
+        _unsyncedLifetimePurchased == 0 &&
+        _unsyncedLevelsCompleted == 0) {
+      return;
+    }
+    if (kDebugMode) {
+      debugPrint(
+        '[coins] startup clears stale pending sync '
+        'delta=$_unsyncedDelta earned=$_unsyncedLifetimeEarned '
+        'purchased=$_unsyncedLifetimePurchased levels=$_unsyncedLevelsCompleted',
+      );
+    }
+    _unsyncedDelta = 0;
+    _unsyncedLifetimeEarned = 0;
+    _unsyncedLifetimePurchased = 0;
+    _unsyncedLevelsCompleted = 0;
+    unawaited(_persistCoinSyncState());
+  }
 
   int get coins => _coins;
   Future<int> getCoins() async => _coins;
@@ -1042,7 +1064,17 @@ class CoinsService extends ChangeNotifier {
   Future<void> _ensureUserDocument(String uid) async {
     try {
       final ref = _usersDocRef(uid);
-      final snap = await ref.get();
+      DocumentSnapshot<Map<String, dynamic>> snap;
+      try {
+        snap = await ref.get(const GetOptions(source: Source.server));
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint(
+            '[coins] ensureUserDocument skipped (server read unavailable) uid=$uid error=$e',
+          );
+        }
+        return;
+      }
       final ts = FieldValue.serverTimestamp();
       final authUser = _firebaseUserOrNull;
       if (snap.exists) {
@@ -1052,6 +1084,11 @@ class CoinsService extends ChangeNotifier {
           existing: existing,
           updatedAt: ts,
         );
+        // Migration must never write wallet defaults; those are managed only
+        // by explicit economy flows (rewards/purchases/manual grants).
+        missing.remove('coins');
+        missing.remove('lifetimeCoinsEarned');
+        missing.remove('lifetimeCoinsPurchased');
         final authPatch = <String, dynamic>{};
         final authName = (authUser?.displayName ?? '').trim();
         final authEmail = (authUser?.email ?? '').trim();
@@ -1085,6 +1122,7 @@ class CoinsService extends ChangeNotifier {
         }
         missing.addAll(authPatch);
         if (missing.isNotEmpty) {
+          _debugUserSetWrite(uid, missing, source: '_ensureUserDocument:migrate');
           await ref.set(missing, SetOptions(merge: true));
           if (kDebugMode) {
             debugPrint(
@@ -1102,22 +1140,34 @@ class CoinsService extends ChangeNotifier {
         await _ensureOwnedDefaultsRemote(uid);
         return;
       }
+      var recoveredCoins = max(0, _coins);
+      final fallbackCoins = await _tryReadCoinsFromDefaultDb(uid);
+      if (fallbackCoins != null) {
+        recoveredCoins = max(recoveredCoins, fallbackCoins);
+      }
+
       final freshPayload = UserModel.defaultFirestore(
         uid: uid,
         createdAt: ts,
         updatedAt: ts,
       )
-        ..['coins'] = max(0, _coins)
         ..['playerName'] = (authUser?.displayName ?? '').trim().isNotEmpty
             ? authUser!.displayName!.trim()
             : 'Player'
         ..['email'] = (authUser?.email ?? '').trim()
         ..['emailLowercase'] = (authUser?.email ?? '').trim().toLowerCase()
         ..['photoUrl'] = (authUser?.photoURL ?? '').trim();
-      await ref.set(freshPayload);
+      // Never initialize wallet fields here to avoid accidental resets on
+      // races/mis-detected first-run states.
+      freshPayload.remove('coins');
+      freshPayload.remove('lifetimeCoinsEarned');
+      freshPayload.remove('lifetimeCoinsPurchased');
+      _debugUserSetWrite(uid, freshPayload, source: '_ensureUserDocument:create');
+      await ref.set(freshPayload, SetOptions(merge: true));
       if (kDebugMode) {
         debugPrint(
-          '[coins] user doc created users/$uid db=${_activeFirestoreName()}',
+          '[coins] user doc created (non-wallet fields) users/$uid '
+          'recoveredCoins=$recoveredCoins db=${_activeFirestoreName()}',
         );
       }
       await _syncUserLookupIndexes(uid: uid, userData: freshPayload);
@@ -1134,28 +1184,28 @@ class CoinsService extends ChangeNotifier {
     _syncInProgress = true;
     try {
       final docRef = _usersDocRef(uid);
-      final snap = await docRef.get();
+      final snap = await _getUserDocFresh(docRef);
       final remoteCoins = _readRemoteInt(snap.data(), 'coins');
-      final remoteEarned = _readRemoteInt(snap.data(), 'lifetimeCoinsEarned');
-      final remotePurchased =
-          _readRemoteInt(snap.data(), 'lifetimeCoinsPurchased');
-      final remoteLevels = _readRemoteInt(snap.data(), 'totalLevelsCompleted');
       final isFirstSyncForUid = _lastSyncedUid != uid;
-      final target =
-          max(0, remoteCoins + (isFirstSyncForUid ? 0 : _unsyncedDelta))
-              .toInt();
+      // Startup/auth sync is strictly remote-authoritative for wallet values.
+      // We intentionally DO NOT push local pending deltas here to avoid
+      // overriding manual admin edits in Firestore.
+      final target = max(0, remoteCoins).toInt();
+      if (kDebugMode) {
+        debugPrint(
+          '[coins] merge read uid=$uid remoteCoins=$remoteCoins unsyncedDelta=$_unsyncedDelta firstSync=$isFirstSyncForUid db=${_activeFirestoreName()}',
+        );
+      }
       final now = FieldValue.serverTimestamp();
-      await docRef.set(<String, dynamic>{
+      final payload = <String, dynamic>{
         'uid': uid,
-        'coins': target,
-        'lifetimeCoinsEarned': remoteEarned + _unsyncedLifetimeEarned,
-        'lifetimeCoinsPurchased': remotePurchased + _unsyncedLifetimePurchased,
-        'totalLevelsCompleted': remoteLevels + _unsyncedLevelsCompleted,
         'equippedSkinId': _remoteSkinId(_selectedSkin),
         'equippedTrailId': _remoteTrailId(_selectedTrail),
         'updatedAt': now,
         if (!snap.exists) 'createdAt': now,
-      }, SetOptions(merge: true));
+      };
+      _debugUserSetWrite(uid, payload, source: '_mergeLocalWithRemote');
+      await docRef.set(payload, SetOptions(merge: true));
 
       _coins = target;
       _unsyncedDelta = 0;
@@ -1191,28 +1241,35 @@ class CoinsService extends ChangeNotifier {
   Future<void> _syncCoinsToRemoteSilently() async {
     final user = _firebaseUserOrNull;
     if (user == null || _syncInProgress) return;
+    if (_unsyncedDelta == 0 &&
+        _unsyncedLifetimeEarned == 0 &&
+        _unsyncedLifetimePurchased == 0 &&
+        _unsyncedLevelsCompleted == 0) {
+      return;
+    }
     _syncInProgress = true;
     try {
       final docRef = _usersDocRef(user.uid);
-      final snap = await docRef.get();
-      final remoteCoins = _readRemoteInt(snap.data(), 'coins');
-      final remoteEarned = _readRemoteInt(snap.data(), 'lifetimeCoinsEarned');
-      final remotePurchased =
-          _readRemoteInt(snap.data(), 'lifetimeCoinsPurchased');
-      final remoteLevels = _readRemoteInt(snap.data(), 'totalLevelsCompleted');
-      final target = max(0, remoteCoins + _unsyncedDelta).toInt();
-      await docRef.set(<String, dynamic>{
+      final delta = _unsyncedDelta;
+      final earnedDelta = _unsyncedLifetimeEarned;
+      final purchasedDelta = _unsyncedLifetimePurchased;
+      final levelsDelta = _unsyncedLevelsCompleted;
+      final payload = <String, dynamic>{
         'uid': user.uid,
-        'coins': target,
-        'lifetimeCoinsEarned': remoteEarned + _unsyncedLifetimeEarned,
-        'lifetimeCoinsPurchased': remotePurchased + _unsyncedLifetimePurchased,
-        'totalLevelsCompleted': remoteLevels + _unsyncedLevelsCompleted,
+        if (delta != 0) 'coins': FieldValue.increment(delta),
+        if (earnedDelta != 0) 'lifetimeCoinsEarned': FieldValue.increment(earnedDelta),
+        if (purchasedDelta != 0)
+          'lifetimeCoinsPurchased': FieldValue.increment(purchasedDelta),
+        if (levelsDelta != 0)
+          'totalLevelsCompleted': FieldValue.increment(levelsDelta),
         'equippedSkinId': _remoteSkinId(_selectedSkin),
         'equippedTrailId': _remoteTrailId(_selectedTrail),
         'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      };
+      _debugUserSetWrite(user.uid, payload, source: '_syncCoinsToRemoteSilently');
+      await docRef.set(payload, SetOptions(merge: true));
 
-      _coins = target;
+      // Keep current local wallet (already updated by local actions) and clear pending deltas.
       _unsyncedDelta = 0;
       _unsyncedLifetimeEarned = 0;
       _unsyncedLifetimePurchased = 0;
@@ -1224,7 +1281,7 @@ class CoinsService extends ChangeNotifier {
       _emitCoinUpdate();
       if (kDebugMode) {
         debugPrint(
-          '[coins] silent sync OK uid=${user.uid} coins=$_coins db=${_activeFirestoreName()}',
+          '[coins] silent sync OK uid=${user.uid} coins=$_coins appliedDelta=$delta db=${_activeFirestoreName()}',
         );
       }
     } catch (e) {
@@ -1302,6 +1359,7 @@ class CoinsService extends ChangeNotifier {
       payload['equippedTrailId'] = _remoteTrailId(trailId);
     }
     try {
+      _debugUserSetWrite(user.uid, payload, source: '_updateEquippedRemote');
       await _usersDocRef(user.uid).set(payload, SetOptions(merge: true));
     } catch (_) {
       _scheduleRemoteRetry();
@@ -1432,6 +1490,52 @@ class CoinsService extends ChangeNotifier {
 
   DocumentReference<Map<String, dynamic>> _usersDocRef(String uid) {
     return _activeFirestore().collection('users').doc(uid);
+  }
+
+  Future<DocumentSnapshot<Map<String, dynamic>>> _getUserDocFresh(
+    DocumentReference<Map<String, dynamic>> ref,
+  ) async {
+    try {
+      return await ref.get(const GetOptions(source: Source.server));
+    } catch (_) {
+      // Fallback to default behavior when server-only read is unavailable.
+      return ref.get();
+    }
+  }
+
+  Future<int?> _tryReadCoinsFromDefaultDb(String uid) async {
+    if (!_isFirebaseConfigured) return null;
+    try {
+      final preferred = _activeFirestore();
+      final defaultDb = FirebaseFirestore.instance;
+      if (preferred.databaseId == defaultDb.databaseId) return null;
+      final snap = await defaultDb.collection('users').doc(uid).get();
+      if (!snap.exists) return null;
+      final recovered = _readRemoteInt(snap.data(), 'coins');
+      if (kDebugMode) {
+        debugPrint(
+          '[coins] fallback read from default db uid=$uid '
+          'coins=$recovered preferred=${preferred.databaseId} default=${defaultDb.databaseId}',
+        );
+      }
+      return recovered;
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[coins] fallback default-db read failed uid=$uid: $e');
+      }
+      return null;
+    }
+  }
+
+  void _debugUserSetWrite(
+    String uid,
+    Map<String, dynamic> data, {
+    required String source,
+  }) {
+    if (!kDebugMode) return;
+    debugPrint(
+      'FIRESTORE WRITE users/$uid source=$source db=${_activeFirestoreName()} -> $data',
+    );
   }
 
   FirebaseFirestore _activeFirestore() {
