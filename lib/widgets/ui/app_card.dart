@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_radius.dart';
 import '../../theme/app_spacing.dart';
+import '../../ui/components/app_card.dart' as modern;
 
 class AppCard extends StatelessWidget {
   const AppCard({
@@ -28,38 +29,15 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final widget = Container(
-      margin: margin,
+    return modern.AppCard(
+      onTap: onTap,
       padding: padding,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: borderColor, width: 1),
-        boxShadow: elevation
-            ? const <BoxShadow>[
-                BoxShadow(
-                  color: AppColors.shadow,
-                  blurRadius: 18,
-                  offset: Offset(0, 10),
-                ),
-                BoxShadow(
-                  color: AppColors.glow,
-                  blurRadius: 26,
-                  offset: Offset(0, 8),
-                ),
-              ]
-            : null,
-      ),
+      margin: margin,
+      color: color,
+      borderColor: borderColor,
+      radius: radius,
+      elevation: elevation,
       child: child,
-    );
-    if (onTap == null) return widget;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(radius),
-        onTap: onTap,
-        child: widget,
-      ),
     );
   }
 }

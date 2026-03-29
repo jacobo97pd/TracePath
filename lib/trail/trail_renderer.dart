@@ -257,6 +257,11 @@ class TrailRenderer {
   static int _rebuiltLastLoggedSliceFrame = -1;
 
   static void paintBase(TrailRenderContext ctx) {
+    if (ctx.trailSkin.renderType == TrailRenderType.galaxyReveal) {
+      // Galaxy reveal draws via dedicated mask-based painter in game_board.dart.
+      // Skip the default procedural stroke to avoid covering the reveal texture.
+      return;
+    }
     final skin = ctx.trailSkin;
     if (skin.renderType == TrailRenderType.punkRiff) {
       _paintPunkRiffBase(ctx);
@@ -376,6 +381,8 @@ class TrailRenderer {
         return;
       case TrailRenderType.galaxy:
         _paintGalaxyTrail(ctx);
+        return;
+      case TrailRenderType.galaxyReveal:
         return;
       case TrailRenderType.speedForce:
         _paintSpeedForceTrail(ctx);

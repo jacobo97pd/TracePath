@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'app_data.dart';
 import 'achievements_service.dart';
@@ -75,6 +76,7 @@ class _GameScreenState extends State<GameScreen>
     with SingleTickerProviderStateMixin {
   static const int _maxHintsPerLevel = 3;
   static const bool _unlimitedHintsForTesting = true;
+  static const int _minSecondsBeforeReport = 20;
   static const String _firestoreDatabaseId = 'tracepath-database';
   static const bool _showLiveEmoteDebugHud = false;
   static bool _ghostModeSessionEnabled = true;
@@ -168,6 +170,8 @@ class _GameScreenState extends State<GameScreen>
   bool _manualAdsLimitReached = false;
   bool _manualAdBusy = false;
   Duration _manualAdCooldownRemaining = Duration.zero;
+  bool _isLevelReported = false;
+  bool _reportStatusLoading = false;
 
   @override
   void initState() {
@@ -188,6 +192,7 @@ class _GameScreenState extends State<GameScreen>
     }
     unawaited(_adsService.loadRewardedAd());
     unawaited(_refreshManualAdQuota());
+    unawaited(_loadReportStatus());
   }
 
   @override
@@ -196,6 +201,7 @@ class _GameScreenState extends State<GameScreen>
     if (oldWidget.packId != widget.packId ||
         oldWidget.levelIndex != widget.levelIndex) {
       _loadLevelAsync();
+      unawaited(_loadReportStatus());
     }
   }
 
@@ -293,6 +299,8 @@ class _GameScreenState extends State<GameScreen>
       _liveInteractionLocked = _isLiveDuelMode;
       _liveResultSheetShownKey = '';
       _liveResultSheetOpen = false;
+      _isLevelReported = false;
+      _reportStatusLoading = false;
       _elapsedAtSolve = null;
       if (!_isLiveDuelMode && !_isFriendChallengeMode) {
         _recordGhostFrame(_status.path, force: true);
@@ -336,6 +344,7 @@ class _GameScreenState extends State<GameScreen>
       });
       _persistInProgressLevel(_status.path);
       unawaited(_maybeShowVariantTutorial(level));
+      unawaited(_loadReportStatus());
     } catch (error) {
       if (!mounted || generation != _levelLoadGeneration) {
         return;
@@ -758,12 +767,38 @@ class _GameScreenState extends State<GameScreen>
                         ],
                       ),
                       SizedBox(height: compactGap),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          onPressed: (duelControlsLocked ||
+                                  _reportStatusLoading ||
+                                  _isLevelReported ||
+                                  _isLiveDuelMode ||
+                                  _isFriendChallengeMode)
+                              ? null
+                              : () => unawaited(_handleReportLevel()),
+                          icon: Icon(
+                            _isLevelReported
+                                ? Icons.flag_circle_rounded
+                                : Icons.flag_outlined,
+                            size: 16,
+                          ),
+                          label: Text(
+                            _isLevelReported ? 'Reported' : 'Report Level',
+                          ),
+                          style: TextButton.styleFrom(
+                            foregroundColor: const Color(0xFF9FB4D6),
+                            disabledForegroundColor:
+                                const Color(0xFF6A7D99).withOpacity(0.9),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: compactGap),
                       Row(
                         children: [
                           Expanded(
                             child: _GameActionButton(
-                              label:
-                                  'Watch Ad (${_manualAdsWatchedToday} / $_manualAdsDailyLimit)',
+                              label: 'Watch Ad',
                               onTap: (_manualAdBusy ||
                                       _manualAdsLimitReached ||
                                       _manualAdCooldownRemaining >
@@ -1340,6 +1375,352 @@ class _GameScreenState extends State<GameScreen>
       );
     } catch (_) {
       return FirebaseFirestore.instance;
+    }
+  }
+
+  Future<void> _loadReportStatus() async {
+    if (!mounted) return;
+    final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
+    if (uid.isEmpty) {
+      if (!mounted) return;
+      setState(() {
+        _isLevelReported = false;
+        _reportStatusLoading = false;
+      });
+      return;
+    }
+    setState(() => _reportStatusLoading = true);
+    try {
+      final userSnap = await _db().collection('users').doc(uid).get();
+      final userData = userSnap.data() ?? const <String, dynamic>{};
+      final reported = _isLevelAlreadyReportedInUserData(
+        userData: userData,
+        levelId: _currentLevelId,
+      );
+      if (!mounted) return;
+      setState(() {
+        _isLevelReported = reported;
+        _reportStatusLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _reportStatusLoading = false);
+    }
+  }
+
+  Future<void> _handleReportLevel() async {
+    if (!mounted) return;
+    if (_isLiveDuelMode || _isFriendChallengeMode) return;
+    if (_isLevelReported) return;
+
+    final started = _runStartedAt;
+    final elapsedSec = started == null
+        ? 0
+        : DateTime.now().difference(started).inSeconds;
+    if (elapsedSec < _minSecondsBeforeReport) {
+      await GameToast.show(
+        context,
+        title: 'Report unavailable',
+        message:
+            'Play at least $_minSecondsBeforeReport seconds before reporting this level.',
+        type: GameToastType.info,
+      );
+      return;
+    }
+
+    final shouldReport = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: const Color(0xFF111827),
+            title: const Text(
+              'Report this level?',
+              style: TextStyle(color: Colors.white),
+            ),
+            content: const Text(
+              'If this level is unsolvable, you can report it and unlock the next one.',
+              style: TextStyle(color: Color(0xFFB6C2DA)),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Report & Skip'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+    if (!shouldReport || !mounted) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+    final uid = user?.uid.trim() ?? '';
+    if (uid.isEmpty) {
+      await GameToast.show(
+        context,
+        title: 'Sign-in required',
+        message: 'Please sign in to report and skip levels.',
+        type: GameToastType.info,
+      );
+      return;
+    }
+
+    final levelId = _currentLevelId;
+    final levelNumber = widget.levelIndex;
+    final nextLevel = (widget.levelIndex + 1).clamp(1, _packLevelCount).toInt();
+    final now = DateTime.now();
+
+    final userRef = _db().collection('users').doc(uid);
+    final progressRef = userRef.collection('progress').doc('campaign');
+    final reportedRef = userRef.collection('reported_levels').doc(levelId);
+
+    try {
+      final userSnap = await userRef.get();
+      final userData = userSnap.data() ?? const <String, dynamic>{};
+      final alreadyReportedFromUserDoc = _isLevelAlreadyReportedInUserData(
+        userData: userData,
+        levelId: levelId,
+      );
+      if (alreadyReportedFromUserDoc) {
+        if (mounted) {
+          setState(() => _isLevelReported = true);
+        }
+        await GameToast.show(
+          context,
+          title: 'Already reported',
+          message: 'This level was already reported from this account.',
+          type: GameToastType.info,
+        );
+        return;
+      }
+      final currentHighest =
+          (userData['highestLevelReached'] as num?)?.toInt() ?? 1;
+      final nextHighest = nextLevel > currentHighest ? nextLevel : currentHighest;
+
+      // Primary write path: user root doc only (already used by app startup and
+      // less brittle than relying on optional subcollection permissions).
+      await userRef.set(
+        <String, dynamic>{
+          'highestLevelReached': nextHighest,
+          'reportedLevelIds': FieldValue.arrayUnion(<String>[levelId]),
+          'lastReportedLevelId': levelId,
+          'lastReportedAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+
+      // Keep previous structures in sync as best effort, but never fail the
+      // whole report if any optional write is blocked.
+      try {
+        await progressRef.set(
+          <String, dynamic>{
+            'highestLevelReached': nextHighest,
+            'updatedAt': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
+      } catch (e, st) {
+        if (kDebugMode) {
+          debugPrint('[report-level] optional progress sync failed: $e');
+          debugPrint('$st');
+        }
+      }
+
+      try {
+        await reportedRef.set(
+          <String, dynamic>{
+            'uid': uid,
+            'packId': widget.packId,
+            'levelId': levelId,
+            'levelNumber': levelNumber,
+            'reportedAt': FieldValue.serverTimestamp(),
+            'clientTimestamp': now.toIso8601String(),
+          },
+          SetOptions(merge: true),
+        );
+      } catch (e, st) {
+        if (kDebugMode) {
+          debugPrint('[report-level] optional reported_levels sync failed: $e');
+          debugPrint('$st');
+        }
+      }
+
+      await widget.progressService.setCurrentLevelForPack(widget.packId, nextLevel);
+
+      if (!mounted) return;
+      setState(() => _isLevelReported = true);
+
+      final body = StringBuffer()
+        ..writeln('User: $uid')
+        ..writeln('Level ID: $levelId')
+        ..writeln('Level Number: $levelNumber')
+        ..writeln('Pack: ${widget.packId}')
+        ..writeln('Time: ${now.toIso8601String()}')
+        ..writeln('App Version: n/a');
+
+      final uri = Uri(
+        scheme: 'mailto',
+        path: 'soporte.tracepath@gmail.com',
+        queryParameters: <String, String>{
+          'subject': 'Level Report - TracePath',
+          'body': body.toString(),
+        },
+      );
+
+      try {
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.platformDefault);
+        } else if (kDebugMode) {
+          debugPrint('[report-level] could not launch mailto uri=$uri');
+        }
+      } catch (emailError, emailStack) {
+        if (kDebugMode) {
+          debugPrint('[report-level] mail launch failed: $emailError');
+          debugPrint('$emailStack');
+        }
+      }
+
+      await GameToast.show(
+        context,
+        title: 'Level reported',
+        message: 'Level reported. Next level unlocked.',
+        type: GameToastType.info,
+      );
+
+      if (!mounted) return;
+      if (nextLevel > widget.levelIndex) {
+        context.go('/play/${widget.packId}/$nextLevel');
+      } else {
+        context.go('/play');
+      }
+    } on FirebaseException catch (e, st) {
+      if (kDebugMode) {
+        debugPrint('[report-level] firestore error code=${e.code}');
+        debugPrint('[report-level] message=${e.message}');
+        debugPrint('$st');
+      }
+      if (!mounted) return;
+      await GameToast.show(
+        context,
+        title: 'Could not report level',
+        message: _friendlyReportError(
+          code: e.code,
+          fallbackMessage: e.message,
+        ),
+        type: GameToastType.info,
+      );
+    } on PlatformException catch (e, st) {
+      if (kDebugMode) {
+        debugPrint('[report-level] platform error code=${e.code}');
+        debugPrint('[report-level] message=${e.message}');
+        debugPrint('$st');
+      }
+      if (!mounted) return;
+      await GameToast.show(
+        context,
+        title: 'Could not report level',
+        message: _friendlyReportError(
+          code: e.code,
+          fallbackMessage: e.message,
+        ),
+        type: GameToastType.info,
+      );
+    } catch (e, st) {
+      if (kDebugMode) {
+        debugPrint('[report-level] unexpected error: $e');
+        final boxed = _extractWrappedReportError(e);
+        if (boxed != null) {
+          debugPrint('[report-level] wrapped code=${boxed.$1} message=${boxed.$2}');
+        }
+        debugPrint('$st');
+      }
+      final wrapped = _extractWrappedReportError(e);
+      if (!mounted) return;
+      await GameToast.show(
+        context,
+        title: 'Could not report level',
+        message: _friendlyReportError(
+          code: wrapped?.$1,
+          fallbackMessage: wrapped?.$2 ?? e.toString(),
+        ),
+        type: GameToastType.info,
+      );
+    }
+  }
+
+  bool _isLevelAlreadyReportedInUserData({
+    required Map<String, dynamic> userData,
+    required String levelId,
+  }) {
+    final idsRaw = userData['reportedLevelIds'];
+    if (idsRaw is Iterable) {
+      for (final item in idsRaw) {
+        if (item is String && item.trim() == levelId) {
+          return true;
+        }
+      }
+    }
+
+    final mapRaw = userData['reportedLevels'];
+    if (mapRaw is Map) {
+      final value = mapRaw[levelId];
+      if (value is bool) return value;
+      if (value is num) return value != 0;
+      if (value is String) {
+        final normalized = value.trim().toLowerCase();
+        return normalized == '1' ||
+            normalized == 'true' ||
+            normalized == 'yes';
+      }
+    }
+    return false;
+  }
+
+  String _friendlyReportError({
+    required String? code,
+    String? fallbackMessage,
+  }) {
+    final normalized = (code ?? '').trim().toLowerCase();
+    if (normalized == 'permission-denied') {
+      return 'Permissions blocked this action. Please try again later.';
+    }
+    if (normalized == 'unavailable' || normalized == 'network-request-failed') {
+      return 'Network issue while reporting. Please try again.';
+    }
+    if (normalized == 'unauthenticated') {
+      return 'Please sign in again and retry.';
+    }
+    final fb = (fallbackMessage ?? '').trim();
+    final fbLower = fb.toLowerCase();
+    if (fbLower.contains('permission-denied')) {
+      return 'Permissions blocked this action. Please try again later.';
+    }
+    if (fbLower.contains('network') || fbLower.contains('unavailable')) {
+      return 'Network issue while reporting. Please try again.';
+    }
+    if (fb.isNotEmpty && fb.length < 120) return fb;
+    return 'Could not report this level right now. Please try again.';
+  }
+
+  (String?, String?)? _extractWrappedReportError(Object error) {
+    try {
+      final dynamic d = error;
+      final dynamic inner = d.error;
+      if (inner == null) return null;
+      String? code;
+      String? message;
+      try {
+        code = (inner.code as String?)?.trim();
+      } catch (_) {}
+      try {
+        message = (inner.message as String?)?.trim();
+      } catch (_) {}
+      return (code, message);
+    } catch (_) {
+      return null;
     }
   }
 

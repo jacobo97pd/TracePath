@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'l10n/l10n.dart';
 import 'models/friend_challenge.dart';
 import 'services/friend_challenge_service.dart';
 
@@ -31,7 +32,7 @@ class _FriendChallengeScreenState extends State<FriendChallengeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
-        title: const Text('Friendly Challenge'),
+        title: Text(context.l10n.friendChallengeTitle),
       ),
       body: FutureBuilder<FriendChallenge?>(
         future: _future,
@@ -41,10 +42,10 @@ class _FriendChallengeScreenState extends State<FriendChallengeScreen> {
           }
           final challenge = snapshot.data;
           if (challenge == null) {
-            return const Center(
+            return Center(
               child: Text(
-                'Challenge unavailable.',
-                style: TextStyle(color: Colors.white),
+                context.l10n.friendChallengeUnavailable,
+                style: const TextStyle(color: Colors.white),
               ),
             );
           }
@@ -63,8 +64,8 @@ class _FriendChallengeScreenState extends State<FriendChallengeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Friendly Challenge',
+                      Text(
+                        context.l10n.friendChallengeTitle,
                         style: TextStyle(
                           color: Color(0xFF8DE3FF),
                           fontWeight: FontWeight.w800,
@@ -72,7 +73,7 @@ class _FriendChallengeScreenState extends State<FriendChallengeScreen> {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Puzzle: ${challenge.puzzleId}',
+                        context.l10n.friendChallengePuzzle(challenge.puzzleId),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -81,7 +82,7 @@ class _FriendChallengeScreenState extends State<FriendChallengeScreen> {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Mode: ${challenge.mode}',
+                        context.l10n.friendChallengeMode(challenge.mode),
                         style: const TextStyle(
                           color: Color(0xFFA9BBDC),
                           fontSize: 13,
@@ -103,7 +104,7 @@ class _FriendChallengeScreenState extends State<FriendChallengeScreen> {
                       ),
                     );
                   },
-                  child: const Text('Play Friendly Challenge'),
+                  child: Text(context.l10n.friendChallengePlayButton),
                 ),
               ],
             ),

@@ -1,7 +1,7 @@
 {
   "packId": "world_01",
   "version": "pack_world_01_v1",
-  "count": 25,
+  "count": 28,
   "world": 1,
   "levels": [
     {
@@ -2642,6 +2642,180 @@
         "variant": "classic",
         "canonical_hash": "3df9caefd4eae76daa2714a775436d87dd9898460dcb10075e3d88ca6182fc5b",
         "imported_from": "c:\\Users\\jacob\\Downloads\\niveles_linkedin_editor.json"
+      }
+    },
+    {
+      "id": "linkedin-editor-ext-9",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 2,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 3,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 4,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 5,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 6,
+          "x": 4,
+          "y": 1
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d2",
+      "source": "linkedin_editor_external",
+      "source_pack": "niveles_linkedin_editor.json",
+      "source_origin": "linkedin_editor_external",
+      "variant": "classic",
+      "canonical_hash": "a2b8f0bb0347c9d0925704f8499d87a9ad10cf8ef5eaf0bff8c61aed73d0bd43",
+      "meta": {
+        "source_pack": "niveles_linkedin_editor.json",
+        "source_origin": "linkedin_editor_external",
+        "variant": "classic",
+        "canonical_hash": "a2b8f0bb0347c9d0925704f8499d87a9ad10cf8ef5eaf0bff8c61aed73d0bd43",
+        "imported_at": "2026-03-29T21:46:37Z"
+      }
+    },
+    {
+      "id": "linkedin-editor-ext-25",
+      "size": {
+        "w": 8,
+        "h": 8
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 1,
+          "y": 6
+        },
+        {
+          "n": 2,
+          "x": 1,
+          "y": 0
+        },
+        {
+          "n": 3,
+          "x": 4,
+          "y": 0
+        },
+        {
+          "n": 4,
+          "x": 6,
+          "y": 7
+        },
+        {
+          "n": 5,
+          "x": 6,
+          "y": 1
+        },
+        {
+          "n": 6,
+          "x": 3,
+          "y": 7
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d4",
+      "source": "linkedin_editor_external",
+      "source_pack": "niveles_linkedin_editor.json",
+      "source_origin": "linkedin_editor_external",
+      "variant": "classic",
+      "canonical_hash": "b55ee8178306c37e4b402106ed19243d55b07a8c50549283f40c5213bffc338b",
+      "meta": {
+        "source_pack": "niveles_linkedin_editor.json",
+        "source_origin": "linkedin_editor_external",
+        "variant": "classic",
+        "canonical_hash": "b55ee8178306c37e4b402106ed19243d55b07a8c50549283f40c5213bffc338b",
+        "imported_at": "2026-03-29T21:46:37Z"
+      }
+    },
+    {
+      "id": "linkedin-editor-ext-31",
+      "size": {
+        "w": 7,
+        "h": 7
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "n": 2,
+          "x": 4,
+          "y": 5
+        },
+        {
+          "n": 3,
+          "x": 1,
+          "y": 5
+        },
+        {
+          "n": 4,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 1
+        },
+        {
+          "n": 6,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 7,
+          "x": 6,
+          "y": 6
+        },
+        {
+          "n": 8,
+          "x": 5,
+          "y": 1
+        },
+        {
+          "n": 9,
+          "x": 3,
+          "y": 3
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d3",
+      "source": "linkedin_editor_external",
+      "source_pack": "niveles_linkedin_editor.json",
+      "source_origin": "linkedin_editor_external",
+      "variant": "classic",
+      "canonical_hash": "6668fff6094acdddca9865d7dfda6f9b7c4cbfe3e6a9d2084c870b758982e8b1",
+      "meta": {
+        "source_pack": "niveles_linkedin_editor.json",
+        "source_origin": "linkedin_editor_external",
+        "variant": "classic",
+        "canonical_hash": "6668fff6094acdddca9865d7dfda6f9b7c4cbfe3e6a9d2084c870b758982e8b1",
+        "imported_at": "2026-03-29T21:46:37Z"
       }
     }
   ]

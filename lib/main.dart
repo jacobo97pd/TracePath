@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:go_router/go_router.dart';
@@ -49,7 +50,11 @@ import 'pack_level_repository.dart';
 import 'services/ads_service.dart';
 import 'services/inbox_service.dart';
 import 'services/live_duel_service.dart';
+import 'services/presence_service.dart';
 import 'ui/components/coin_reward_overlay.dart';
+import 'ui/components/app_game_backdrop.dart';
+import 'l10n/l10n.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 // Temporary diagnostics switch:
 // Set to true to skip notification initialization and isolate startup issues in release.
@@ -169,6 +174,7 @@ class _MyAppState extends State<MyApp> {
   final Set<String> _warmedShopPaths = <String>{};
   final GlobalKey<NavigatorState> _rootNavigatorKey =
       GlobalKey<NavigatorState>();
+  final PresenceService _presenceService = PresenceService();
 
   late final GoRouter _router = GoRouter(
     navigatorKey: _rootNavigatorKey,
@@ -353,8 +359,8 @@ class _MyAppState extends State<MyApp> {
         builder: (context, state) {
           final args = state.extra;
           if (args is! VictoryScreenArgs) {
-            return const Scaffold(
-              body: Center(child: Text('Victory data missing')),
+            return Scaffold(
+              body: Center(child: Text(context.l10n.victoryDataMissing)),
             );
           }
           return VictoryScreen(args: args);
@@ -380,12 +386,14 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    _presenceService.start();
     widget.skinCatalogService.addListener(_queueShopImageWarmup);
     _queueShopImageWarmup();
   }
 
   @override
   void dispose() {
+    unawaited(_presenceService.stop());
     widget.skinCatalogService.removeListener(_queueShopImageWarmup);
     super.dispose();
   }
@@ -507,6 +515,28 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       routerConfig: _router,
+      onGenerateTitle: (context) => context.l10n.appTitle,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('es'),
+        Locale('en'),
+      ],
+      localeListResolutionCallback: (locales, supportedLocales) {
+        if (locales == null || locales.isEmpty) {
+          return const Locale('es');
+        }
+        for (final locale in locales) {
+          final lang = locale.languageCode.toLowerCase();
+          if (lang == 'es') return const Locale('es');
+          if (lang == 'en') return const Locale('en');
+        }
+        return const Locale('es');
+      },
       themeMode: ThemeMode.dark,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
@@ -514,7 +544,9 @@ class _MyAppState extends State<MyApp> {
         final content = Stack(
           fit: StackFit.expand,
           children: [
+            const AppGameBackdrop(),
             if (child != null) child,
+            const AppGameOverlay(),
             const CoinRewardOverlay(),
           ],
         );
@@ -626,31 +658,32 @@ class _GlobalLiveInvitePopupHostState
         useRootNavigator: true,
         builder: (ctx) {
           final from = item.senderDisplayName;
+          final l10n = ctx.l10n;
           return AlertDialog(
             backgroundColor: const Color(0xFF111C33),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18),
               side: const BorderSide(color: Color(0xFF355687)),
             ),
-            title: const Text(
-              'Live Duel Invite',
+            title: Text(
+              l10n.liveDuelInviteTitle,
               style:
                   TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
             ),
             content: Text(
-              '$from challenged you to a live duel.\nDo you want to accept?',
+              l10n.liveDuelInviteBody(from),
               style: const TextStyle(color: Color(0xFFD3E5FF)),
             ),
             actions: [
               TextButton(
                 onPressed: () =>
                     Navigator.of(ctx).pop(_GlobalLiveInviteAction.decline),
-                child: const Text('Decline'),
+                child: Text(l10n.decline),
               ),
               FilledButton(
                 onPressed: () =>
                     Navigator.of(ctx).pop(_GlobalLiveInviteAction.accept),
-                child: const Text('Accept'),
+                child: Text(l10n.accept),
               ),
             ],
           );
@@ -681,24 +714,24 @@ class _GlobalLiveInvitePopupHostState
         );
       }
       final txt = '${e.code} ${e.message ?? ''}';
-      var msg = 'Could not process live invite';
+      var msg = context.l10n.liveInviteCouldNotProcess;
       var shouldDropInvite = false;
       if (txt.contains('MATCH_NOT_FOUND')) {
-        msg = 'Invite is no longer available';
+        msg = context.l10n.liveInviteNoLongerAvailable;
         shouldDropInvite = true;
       } else if (txt.contains('MATCH_CLOSED')) {
-        msg = 'This duel is already closed';
+        msg = context.l10n.liveInviteAlreadyClosed;
         shouldDropInvite = true;
       } else if (txt.contains('MATCH_ACCESS_DENIED')) {
-        msg = 'Invite is not valid for this account';
+        msg = context.l10n.liveInviteInvalidAccount;
         shouldDropInvite = true;
       } else if (txt.contains('INVALID_MATCH_ID')) {
-        msg = 'Invite payload is invalid';
+        msg = context.l10n.liveInviteInvalidPayload;
         shouldDropInvite = true;
       } else if (e.code == 'permission-denied') {
-        msg = 'Permissions blocked this invite action';
+        msg = context.l10n.liveInvitePermissionsBlocked;
       } else if (e.code == 'unavailable' || e.code == 'deadline-exceeded') {
-        msg = 'Network issue while processing invite';
+        msg = context.l10n.liveInviteNetworkIssue;
       }
       if (shouldDropInvite) {
         try {
@@ -724,19 +757,19 @@ class _GlobalLiveInvitePopupHostState
         );
       }
       final txt = e.toString();
-      var msg = 'Could not process live invite';
+      var msg = context.l10n.liveInviteCouldNotProcess;
       var shouldDropInvite = false;
       if (txt.contains('MATCH_NOT_FOUND')) {
-        msg = 'Invite is no longer available';
+        msg = context.l10n.liveInviteNoLongerAvailable;
         shouldDropInvite = true;
       } else if (txt.contains('MATCH_CLOSED')) {
-        msg = 'This duel is already closed';
+        msg = context.l10n.liveInviteAlreadyClosed;
         shouldDropInvite = true;
       } else if (txt.contains('MATCH_ACCESS_DENIED')) {
-        msg = 'Invite is not valid for this account';
+        msg = context.l10n.liveInviteInvalidAccount;
         shouldDropInvite = true;
       } else if (txt.contains('INVALID_MATCH_ID')) {
-        msg = 'Invite payload is invalid';
+        msg = context.l10n.liveInviteInvalidPayload;
         shouldDropInvite = true;
       }
       if (shouldDropInvite) {

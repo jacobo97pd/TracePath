@@ -1,7 +1,7 @@
 {
   "packId": "world_16",
   "version": "pack_world_16_v1",
-  "count": 24,
+  "count": 25,
   "world": 16,
   "levels": [
     {
@@ -3263,6 +3263,79 @@
         "canonical_hash": "a2d4190140050e391bcc97a51b90c87ec59adbaaec833ed3667aee51a6a48902",
         "difficulty_rebalanced_from": "d3",
         "difficulty_score": 6.3833
+      }
+    },
+    {
+      "id": "linkedin-editor-ext-10",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "n": 2,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "n": 3,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 4,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 6,
+          "x": 1,
+          "y": 4
+        },
+        {
+          "n": 7,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 8,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 9,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 10,
+          "x": 2,
+          "y": 1
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d2",
+      "source": "linkedin_editor_external",
+      "source_pack": "niveles_linkedin_editor.json",
+      "source_origin": "linkedin_editor_external",
+      "variant": "classic",
+      "canonical_hash": "5fb93ed0dc27a4a29430baecba31774c5b3657e7827a00275b05f2cee4fc3105",
+      "meta": {
+        "source_pack": "niveles_linkedin_editor.json",
+        "source_origin": "linkedin_editor_external",
+        "variant": "classic",
+        "canonical_hash": "5fb93ed0dc27a4a29430baecba31774c5b3657e7827a00275b05f2cee4fc3105",
+        "imported_at": "2026-03-29T21:46:37Z"
       }
     }
   ]

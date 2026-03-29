@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import 'app_firestore.dart';
+
 class ManualAdQuota {
   const ManualAdQuota({
     required this.watchedToday,
@@ -272,7 +274,7 @@ class AdsService {
     _rewardedAd = null;
   }
 
-  FirebaseFirestore get _db => FirebaseFirestore.instance;
+  FirebaseFirestore get _db => AppFirestore.instance();
 
   int _readInt(Object? value) {
     if (value is int) return value;

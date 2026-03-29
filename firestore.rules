@@ -134,6 +134,14 @@ service cloud.firestore {
       match /achievements/{achievementId} {
         allow read, write: if isSelf(uid);
       }
+
+      match /reported_levels/{levelId} {
+        allow read, write: if isSelf(uid);
+      }
+
+      match /progress/{docId} {
+        allow read, write: if isSelf(uid);
+      }
     }
 
     // Username and email lookup indexes for social search.
@@ -221,7 +229,15 @@ service cloud.firestore {
           'playerBName'
         ]);
 
-      allow delete: if false;
+      // Allow hard delete only to participants, and only when match is no longer
+      // active to avoid accidental griefing during live gameplay.
+      allow delete: if isSignedIn() &&
+        request.auth.uid in resource.data.playerUids &&
+        (
+          resource.data.status == 'finished' ||
+          resource.data.status == 'cancelled' ||
+          resource.data.status == 'pending'
+        );
 
       match /players/{uid} {
         allow read: if isLiveMatchParticipant(matchId);
@@ -258,7 +274,10 @@ service cloud.firestore {
             'lastEmoteAtMs'
           ]);
 
-        allow delete: if false;
+        // Keep ownership boundaries: each participant can delete only their own
+        // player snapshot if needed for cleanup.
+        allow delete: if isLiveMatchParticipant(matchId) &&
+          request.auth.uid == uid;
       }
 
       match /realtime/{uid} {
@@ -283,7 +302,9 @@ service cloud.firestore {
             'pathVersion',
             'updatedAt'
           ]);
-        allow delete: if false;
+        // Realtime traces are fully self-owned.
+        allow delete: if isLiveMatchParticipant(matchId) &&
+          request.auth.uid == uid;
       }
 
       match /postMatchEmotes/{emoteId} {

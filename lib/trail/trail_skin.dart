@@ -12,6 +12,7 @@ enum TrailRenderType {
   magma,
   ice,
   galaxy,
+  galaxyReveal,
   speedForce,
   electric,
   comic,
@@ -89,6 +90,7 @@ class TrailSkinConfig {
     this.magma = const MagmaTrailConfig(),
     this.ice = const IceTrailConfig(),
     this.galaxy = const GalaxyTrailConfig(),
+    this.galaxyReveal = const GalaxyRevealConfig(),
     this.speedForce = const SpeedForceTrailConfig(),
     this.holidaySpark = const HolidaySparkTrailConfig(),
     this.upside = const UpsideTrailConfig(),
@@ -131,6 +133,7 @@ class TrailSkinConfig {
   final MagmaTrailConfig magma;
   final IceTrailConfig ice;
   final GalaxyTrailConfig galaxy;
+  final GalaxyRevealConfig galaxyReveal;
   final SpeedForceTrailConfig speedForce;
   final HolidaySparkTrailConfig holidaySpark;
   final UpsideTrailConfig upside;
@@ -869,6 +872,24 @@ class GalaxyTrailConfig {
   final Color nebulaColorA;
   final Color nebulaColorB;
   final Color glowColor;
+}
+
+class GalaxyRevealConfig {
+  const GalaxyRevealConfig({
+    this.radius = 0.44,
+    this.softness = 0.62,
+    this.enableGlow = true,
+    this.enableSparkles = true,
+    this.enableBloom = true,
+    this.textureAsset = 'assets/galaxy_trail/galaxy_trail.webp',
+  });
+
+  final double radius;
+  final double softness;
+  final bool enableGlow;
+  final bool enableSparkles;
+  final bool enableBloom;
+  final String textureAsset;
 }
 
 class SpeedForceTrailConfig {

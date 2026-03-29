@@ -1,7 +1,7 @@
 name: zip_path_flutter
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.0.6+48
+version: 1.0.7+49
 
 environment:
   sdk: ^3.5.4
@@ -9,6 +9,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.19.0
+  google_fonts: ^6.2.1
   cupertino_icons: ^1.0.8
   flutter_riverpod: ^2.6.1
   go_router: ^14.8.1
@@ -26,6 +30,7 @@ dependencies:
   in_app_purchase: ^3.2.0
   google_mobile_ads: ^5.2.0
   animate_do: ^4.2.0
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:
@@ -33,6 +38,7 @@ dev_dependencies:
   flutter_lints: ^4.0.0
 
 flutter:
+  generate: true
   uses-material-design: true
   assets:
     - assets/levels/pack_core_v1.json
@@ -82,4 +88,5 @@ flutter:
     - assets/trails/
     - assets/trails/comic_spiderverse/
     - assets/trails/urban_graffiti/
+    - assets/galaxy_trail/
     - assets/vfx/smoke/

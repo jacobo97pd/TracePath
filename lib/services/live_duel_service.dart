@@ -383,6 +383,7 @@ class LiveDuelService {
       tx.set(
         playerRef,
         <String, dynamic>{
+          'uid': uid,
           'state': 'abandoned',
           'completed': false,
           'resultPlace': 2,
@@ -696,6 +697,7 @@ class LiveDuelService {
       tx.set(
         playerRef,
         <String, dynamic>{
+          'uid': uid,
           'state': 'abandoned',
           'completed': false,
           'resultPlace': 2,
@@ -714,7 +716,19 @@ class LiveDuelService {
         SetOptions(merge: true),
       );
     } catch (_) {}
-    await resolveWinner(matchId);
+    try {
+      await resolveWinner(matchId);
+    } on FirebaseException catch (e) {
+      // For some legacy matches, root match resolution can be blocked by
+      // stricter rules/legacy shape. Keep UX functional: local player already
+      // marked as abandoned and should no longer see this as active.
+      if (kDebugMode) {
+        debugPrint(
+          '[live-duel] resolveWinner skipped after abandon '
+          'matchId=$normalizedId code=${e.code} msg=${e.message}',
+        );
+      }
+    }
   }
 
   Stream<LiveMatchRealtimeTrail?> watchRealtimeTrail({
@@ -1018,6 +1032,8 @@ class LiveDuelService {
         final match =
             LiveMatch.fromFirestore(id: doc.id, data: data, players: players);
         if (!match.playerUids.contains(uid)) continue;
+        final myState = match.players[uid]?.state;
+        if (myState == LiveMatchPlayerState.abandoned) continue;
         matches.add(match);
       }
       matches.sort((a, b) {

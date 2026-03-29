@@ -1,0 +1,261 @@
+{
+  "@@locale": "es",
+  "appTitle": "TracePath",
+  "victoryDataMissing": "Faltan datos de victoria",
+  "liveDuelInviteTitle": "Invitación de duelo en vivo",
+  "liveDuelInviteBody": "{from} te desafió a un duelo en vivo.\n¿Quieres aceptar?",
+  "@liveDuelInviteBody": {
+    "placeholders": {
+      "from": {}
+    }
+  },
+  "decline": "Rechazar",
+  "accept": "Aceptar",
+  "liveInviteCouldNotProcess": "No se pudo procesar la invitación",
+  "liveInviteNoLongerAvailable": "La invitación ya no está disponible",
+  "liveInviteAlreadyClosed": "Este duelo ya está cerrado",
+  "liveInviteInvalidAccount": "La invitación no es válida para esta cuenta",
+  "liveInviteInvalidPayload": "El contenido de la invitación es inválido",
+  "liveInvitePermissionsBlocked": "Los permisos bloquearon esta acción",
+  "liveInviteNetworkIssue": "Problema de red al procesar la invitación",
+  "tabHome": "Inicio",
+  "tabShop": "Tienda",
+  "tabDuel": "Duelo",
+  "tabCards": "Cartas",
+  "tabProfile": "Perfil",
+  "playModeWorlds": "Mundos",
+  "playModeDaily": "Diario",
+  "playModeRanked": "Ranking",
+  "playModeEvents": "Eventos",
+  "playModeDuels": "Duelos",
+  "playButton": "Jugar",
+  "homePlayerName": "Jugador",
+  "homeTitle": "TracePath",
+  "homeStreakPill": "Racha {count}",
+  "@homeStreakPill": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeLevelPill": "Nv {count}",
+  "@homeLevelPill": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeTrainTitle": "Entrena tu mente",
+  "homeTrainSubtitle": "Traza caminos más rápido, mejora tu precisión y supera cada desafío.",
+  "homeStartSolving": "¡EMPIEZA A RESOLVER!",
+  "homeJumpToNextPuzzle": "Salta a tu próximo puzzle",
+  "homeContinue": "Continuar",
+  "homeContinueFirstRun": "Empieza tu primera partida",
+  "homeContinueResumeLevel": "Nivel {level} · Retoma donde lo dejaste",
+  "@homeContinueResumeLevel": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "homeQuickAccessTitle": "Accesos rápidos",
+  "homeQuickAccessSubtitle": "Entra directo a tus modos favoritos",
+  "homeQuickDailyTitle": "Puzzle diario",
+  "homeQuickDailySubtitle": "Un desafío cada día",
+  "homeQuickLevelsTitle": "Niveles",
+  "homeQuickLevelsSubtitle": "Elige cualquier nivel disponible",
+  "homeQuickSocialTitle": "Social",
+  "homeQuickSocialSubtitle": "Amigos, inbox y multijugador",
+  "homeProgressTitle": "Progreso",
+  "homeProgressSubtitle": "Tu rendimiento y momentum recientes",
+  "homeMetricLevelsSolved": "Niveles resueltos",
+  "homeMetricCurrentStreak": "Racha actual",
+  "homeMetricBestStreak": "Mejor racha",
+  "homeMetricHighestLevel": "Nivel más alto",
+  "homeDailySolved": "Puzzles diarios resueltos: {count}",
+  "@homeDailySolved": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeViewProfile": "Ver perfil",
+  "duelHubTitle": "Centro de duelo",
+  "duelHubSubtitle": "Desafía amigos y juega partidas en vivo.",
+  "duelCreating": "Creando duelo...",
+  "duelChallengeFriend": "Desafiar a un amigo",
+  "duelIncomingInvitesTitle": "Invitaciones entrantes",
+  "duelIncomingInvitesSubtitle": "Acepta o rechaza desafíos en vivo",
+  "duelNoPendingInvitesTitle": "No hay invitaciones pendientes",
+  "duelNoPendingInvitesSubtitle": "Los nuevos desafíos aparecerán aquí.",
+  "duelInviteLoadErrorTitle": "No se pudieron cargar las invitaciones",
+  "duelTryAgainLater": "Intentalo de nuevo en un momento.",
+  "duelActiveMatchesTitle": "Partidas activas",
+  "duelActiveMatchesSubtitle": "Reanuda tus duelos en vivo",
+  "duelNoActiveTitle": "No hay duelos activos",
+  "duelNoActiveSubtitle": "Empieza un desafío para jugar en vivo.",
+  "duelActiveLoadErrorTitle": "No se pudieron cargar las partidas activas",
+  "duelHistoryTitle": "Historial",
+  "duelHistorySubtitle": "Resultados recientes de duelo",
+  "duelHistoryComingSoonTitle": "Historial próximamente",
+  "duelHistoryComingSoonSubtitle": "Tus últimos duelos se mostrarán aquí.",
+  "duelChooseFriend": "Elige un amigo",
+  "duelCouldNotLoadFriends": "No se pudieron cargar los amigos",
+  "duelNoFriendsYet": "Aún no tienes amigos",
+  "duelInviteSentText": "te envió una invitación de duelo en vivo.",
+  "duelAcceptError": "No se pudo aceptar la invitación: {error}",
+  "@duelAcceptError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "duelDeclineError": "No se pudo rechazar la invitación: {error}",
+  "@duelDeclineError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "duelAccept": "Aceptar",
+  "duelResume": "Reanudar",
+  "duelStatusPending": "Pendiente",
+  "duelStatusCountdown": "Cuenta atrás",
+  "duelStatusPlaying": "Jugando",
+  "duelStatusFinished": "Finalizado",
+  "duelStatusCancelled": "Cancelado",
+  "duelUnknownOpponent": "Desconocido",
+  "duelVersusOpponent": "VS {name}",
+  "@duelVersusOpponent": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "duelLevelAndStatus": "Nivel: {level} · {status}",
+  "@duelLevelAndStatus": {
+    "placeholders": {
+      "level": {},
+      "status": {}
+    }
+  },
+  "duelErrorFinishCurrentFirst": "Termina primero tu duelo en curso.",
+  "duelErrorFriendBusy": "Este amigo ya está en otro duelo.",
+  "duelErrorNoPuzzles": "No hay puzzles disponibles ahora mismo.",
+  "duelErrorInvalidTarget": "No se pudo iniciar duelo con este amigo.",
+  "duelErrorCreateInvite": "No se pudo crear la invitación de duelo ahora mismo.",
+  "duelRemoveActiveTitle": "Eliminar partida activa",
+  "duelRemoveActiveBody": "Esta partida activa se cerrará y dejará de aparecer en esta lista.",
+  "duelKeep": "Mantener",
+  "duelRemove": "Eliminar",
+  "duelRemoving": "Eliminando...",
+  "duelRemovedActive": "Partida activa eliminada",
+  "duelRemoveError": "No se pudo eliminar la partida: {error}",
+  "@duelRemoveError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendChallengeTitle": "Desafío amistoso",
+  "friendChallengeUnavailable": "Desafío no disponible.",
+  "friendChallengePuzzle": "Puzzle: {puzzleId}",
+  "@friendChallengePuzzle": {
+    "placeholders": {
+      "puzzleId": {}
+    }
+  },
+  "friendChallengeMode": "Modo: {mode}",
+  "@friendChallengeMode": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "friendChallengePlayButton": "Jugar desafío amistoso",
+  "shopTitle": "Tienda",
+  "shopSkinEditorTooltip": "Editor de skins",
+  "shopTabSkins": "Skins",
+  "shopTabTrails": "Estelas",
+  "shopTabCoinPacks": "Packs de monedas",
+  "shopSkinsLoaded": "Skins cargadas: {visible}/{total}",
+  "@shopSkinsLoaded": {
+    "placeholders": {
+      "visible": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "shopFeaturedSkin": "Skin destacada",
+  "shopPointerSkins": "Skins de puntero",
+  "shopLoadMore": "Cargar más",
+  "shopOwned": "Comprado",
+  "shopCoinsAmount": "{coins} monedas",
+  "@shopCoinsAmount": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "shopEquipped": "Equipado",
+  "shopEquip": "Equipar",
+  "shopBuyCoins": "Comprar {coins}",
+  "@shopBuyCoins": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "shopNewTrail": "NUEVA ESTELA",
+  "shopUnlockedAndEquipped": "Desbloqueado y equipado",
+  "shopDefaultTrailDescription": "Estilo visual único para el trazo de tu ruta.",
+  "profileGuestMode": "Modo invitado",
+  "profileGoogleAccount": "Cuenta de Google",
+  "profileLogout": "Cerrar sesion",
+  "profileLogoutConfirm": "Quieres cerrar sesion?",
+  "profileCancel": "Cancelar",
+  "profileSignedOut": "Sesion cerrada",
+  "profileDefaultName": "Default",
+  "profileLevelLabel": "Nivel",
+  "profileStreakLabel": "Racha",
+  "profileBestLabel": "Mejor",
+  "profileBestStreak": "Mejor racha: {count}",
+  "@profileBestStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileEquippedSkin": "Skin equipada: {name}",
+  "@profileEquippedSkin": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "profileStatsTitle": "Estadisticas",
+  "profileGamesPlayed": "Partidas jugadas",
+  "profileBestTime": "Mejor tiempo",
+  "profileVaultTitle": "Boveda",
+  "profileLockerTitle": "Locker",
+  "profileLockerHint": "Toca un item equipado para abrir el inventario.",
+  "profileOpenVault": "Abrir boveda",
+  "profileInboxTitle": "Inbox",
+  "profileInboxWithCount": "Inbox ({count})",
+  "@profileInboxWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileInboxUnavailableTitle": "Inbox no disponible ahora",
+  "profileInboxEmptyTitle": "Aun no hay mensajes",
+  "profileInboxEmptySubtitle": "Las solicitudes de amistad, recompensas y noticias apareceran aqui.",
+  "profileVaultLockerTitle": "Boveda / Locker",
+  "profileReadyToEquip": "Listo para equipar"
+}

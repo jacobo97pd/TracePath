@@ -549,9 +549,20 @@ class FriendsService {
     final uid = await _requireUid();
     final snap =
         await _friendsRef(uid).orderBy('addedAt', descending: true).get();
-    return snap.docs
-        .map((doc) => FriendProfile.fromFirestore(doc.id, doc.data()))
-        .toList(growable: false);
+    final profiles = <FriendProfile>[];
+    for (final doc in snap.docs) {
+      try {
+        profiles.add(await _buildFriendProfile(doc.id, doc.data()));
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint(
+            '[friends] getFriends skip malformed uid=${doc.id} error=$e',
+          );
+        }
+      }
+    }
+    profiles.sort(_friendSort);
+    return profiles;
   }
 
   Stream<List<FriendProfile>> watchFriends() async* {
@@ -559,11 +570,53 @@ class FriendsService {
     yield* _friendsRef(uid)
         .orderBy('addedAt', descending: true)
         .snapshots()
-        .map(
-          (snap) => snap.docs
-              .map((doc) => FriendProfile.fromFirestore(doc.id, doc.data()))
-              .toList(growable: false),
-        );
+        .asyncMap((snap) async {
+      final profiles = <FriendProfile>[];
+      for (final doc in snap.docs) {
+        try {
+          profiles.add(await _buildFriendProfile(doc.id, doc.data()));
+        } catch (e) {
+          if (kDebugMode) {
+            debugPrint(
+              '[friends] watchFriends skip malformed uid=${doc.id} error=$e',
+            );
+          }
+        }
+      }
+      profiles.sort(_friendSort);
+      return profiles;
+    });
+  }
+
+  Future<FriendProfile> _buildFriendProfile(
+    String friendUid,
+    Map<String, dynamic> friendData,
+  ) async {
+    Map<String, dynamic> userData = const <String, dynamic>{};
+    try {
+      userData = await _readUserData(friendUid) ?? const <String, dynamic>{};
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[friends] profile hydrate failed uid=$friendUid error=$e');
+      }
+    }
+    final merged = <String, dynamic>{
+      ...friendData,
+      ...userData,
+      if (friendData['addedAt'] != null) 'addedAt': friendData['addedAt'],
+      if (userData['isOnline'] != null) 'isOnline': userData['isOnline'],
+      if (userData['lastSeenAt'] != null) 'lastSeenAt': userData['lastSeenAt'],
+    };
+    return FriendProfile.fromFirestore(friendUid, merged);
+  }
+
+  int _friendSort(FriendProfile a, FriendProfile b) {
+    if (a.isOnline != b.isOnline) return a.isOnline ? -1 : 1;
+    final byName = a.displayName.toLowerCase().compareTo(b.displayName.toLowerCase());
+    if (byName != 0) return byName;
+    final aMs = a.addedAt?.millisecondsSinceEpoch ?? 0;
+    final bMs = b.addedAt?.millisecondsSinceEpoch ?? 0;
+    return bMs.compareTo(aMs);
   }
 
   Map<String, dynamic> _friendDocData({

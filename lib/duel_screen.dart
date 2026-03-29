@@ -10,7 +10,11 @@ import 'models/live_match.dart';
 import 'services/friends_service.dart';
 import 'services/inbox_service.dart';
 import 'services/live_duel_service.dart';
+import 'theme/app_colors.dart';
+import 'l10n/l10n.dart';
 import 'ui/components/game_card.dart';
+import 'ui/components/presence_dot.dart';
+import 'ui/components/primary_cta_button.dart';
 
 class DuelScreen extends StatefulWidget {
   const DuelScreen({super.key});
@@ -26,24 +30,25 @@ class _DuelScreenState extends State<DuelScreen> {
 
   bool _creatingInvite = false;
   final Set<String> _processingInviteIds = <String>{};
+  final Set<String> _processingActiveMatchIds = <String>{};
 
   String get _uid => FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Color(0xFF101A30), Color(0xFF0F172A)],
+              colors: [AppColors.primaryDark, AppColors.background],
             ),
           ),
           child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 140),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -54,9 +59,9 @@ class _DuelScreenState extends State<DuelScreen> {
                   onTap: _creatingInvite ? null : _challengeFriend,
                 ),
                 const SizedBox(height: 18),
-                const _DuelSectionTitle(
-                  title: 'Incoming Invites',
-                  subtitle: 'Accept or decline live duel requests',
+                _DuelSectionTitle(
+                  title: context.l10n.duelIncomingInvitesTitle,
+                  subtitle: context.l10n.duelIncomingInvitesSubtitle,
                 ),
                 const SizedBox(height: 10),
                 StreamBuilder<List<InboxItem>>(
@@ -71,17 +76,17 @@ class _DuelScreenState extends State<DuelScreen> {
                         )
                         .toList(growable: false);
                     if (snapshot.hasError) {
-                      return const _InlineInfoCard(
+                      return _InlineInfoCard(
                         icon: Icons.wifi_tethering_error_rounded,
-                        title: 'Could not load invites',
-                        subtitle: 'Try again in a moment.',
+                        title: context.l10n.duelInviteLoadErrorTitle,
+                        subtitle: context.l10n.duelTryAgainLater,
                       );
                     }
                     if (items.isEmpty) {
-                      return const _InlineInfoCard(
+                      return _InlineInfoCard(
                         icon: Icons.inbox_outlined,
-                        title: 'No pending invites',
-                        subtitle: 'New challenges will appear here.',
+                        title: context.l10n.duelNoPendingInvitesTitle,
+                        subtitle: context.l10n.duelNoPendingInvitesSubtitle,
                       );
                     }
                     return Column(
@@ -101,9 +106,9 @@ class _DuelScreenState extends State<DuelScreen> {
                   },
                 ),
                 const SizedBox(height: 18),
-                const _DuelSectionTitle(
-                  title: 'Active Matches',
-                  subtitle: 'Resume your current live duels',
+                _DuelSectionTitle(
+                  title: context.l10n.duelActiveMatchesTitle,
+                  subtitle: context.l10n.duelActiveMatchesSubtitle,
                 ),
                 const SizedBox(height: 10),
                 StreamBuilder<List<LiveMatch>>(
@@ -113,17 +118,17 @@ class _DuelScreenState extends State<DuelScreen> {
                         .where((m) => !m.isTerminal)
                         .toList(growable: false);
                     if (snapshot.hasError) {
-                      return const _InlineInfoCard(
+                      return _InlineInfoCard(
                         icon: Icons.error_outline_rounded,
-                        title: 'Could not load active matches',
-                        subtitle: 'Try again in a moment.',
+                        title: context.l10n.duelActiveLoadErrorTitle,
+                        subtitle: context.l10n.duelTryAgainLater,
                       );
                     }
                     if (matches.isEmpty) {
-                      return const _InlineInfoCard(
+                      return _InlineInfoCard(
                         icon: Icons.sports_esports_outlined,
-                        title: 'No active duels',
-                        subtitle: 'Start a challenge to play live.',
+                        title: context.l10n.duelNoActiveTitle,
+                        subtitle: context.l10n.duelNoActiveSubtitle,
                       );
                     }
                     return Column(
@@ -134,8 +139,11 @@ class _DuelScreenState extends State<DuelScreen> {
                             child: _ActiveMatchCard(
                               match: match,
                               currentUid: _uid,
+                              removing:
+                                  _processingActiveMatchIds.contains(match.id),
                               onResume: () =>
                                   context.go('/live-duel/${match.id}'),
+                              onRemove: () => _removeActiveMatch(match),
                             ),
                           ),
                       ],
@@ -143,15 +151,15 @@ class _DuelScreenState extends State<DuelScreen> {
                   },
                 ),
                 const SizedBox(height: 18),
-                const _DuelSectionTitle(
-                  title: 'History',
-                  subtitle: 'Recent duel results',
+                _DuelSectionTitle(
+                  title: context.l10n.duelHistoryTitle,
+                  subtitle: context.l10n.duelHistorySubtitle,
                 ),
                 const SizedBox(height: 10),
-                const _InlineInfoCard(
+                _InlineInfoCard(
                   icon: Icons.history_rounded,
-                  title: 'History coming soon',
-                  subtitle: 'Your last duels will be shown here.',
+                  title: context.l10n.duelHistoryComingSoonTitle,
+                  subtitle: context.l10n.duelHistoryComingSoonSubtitle,
                 ),
               ],
             ),
@@ -201,8 +209,8 @@ class _DuelScreenState extends State<DuelScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Choose a friend',
+                Text(
+                  context.l10n.duelChooseFriend,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -214,19 +222,28 @@ class _DuelScreenState extends State<DuelScreen> {
                   child: StreamBuilder<List<FriendProfile>>(
                     stream: _friendsService.watchFriends(),
                     builder: (context, snapshot) {
-                      final friends = snapshot.data ?? const <FriendProfile>[];
+                      final friends = (snapshot.data ?? const <FriendProfile>[])
+                          .toList(growable: false)
+                        ..sort((a, b) {
+                          if (a.isOnline != b.isOnline) {
+                            return a.isOnline ? -1 : 1;
+                          }
+                          return a.displayName
+                              .toLowerCase()
+                              .compareTo(b.displayName.toLowerCase());
+                        });
                       if (snapshot.hasError) {
-                        return const Center(
+                        return Center(
                           child: Text(
-                            'Could not load friends',
+                            context.l10n.duelCouldNotLoadFriends,
                             style: TextStyle(color: Color(0xFF9EB0D2)),
                           ),
                         );
                       }
                       if (friends.isEmpty) {
-                        return const Center(
+                        return Center(
                           child: Text(
-                            'No friends yet',
+                            context.l10n.duelNoFriendsYet,
                             style: TextStyle(color: Color(0xFF9EB0D2)),
                           ),
                         );
@@ -252,16 +269,29 @@ class _DuelScreenState extends State<DuelScreen> {
                                 ),
                                 child: Row(
                                   children: [
-                                    const Icon(
-                                      Icons.person_rounded,
-                                      color: Color(0xFF9EC5FF),
-                                      size: 20,
+                                    Stack(
+                                      clipBehavior: Clip.none,
+                                      children: [
+                                        const Icon(
+                                          Icons.person_rounded,
+                                          color: Color(0xFF9EC5FF),
+                                          size: 20,
+                                        ),
+                                        Positioned(
+                                          right: -4,
+                                          bottom: -2,
+                                          child: PresenceDot(
+                                            isOnline: friend.isOnline,
+                                            size: 8.5,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                     const SizedBox(width: 10),
                                     Expanded(
                                       child: Text(
-                                        username,
-                                        style: const TextStyle(
+                                        '$username · ${friend.isOnline ? 'Online' : 'Offline'}',
+                                        style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 14,
                                           fontWeight: FontWeight.w700,
@@ -306,7 +336,7 @@ class _DuelScreenState extends State<DuelScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Could not accept duel invite: $e'),
+          content: Text(context.l10n.duelAcceptError('$e')),
           duration: const Duration(milliseconds: 1600),
         ),
       );
@@ -330,7 +360,7 @@ class _DuelScreenState extends State<DuelScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Could not decline duel invite: $e'),
+          content: Text(context.l10n.duelDeclineError('$e')),
           duration: const Duration(milliseconds: 1600),
         ),
       );
@@ -344,18 +374,74 @@ class _DuelScreenState extends State<DuelScreen> {
   String _mapCreateInviteError(Object error) {
     final text = error.toString();
     if (text.contains('ALREADY_IN_ACTIVE_DUEL')) {
-      return 'Finish your current live duel first.';
+      return context.l10n.duelErrorFinishCurrentFirst;
     }
     if (text.contains('TARGET_IN_ACTIVE_DUEL')) {
-      return 'This friend is already in another duel.';
+      return context.l10n.duelErrorFriendBusy;
     }
     if (text.contains('NO_PUZZLES_AVAILABLE')) {
-      return 'No puzzles available right now.';
+      return context.l10n.duelErrorNoPuzzles;
     }
     if (text.contains('INVALID_DUEL_TARGET')) {
-      return 'Could not start duel with this friend.';
+      return context.l10n.duelErrorInvalidTarget;
     }
-    return 'Could not create duel invite right now.';
+    return context.l10n.duelErrorCreateInvite;
+  }
+
+  Future<void> _removeActiveMatch(LiveMatch match) async {
+    final matchId = match.id.trim();
+    if (matchId.isEmpty) return;
+    if (_processingActiveMatchIds.contains(matchId)) return;
+    final shouldRemove = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: const Color(0xFF111827),
+            title: Text(
+              context.l10n.duelRemoveActiveTitle,
+              style: const TextStyle(color: Colors.white),
+            ),
+            content: Text(
+              context.l10n.duelRemoveActiveBody,
+              style: const TextStyle(color: Color(0xFFB6C2DA)),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(context.l10n.duelKeep),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(context.l10n.duelRemove),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+    if (!shouldRemove || !mounted) return;
+
+    setState(() => _processingActiveMatchIds.add(matchId));
+    try {
+      await _liveDuelService.markAbandoned(matchId);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.duelRemovedActive),
+          duration: const Duration(milliseconds: 1300),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.duelRemoveError('$e')),
+          duration: const Duration(milliseconds: 1600),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _processingActiveMatchIds.remove(matchId));
+      }
+    }
   }
 }
 
@@ -371,25 +457,25 @@ class _DuelHeader extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFF2B3F63)),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.flash_on_rounded, color: Color(0xFF9EC5FF), size: 22),
-          SizedBox(width: 10),
+          const Icon(Icons.flash_on_rounded, color: Color(0xFF9EC5FF), size: 22),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Duel Hub',
+                  context.l10n.duelHubTitle,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
-                  'Challenge friends and play live matches.',
+                  context.l10n.duelHubSubtitle,
                   style: TextStyle(
                     color: Color(0xFF9EB0D2),
                     fontSize: 12,
@@ -416,32 +502,10 @@ class _DuelPrimaryCta extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton.icon(
-      onPressed: onTap,
-      style: ElevatedButton.styleFrom(
-        minimumSize: const Size.fromHeight(56),
-        backgroundColor: const Color(0xFF2F7BFF),
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
-      icon: busy
-          ? const SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
-              ),
-            )
-          : const Icon(Icons.flash_on_rounded, size: 18),
-      label: Text(
-        busy ? 'Creating duel...' : 'Challenge a Friend',
-        style: const TextStyle(
-          fontWeight: FontWeight.w800,
-          fontSize: 16,
-          letterSpacing: 0.2,
-        ),
-      ),
+    return PrimaryCtaButton(
+      label: busy ? context.l10n.duelCreating : context.l10n.duelChallengeFriend,
+      icon: busy ? null : Icons.flash_on_rounded,
+      onTap: onTap,
     );
   }
 }
@@ -559,8 +623,8 @@ class _InviteCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
-            'sent you a live duel invite.',
+          Text(
+            context.l10n.duelInviteSentText,
             style: TextStyle(
               color: Color(0xFF9EB0D2),
               fontSize: 12,
@@ -573,14 +637,14 @@ class _InviteCard extends StatelessWidget {
               Expanded(
                 child: OutlinedButton(
                   onPressed: busy ? null : onDecline,
-                  child: const Text('Decline'),
+                  child: Text(context.l10n.decline),
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: FilledButton(
                   onPressed: busy ? null : onAccept,
-                  child: Text(busy ? '...' : 'Accept'),
+                  child: Text(busy ? '...' : context.l10n.duelAccept),
                 ),
               ),
             ],
@@ -596,11 +660,15 @@ class _ActiveMatchCard extends StatelessWidget {
     required this.match,
     required this.currentUid,
     required this.onResume,
+    required this.onRemove,
+    this.removing = false,
   });
 
   final LiveMatch match;
   final String currentUid;
   final VoidCallback onResume;
+  final VoidCallback onRemove;
+  final bool removing;
 
   @override
   Widget build(BuildContext context) {
@@ -608,13 +676,13 @@ class _ActiveMatchCard extends StatelessWidget {
     final opponentPlayer = match.players[opponentUid];
     final opponentName = (opponentPlayer?.username.trim().isNotEmpty ?? false)
         ? opponentPlayer!.username.trim()
-        : (opponentUid.isEmpty ? 'Unknown' : opponentUid);
+        : (opponentUid.isEmpty ? context.l10n.duelUnknownOpponent : opponentUid);
     final status = switch (match.status) {
-      LiveMatchStatus.pending => 'Pending',
-      LiveMatchStatus.countdown => 'Countdown',
-      LiveMatchStatus.playing => 'Playing',
-      LiveMatchStatus.finished => 'Finished',
-      LiveMatchStatus.cancelled => 'Cancelled',
+      LiveMatchStatus.pending => context.l10n.duelStatusPending,
+      LiveMatchStatus.countdown => context.l10n.duelStatusCountdown,
+      LiveMatchStatus.playing => context.l10n.duelStatusPlaying,
+      LiveMatchStatus.finished => context.l10n.duelStatusFinished,
+      LiveMatchStatus.cancelled => context.l10n.duelStatusCancelled,
     };
     return GameCard(
       child: Row(
@@ -626,7 +694,7 @@ class _ActiveMatchCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'VS $opponentName',
+                  context.l10n.duelVersusOpponent(opponentName),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -635,7 +703,7 @@ class _ActiveMatchCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Level: ${match.levelId} · $status',
+                  context.l10n.duelLevelAndStatus(match.levelId, status),
                   style: const TextStyle(
                     color: Color(0xFF9EB0D2),
                     fontSize: 12,
@@ -646,11 +714,21 @@ class _ActiveMatchCard extends StatelessWidget {
             ),
           ),
           FilledButton(
-            onPressed: onResume,
-            child: const Text('Resume'),
+            onPressed: removing ? null : onResume,
+            child: Text(context.l10n.duelResume),
+          ),
+          const SizedBox(width: 8),
+          OutlinedButton(
+            onPressed: removing ? null : onRemove,
+            child: Text(
+              removing ? context.l10n.duelRemoving : context.l10n.duelRemove,
+            ),
           ),
         ],
       ),
     );
   }
 }
+
+
+

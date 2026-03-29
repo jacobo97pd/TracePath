@@ -10,6 +10,8 @@ class FriendProfile {
     required this.equippedSkinId,
     required this.equippedTrailId,
     required this.addedAt,
+    required this.isOnline,
+    required this.lastSeenAt,
   });
 
   final String uid;
@@ -20,6 +22,8 @@ class FriendProfile {
   final String equippedSkinId;
   final String equippedTrailId;
   final DateTime? addedAt;
+  final bool isOnline;
+  final DateTime? lastSeenAt;
 
   String get displayName => username.trim().isNotEmpty ? username : playerName;
 
@@ -28,6 +32,8 @@ class FriendProfile {
     Map<String, dynamic> data,
   ) {
     final ts = data['addedAt'];
+    final lastSeen = data['lastSeenAt'];
+    final onlineRaw = data['isOnline'];
     return FriendProfile(
       uid: uid,
       playerName: (data['playerName'] as String?)?.trim().isNotEmpty == true
@@ -47,6 +53,9 @@ class FriendProfile {
               ? (data['equippedTrailId'] as String).trim()
               : 'none',
       addedAt: ts is Timestamp ? ts.toDate() : null,
+      isOnline: onlineRaw == true ||
+          (onlineRaw is String && onlineRaw.trim().toLowerCase() == 'true'),
+      lastSeenAt: lastSeen is Timestamp ? lastSeen.toDate() : null,
     );
   }
 }

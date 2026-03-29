@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 import 'network_burst_overlay.dart';
@@ -12,6 +11,7 @@ import 'services/live_duel_service.dart';
 import 'ui/components/friends_ranking_list.dart';
 import 'ui/components/game_button.dart';
 import 'ui/components/game_card.dart';
+import 'ui/components/presence_dot.dart';
 import 'ui/components/stat_item.dart';
 
 class VictoryScreenArgs {
@@ -150,6 +150,13 @@ class _VictoryScreenState extends State<VictoryScreen>
     List<FriendProfile> friends = const <FriendProfile>[];
     try {
       friends = await _friendsService.getFriends();
+      friends = friends.toList(growable: false)
+        ..sort((a, b) {
+          if (a.isOnline != b.isOnline) return a.isOnline ? -1 : 1;
+          return a.displayName
+              .toLowerCase()
+              .compareTo(b.displayName.toLowerCase());
+        });
     } catch (_) {}
     if (!mounted) return;
     if (friends.isEmpty) {
@@ -228,20 +235,33 @@ class _VictoryScreenState extends State<VictoryScreen>
                             ),
                             child: Row(
                               children: [
-                                CircleAvatar(
-                                  radius: 16,
-                                  backgroundColor: const Color(0xFF2A3E63),
-                                  child: Text(
-                                    f.displayName.isNotEmpty
-                                        ? f.displayName
-                                            .substring(0, 1)
-                                            .toUpperCase()
-                                        : 'P',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w800,
+                                Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 16,
+                                      backgroundColor: const Color(0xFF2A3E63),
+                                      child: Text(
+                                        f.displayName.isNotEmpty
+                                            ? f.displayName
+                                                .substring(0, 1)
+                                                .toUpperCase()
+                                            : 'P',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    Positioned(
+                                      right: -2,
+                                      bottom: -1,
+                                      child: PresenceDot(
+                                        isOnline: f.isOnline,
+                                        size: 9,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(
@@ -257,7 +277,9 @@ class _VictoryScreenState extends State<VictoryScreen>
                                         ),
                                       ),
                                       Text(
-                                        'Invite to a live 1v1 duel',
+                                        f.isOnline
+                                            ? 'Invite to a live 1v1 duel · Online'
+                                            : 'Invite to a live 1v1 duel · Offline',
                                         style: const TextStyle(
                                           color: Color(0xFF9EB0D2),
                                           fontSize: 12,

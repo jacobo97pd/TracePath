@@ -20,6 +20,7 @@ import 'ui/components/game_button.dart';
 import 'ui/components/game_card.dart';
 import 'ui/components/game_toast.dart';
 import 'ui/components/network_image_compat.dart';
+import 'ui/components/presence_dot.dart';
 
 class SocialScreen extends StatefulWidget {
   const SocialScreen({super.key});
@@ -51,6 +52,7 @@ class _SocialScreenState extends State<SocialScreen> {
 
   late Future<List<FriendProfile>> _friendsFuture;
   late Future<List<LeaderboardEntry>> _leaderboardFuture;
+  bool _friendsExpanded = false;
 
   @override
   void initState() {
@@ -68,7 +70,6 @@ class _SocialScreenState extends State<SocialScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
@@ -77,7 +78,7 @@ class _SocialScreenState extends State<SocialScreen> {
       ),
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
-        padding: EdgeInsets.fromLTRB(16, 14, 16, 24 + bottomPadding),
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -232,68 +233,139 @@ class _SocialScreenState extends State<SocialScreen> {
   }
 
   Widget _buildFriends() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const _SectionTitle(
-            title: 'Friends', subtitle: 'Your rivals and teammates'),
-        const SizedBox(height: 10),
-        StreamBuilder<List<FriendProfile>>(
-          stream: _friendsService.watchFriends(),
-          builder: (context, snapshot) {
-            final friends = snapshot.data;
-            if (friends == null) {
-              return FutureBuilder<List<FriendProfile>>(
-                future: _friendsFuture,
-                builder: (context, fs) {
-                  final items = fs.data ?? const <FriendProfile>[];
-                  if (items.isEmpty) {
-                    return const _EmptyHint(
-                      icon: Icons.people_outline_rounded,
-                      title: 'No friends added yet',
-                      text:
-                          'Add friends to compete on rankings and send challenges.',
-                    );
-                  }
-                  return Column(
-                    children: items
-                        .map(
-                          (f) => Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: _FriendCard(
-                              friend: f,
-                              onRemove: () => _removeFriend(f.uid),
+    return StreamBuilder<List<FriendProfile>>(
+      stream: _friendsService.watchFriends(),
+      builder: (context, snapshot) {
+        final count = snapshot.data?.length;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const _SectionTitle(
+              title: 'Friends',
+              subtitle: 'Your rivals and teammates',
+            ),
+            const SizedBox(height: 10),
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF1B2740),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFF2E466B), width: 1),
+              ),
+              child: Column(
+                children: [
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () {
+                        setState(() {
+                          _friendsExpanded = !_friendsExpanded;
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.groups_rounded,
+                              color: Color(0xFF9EC5FF),
+                              size: 20,
                             ),
-                          ),
-                        )
-                        .toList(growable: false),
-                  );
-                },
-              );
-            }
-            if (friends.isEmpty) {
-              return const _EmptyHint(
-                icon: Icons.people_outline_rounded,
-                title: 'No friends added yet',
-                text: 'Add friends to compete on rankings and send challenges.',
-              );
-            }
-            return Column(
-              children: friends
-                  .map(
-                    (f) => Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: _FriendCard(
-                        friend: f,
-                        onRemove: () => _removeFriend(f.uid),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                count == null
+                                    ? 'Friends'
+                                    : 'Friends ($count)',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                            AnimatedRotation(
+                              duration: const Duration(milliseconds: 180),
+                              turns: _friendsExpanded ? 0.5 : 0.0,
+                              child: const Icon(
+                                Icons.keyboard_arrow_down_rounded,
+                                color: Color(0xFF9EB0D2),
+                                size: 22,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  )
-                  .toList(growable: false),
+                  ),
+                  AnimatedCrossFade(
+                    duration: const Duration(milliseconds: 220),
+                    crossFadeState: _friendsExpanded
+                        ? CrossFadeState.showSecond
+                        : CrossFadeState.showFirst,
+                    firstChild: const SizedBox.shrink(),
+                    secondChild: Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                      child: _buildFriendsListContent(snapshot.data),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildFriendsListContent(List<FriendProfile>? friends) {
+    if (friends == null) {
+      return FutureBuilder<List<FriendProfile>>(
+        future: _friendsFuture,
+        builder: (context, fs) {
+          final items = fs.data ?? const <FriendProfile>[];
+          if (items.isEmpty) {
+            return const _EmptyHint(
+              icon: Icons.people_outline_rounded,
+              title: 'No friends added yet',
+              text: 'Add friends to compete on rankings and send challenges.',
             );
-          },
-        ),
-      ],
+          }
+          return Column(
+            children: items
+                .map(
+                  (f) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _FriendCard(
+                      friend: f,
+                      onRemove: () => _removeFriend(f.uid),
+                    ),
+                  ),
+                )
+                .toList(growable: false),
+          );
+        },
+      );
+    }
+    if (friends.isEmpty) {
+      return const _EmptyHint(
+        icon: Icons.people_outline_rounded,
+        title: 'No friends added yet',
+        text: 'Add friends to compete on rankings and send challenges.',
+      );
+    }
+    return Column(
+      children: friends
+          .map(
+            (f) => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _FriendCard(
+                friend: f,
+                onRemove: () => _removeFriend(f.uid),
+              ),
+            ),
+          )
+          .toList(growable: false),
     );
   }
 
@@ -549,6 +621,13 @@ class _SocialScreenState extends State<SocialScreen> {
     List<FriendProfile> friends = const <FriendProfile>[];
     try {
       friends = await _friendsService.getFriends();
+      friends = friends.toList(growable: false)
+        ..sort((a, b) {
+          if (a.isOnline != b.isOnline) return a.isOnline ? -1 : 1;
+          return a.displayName
+              .toLowerCase()
+              .compareTo(b.displayName.toLowerCase());
+        });
     } catch (_) {}
     if (!mounted) return;
     if (friends.isEmpty) {
@@ -628,20 +707,33 @@ class _SocialScreenState extends State<SocialScreen> {
                             ),
                             child: Row(
                               children: [
-                                CircleAvatar(
-                                  radius: 16,
-                                  backgroundColor: const Color(0xFF2A3E63),
-                                  child: Text(
-                                    f.displayName.isNotEmpty
-                                        ? f.displayName
-                                            .substring(0, 1)
-                                            .toUpperCase()
-                                        : 'P',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w800,
+                                Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 16,
+                                      backgroundColor: const Color(0xFF2A3E63),
+                                      child: Text(
+                                        f.displayName.isNotEmpty
+                                            ? f.displayName
+                                                .substring(0, 1)
+                                                .toUpperCase()
+                                            : 'P',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    Positioned(
+                                      right: -2,
+                                      bottom: -1,
+                                      child: PresenceDot(
+                                        isOnline: f.isOnline,
+                                        size: 9,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(
@@ -657,7 +749,9 @@ class _SocialScreenState extends State<SocialScreen> {
                                         ),
                                       ),
                                       Text(
-                                        'Invite to a live 1v1 duel',
+                                        f.isOnline
+                                            ? 'Invite to a live 1v1 duel · Online'
+                                            : 'Invite to a live 1v1 duel · Offline',
                                         style: TextStyle(
                                           color: const Color(0xFF9EB0D2),
                                           fontSize: 12,
@@ -1349,18 +1443,28 @@ class _FriendCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              CircleAvatar(
-                radius: 22,
-                backgroundColor: const Color(0xFF1B2A43),
-                child: Text(
-                  friend.playerName.isNotEmpty
-                      ? friend.playerName.substring(0, 1).toUpperCase()
-                      : 'P',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  CircleAvatar(
+                    radius: 22,
+                    backgroundColor: const Color(0xFF1B2A43),
+                    child: Text(
+                      friend.playerName.isNotEmpty
+                          ? friend.playerName.substring(0, 1).toUpperCase()
+                          : 'P',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
                   ),
-                ),
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: PresenceDot(isOnline: friend.isOnline, size: 11),
+                  ),
+                ],
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -1388,6 +1492,17 @@ class _FriendCard extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
+                    const SizedBox(height: 2),
+                    Text(
+                      friend.isOnline ? 'En línea' : 'Desconectado',
+                      style: TextStyle(
+                        color: friend.isOnline
+                            ? const Color(0xFF6EE7A0)
+                            : const Color(0xFFFCA5A5),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -1407,10 +1522,10 @@ class _FriendCard extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              const _TinyInfoChip(
+              _TinyInfoChip(
                 icon: Icons.flag_rounded,
                 label: 'Status',
-                value: 'Friend',
+                value: friend.isOnline ? 'Online' : 'Offline',
               ),
               _TinyInfoChip(
                 icon: Icons.auto_awesome_rounded,

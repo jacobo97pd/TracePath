@@ -7,11 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'coins_service.dart';
+import 'l10n/l10n.dart';
 import 'progress_service.dart';
+import 'theme/app_colors.dart';
 import 'ui/avatar_utils.dart';
 import 'ui/components/coin_display.dart';
 import 'ui/components/game_card.dart';
 import 'ui/components/network_image_compat.dart';
+import 'ui/components/primary_cta_button.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
@@ -42,7 +45,7 @@ class HomeScreen extends StatelessWidget {
         final googleAvatarUrl = _resolveGoogleAvatarUrl();
 
         return Scaffold(
-          backgroundColor: const Color(0xFF0F172A),
+          backgroundColor: AppColors.background,
           body: SafeArea(
             child: Container(
               decoration: const BoxDecoration(
@@ -50,8 +53,8 @@ class HomeScreen extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0xFF101A30),
-                    Color(0xFF0F172A),
+                    AppColors.primaryDark,
+                    AppColors.background,
                   ],
                 ),
               ),
@@ -60,13 +63,13 @@ class HomeScreen extends StatelessWidget {
                   16,
                   14,
                   16,
-                  22 + _homeBottomClearance(context),
+                  22,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _TopPlayerBar(
-                      playerName: 'Player',
+                      playerName: context.l10n.homePlayerName,
                       streak: streak,
                       highestLevel: highestReached,
                       coins: coinsService.coins,
@@ -86,20 +89,19 @@ class HomeScreen extends StatelessWidget {
                       onTap: () => context.go('/play'),
                     ),
                     const SizedBox(height: 22),
-                    const _SectionTitle(
-                      title: 'Quick Access',
-                      subtitle: 'Jump directly into your favorite modes',
+                    _SectionTitle(
+                      title: context.l10n.homeQuickAccessTitle,
+                      subtitle: context.l10n.homeQuickAccessSubtitle,
                     ),
                     const SizedBox(height: 10),
                     _QuickAccessGrid(
                       onDaily: () => context.go('/daily'),
-                      onLevels: () => context.go('/play'),
                       onSocial: () => context.go('/social'),
                     ),
                     const SizedBox(height: 22),
-                    const _SectionTitle(
-                      title: 'Progress',
-                      subtitle: 'Your latest performance and momentum',
+                    _SectionTitle(
+                      title: context.l10n.homeProgressTitle,
+                      subtitle: context.l10n.homeProgressSubtitle,
                     ),
                     const SizedBox(height: 10),
                     _ProgressDashboard(
@@ -151,10 +153,6 @@ class HomeScreen extends StatelessWidget {
     return '';
   }
 
-  double _homeBottomClearance(BuildContext context) {
-    final inset = MediaQuery.of(context).padding.bottom;
-    return 96 + inset;
-  }
 }
 
 class _TopPlayerBar extends StatelessWidget {
@@ -208,8 +206,8 @@ class _TopPlayerBar extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'TracePath',
+                Text(
+                  context.l10n.homeTitle,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 19,
@@ -230,8 +228,8 @@ class _TopPlayerBar extends StatelessWidget {
                   spacing: 6,
                   runSpacing: 6,
                   children: [
-                    _Pill(text: 'Streak $streak'),
-                    _Pill(text: 'Lv $highestLevel'),
+                    _Pill(text: context.l10n.homeStreakPill(streak)),
+                    _Pill(text: context.l10n.homeLevelPill(highestLevel)),
                   ],
                 ),
               ],
@@ -334,20 +332,20 @@ class _HeroBanner extends StatelessWidget {
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Text(
-                'Train your brain',
-                style: TextStyle(
+                context.l10n.homeTrainTitle,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 28,
                   fontWeight: FontWeight.w900,
                   letterSpacing: -0.8,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
-                'Trace paths faster, improve precision, and climb every challenge.',
-                style: TextStyle(
+                context.l10n.homeTrainSubtitle,
+                style: const TextStyle(
                   color: Color(0xFFACB9D3),
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -371,62 +369,15 @@ class _PrimaryPlayCta extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        GestureDetector(
+        PrimaryCtaButton(
+          label: context.l10n.homeStartSolving,
+          icon: Icons.bolt_rounded,
           onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
-              gradient: const LinearGradient(
-                colors: [
-                  Color(0xFF06B6D4),
-                  Color(0xFF3B82F6),
-                  Color(0xFF8B5CF6),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x8806B6D4),
-                  blurRadius: 28,
-                  offset: Offset(0, 10),
-                ),
-                BoxShadow(
-                  color: Color(0x668B5CF6),
-                  blurRadius: 24,
-                  offset: Offset(0, 12),
-                ),
-              ],
-              border: Border.all(color: const Color(0xCCFFFFFF), width: 1.4),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(Icons.bolt_rounded, size: 28, color: Colors.white),
-                SizedBox(width: 10),
-                Flexible(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      'START SOLVING!',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.9,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ),
         const SizedBox(height: 8),
-        const Center(
+        Center(
           child: Text(
-            'Jump into your next puzzle',
+            context.l10n.homeJumpToNextPuzzle,
             style: TextStyle(
               color: Color(0xFFAFC0DF),
               fontSize: 12,
@@ -471,8 +422,8 @@ class _ContinueCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Continue',
+                Text(
+                  context.l10n.homeContinue,
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w800,
@@ -482,8 +433,8 @@ class _ContinueCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   solved > 0
-                      ? 'Level $nextLevel Â· Pick up where you left off'
-                      : 'Start your first run',
+                      ? context.l10n.homeContinueResumeLevel(nextLevel)
+                      : context.l10n.homeContinueFirstRun,
                   style: const TextStyle(
                     color: Color(0xFF9BA8C3),
                     fontSize: 12,
@@ -502,12 +453,10 @@ class _ContinueCard extends StatelessWidget {
 class _QuickAccessGrid extends StatelessWidget {
   const _QuickAccessGrid({
     required this.onDaily,
-    required this.onLevels,
     required this.onSocial,
   });
 
   final VoidCallback onDaily;
-  final VoidCallback onLevels;
   final VoidCallback onSocial;
 
   @override
@@ -516,22 +465,15 @@ class _QuickAccessGrid extends StatelessWidget {
       children: [
         _QuickCard(
           icon: Icons.calendar_month_rounded,
-          title: 'Daily Puzzle',
-          subtitle: 'One challenge each day',
+          title: context.l10n.homeQuickDailyTitle,
+          subtitle: context.l10n.homeQuickDailySubtitle,
           onTap: onDaily,
         ),
         const SizedBox(height: 10),
         _QuickCard(
-          icon: Icons.grid_view_rounded,
-          title: 'Levels',
-          subtitle: 'Choose any available level',
-          onTap: onLevels,
-        ),
-        const SizedBox(height: 10),
-        _QuickCard(
           icon: Icons.groups_rounded,
-          title: 'Social',
-          subtitle: 'Friends, inbox and multiplayer',
+          title: context.l10n.homeQuickSocialTitle,
+          subtitle: context.l10n.homeQuickSocialSubtitle,
           onTap: onSocial,
         ),
       ],
@@ -619,7 +561,7 @@ class _ProgressDashboard extends StatelessWidget {
           children: [
             Expanded(
               child: _MetricCard(
-                title: 'Levels solved',
+                title: context.l10n.homeMetricLevelsSolved,
                 value: '$solved',
                 icon: Icons.check_circle_outline_rounded,
               ),
@@ -627,7 +569,7 @@ class _ProgressDashboard extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: _MetricCard(
-                title: 'Current streak',
+                title: context.l10n.homeMetricCurrentStreak,
                 value: '$streak',
                 icon: Icons.local_fire_department_rounded,
               ),
@@ -639,7 +581,7 @@ class _ProgressDashboard extends StatelessWidget {
           children: [
             Expanded(
               child: _MetricCard(
-                title: 'Best streak',
+                title: context.l10n.homeMetricBestStreak,
                 value: '$bestStreak',
                 icon: Icons.workspace_premium_rounded,
               ),
@@ -647,7 +589,7 @@ class _ProgressDashboard extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: _MetricCard(
-                title: 'Highest level',
+                title: context.l10n.homeMetricHighestLevel,
                 value: '$highestLevel',
                 icon: Icons.flag_rounded,
               ),
@@ -725,7 +667,7 @@ class _DailySummaryCard extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Daily puzzles solved: $dailySolved',
+              context.l10n.homeDailySolved(dailySolved),
               style: const TextStyle(
                 color: Color(0xFFD8E0F5),
                 fontWeight: FontWeight.w600,
@@ -734,7 +676,7 @@ class _DailySummaryCard extends StatelessWidget {
           ),
           TextButton(
             onPressed: onProfileTap,
-            child: const Text('View profile'),
+            child: Text(context.l10n.homeViewProfile),
           ),
         ],
       ),
@@ -817,3 +759,8 @@ class _EquippedSkinImage extends StatelessWidget {
     );
   }
 }
+
+
+
+
+

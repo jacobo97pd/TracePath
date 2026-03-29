@@ -80,11 +80,21 @@ class _StartupSplashGateState extends State<StartupSplashGate> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(26),
-                        child: Image.asset(
-                          'assets/branding/logo_tracePath.png',
+                        child: Container(
                           width: 114,
                           height: 114,
-                          fit: BoxFit.cover,
+                          color: const Color(0xFF0A1323),
+                          child: OverflowBox(
+                            maxWidth: 146,
+                            maxHeight: 146,
+                            child: Image.asset(
+                              'assets/branding/logo_tracePath.png',
+                              width: 146,
+                              height: 146,
+                              fit: BoxFit.cover,
+                              filterQuality: FilterQuality.medium,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 18),

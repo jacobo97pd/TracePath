@@ -1,7 +1,7 @@
 {
   "packId": "world_03",
   "version": "pack_world_03_v1",
-  "count": 25,
+  "count": 26,
   "world": 3,
   "levels": [
     {
@@ -3089,6 +3089,89 @@
         "variant": "classic",
         "canonical_hash": "233acd0c35086a2b63fb3c9088a1a7a091f6ac989513b23e2c6810a3a04d136e",
         "imported_from": "c:\\Users\\jacob\\Downloads\\niveles_linkedin_editor.json"
+      }
+    },
+    {
+      "id": "linkedin-editor-ext-26",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 5,
+          "y": 2
+        },
+        {
+          "n": 2,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 3,
+          "x": 2,
+          "y": 4
+        },
+        {
+          "n": 4,
+          "x": 4,
+          "y": 4
+        },
+        {
+          "n": 5,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 6,
+          "x": 4,
+          "y": 0
+        },
+        {
+          "n": 7,
+          "x": 3,
+          "y": 1
+        },
+        {
+          "n": 8,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "n": 9,
+          "x": 1,
+          "y": 1
+        },
+        {
+          "n": 10,
+          "x": 0,
+          "y": 3
+        },
+        {
+          "n": 11,
+          "x": 1,
+          "y": 5
+        },
+        {
+          "n": 12,
+          "x": 2,
+          "y": 2
+        }
+      ],
+      "walls": [],
+      "difficultyTag": "d2",
+      "source": "linkedin_editor_external",
+      "source_pack": "niveles_linkedin_editor.json",
+      "source_origin": "linkedin_editor_external",
+      "variant": "classic",
+      "canonical_hash": "e139f5b96516d9f183c7c7ec7910635e04011615759098d28c63ced279c516e2",
+      "meta": {
+        "source_pack": "niveles_linkedin_editor.json",
+        "source_origin": "linkedin_editor_external",
+        "variant": "classic",
+        "canonical_hash": "e139f5b96516d9f183c7c7ec7910635e04011615759098d28c63ced279c516e2",
+        "imported_at": "2026-03-29T21:46:37Z"
       }
     }
   ]
