@@ -1,6 +1,7 @@
 {
   "projects": {
-    "default": "tracepath-e2e90"
+    "default": "tracepath-e2e90",
+    "TracePath": "tracepath-e2e90"
   },
   "targets": {},
   "etags": {}
