@@ -5,7 +5,6 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import 'coins_service.dart';
 import 'skin_catalog_service.dart';
@@ -349,12 +348,6 @@ class _ShopScreenState extends State<ShopScreen> {
                 ],
               ),
               actions: [
-                if (kDebugMode)
-                  IconButton(
-                    tooltip: context.l10n.shopSkinEditorTooltip,
-                    onPressed: () => context.push('/skin-editor'),
-                    icon: const Icon(Icons.tune_rounded),
-                  ),
                 Padding(
                   padding: const EdgeInsets.only(right: 12),
                   child: StreamBuilder<int>(

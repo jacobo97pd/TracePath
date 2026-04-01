@@ -249,6 +249,8 @@ class SocialLeaderboardService {
         .doc(uid)
         .collection('completed_levels')
         .get();
+    final avgSolveTimeMs = _computeAverageSolveTimeMs(completedSnap.docs);
+    final averagedLevelCount = _countValidAverageLevels(completedSnap.docs);
     final totalCompleted = completedSnap.docs.length;
     final currentUserSnap = await userRef.get();
     final currentUser = currentUserSnap.data() ?? <String, dynamic>{};
@@ -290,6 +292,8 @@ class SocialLeaderboardService {
       totalLevelsCompleted: totalCompleted,
       highestLevelReached: nextHighest,
       fastestSolveMs: nextFastest,
+      avgSolveTimeMs: avgSolveTimeMs,
+      averagedLevelCount: averagedLevelCount,
     );
   }
 
@@ -327,6 +331,37 @@ class SocialLeaderboardService {
           .where((e) => e.uid.trim().isNotEmpty)
           .toList(growable: false);
       return items;
+    });
+  }
+
+  Stream<Map<String, dynamic>?> watchCurrentGlobalProfile() async* {
+    final uid = await _requireUid();
+    yield* _db()
+        .collection('leaderboards')
+        .doc(_globalLeaderboardId)
+        .collection('scores')
+        .doc(uid)
+        .snapshots()
+        .map((snap) => snap.data());
+  }
+
+  Stream<int?> watchCurrentGlobalRank({int scanLimit = 500}) async* {
+    final uid = await _requireUid();
+    final safeLimit = scanLimit <= 0 ? 50 : (scanLimit > 2000 ? 2000 : scanLimit);
+    yield* _db()
+        .collection('leaderboards')
+        .doc(_globalLeaderboardId)
+        .collection('scores')
+        .orderBy('globalScore', descending: true)
+        .orderBy('bestTimeMs')
+        .limit(safeLimit)
+        .snapshots()
+        .map((snap) {
+      final docs = snap.docs;
+      for (var i = 0; i < docs.length; i++) {
+        if (docs[i].id == uid) return i + 1;
+      }
+      return null;
     });
   }
 
@@ -474,6 +509,8 @@ class SocialLeaderboardService {
     required int totalLevelsCompleted,
     required int highestLevelReached,
     required int fastestSolveMs,
+    required double avgSolveTimeMs,
+    required int averagedLevelCount,
   }) async {
     final username = (userData['username'] as String?)?.trim() ?? '';
     final playerName =
@@ -500,9 +537,14 @@ class SocialLeaderboardService {
             : 'none';
 
     final safeFastest = fastestSolveMs > 0 ? fastestSolveMs : 99999999;
-    final globalScore = (totalLevelsCompleted * 1000000) +
-        (highestLevelReached * 1000) +
-        max(0, 100000 - safeFastest);
+    final safeAvg = avgSolveTimeMs.isFinite && avgSolveTimeMs > 0
+        ? avgSolveTimeMs
+        : safeFastest.toDouble();
+    // Ranking based on average clear time (lower is better), without penalizing
+    // users who completed more levels.
+    final globalScore =
+        max(0, 1000000000 - safeAvg.round()) + max(0, totalLevelsCompleted);
+    final globalTier = _globalTierForAverageMs(safeAvg);
     final globalRef = _db()
         .collection('leaderboards')
         .doc(_globalLeaderboardId)
@@ -523,6 +565,9 @@ class SocialLeaderboardService {
         'moves': totalLevelsCompleted,
         'stars': highestLevelReached,
         'globalScore': globalScore,
+        'globalTier': globalTier,
+        'avgSolveTimeMs': safeAvg.round(),
+        'averagedLevelCount': averagedLevelCount,
         'totalLevelsCompleted': totalLevelsCompleted,
         'highestLevelReached': highestLevelReached,
         'fastestSolveMs': safeFastest,
@@ -530,5 +575,50 @@ class SocialLeaderboardService {
       },
       SetOptions(merge: true),
     );
+  }
+
+  int _resolveLevelTimeMs(Map<String, dynamic> data) {
+    final firstClear = LeaderboardEntry.readInt(data['firstClearTimeMs']);
+    if (firstClear > 0) return firstClear;
+    final personalBest = LeaderboardEntry.readInt(data['personalBestTimeMs']);
+    if (personalBest > 0) return personalBest;
+    final best = LeaderboardEntry.readInt(data['bestTimeMs']);
+    if (best > 0) return best;
+    return 0;
+  }
+
+  int _countValidAverageLevels(
+    List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
+  ) {
+    var count = 0;
+    for (final doc in docs) {
+      final timeMs = _resolveLevelTimeMs(doc.data());
+      if (timeMs > 0) count++;
+    }
+    return count;
+  }
+
+  double _computeAverageSolveTimeMs(
+    List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
+  ) {
+    var total = 0;
+    var count = 0;
+    for (final doc in docs) {
+      final timeMs = _resolveLevelTimeMs(doc.data());
+      if (timeMs <= 0) continue;
+      total += timeMs;
+      count++;
+    }
+    if (count == 0) return 0;
+    return total / count;
+  }
+
+  String _globalTierForAverageMs(double avgMs) {
+    if (avgMs <= 3500) return 'S+';
+    if (avgMs <= 5000) return 'S';
+    if (avgMs <= 7000) return 'A';
+    if (avgMs <= 9000) return 'B';
+    if (avgMs <= 12000) return 'C';
+    return 'D';
   }
 }

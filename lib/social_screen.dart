@@ -118,83 +118,110 @@ class _SocialScreenState extends State<SocialScreen> {
           stream: _leaderboardService.watchGlobalTopScores(limit: 10),
           builder: (context, rankSnapshot) {
             final entries = rankSnapshot.data ?? const <LeaderboardEntry>[];
-            final bestTime =
-                entries.isEmpty ? '--:--' : _formatMs(entries.first.bestTimeMs);
-            final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
-            final myRank =
-                currentUid.isEmpty ? 0 : _rankForUidByTime(entries, currentUid);
-            return Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF1A2950),
-                    Color(0xFF15264A),
-                    Color(0xFF141E39)
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                border: Border.all(color: const Color(0xFF365588), width: 1.1),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x331A5CF6),
-                    blurRadius: 24,
-                    offset: Offset(0, 12),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Social Hub',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 26,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Friends, rankings and challenges',
-                    style: TextStyle(
-                      color: Color(0xFFAEC2E8),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _HeroChip(
-                          icon: Icons.groups_rounded,
-                          label: 'Friends',
-                          value: '$friendCount',
+            return StreamBuilder<Map<String, dynamic>?>(
+              stream: _leaderboardService.watchCurrentGlobalProfile(),
+              builder: (context, myProfileSnapshot) {
+                return StreamBuilder<int?>(
+                  stream: _leaderboardService.watchCurrentGlobalRank(),
+                  builder: (context, myRankSnapshot) {
+                    final myProfile = myProfileSnapshot.data;
+                    final myBestTimeMs =
+                        LeaderboardEntry.readInt(myProfile?['bestTimeMs']);
+                    final myBestTime = myBestTimeMs > 0
+                        ? _formatMs(myBestTimeMs)
+                        : (entries.isEmpty
+                            ? '--:--'
+                            : _formatMs(entries.first.bestTimeMs));
+                    final myRank = myRankSnapshot.data;
+                    final globalTier =
+                        (myProfile?['globalTier'] as String?)?.trim().isNotEmpty ==
+                                true
+                            ? (myProfile?['globalTier'] as String).trim()
+                            : '--';
+
+                    return Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(24),
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFF1A2950),
+                            Color(0xFF15264A),
+                            Color(0xFF141E39)
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
+                        border:
+                            Border.all(color: const Color(0xFF365588), width: 1.1),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x331A5CF6),
+                            blurRadius: 24,
+                            offset: Offset(0, 12),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _HeroChip(
-                          icon: Icons.workspace_premium_rounded,
-                          label: 'Best Rank',
-                          value: myRank > 0 ? '#$myRank' : '--',
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Social Hub',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 26,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Friends, rankings and challenges',
+                            style: TextStyle(
+                              color: Color(0xFFAEC2E8),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _HeroChip(
+                                  icon: Icons.groups_rounded,
+                                  label: 'Friends',
+                                  value: '$friendCount',
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _HeroChip(
+                                  icon: Icons.workspace_premium_rounded,
+                                  label: 'Best Rank',
+                                  value: myRank != null ? '#$myRank' : '--',
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _HeroChip(
+                                  icon: Icons.bolt_rounded,
+                                  label: 'Top Time',
+                                  value: myBestTime,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          _HeroChip(
+                            icon: Icons.auto_awesome_rounded,
+                            label: 'Global Tier',
+                            value: globalTier,
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _HeroChip(
-                          icon: Icons.bolt_rounded,
-                          label: 'Top Time',
-                          value: bestTime,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                    );
+                  },
+                );
+              },
             );
           },
         );
@@ -1161,17 +1188,6 @@ class _SocialScreenState extends State<SocialScreen> {
       ranks[i] = currentRank;
     }
     return ranks;
-  }
-
-  int _rankForUidByTime(List<LeaderboardEntry> entries, String uid) {
-    if (uid.trim().isEmpty || entries.isEmpty) return 0;
-    final ranks = _computeRanksByTime(
-      entries.map((e) => e.bestTimeMs).toList(growable: false),
-    );
-    for (var i = 0; i < entries.length; i++) {
-      if (entries[i].uid == uid) return ranks[i];
-    }
-    return 0;
   }
 
   String? _readString(Object? value) {

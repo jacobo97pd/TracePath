@@ -75,7 +75,7 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen>
     with SingleTickerProviderStateMixin {
   static const int _maxHintsPerLevel = 3;
-  static const bool _unlimitedHintsForTesting = true;
+  static const bool _unlimitedHintsForTesting = false;
   static const int _minSecondsBeforeReport = 20;
   static const String _firestoreDatabaseId = 'tracepath-database';
   static const bool _showLiveEmoteDebugHud = false;

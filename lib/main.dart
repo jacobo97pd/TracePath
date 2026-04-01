@@ -37,7 +37,6 @@ import 'progress_service.dart';
 import 'puzzle_leaderboard_screen.dart';
 import 'shop_screen.dart';
 import 'skin_catalog_service.dart';
-import 'skin_editor_screen.dart';
 import 'stats_service.dart';
 import 'social_screen.dart';
 import 'victory_screen.dart';
@@ -373,12 +372,6 @@ class _MyAppState extends State<MyApp> {
       GoRoute(
         path: '/editor-nuevos',
         builder: (context, state) => const EditorNuevosPage(),
-      ),
-      GoRoute(
-        path: '/skin-editor',
-        builder: (context, state) => SkinEditorScreen(
-          catalogService: widget.skinCatalogService,
-        ),
       ),
     ],
   );
