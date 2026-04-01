@@ -638,6 +638,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     onCta: item.hasCta
                                         ? () => unawaited(_handleInboxCta(item))
                                         : null,
+                                    onClaim:
+                                        item.canClaimAllAchievementsReward
+                                            ? () => _claimInboxReward(item)
+                                            : null,
                                     onDelete: item.read &&
                                             !item.isPendingFriendRequest
                                         ? () => _deleteInboxItem(item)
@@ -834,6 +838,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (_) {}
   }
 
+  Future<void> _claimInboxReward(InboxItem item) async {
+    if (!item.canClaimAllAchievementsReward) return;
+    try {
+      final granted = await _inboxService.claimAllAchievementsReward(
+        uid: '',
+        messageId: item.id,
+      );
+      if (!mounted) return;
+      if (granted) {
+        await widget.coinsService
+            .syncCoinsFromRemote(widget.coinsService.coins + item.rewardCoins);
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Reward claimed: +${item.rewardCoins} coins'),
+            duration: const Duration(milliseconds: 1200),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Reward already claimed'),
+            duration: Duration(milliseconds: 1000),
+          ),
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[profile] claim reward failed id=${item.id} error=$e');
+      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not claim reward'),
+          duration: Duration(milliseconds: 1200),
+        ),
+      );
+    }
+  }
+
   Future<void> _acceptFriendRequest(InboxItem item) async {
     final fromUid = item.fromUid.trim();
     if (fromUid.isEmpty) return;
@@ -932,6 +976,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           break;
         case InboxItemType.friendRequest:
         case InboxItemType.friendAccept:
+        case InboxItemType.systemReward:
         case InboxItemType.systemNews:
         case InboxItemType.unknown:
           return;
@@ -3185,6 +3230,7 @@ class _InboxItemCard extends StatelessWidget {
     this.onAccept,
     this.onDecline,
     this.onCta,
+    this.onClaim,
     this.onDelete,
   });
 
@@ -3193,6 +3239,7 @@ class _InboxItemCard extends StatelessWidget {
   final VoidCallback? onAccept;
   final VoidCallback? onDecline;
   final VoidCallback? onCta;
+  final VoidCallback? onClaim;
   final VoidCallback? onDelete;
 
   @override
@@ -3282,11 +3329,20 @@ class _InboxItemCard extends StatelessWidget {
                     ),
                   if (onDecline != null && onCta != null)
                     const SizedBox(width: 8),
+                  if ((onDecline != null || onCta != null) && onClaim != null)
+                    const SizedBox(width: 8),
                   if (onCta != null)
                     Expanded(
                       child: ElevatedButton(
                         onPressed: onCta,
                         child: const Text('Open'),
+                      ),
+                    ),
+                  if (onClaim != null)
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: onClaim,
+                        child: Text('Claim ${item.rewardCoins}'),
                       ),
                     ),
                   if (onDelete != null)
@@ -3318,6 +3374,8 @@ class _InboxItemCard extends StatelessWidget {
         return Icons.sports_esports_rounded;
       case InboxItemType.liveDuelInvite:
         return Icons.sports_martial_arts_rounded;
+      case InboxItemType.systemReward:
+        return Icons.card_giftcard_rounded;
       case InboxItemType.systemNews:
         return Icons.campaign_rounded;
       case InboxItemType.unknown:

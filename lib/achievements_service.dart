@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'progress_service.dart';
 import 'stats_service.dart';
 import 'services/achievement_persistence_service.dart';
+import 'services/inbox_service.dart';
 
 class AchievementDef {
   const AchievementDef({
@@ -115,6 +116,7 @@ class AchievementsService extends ChangeNotifier {
   final StatsService _statsService;
   final int speedrunnerThresholdMs;
   late final AchievementPersistenceService _persistenceService;
+  final InboxService _inboxService = InboxService();
   StreamSubscription<User?>? _authSub;
   final Map<String, int> _unlockedAtMs = <String, int>{};
   String? _activeUid;
@@ -176,6 +178,7 @@ class AchievementsService extends ChangeNotifier {
       await _save();
       notifyListeners();
     }
+    unawaited(_ensureAllAchievementsRewardInbox());
     return unlockedNow;
   }
 
@@ -198,6 +201,7 @@ class AchievementsService extends ChangeNotifier {
     _unlockedAtMs[def.id] = unlockedAtMs;
     await _save();
     notifyListeners();
+    unawaited(_ensureAllAchievementsRewardInbox());
     return def;
   }
 
@@ -282,6 +286,33 @@ class AchievementsService extends ChangeNotifier {
 
     await _save();
     notifyListeners();
+    unawaited(_ensureAllAchievementsRewardInbox());
+  }
+
+  Future<void> _ensureAllAchievementsRewardInbox() async {
+    final uid = _activeUid?.trim() ?? '';
+    if (uid.isEmpty) return;
+    final unlockedCount = _unlockedAtMs.length;
+    final total = definitions.length;
+    if (unlockedCount < total) return;
+    try {
+      await _inboxService.ensureAllAchievementsRewardInbox(
+        uid: uid,
+        unlockedAchievements: unlockedCount,
+        totalAchievements: total,
+      );
+      if (kDebugMode) {
+        debugPrint(
+          '[achievements] all complete -> ensured reward inbox uid=$uid unlocked=$unlockedCount/$total',
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint(
+          '[achievements] ensure reward inbox failed uid=$uid error=$e',
+        );
+      }
+    }
   }
 
   Future<int> _persistUnlock(String achievementId) async {

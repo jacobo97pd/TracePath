@@ -16,6 +16,7 @@ service cloud.firestore {
         'friend_challenge',
         'level_challenge',
         'live_duel_invite',
+        'system_reward',
         'system_news'
       ];
     }

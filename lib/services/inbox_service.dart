@@ -6,6 +6,9 @@ import '../models/inbox_item.dart';
 
 class InboxService {
   static const String _firestoreDatabaseId = 'tracepath-database';
+  static const String _allAchievementsRewardInboxId =
+      'system_reward_all_achievements_completed';
+  static const int _allAchievementsRewardCoins = 250;
 
   Future<void> addInboxItem({
     required String uid,
@@ -119,6 +122,7 @@ class InboxService {
       case 'friend_challenge':
       case 'level_challenge':
       case 'live_duel_invite':
+      case 'system_reward':
       case 'system_news':
         return value;
       default:
@@ -161,5 +165,144 @@ class InboxService {
       throw StateError('AUTH_REQUIRED');
     }
     return uid;
+  }
+
+  Future<void> ensureAllAchievementsRewardInbox({
+    required String uid,
+    required int unlockedAchievements,
+    required int totalAchievements,
+  }) async {
+    final normalizedUid = uid.trim().isEmpty ? await _requireUid() : uid.trim();
+    if (normalizedUid.isEmpty) return;
+    if (totalAchievements <= 0) return;
+    if (unlockedAchievements < totalAchievements) return;
+
+    final userRef = _db().collection('users').doc(normalizedUid);
+    final inboxRef = _inboxRef(normalizedUid).doc(_allAchievementsRewardInboxId);
+
+    await _db().runTransaction((tx) async {
+      final userSnap = await tx.get(userRef);
+      final userData = userSnap.data() ?? const <String, dynamic>{};
+      final rewardAlreadyClaimed = userData['allAchievementsRewardClaimed'] == true;
+      if (rewardAlreadyClaimed) {
+        return;
+      }
+
+      final inboxSnap = await tx.get(inboxRef);
+      if (!inboxSnap.exists) {
+        tx.set(
+          inboxRef,
+          <String, dynamic>{
+            'type': 'system_reward',
+            'subtype': 'all_achievements_completed',
+            'title': 'All achievements completed',
+            'body': 'You unlocked every achievement. Claim your reward chest.',
+            'status': 'active',
+            'read': false,
+            'claimed': false,
+            'rewardCoins': _allAchievementsRewardCoins,
+            'fromUid': 'system',
+            'fromUsername': 'TracePath',
+            'fromPlayerName': 'TracePath',
+            'fromAvatarId': 'default',
+            'ctaType': '',
+            'ctaPayload': '',
+            'relatedType': 'all_achievements_completed',
+            'createdAt': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
+      }
+    });
+  }
+
+  Future<bool> claimAllAchievementsReward({
+    required String uid,
+    String? messageId,
+  }) async {
+    final normalizedUid = uid.trim().isEmpty ? await _requireUid() : uid.trim();
+    if (normalizedUid.isEmpty) return false;
+    final inboxId = (messageId ?? '').trim().isEmpty
+        ? _allAchievementsRewardInboxId
+        : messageId!.trim();
+
+    final userRef = _db().collection('users').doc(normalizedUid);
+    final inboxRef = _inboxRef(normalizedUid).doc(inboxId);
+    final walletRef = userRef
+        .collection('wallet_transactions')
+        .doc('reward_all_achievements_completed');
+
+    var granted = false;
+    await _db().runTransaction((tx) async {
+      final userSnap = await tx.get(userRef);
+      final userData = userSnap.data() ?? const <String, dynamic>{};
+      final alreadyClaimedInUser = userData['allAchievementsRewardClaimed'] == true;
+
+      final inboxSnap = await tx.get(inboxRef);
+      if (!inboxSnap.exists) {
+        return;
+      }
+      final inboxData = inboxSnap.data() ?? const <String, dynamic>{};
+      final alreadyClaimedInInbox = inboxData['claimed'] == true;
+
+      if (alreadyClaimedInUser || alreadyClaimedInInbox) {
+        tx.set(
+          inboxRef,
+          <String, dynamic>{
+            'claimed': true,
+            'status': 'claimed',
+            'read': true,
+            'claimedAt': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
+        tx.set(
+          userRef,
+          <String, dynamic>{
+            'allAchievementsRewardClaimed': true,
+            'allAchievementsRewardClaimedAt': FieldValue.serverTimestamp(),
+            'updatedAt': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
+        granted = false;
+        return;
+      }
+
+      granted = true;
+      tx.set(
+        userRef,
+        <String, dynamic>{
+          'coins': FieldValue.increment(_allAchievementsRewardCoins),
+          'lifetimeCoinsEarned': FieldValue.increment(_allAchievementsRewardCoins),
+          'allAchievementsRewardClaimed': true,
+          'allAchievementsRewardClaimedAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+      tx.set(
+        inboxRef,
+        <String, dynamic>{
+          'claimed': true,
+          'status': 'claimed',
+          'read': true,
+          'claimedAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+      tx.set(
+        walletRef,
+        <String, dynamic>{
+          'type': 'reward',
+          'amount': _allAchievementsRewardCoins,
+          'source': 'all_achievements_completed',
+          'referenceId': inboxId,
+          'createdAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+    });
+    return granted;
   }
 }
