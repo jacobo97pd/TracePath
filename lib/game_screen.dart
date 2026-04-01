@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'app_data.dart';
 import 'achievements_service.dart';
@@ -34,6 +33,7 @@ import 'services/ghost_service.dart';
 import 'services/leaderboard_service.dart' as social_lb;
 import 'services/live_duel_service.dart';
 import 'services/friend_challenge_service.dart';
+import 'services/level_report_service.dart';
 import 'services/streak_service.dart';
 import 'trail/trail_catalog.dart';
 import 'trail/trail_skin.dart';
@@ -90,6 +90,7 @@ class _GameScreenState extends State<GameScreen>
   final LiveDuelService _liveDuelService = LiveDuelService();
   final FriendChallengeService _friendChallengeService =
       FriendChallengeService();
+  final LevelReportService _levelReportService = LevelReportService();
   final AdsService _adsService = AdsService.instance;
   final Map<String, String?> _rankingSkinPreviewUrlCache = <String, String?>{};
   late final AnimationController _pathColorController;
@@ -172,6 +173,7 @@ class _GameScreenState extends State<GameScreen>
   Duration _manualAdCooldownRemaining = Duration.zero;
   bool _isLevelReported = false;
   bool _reportStatusLoading = false;
+  bool _reportSubmitting = false;
 
   @override
   void initState() {
@@ -772,6 +774,7 @@ class _GameScreenState extends State<GameScreen>
                         child: TextButton.icon(
                           onPressed: (duelControlsLocked ||
                                   _reportStatusLoading ||
+                                  _reportSubmitting ||
                                   _isLevelReported ||
                                   _isLiveDuelMode ||
                                   _isFriendChallengeMode)
@@ -784,7 +787,11 @@ class _GameScreenState extends State<GameScreen>
                             size: 16,
                           ),
                           label: Text(
-                            _isLevelReported ? 'Reported' : 'Report Level',
+                            _reportSubmitting
+                                ? 'Reporting...'
+                                : (_isLevelReported
+                                    ? 'Reported'
+                                    : 'Report Level'),
                           ),
                           style: TextButton.styleFrom(
                             foregroundColor: const Color(0xFF9FB4D6),
@@ -1411,7 +1418,7 @@ class _GameScreenState extends State<GameScreen>
   Future<void> _handleReportLevel() async {
     if (!mounted) return;
     if (_isLiveDuelMode || _isFriendChallengeMode) return;
-    if (_isLevelReported) return;
+    if (_isLevelReported || _reportSubmitting) return;
 
     final started = _runStartedAt;
     final elapsedSec = started == null
@@ -1468,14 +1475,12 @@ class _GameScreenState extends State<GameScreen>
     }
 
     final levelId = _currentLevelId;
-    final levelNumber = widget.levelIndex;
     final nextLevel = (widget.levelIndex + 1).clamp(1, _packLevelCount).toInt();
-    final now = DateTime.now();
+    final nextLevelId = _buildNextLevelId(widget.packId, nextLevel);
 
     final userRef = _db().collection('users').doc(uid);
-    final progressRef = userRef.collection('progress').doc('campaign');
-    final reportedRef = userRef.collection('reported_levels').doc(levelId);
 
+    setState(() => _reportSubmitting = true);
     try {
       final userSnap = await userRef.get();
       final userData = userSnap.data() ?? const <String, dynamic>{};
@@ -1495,57 +1500,18 @@ class _GameScreenState extends State<GameScreen>
         );
         return;
       }
-      final currentHighest =
-          (userData['highestLevelReached'] as num?)?.toInt() ?? 1;
-      final nextHighest = nextLevel > currentHighest ? nextLevel : currentHighest;
 
-      // Primary write path: user root doc only (already used by app startup and
-      // less brittle than relying on optional subcollection permissions).
-      await userRef.set(
-        <String, dynamic>{
-          'highestLevelReached': nextHighest,
-          'reportedLevelIds': FieldValue.arrayUnion(<String>[levelId]),
-          'lastReportedLevelId': levelId,
-          'lastReportedAt': FieldValue.serverTimestamp(),
-          'updatedAt': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
+      final result = await _levelReportService.reportLevelAndUnlockNext(
+        levelId: levelId,
+        nextLevelId: nextLevelId,
+        nextLevelIndex: nextLevel,
+        reason: 'unsolvable_or_bugged',
       );
 
-      // Keep previous structures in sync as best effort, but never fail the
-      // whole report if any optional write is blocked.
-      try {
-        await progressRef.set(
-          <String, dynamic>{
-            'highestLevelReached': nextHighest,
-            'updatedAt': FieldValue.serverTimestamp(),
-          },
-          SetOptions(merge: true),
+      if (kDebugMode) {
+        debugPrint(
+          '[report-level] callable ok uid=$uid level=$levelId next=$nextLevelId reportCreated=${result.reportCreated} emailSent=${result.emailSent}',
         );
-      } catch (e, st) {
-        if (kDebugMode) {
-          debugPrint('[report-level] optional progress sync failed: $e');
-          debugPrint('$st');
-        }
-      }
-
-      try {
-        await reportedRef.set(
-          <String, dynamic>{
-            'uid': uid,
-            'packId': widget.packId,
-            'levelId': levelId,
-            'levelNumber': levelNumber,
-            'reportedAt': FieldValue.serverTimestamp(),
-            'clientTimestamp': now.toIso8601String(),
-          },
-          SetOptions(merge: true),
-        );
-      } catch (e, st) {
-        if (kDebugMode) {
-          debugPrint('[report-level] optional reported_levels sync failed: $e');
-          debugPrint('$st');
-        }
       }
 
       await widget.progressService.setCurrentLevelForPack(widget.packId, nextLevel);
@@ -1553,40 +1519,10 @@ class _GameScreenState extends State<GameScreen>
       if (!mounted) return;
       setState(() => _isLevelReported = true);
 
-      final body = StringBuffer()
-        ..writeln('User: $uid')
-        ..writeln('Level ID: $levelId')
-        ..writeln('Level Number: $levelNumber')
-        ..writeln('Pack: ${widget.packId}')
-        ..writeln('Time: ${now.toIso8601String()}')
-        ..writeln('App Version: n/a');
-
-      final uri = Uri(
-        scheme: 'mailto',
-        path: 'soporte.tracepath@gmail.com',
-        queryParameters: <String, String>{
-          'subject': 'Level Report - TracePath',
-          'body': body.toString(),
-        },
-      );
-
-      try {
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(uri, mode: LaunchMode.platformDefault);
-        } else if (kDebugMode) {
-          debugPrint('[report-level] could not launch mailto uri=$uri');
-        }
-      } catch (emailError, emailStack) {
-        if (kDebugMode) {
-          debugPrint('[report-level] mail launch failed: $emailError');
-          debugPrint('$emailStack');
-        }
-      }
-
       await GameToast.show(
         context,
         title: 'Level reported',
-        message: 'Level reported. Next level unlocked.',
+        message: 'Report sent. Next level unlocked.',
         type: GameToastType.info,
       );
 
@@ -1596,10 +1532,11 @@ class _GameScreenState extends State<GameScreen>
       } else {
         context.go('/play');
       }
-    } on FirebaseException catch (e, st) {
+    } on LevelReportException catch (e, st) {
       if (kDebugMode) {
-        debugPrint('[report-level] firestore error code=${e.code}');
-        debugPrint('[report-level] message=${e.message}');
+        debugPrint(
+          '[report-level] callable error code=${e.code} message=${e.message}',
+        );
         debugPrint('$st');
       }
       if (!mounted) return;
@@ -1612,9 +1549,9 @@ class _GameScreenState extends State<GameScreen>
         ),
         type: GameToastType.info,
       );
-    } on PlatformException catch (e, st) {
+    } on FirebaseException catch (e, st) {
       if (kDebugMode) {
-        debugPrint('[report-level] platform error code=${e.code}');
+        debugPrint('[report-level] firestore error code=${e.code}');
         debugPrint('[report-level] message=${e.message}');
         debugPrint('$st');
       }
@@ -1648,6 +1585,10 @@ class _GameScreenState extends State<GameScreen>
         ),
         type: GameToastType.info,
       );
+    } finally {
+      if (mounted) {
+        setState(() => _reportSubmitting = false);
+      }
     }
   }
 
@@ -1679,6 +1620,11 @@ class _GameScreenState extends State<GameScreen>
     return false;
   }
 
+  String _buildNextLevelId(String packId, int levelIndex) {
+    final normalizedPack = packId.trim().isEmpty ? 'pack' : packId.trim();
+    return '$normalizedPack:$levelIndex';
+  }
+
   String _friendlyReportError({
     required String? code,
     String? fallbackMessage,
@@ -1686,6 +1632,21 @@ class _GameScreenState extends State<GameScreen>
     final normalized = (code ?? '').trim().toLowerCase();
     if (normalized == 'permission-denied') {
       return 'Permissions blocked this action. Please try again later.';
+    }
+    if (normalized == 'endpoint-not-configured') {
+      return 'Report endpoint is not configured in this build.';
+    }
+    if (normalized == 'invalid-endpoint') {
+      return 'Report endpoint URL is invalid.';
+    }
+    if (normalized == 'timeout') {
+      return 'Report request timed out. Please retry.';
+    }
+    if (normalized == 'network-failed') {
+      return 'Network issue while reporting. Please try again.';
+    }
+    if (normalized.startsWith('http-')) {
+      return 'Server rejected the report. Please try again in a moment.';
     }
     if (normalized == 'unavailable' || normalized == 'network-request-failed') {
       return 'Network issue while reporting. Please try again.';
