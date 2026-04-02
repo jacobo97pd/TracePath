@@ -2304,7 +2304,7 @@
         },
         {
           "n": 3,
-          "x": 0,
+          "x": 5,
           "y": 5
         }
       ],
@@ -2391,14 +2391,15 @@
       "source_pack": "pack_linkedin_editor_v1",
       "source_origin": "linkedin_editor",
       "variant": "classic",
-      "canonical_hash": "55c02c107c392562c8def24eaf9d0ed23ea8fa4656ffa23a7888e750a07dee9c",
+      "canonical_hash": "eec476b8b620e7e09ce41fb2db138cdf389b460a33d9e8cc657ca91144862748",
       "meta": {
         "source_pack": "pack_linkedin_editor_v1",
         "source_origin": "linkedin_editor",
         "variant": "classic",
-        "canonical_hash": "55c02c107c392562c8def24eaf9d0ed23ea8fa4656ffa23a7888e750a07dee9c",
+        "canonical_hash": "eec476b8b620e7e09ce41fb2db138cdf389b460a33d9e8cc657ca91144862748",
         "difficulty_rebalanced_from": "d5",
-        "difficulty_score": 12.1533
+        "difficulty_score": 12.1533,
+        "manual_fix": "w1_level23_user_patch_2026-04-02"
       }
     },
     {
@@ -2610,13 +2611,8 @@
         },
         {
           "n": 10,
-          "x": 0,
+          "x": 1,
           "y": 4
-        },
-        {
-          "n": 11,
-          "x": 2,
-          "y": 3
         },
         {
           "n": 11,
@@ -2625,23 +2621,29 @@
         },
         {
           "n": 12,
-          "x": 3,
+          "x": 4,
           "y": 4
+        },
+        {
+          "n": 13,
+          "x": 2,
+          "y": 3
         }
       ],
       "walls": [],
-      "difficultyTag": "d2",
+      "difficultyTag": "d3",
       "source": "linkedin_editor",
       "source_pack": "pack_linkedin_editor_v1",
       "source_origin": "linkedin_editor",
       "variant": "classic",
-      "canonical_hash": "3df9caefd4eae76daa2714a775436d87dd9898460dcb10075e3d88ca6182fc5b",
+      "canonical_hash": "c947358086f7104165f1c16c325da7c64b846449943106eb7fa2deda68c3c44f",
       "meta": {
         "source_pack": "pack_linkedin_editor_v1",
         "source_origin": "linkedin_editor",
         "variant": "classic",
-        "canonical_hash": "3df9caefd4eae76daa2714a775436d87dd9898460dcb10075e3d88ca6182fc5b",
-        "imported_from": "c:\\Users\\jacob\\Downloads\\niveles_linkedin_editor.json"
+        "canonical_hash": "c947358086f7104165f1c16c325da7c64b846449943106eb7fa2deda68c3c44f",
+        "imported_from": "c:\\Users\\jacob\\Downloads\\niveles_linkedin_editor.json",
+        "manual_fix": "w1_level25_user_patch_2026-04-02"
       }
     },
     {
