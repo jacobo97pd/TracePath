@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_data.dart';
 import 'engine/seed_random.dart';
+import 'services/daily_puzzle_service.dart';
 
 class ProgressService extends ChangeNotifier {
   ProgressService(this._prefs) {
@@ -178,7 +179,7 @@ class ProgressService extends ChangeNotifier {
       return 0;
     }
 
-    final today = _dateOnly(now ?? DateTime.now());
+    final today = _dailyCycleDate(now: now);
     final diffDays = today.difference(lastDate).inDays;
     final stored = _prefs.getInt(_dailyStreakKey) ?? 0;
     if (diffDays <= 1) {
@@ -191,12 +192,29 @@ class ProgressService extends ChangeNotifier {
   }
 
   bool isDailyCompleted({DateTime? now}) {
-    return lastDailyCompletedDate == getTodayString(now: now);
+    return isDailyCompletedForKey(
+      DailyPuzzleService.currentDailyKey(now: now),
+    );
+  }
+
+  bool isDailyCompletedForKey(String dailyKey) {
+    return lastDailyCompletedDate == dailyKey.trim();
   }
 
   Future<void> markDailyCompleted({DateTime? now}) async {
-    final date = _dateOnly(now ?? DateTime.now());
-    final todayKey = getTodayString(now: date);
+    final date = _dailyCycleDate(now: now);
+    final todayKey = DailyPuzzleService.currentDailyKey(now: now);
+    await markDailyCompletedForKey(todayKey, now: date);
+  }
+
+  Future<void> markDailyCompletedForKey(
+    String dailyKey, {
+    DateTime? now,
+  }) async {
+    final normalizedDailyKey = dailyKey.trim();
+    if (normalizedDailyKey.isEmpty) return;
+    final date = _dailyCycleDate(now: now);
+    final todayKey = normalizedDailyKey;
     if (lastDailyCompletedDate == todayKey) {
       return;
     }
@@ -448,8 +466,9 @@ class ProgressService extends ChangeNotifier {
     return 'best_score:$mode:$runId';
   }
 
-  DateTime _dateOnly(DateTime date) {
-    return DateTime(date.year, date.month, date.day);
+  DateTime _dailyCycleDate({DateTime? now}) {
+    final utc = (now ?? DateTime.now()).toUtc();
+    return DateTime.utc(utc.year, utc.month, utc.day);
   }
 
   DateTime? _parseDate(String value) {

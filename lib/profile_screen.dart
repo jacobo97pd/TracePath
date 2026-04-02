@@ -3699,6 +3699,41 @@ class _ProfileHeaderAvatarState extends State<_ProfileHeaderAvatar> {
   int _index = 0;
   bool _notifiedExhausted = false;
 
+  List<String> _googleVariants(String rawUrl) {
+    final out = <String>[];
+    final trimmed = rawUrl.trim();
+    if (trimmed.isEmpty) return out;
+    void add(String value) {
+      final v = value.trim();
+      if (v.isEmpty) return;
+      if (!out.contains(v)) out.add(v);
+    }
+
+    add(trimmed);
+    final uri = Uri.tryParse(trimmed);
+    final host = (uri?.host ?? '').toLowerCase();
+    final isGoogleHost = host.contains('googleusercontent.com') ||
+        host.contains('gstatic.com') ||
+        host.contains('googleapis.com');
+    if (!isGoogleHost) return out;
+
+    // Variant 1: enforce a larger stable suffix for googleusercontent avatars.
+    final resizedSuffix = trimmed.replaceAllMapped(
+      RegExp(r'=s\d+(-c)?$'),
+      (_) => '=s256-c',
+    );
+    add(resizedSuffix);
+
+    // Variant 2: force sz query for providers that use query-based sizing.
+    if (uri != null) {
+      final query = Map<String, String>.from(uri.queryParameters);
+      query['sz'] = '256';
+      add(uri.replace(queryParameters: query).toString());
+    }
+
+    return out;
+  }
+
   List<_AvatarCandidate> get _candidates {
     final list = <_AvatarCandidate>[];
     final google = widget.googleAvatarUrl.trim();
@@ -3717,12 +3752,16 @@ class _ProfileHeaderAvatarState extends State<_ProfileHeaderAvatar> {
         list.add(_AvatarCandidate(type: 'skin', path: skin));
       }
       if (google.isNotEmpty) {
-        list.add(_AvatarCandidate(type: 'google', path: google));
+        for (final variant in _googleVariants(google)) {
+          list.add(_AvatarCandidate(type: 'google', path: variant));
+        }
       }
       return list;
     }
     if (google.isNotEmpty) {
-      list.add(_AvatarCandidate(type: 'google', path: google));
+      for (final variant in _googleVariants(google)) {
+        list.add(_AvatarCandidate(type: 'google', path: variant));
+      }
     }
     for (final skin in dedupSkins) {
       list.add(_AvatarCandidate(type: 'skin', path: skin));
@@ -3796,6 +3835,14 @@ class _ProfileAvatarImageCandidate extends StatelessWidget {
     }
     if (path.startsWith('http://') || path.startsWith('https://')) {
       if (_isGoogleAvatarUrl(path)) {
+        if (kIsWeb) {
+          return buildNetworkImageCompat(
+            url: path,
+            fit: BoxFit.cover,
+            filterQuality: FilterQuality.high,
+            fallback: _AvatarFailureSignal(onFailed: onFailed),
+          );
+        }
         return Image.network(
           path,
           fit: BoxFit.cover,

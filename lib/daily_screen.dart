@@ -8,12 +8,14 @@ import 'package:go_router/go_router.dart';
 import 'app_data.dart';
 import 'achievements_service.dart';
 import 'celebration_overlay.dart';
+import 'coins_service.dart';
 import 'engine/level.dart';
 import 'engine/seed_random.dart';
 import 'game_board.dart';
 import 'game_theme.dart';
 import 'progress_service.dart';
 import 'score_calculator.dart';
+import 'services/daily_puzzle_service.dart';
 import 'stats_service.dart';
 import 'victory_screen.dart';
 import 'ui/components/game_toast.dart';
@@ -24,11 +26,13 @@ class DailyScreen extends StatefulWidget {
     required this.progressService,
     required this.statsService,
     required this.achievementsService,
+    this.coinsService,
   });
 
   final ProgressService progressService;
   final StatsService statsService;
   final AchievementsService achievementsService;
+  final CoinsService? coinsService;
 
   @override
   State<DailyScreen> createState() => _DailyScreenState();
@@ -52,18 +56,19 @@ class _DailyScreenState extends State<DailyScreen> {
   Duration? _elapsedAtSolve;
   int _rewindsUsed = 0;
   bool _showCelebration = false;
-  late final String _dailyDateKey;
-  late final int _themeSeed;
+  late String _dailyDateKey;
+  late int _themeSeed;
   Brightness? _cachedBrightness;
   GameTheme? _cachedTheme;
   Timer? _clockTimer;
   DailyLeaderboardUpdate? _lastLeaderboardUpdate;
   static const int _autoRetryAttempts = 2;
+  final DailyPuzzleService _dailyPuzzleService = DailyPuzzleService();
 
   @override
   void initState() {
     super.initState();
-    _dailyDateKey = getTodayString();
+    _dailyDateKey = DailyPuzzleService.currentDailyKey();
     _themeSeed = hashString('daily-theme-$_dailyDateKey');
     _loadDailyLevel();
   }
@@ -103,6 +108,11 @@ class _DailyScreenState extends State<DailyScreen> {
         _clockTimer?.cancel();
         _clockTimer = Timer.periodic(const Duration(seconds: 1), (_) {
           if (!mounted) return;
+          final nextKey = DailyPuzzleService.currentDailyKey();
+          if (nextKey != _dailyDateKey) {
+            _handleDailyCycleRollover(nextKey);
+            return;
+          }
           setState(() {});
         });
         return;
@@ -174,7 +184,8 @@ class _DailyScreenState extends State<DailyScreen> {
           Listenable.merge([widget.progressService, widget.statsService]),
       builder: (context, child) {
         final streak = widget.progressService.getDailyStreak();
-        final completedToday = widget.progressService.isDailyCompleted();
+        final completedToday =
+            widget.progressService.isDailyCompletedForKey(_dailyDateKey);
         final leaderboard =
             widget.statsService.getDailyLeaderboard(_dailyDateKey);
         final bestAttempt = leaderboard.isEmpty ? null : leaderboard.first;
@@ -284,7 +295,8 @@ class _DailyScreenState extends State<DailyScreen> {
                               Expanded(
                                 child: _DailyInfoCard(
                                   label: 'Reward',
-                                  value: '\u2B50\u2B50\u2B50',
+                                  value:
+                                      '${DailyPuzzleService.dailyRewardCoins} coins',
                                   accent: const Color(0xFF4E8CFF),
                                 ),
                               ),
@@ -476,6 +488,21 @@ class _DailyScreenState extends State<DailyScreen> {
     }
   }
 
+  void _handleDailyCycleRollover(String newKey) {
+    if (kDebugMode) {
+      debugPrint('[daily] cycle rollover old=$_dailyDateKey new=$newKey');
+    }
+    setState(() {
+      _dailyDateKey = newKey;
+      _themeSeed = hashString('daily-theme-$_dailyDateKey');
+      _completionHandled = false;
+      _showCelebration = false;
+      _elapsedAtSolve = null;
+      _rewindsUsed = 0;
+    });
+    unawaited(_loadDailyLevel());
+  }
+
   void _handleStatusChanged(GameBoardStatus status) {
     final level = _level;
     if (level == null) {
@@ -520,7 +547,27 @@ class _DailyScreenState extends State<DailyScreen> {
     if (!mounted) {
       return;
     }
-    await _showCompletionDialog();
+    try {
+      await _showCompletionDialog();
+    } catch (e, st) {
+      if (kDebugMode) {
+        debugPrint('[daily] completion flow crashed: $e');
+        debugPrint('$st');
+      }
+      if (!mounted) return;
+      setState(() {
+        _showCelebration = false;
+      });
+      unawaited(
+        GameToast.show(
+          context,
+          type: GameToastType.info,
+          title: 'Daily completed',
+          message: 'Saved with partial sync issue. Try again later.',
+          duration: const Duration(milliseconds: 2600),
+        ),
+      );
+    }
   }
 
   Future<void> _showCompletionDialog() async {
@@ -528,21 +575,61 @@ class _DailyScreenState extends State<DailyScreen> {
     if (level == null) {
       return;
     }
-    await widget.progressService.markDailyCompleted();
-    await widget.statsService.recordLevelCompleted(
-      mode: SolveMode.daily,
-      difficulty: level.difficulty,
-      solveTimeMs: _currentElapsedDuration.inMilliseconds,
-      hintsUsed: 0,
-      rewindsUsed: _rewindsUsed,
+    var rewardResult = const DailyRewardClaimResult(
+      granted: false,
+      alreadyClaimed: false,
     );
-    final unlocked = await widget.achievementsService.evaluateAfterCompletion(
-      mode: SolveMode.daily,
-      difficulty: level.difficulty,
-      solveTimeMs: _currentElapsedDuration.inMilliseconds,
-      hintsUsed: 0,
-      rewindsUsed: _rewindsUsed,
-    );
+    try {
+      await widget.progressService.markDailyCompletedForKey(_dailyDateKey);
+      rewardResult = await _dailyPuzzleService.claimDailyRewardOnce(
+        dailyKey: _dailyDateKey,
+      );
+    } catch (e, st) {
+      if (kDebugMode) {
+        debugPrint('[daily] reward/persist error key=$_dailyDateKey error=$e');
+        debugPrint('$st');
+      }
+      if (mounted) {
+        unawaited(
+          GameToast.show(
+            context,
+            type: GameToastType.info,
+            title: 'Daily completed',
+            message: 'Reward sync failed. Please try again.',
+            duration: const Duration(milliseconds: 2400),
+          ),
+        );
+      }
+    }
+    if (rewardResult.granted &&
+        rewardResult.newCoinsBalance != null &&
+        widget.coinsService != null) {
+      await widget.coinsService!.syncCoinsFromRemote(
+        rewardResult.newCoinsBalance!,
+      );
+    }
+    var unlocked = <dynamic>[];
+    try {
+      await widget.statsService.recordLevelCompleted(
+        mode: SolveMode.daily,
+        difficulty: level.difficulty,
+        solveTimeMs: _currentElapsedDuration.inMilliseconds,
+        hintsUsed: 0,
+        rewindsUsed: _rewindsUsed,
+      );
+      unlocked = await widget.achievementsService.evaluateAfterCompletion(
+        mode: SolveMode.daily,
+        difficulty: level.difficulty,
+        solveTimeMs: _currentElapsedDuration.inMilliseconds,
+        hintsUsed: 0,
+        rewindsUsed: _rewindsUsed,
+      );
+    } catch (e, st) {
+      if (kDebugMode) {
+        debugPrint('[daily] stats/achievements error key=$_dailyDateKey error=$e');
+        debugPrint('$st');
+      }
+    }
     final score = ScoreCalculator.calculate(
       ScoreInput(
         difficulty: level.difficulty,
@@ -551,22 +638,28 @@ class _DailyScreenState extends State<DailyScreen> {
         rewindsUsed: _rewindsUsed,
       ),
     ).finalScore;
-    await widget.progressService
-        .setBestDailyScoreIfHigher(_dailyDateKey, score);
-    final leaderboardUpdate = await widget.statsService.recordDailyAttempt(
-      dateKey: _dailyDateKey,
-      attempt: DailyAttempt(
-        timeMs: _currentElapsedDuration.inMilliseconds,
-        hintsUsed: 0,
-        rewindsUsed: _rewindsUsed,
-        score: score,
-        timestamp: DateTime.now().millisecondsSinceEpoch,
-      ),
-    );
-    if (mounted) {
-      setState(() {
-        _lastLeaderboardUpdate = leaderboardUpdate;
-      });
+    try {
+      await widget.progressService.setBestDailyScoreIfHigher(_dailyDateKey, score);
+      final leaderboardUpdate = await widget.statsService.recordDailyAttempt(
+        dateKey: _dailyDateKey,
+        attempt: DailyAttempt(
+          timeMs: _currentElapsedDuration.inMilliseconds,
+          hintsUsed: 0,
+          rewindsUsed: _rewindsUsed,
+          score: score,
+          timestamp: DateTime.now().millisecondsSinceEpoch,
+        ),
+      );
+      if (mounted) {
+        setState(() {
+          _lastLeaderboardUpdate = leaderboardUpdate;
+        });
+      }
+    } catch (e, st) {
+      if (kDebugMode) {
+        debugPrint('[daily] leaderboard write error key=$_dailyDateKey error=$e');
+        debugPrint('$st');
+      }
     }
     if (!mounted) {
       return;
@@ -580,6 +673,17 @@ class _DailyScreenState extends State<DailyScreen> {
           title: 'Achievement Unlocked',
           message: first.title,
           duration: const Duration(milliseconds: 2300),
+        ),
+      );
+    }
+    if (rewardResult.granted) {
+      unawaited(
+        GameToast.show(
+          context,
+          type: GameToastType.coins,
+          title: 'Daily reward',
+          message: '+${DailyPuzzleService.dailyRewardCoins} coins',
+          duration: const Duration(milliseconds: 1900),
         ),
       );
     }
@@ -664,9 +768,7 @@ class _DailyScreenState extends State<DailyScreen> {
   }
 
   Duration _timeUntilNextDailyPuzzle() {
-    final now = DateTime.now();
-    final next = DateTime(now.year, now.month, now.day + 1);
-    return next.difference(now);
+    return DailyPuzzleService.timeUntilNextReset();
   }
 
   String _formatCountdown(Duration duration) {

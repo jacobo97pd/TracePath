@@ -140,6 +140,10 @@ service cloud.firestore {
         allow read, write: if isSelf(uid);
       }
 
+      match /daily_rewards/{dailyKey} {
+        allow read, write: if isSelf(uid);
+      }
+
       match /progress/{docId} {
         allow read, write: if isSelf(uid);
       }
