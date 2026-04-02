@@ -91,18 +91,6 @@ class _SocialScreenState extends State<SocialScreen> {
             _buildRanking(),
             const SizedBox(height: 16),
             _buildCtas(),
-            const SizedBox(height: 16),
-            const _SectionTitle(
-              title: 'Recent Activity',
-              subtitle: 'Social updates and challenge results',
-            ),
-            const SizedBox(height: 10),
-            const _EmptyHint(
-              icon: Icons.notifications_none_rounded,
-              title: 'No recent activity yet',
-              text:
-                  'Friend challenges, ranking updates and social news will appear here.',
-            ),
           ],
         ),
       ),
@@ -133,11 +121,12 @@ class _SocialScreenState extends State<SocialScreen> {
                             ? '--:--'
                             : _formatMs(entries.first.bestTimeMs));
                     final myRank = myRankSnapshot.data;
-                    final globalTier =
-                        (myProfile?['globalTier'] as String?)?.trim().isNotEmpty ==
-                                true
-                            ? (myProfile?['globalTier'] as String).trim()
-                            : '--';
+                    final globalTier = (myProfile?['globalTier'] as String?)
+                                ?.trim()
+                                .isNotEmpty ==
+                            true
+                        ? (myProfile?['globalTier'] as String).trim()
+                        : '--';
 
                     return Container(
                       padding: const EdgeInsets.all(16),
@@ -152,8 +141,8 @@ class _SocialScreenState extends State<SocialScreen> {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
-                        border:
-                            Border.all(color: const Color(0xFF365588), width: 1.1),
+                        border: Border.all(
+                            color: const Color(0xFF365588), width: 1.1),
                         boxShadow: const [
                           BoxShadow(
                             color: Color(0x331A5CF6),
@@ -301,9 +290,7 @@ class _SocialScreenState extends State<SocialScreen> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                count == null
-                                    ? 'Friends'
-                                    : 'Friends ($count)',
+                                count == null ? 'Friends' : 'Friends ($count)',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 15,
@@ -857,6 +844,32 @@ class _SocialScreenState extends State<SocialScreen> {
   }
 
   Future<void> _removeFriend(String uid) async {
+    final shouldRemove = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: const Color(0xFF111827),
+            title: const Text(
+              'Remove friend',
+              style: TextStyle(color: Colors.white),
+            ),
+            content: const Text(
+              'Are you sure you want to remove this friend?',
+              style: TextStyle(color: Color(0xFFB6C2DA)),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Remove'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+    if (!shouldRemove) return;
     await _friendsService.removeFriend(uid);
     if (!mounted) return;
     setState(() {

@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'coins_service.dart';
 import 'pack_level_repository.dart';
 import 'progress_service.dart';
+import 'services/app_firestore.dart';
 import 'services/energy_service.dart';
 import 'ui/components/coin_display.dart';
 
@@ -130,6 +133,8 @@ class PlayLevelsScreen extends StatefulWidget {
 
 class _PlayLevelsScreenState extends State<PlayLevelsScreen>
     with SingleTickerProviderStateMixin {
+  static const String _qaBypassUid = 'arfxuI4FhHV4eXYPdplpqpJUqRl2';
+
   double get _mapRowExtent => _compact ? 92 : 112;
   bool get _compact => _screenWidth < 390;
   double _screenWidth = 390;
@@ -146,7 +151,10 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
   int _selectedLevelIndex = 1;
   PackLevelRecord? _selectedRecord;
   bool _isLoading = true;
+  bool _metaLoading = true;
   Timer? _energyCountdownTimer;
+  final Map<String, int> _worldTotalLevelsByPack = <String, int>{};
+  Set<String> _reportedLevelIds = <String>{};
 
   @override
   void initState() {
@@ -154,6 +162,7 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
     widget.energyService.addListener(_handleEnergyChanged);
     _startEnergyTicker();
     unawaited(widget.energyService.refresh());
+    unawaited(_loadWorldMetaAndReportedLevels());
     _loadPack();
   }
 
@@ -196,6 +205,18 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
     setState(() {
       _isLoading = true;
     });
+    await _loadWorldMetaAndReportedLevels();
+
+    final requestedPackId = widget.packId;
+    final selectedPackUnlocked = _isWorldUnlocked(requestedPackId);
+    if (!selectedPackUnlocked) {
+      final fallbackPack = _latestUnlockedPackId();
+      if (mounted && fallbackPack != requestedPackId) {
+        context.go('/play/$fallbackPack');
+      }
+      return;
+    }
+
     await PackLevelRepository.instance.loadPack(widget.packId);
     final total = await PackLevelRepository.instance.totalLevels(widget.packId);
     final continueIndex = _continueIndex(total);
@@ -217,6 +238,42 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
     _scheduleChipReveal();
   }
 
+  Future<void> _loadWorldMetaAndReportedLevels() async {
+    if (_worldTotalLevelsByPack.isNotEmpty && !_metaLoading) return;
+    if (_metaLoading && _worldTotalLevelsByPack.isNotEmpty) return;
+
+    setState(() {
+      _metaLoading = true;
+    });
+
+    for (final tab in _worldTabs) {
+      await PackLevelRepository.instance.loadPack(tab.packId);
+      final total = PackLevelRepository.instance.totalLevelsSync(tab.packId);
+      _worldTotalLevelsByPack[tab.packId] = total;
+    }
+
+    final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
+    final nextReported = <String>{};
+    if (uid.isNotEmpty) {
+      try {
+        final snap = await AppFirestore.instance()
+            .collection('users')
+            .doc(uid)
+            .get(const GetOptions(source: Source.serverAndCache));
+        final data = snap.data() ?? const <String, dynamic>{};
+        nextReported.addAll(_extractReportedLevelIds(data));
+      } catch (_) {
+        // Keep gameplay available even if report metadata cannot be fetched.
+      }
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _reportedLevelIds = nextReported;
+      _metaLoading = false;
+    });
+  }
+
   int _continueIndex(int total) {
     if (total <= 0) {
       return 1;
@@ -235,6 +292,127 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
       solved = i;
     }
     return solved;
+  }
+
+  bool get _isQaBypassUser {
+    final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
+    return uid == _qaBypassUid;
+  }
+
+  bool _isWorldUnlocked(String packId) {
+    if (_isQaBypassUser) return true;
+
+    final index = _worldTabs.indexWhere((tab) => tab.packId == packId);
+    if (index <= 0) return true;
+
+    for (var i = 0; i < index; i++) {
+      final prevPackId = _worldTabs[i].packId;
+      final total = _worldTotalLevelsByPack[prevPackId] ?? 0;
+      if (total <= 0) return false;
+      final solvedOrReported = _effectiveSolvedCount(prevPackId, total);
+      if (solvedOrReported < total) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  String _latestUnlockedPackId() {
+    if (_isQaBypassUser) return widget.packId;
+    var latest = _worldTabs.first.packId;
+    for (final tab in _worldTabs) {
+      if (_isWorldUnlocked(tab.packId)) {
+        latest = tab.packId;
+      } else {
+        break;
+      }
+    }
+    return latest;
+  }
+
+  int _completedCountForPack(String packId, int total) {
+    if (total <= 0) return 0;
+    var count = 0;
+    for (var i = 1; i <= total; i++) {
+      if (widget.progressService.isCompleted(packId, i)) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  int _effectiveSolvedCount(String packId, int total) {
+    if (total <= 0) return 0;
+    final completed = _completedCountForPack(packId, total);
+    if (_reportedLevelIds.isEmpty) return completed;
+
+    var reportedOnly = 0;
+    for (final levelId in _reportedLevelIds) {
+      final reportedIndex = _parseReportedLevelIndex(
+        packId: packId,
+        levelId: levelId,
+      );
+      if (reportedIndex == null ||
+          reportedIndex <= 0 ||
+          reportedIndex > total) {
+        continue;
+      }
+      if (!widget.progressService.isCompleted(packId, reportedIndex)) {
+        reportedOnly++;
+      }
+    }
+    return (completed + reportedOnly).clamp(0, total);
+  }
+
+  int? _parseReportedLevelIndex({
+    required String packId,
+    required String levelId,
+  }) {
+    final normalized = levelId.trim();
+    if (normalized.isEmpty) return null;
+
+    final underscorePrefix = '${packId}_';
+    if (normalized.startsWith(underscorePrefix)) {
+      return int.tryParse(normalized.substring(underscorePrefix.length));
+    }
+
+    final colonPrefix = '$packId:';
+    if (normalized.startsWith(colonPrefix)) {
+      return int.tryParse(normalized.substring(colonPrefix.length));
+    }
+
+    return null;
+  }
+
+  Set<String> _extractReportedLevelIds(Map<String, dynamic> userData) {
+    final out = <String>{};
+
+    final idsRaw = userData['reportedLevelIds'];
+    if (idsRaw is Iterable) {
+      for (final item in idsRaw) {
+        if (item is String && item.trim().isNotEmpty) {
+          out.add(item.trim());
+        }
+      }
+    }
+
+    final mapRaw = userData['reportedLevels'];
+    if (mapRaw is Map) {
+      for (final entry in mapRaw.entries) {
+        final key = entry.key.toString().trim();
+        if (key.isEmpty) continue;
+        final value = entry.value;
+        final isReported = value == true ||
+            value == 1 ||
+            (value is String &&
+                (value.trim().toLowerCase() == 'true' ||
+                    value.trim() == '1' ||
+                    value.trim().toLowerCase() == 'yes'));
+        if (isReported) out.add(key);
+      }
+    }
+
+    return out;
   }
 
   Future<void> _selectLevel(int levelIndex) async {
@@ -275,10 +453,29 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
   }
 
   void _handleNodeTap(int levelIndex, bool unlocked) {
+    if (!unlocked) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'World locked. Complete or report all levels in previous world first.',
+          ),
+          duration: Duration(milliseconds: 1100),
+        ),
+      );
+      return;
+    }
     _selectLevel(levelIndex);
   }
 
   Future<void> _playSelectedLevel() async {
+    if (!_isWorldUnlocked(widget.packId)) {
+      final fallbackPack = _latestUnlockedPackId();
+      if (mounted && fallbackPack != widget.packId) {
+        context.go('/play/$fallbackPack');
+      }
+      return;
+    }
+
     final energy = await widget.energyService.refresh();
     if (energy.current <= 0) {
       await _showOutOfEnergyDialog();
@@ -433,15 +630,15 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
         _ambientController,
       ]),
       builder: (context, _) {
-        final solvedCount = List<int>.generate(_totalLevels, (i) => i + 1)
-            .where(_isCompleted)
-            .length;
+        final solvedCount = _effectiveSolvedCount(widget.packId, _totalLevels);
         final continueIndex = _continueIndex(_totalLevels);
         final currentNode = continueIndex;
         final energy = widget.energyService.snapshot;
+        final selectedWorldUnlocked = _isWorldUnlocked(widget.packId);
         final energyText =
             '${energy.current}/${energy.max} - reset ${_formatDuration(energy.timeUntilReset())}';
-        final canPlaySelectedLevel = energy.current > 0;
+        final canPlaySelectedLevel =
+            energy.current > 0 && selectedWorldUnlocked;
 
         return Scaffold(
           backgroundColor: const Color(0xFF08111F),
@@ -494,6 +691,10 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                             controller: _chipScrollController,
                             tabs: _worldTabs,
                             selectedPackId: widget.packId,
+                            unlockedPackIds: _worldTabs
+                                .where((tab) => _isWorldUnlocked(tab.packId))
+                                .map((tab) => tab.packId)
+                                .toSet(),
                             onSelected: (packId) => context.go('/play/$packId'),
                             accent: palette.accent,
                             compact: _compact,
@@ -536,7 +737,7 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                                       final levelIndex = index + 1;
                                       final completed =
                                           _isCompleted(levelIndex);
-                                      final unlocked =
+                                      final unlocked = selectedWorldUnlocked &&
                                           levelIndex <= continueIndex;
                                       final isCurrent =
                                           levelIndex == currentNode;
@@ -782,6 +983,7 @@ class _WorldChipSelector extends StatelessWidget {
     required this.controller,
     required this.tabs,
     required this.selectedPackId,
+    required this.unlockedPackIds,
     required this.onSelected,
     required this.accent,
     required this.compact,
@@ -790,6 +992,7 @@ class _WorldChipSelector extends StatelessWidget {
   final ScrollController controller;
   final List<_WorldTabOption> tabs;
   final String selectedPackId;
+  final Set<String> unlockedPackIds;
   final ValueChanged<String> onSelected;
   final Color accent;
   final bool compact;
@@ -805,12 +1008,13 @@ class _WorldChipSelector extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
           final tab = tabs[index];
+          final worldUnlocked = unlockedPackIds.contains(tab.packId);
           final selected = tab.packId == selectedPackId;
           return AnimatedContainer(
             duration: const Duration(milliseconds: 220),
             curve: Curves.easeOutCubic,
             decoration: BoxDecoration(
-              gradient: selected
+              gradient: selected && worldUnlocked
                   ? LinearGradient(
                       colors: [
                         accent.withOpacity(0.95),
@@ -818,14 +1022,18 @@ class _WorldChipSelector extends StatelessWidget {
                       ],
                     )
                   : null,
-              color: selected ? null : const Color(0xFF152234),
+              color: selected && worldUnlocked
+                  ? null
+                  : worldUnlocked
+                      ? const Color(0xFF152234)
+                      : const Color(0xFF101A29),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: selected
+                color: selected && worldUnlocked
                     ? Colors.white.withOpacity(0.16)
-                    : Colors.white.withOpacity(0.08),
+                    : Colors.white.withOpacity(worldUnlocked ? 0.08 : 0.05),
               ),
-              boxShadow: selected
+              boxShadow: selected && worldUnlocked
                   ? [
                       BoxShadow(
                         color: accent.withOpacity(0.26),
@@ -837,7 +1045,7 @@ class _WorldChipSelector extends StatelessWidget {
             ),
             child: InkWell(
               borderRadius: BorderRadius.circular(20),
-              onTap: () => onSelected(tab.packId),
+              onTap: worldUnlocked ? () => onSelected(tab.packId) : null,
               child: Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: compact ? 12 : 16,
@@ -850,20 +1058,46 @@ class _WorldChipSelector extends StatelessWidget {
                     Text(
                       tab.title,
                       style: TextStyle(
-                        color: Colors.white,
+                        color: worldUnlocked
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.52),
                         fontSize: compact ? 12 : 14,
-                        fontWeight:
-                            selected ? FontWeight.w800 : FontWeight.w700,
+                        fontWeight: selected && worldUnlocked
+                            ? FontWeight.w800
+                            : FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      tab.subtitle,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(selected ? 0.84 : 0.56),
-                        fontSize: compact ? 10 : 11,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            tab.subtitle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(
+                                !worldUnlocked
+                                    ? 0.42
+                                    : selected
+                                        ? 0.84
+                                        : 0.56,
+                              ),
+                              fontSize: compact ? 10 : 11,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        if (!worldUnlocked) ...[
+                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.lock_rounded,
+                            size: compact ? 11 : 12,
+                            color: Colors.white.withOpacity(0.5),
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),

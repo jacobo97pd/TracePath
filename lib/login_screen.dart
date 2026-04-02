@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'auth_service.dart';
+import 'l10n/l10n.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({
@@ -29,7 +30,8 @@ class _LoginScreenState extends State<LoginScreen> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 500),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                   child: _buildHeroCard(context),
                 ),
               ),
@@ -85,10 +87,10 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Train your brain. Trace the path faster than anyone.',
+          Text(
+            context.l10n.loginTagline,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               color: Color(0xFFB3C4E8),
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -96,11 +98,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          const _BenefitRow(
+          _BenefitRow(
             items: <String>[
-              'Save progress',
-              'Challenge friends',
-              'Keep your streak',
+              context.l10n.loginBenefitSaveProgress,
+              context.l10n.loginBenefitChallengeFriends,
+              context.l10n.loginBenefitKeepStreak,
             ],
           ),
           const SizedBox(height: 20),
@@ -125,9 +127,9 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             icon: const Icon(Icons.person_outline_rounded),
-            label: const Text(
-              'Continue as Guest',
-              style: TextStyle(
+            label: Text(
+              context.l10n.loginContinueGuest,
+              style: const TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 15,
               ),
@@ -141,10 +143,10 @@ class _LoginScreenState extends State<LoginScreen> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: const Color(0xFF2E3F61)),
             ),
-            child: const Text(
-              'Guest mode: no friends, no challenges.',
+            child: Text(
+              context.l10n.loginGuestModeHint,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Color(0xFF90A3CA),
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -216,7 +218,9 @@ class _GoogleButton extends StatelessWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
               ),
         label: Text(
-          busy ? 'Connecting...' : 'Continue with Google',
+          busy
+              ? context.l10n.loginConnecting
+              : context.l10n.loginContinueGoogle,
           style: const TextStyle(
             fontWeight: FontWeight.w800,
             fontSize: 16,

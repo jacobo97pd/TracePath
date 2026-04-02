@@ -241,7 +241,7 @@
   "profileGamesPlayed": "Partidas jugadas",
   "profileBestTime": "Mejor tiempo",
   "profileVaultTitle": "Boveda",
-  "profileLockerTitle": "Locker",
+  "profileLockerTitle": "Taquilla",
   "profileLockerHint": "Toca un item equipado para abrir el inventario.",
   "profileOpenVault": "Abrir boveda",
   "profileInboxTitle": "Inbox",
@@ -256,6 +256,99 @@
   "profileInboxUnavailableTitle": "Inbox no disponible ahora",
   "profileInboxEmptyTitle": "Aun no hay mensajes",
   "profileInboxEmptySubtitle": "Las solicitudes de amistad, recompensas y noticias apareceran aqui.",
-  "profileVaultLockerTitle": "Boveda / Locker",
-  "profileReadyToEquip": "Listo para equipar"
+  "profileVaultLockerTitle": "Boveda / Taquilla",
+  "profileReadyToEquip": "Listo para equipar",
+  "profileRewardClaimed": "Recompensa reclamada: +{coins} monedas",
+  "@profileRewardClaimed": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "profileRewardAlreadyClaimed": "Recompensa ya reclamada",
+  "profileRewardClaimFailed": "No se pudo reclamar la recompensa",
+  "profileFriendRequestAccepted": "Solicitud de amistad aceptada",
+  "profileFriendRequestDeclined": "Solicitud de amistad rechazada",
+  "profileFriendRequestDeclineFailed": "No se pudo rechazar la solicitud de amistad",
+  "profileChallengeDeclined": "Desafio rechazado",
+  "profileChallengeDeclineFailed": "No se pudo rechazar el desafio",
+  "profileChallengeDeclinedTitle": "Desafio rechazado",
+  "profileChallengeDeclinedBodySuffix": "rechazo tu desafio.",
+  "profileChallengeAcceptedTitle": "Desafio aceptado",
+  "profileChallengeAcceptedBodySuffix": "acepto tu desafio.",
+  "profileFunctionUnavailableTitle": "Funcion no disponible",
+  "profileFunctionUnavailableBody": "Esta funcion solo esta disponible cuando compres y equipes una skin.",
+  "profileUnderstand": "Entendido",
+  "profileCardUnavailableTitle": "Carta no disponible",
+  "profileCardUnavailableBody": "Todavia no hay carta para esta skin.",
+  "profileWorldProgressTitle": "Progreso del mundo",
+  "profileLevelsCompleted": "{solved} / {total} niveles completados",
+  "@profileLevelsCompleted": {
+    "placeholders": {
+      "solved": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "profileHighestLevelValue": "Maximo {level}",
+  "@profileHighestLevelValue": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "profileAchievementsTitle": "Logros",
+  "profileAchievementsProgress": "{unlocked} / {total} desbloqueados",
+  "@profileAchievementsProgress": {
+    "placeholders": {
+      "unlocked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "profileAchievementCompleted": "Completado{datePart}",
+  "@profileAchievementCompleted": {
+    "placeholders": {
+      "datePart": {}
+    }
+  },
+  "profileAchievementLocked": "Bloqueado",
+  "profileAchievementUnlocked": "Desbloqueado{datePart}",
+  "@profileAchievementUnlocked": {
+    "placeholders": {
+      "datePart": {}
+    }
+  },
+  "profileAchievementOnDate": "el {date}",
+  "@profileAchievementOnDate": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "profileInboxOpen": "Abrir",
+  "profileInboxClaim": "Reclamar {coins}",
+  "@profileInboxClaim": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "profileInboxNow": "ahora",
+  "loginTagline": "Entrena tu mente. Traza el camino mas rapido que nadie.",
+  "loginBenefitSaveProgress": "Guardar progreso",
+  "loginBenefitChallengeFriends": "Desafiar amigos",
+  "loginBenefitKeepStreak": "Mantener racha",
+  "loginContinueGuest": "Continuar como invitado",
+  "loginGuestModeHint": "Modo invitado: sin amigos ni desafios.",
+  "loginConnecting": "Conectando...",
+  "loginContinueGoogle": "Continuar con Google"
 }

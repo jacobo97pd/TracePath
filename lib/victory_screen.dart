@@ -486,35 +486,41 @@ class _VictoryScreenState extends State<VictoryScreen>
                       ),
                     ),
                   ),
+                  const SizedBox(height: 12),
                   if (args.levelId.trim().isNotEmpty) ...[
-                    _StaggerIn(
-                      parent: _introController,
-                      start: 0.58,
-                      end: 0.86,
-                      child: GameCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Friends ranking',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 16,
+                    Expanded(
+                      child: _StaggerIn(
+                        parent: _introController,
+                        start: 0.58,
+                        end: 0.86,
+                        child: GameCard(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Friends ranking',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 16,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 10),
-                            FriendsRankingList(
-                              future: _friendsRankingFuture,
-                              currentUid: currentUid,
-                            ),
-                          ],
+                              const SizedBox(height: 10),
+                              Expanded(
+                                child: FriendsRankingList(
+                                  future: _friendsRankingFuture,
+                                  currentUid: currentUid,
+                                  scrollable: true,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(height: 12),
-                  ],
-                  const Spacer(),
+                  ] else
+                    const Spacer(),
                   _StaggerIn(
                     parent: _introController,
                     start: 0.82,

@@ -28,12 +28,14 @@ class FriendsRankingList extends StatelessWidget {
     required this.currentUid,
     this.emptyText = 'No friends scores yet for this level.',
     this.errorText = 'Friends ranking unavailable right now.',
+    this.scrollable = false,
   });
 
   final Future<List<FriendsRankingRow>> future;
   final String currentUid;
   final String emptyText;
   final String errorText;
+  final bool scrollable;
 
   @override
   Widget build(BuildContext context) {
@@ -67,20 +69,34 @@ class FriendsRankingList extends StatelessWidget {
             ),
           );
         }
-        return Column(
-          children: [
-            for (var i = 0; i < rows.length; i++) ...[
-              _FriendsRankingRowTile(
-                row: rows[i],
-                rank: _rankAtIndexByTime(
-                  rows.map((r) => r.bestTimeMs).toList(growable: false),
-                  i,
+        if (!scrollable) {
+          return Column(
+            children: [
+              for (var i = 0; i < rows.length; i++) ...[
+                _FriendsRankingRowTile(
+                  row: rows[i],
+                  rank: _rankAtIndexByTime(
+                    rows.map((r) => r.bestTimeMs).toList(growable: false),
+                    i,
+                  ),
+                  isCurrentUser: rows[i].uid == currentUid,
                 ),
-                isCurrentUser: rows[i].uid == currentUid,
-              ),
-              if (i < rows.length - 1) const SizedBox(height: 2),
+                if (i < rows.length - 1) const SizedBox(height: 2),
+              ],
             ],
-          ],
+          );
+        }
+
+        final times = rows.map((r) => r.bestTimeMs).toList(growable: false);
+        return ListView.separated(
+          padding: EdgeInsets.zero,
+          itemCount: rows.length,
+          itemBuilder: (context, i) => _FriendsRankingRowTile(
+            row: rows[i],
+            rank: _rankAtIndexByTime(times, i),
+            isCurrentUser: rows[i].uid == currentUid,
+          ),
+          separatorBuilder: (_, __) => const SizedBox(height: 2),
         );
       },
     );

@@ -257,5 +257,98 @@
   "profileInboxEmptyTitle": "No messages yet",
   "profileInboxEmptySubtitle": "Friend requests, rewards and news will appear here.",
   "profileVaultLockerTitle": "Vault / Locker",
-  "profileReadyToEquip": "Ready to equip"
+  "profileReadyToEquip": "Ready to equip",
+  "profileRewardClaimed": "Reward claimed: +{coins} coins",
+  "@profileRewardClaimed": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "profileRewardAlreadyClaimed": "Reward already claimed",
+  "profileRewardClaimFailed": "Could not claim reward",
+  "profileFriendRequestAccepted": "Friend request accepted",
+  "profileFriendRequestDeclined": "Friend request declined",
+  "profileFriendRequestDeclineFailed": "Could not decline friend request",
+  "profileChallengeDeclined": "Challenge declined",
+  "profileChallengeDeclineFailed": "Could not decline challenge",
+  "profileChallengeDeclinedTitle": "Challenge declined",
+  "profileChallengeDeclinedBodySuffix": "declined your challenge.",
+  "profileChallengeAcceptedTitle": "Challenge accepted",
+  "profileChallengeAcceptedBodySuffix": "accepted your challenge.",
+  "profileFunctionUnavailableTitle": "Feature unavailable",
+  "profileFunctionUnavailableBody": "This feature is only available after buying and equipping a skin.",
+  "profileUnderstand": "Understood",
+  "profileCardUnavailableTitle": "Card unavailable",
+  "profileCardUnavailableBody": "There is no card for this skin yet.",
+  "profileWorldProgressTitle": "World progress",
+  "profileLevelsCompleted": "{solved} / {total} levels completed",
+  "@profileLevelsCompleted": {
+    "placeholders": {
+      "solved": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "profileHighestLevelValue": "Highest {level}",
+  "@profileHighestLevelValue": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "profileAchievementsTitle": "Achievements",
+  "profileAchievementsProgress": "{unlocked} / {total} unlocked",
+  "@profileAchievementsProgress": {
+    "placeholders": {
+      "unlocked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "profileAchievementCompleted": "Completed{datePart}",
+  "@profileAchievementCompleted": {
+    "placeholders": {
+      "datePart": {}
+    }
+  },
+  "profileAchievementLocked": "Locked",
+  "profileAchievementUnlocked": "Unlocked{datePart}",
+  "@profileAchievementUnlocked": {
+    "placeholders": {
+      "datePart": {}
+    }
+  },
+  "profileAchievementOnDate": "on {date}",
+  "@profileAchievementOnDate": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "profileInboxOpen": "Open",
+  "profileInboxClaim": "Claim {coins}",
+  "@profileInboxClaim": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "profileInboxNow": "now",
+  "loginTagline": "Train your brain. Trace the path faster than anyone.",
+  "loginBenefitSaveProgress": "Save progress",
+  "loginBenefitChallengeFriends": "Challenge friends",
+  "loginBenefitKeepStreak": "Keep your streak",
+  "loginContinueGuest": "Continue as Guest",
+  "loginGuestModeHint": "Guest mode: no friends, no challenges.",
+  "loginConnecting": "Connecting...",
+  "loginContinueGoogle": "Continue with Google"
 }

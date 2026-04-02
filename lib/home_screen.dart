@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -34,11 +35,13 @@ class HomeScreen extends StatelessWidget {
         final solved = progressService.totalCampaignSolved;
         final streakRaw = progressService.getDailyStreak();
         final streak = streakRaw > 0 ? streakRaw : 1;
+        final resumeTarget = progressService.getCampaignResumeTarget();
         final dailySolved = progressService.totalDailySolved;
         final bestStreak = progressService.bestDailyStreak;
         final highestReachedRaw = solved + 1;
         final highestReached = highestReachedRaw > 0 ? highestReachedRaw : 1;
-        final nextSuggestedLevel = highestReached <= 1 ? 1 : highestReached;
+        final nextSuggestedLevel =
+            resumeTarget.levelIndex <= 0 ? 1 : resumeTarget.levelIndex;
         final equippedSkin = coinsService.selectedSkinAssetPath;
         final isDefaultSkinSelected =
             isDefaultSkinId(coinsService.selectedSkin);
@@ -86,7 +89,17 @@ class HomeScreen extends StatelessWidget {
                     _ContinueCard(
                       nextLevel: nextSuggestedLevel,
                       solved: solved,
-                      onTap: () => context.go('/play'),
+                      onTap: () {
+                        unawaited(
+                          progressService.setCurrentLevelForPack(
+                            resumeTarget.packId,
+                            nextSuggestedLevel,
+                          ),
+                        );
+                        context.go(
+                          '/play/${resumeTarget.packId}/$nextSuggestedLevel',
+                        );
+                      },
                     ),
                     const SizedBox(height: 22),
                     _SectionTitle(
@@ -152,7 +165,6 @@ class HomeScreen extends StatelessWidget {
     }
     return '';
   }
-
 }
 
 class _TopPlayerBar extends StatelessWidget {
@@ -759,8 +771,3 @@ class _EquippedSkinImage extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
