@@ -307,6 +307,66 @@ class TrailRenderer {
       _paintComicSpiderverseRebuiltBase(ctx);
       return;
     }
+    if (skin.renderType == TrailRenderType.smoke) {
+      _paintSmokeBase(ctx);
+      return;
+    }
+    if (skin.renderType == TrailRenderType.fire) {
+      _paintFireBase(ctx);
+      return;
+    }
+    if (skin.renderType == TrailRenderType.plasma) {
+      _paintPlasmaBase(ctx);
+      return;
+    }
+    if (skin.renderType == TrailRenderType.glitch) {
+      _paintGlitchBase(ctx);
+      return;
+    }
+    if (skin.renderType == TrailRenderType.ink) {
+      _paintInkBase(ctx);
+      return;
+    }
+    if (skin.renderType == TrailRenderType.magma) {
+      _paintMagmaBase(ctx);
+      return;
+    }
+    if (skin.renderType == TrailRenderType.ice) {
+      _paintIceBase(ctx);
+      return;
+    }
+    if (skin.renderType == TrailRenderType.galaxy) {
+      _paintGalaxyBase(ctx);
+      return;
+    }
+    if (skin.renderType == TrailRenderType.inkBrush) {
+      _paintInkBrushBase(ctx);
+      return;
+    }
+    if (skin.renderType == TrailRenderType.electricArc) {
+      _paintElectricArcBase(ctx);
+      return;
+    }
+    if (skin.renderType == TrailRenderType.goldenThread) {
+      _paintGoldenThreadBase(ctx);
+      return;
+    }
+    if (skin.renderType == TrailRenderType.goldenAura) {
+      _paintGoldenAuraBase(ctx);
+      return;
+    }
+    if (skin.renderType == TrailRenderType.holidaySpark) {
+      _paintHolidaySparkBase(ctx);
+      return;
+    }
+    if (skin.renderType == TrailRenderType.upside) {
+      _paintUpsideBase(ctx);
+      return;
+    }
+    if (skin.renderType == TrailRenderType.binaryRain) {
+      _paintBinaryRainBase(ctx);
+      return;
+    }
     final widthStep =
         skin.renderType == TrailRenderType.comic ? _comicWidthStep(ctx) : 1.0;
     final width = ctx.baseStrokeWidth * skin.thickness * widthStep;
@@ -772,7 +832,8 @@ class TrailRenderer {
       final stampCount = (pathLen / max(6.0, spacing)).ceil().clamp(8, 260);
       for (var i = 0; i < stampCount; i++) {
         final seed = 61031 + i * 37;
-        final d = i * spacing + _rand(seed + 3, -spacing * 0.35, spacing * 0.35);
+        final d =
+            i * spacing + _rand(seed + 3, -spacing * 0.35, spacing * 0.35);
         final p = _samplePointAtDistance(points, d);
         final tan = _sampleTangentAtDistance(points, d);
         if (p == null || tan == null) continue;
@@ -830,7 +891,9 @@ class TrailRenderer {
       }
     }
 
-    for (var i = 0; i < max(8, (pathLen / max(12.0, ctx.cellSize * 0.4)).round()); i++) {
+    for (var i = 0;
+        i < max(8, (pathLen / max(12.0, ctx.cellSize * 0.4)).round());
+        i++) {
       final seed = 63001 + i * 29;
       final p = _samplePoint(points, _rand(seed + 3, 0, 1));
       if (p == null) continue;
@@ -839,10 +902,11 @@ class TrailRenderer {
           ? const Color(0xFF53C1BC)
           : const Color(0xFFB14486);
       ctx.canvas.drawCircle(
-        p + Offset(
-          _rand(seed + 9, -1, 1) * ctx.cellSize * 0.04,
-          _rand(seed + 11, -1, 1) * ctx.cellSize * 0.04,
-        ),
+        p +
+            Offset(
+              _rand(seed + 9, -1, 1) * ctx.cellSize * 0.04,
+              _rand(seed + 11, -1, 1) * ctx.cellSize * 0.04,
+            ),
         r,
         Paint()..color = c.withOpacity(_rand(seed + 13, 0.28, 0.52)),
       );
@@ -952,7 +1016,8 @@ class TrailRenderer {
       if (resolved == null) {
         continue;
       }
-      final scale = _rand(42013 + i * 29, cfg.splashScaleMin, cfg.splashScaleMax);
+      final scale =
+          _rand(42013 + i * 29, cfg.splashScaleMin, cfg.splashScaleMax);
       final opacity = _rand(
         42017 + i * 31,
         cfg.splashOpacityMin,
@@ -1025,7 +1090,8 @@ class TrailRenderer {
         continue;
       }
       final scale = _rand(43009 + i * 53, cfg.dripScaleMin, cfg.dripScaleMax);
-      final opacity = _rand(43013 + i * 59, cfg.dripOpacityMin, cfg.dripOpacityMax);
+      final opacity =
+          _rand(43013 + i * 59, cfg.dripOpacityMin, cfg.dripOpacityMax);
       final tint = _rand(43014 + i * 61, 0, 1) < 0.5
           ? const Color(0xFF72C9C4)
           : const Color(0xFFAA4B8B);
@@ -1094,7 +1160,8 @@ class TrailRenderer {
         continue;
       }
       final scale = _rand(44009 + i * 83, cfg.tagScaleMin, cfg.tagScaleMax);
-      final opacity = _rand(44011 + i * 89, cfg.tagOpacityMin, cfg.tagOpacityMax);
+      final opacity =
+          _rand(44011 + i * 89, cfg.tagOpacityMin, cfg.tagOpacityMax);
       const tint = Color(0xFFB6B1B8);
       _drawTrailSprite(
         canvas: ctx.canvas,
@@ -1123,7 +1190,8 @@ class TrailRenderer {
     }
   }
 
-  static List<_UrbanAnchor> _collectUrbanGraffitiAnchors(TrailRenderContext ctx) {
+  static List<_UrbanAnchor> _collectUrbanGraffitiAnchors(
+      TrailRenderContext ctx) {
     final points = ctx.pathPoints;
     if (points.length < 2) return const <_UrbanAnchor>[];
     final anchors = <_UrbanAnchor>[];
@@ -1484,13 +1552,13 @@ class TrailRenderer {
     List<Color> palette,
   ) {
     final count =
-        max(8, (ctx.pathPoints.length * cfg.stickerFrequency * 2.2).round());
+        max(14, (ctx.pathPoints.length * cfg.stickerFrequency * 3.4).round());
     final ttl = cfg.stickerLifetime.clamp(0.25, 1.5);
     for (var i = 0; i < count; i++) {
       final lifeT = ((ctx.nowSeconds / ttl) + i * 0.197) % 1.0;
       final fade = (1 - lifeT).clamp(0.0, 1.0);
       if (fade < 0.05) continue;
-      final t = ((ctx.visualFrame * 0.023) + i * 0.141) % 1.0;
+      final t = ((ctx.nowSeconds * 0.28) + i * 0.141) % 1.0;
       final p = _samplePoint(ctx.pathPoints, t);
       final tan = _sampleTangent(ctx.pathPoints, t);
       if (p == null || tan == null) continue;
@@ -1499,8 +1567,17 @@ class TrailRenderer {
           n * _rand(15000 + i, -1, 1) * ctx.cellSize * 0.17 +
           tan * _rand(15020 + i, -1, 1) * ctx.cellSize * 0.08;
       final rotation = _rand(
-          15040 + i, -cfg.rotationVariance * pi, cfg.rotationVariance * pi);
-      final scale = 1 + _rand(15060 + i, -cfg.scaleVariance, cfg.scaleVariance);
+        15040 + i,
+        -cfg.rotationVariance * pi * 1.8,
+        cfg.rotationVariance * pi * 1.8,
+      );
+      final scale = 1 +
+          _rand(
+            15060 + i,
+            -cfg.scaleVariance * 1.35,
+            cfg.scaleVariance * 1.35,
+          ) +
+          sin(ctx.nowSeconds * 1.8 + i * 0.7) * 0.08;
       final size = ctx.cellSize * (0.145 * scale.clamp(0.7, 1.55));
       final color = palette[i % palette.length].withOpacity(0.24 + fade * 0.52);
       _drawSticker(
@@ -1518,9 +1595,9 @@ class TrailRenderer {
     List<Color> palette,
   ) {
     final clusterCount =
-        max(2, (ctx.pathPoints.length * cfg.stickerFrequency * 0.8).round());
+        max(3, (ctx.pathPoints.length * cfg.stickerFrequency * 1.35).round());
     for (var i = 0; i < clusterCount; i++) {
-      final t = ((ctx.visualFrame * 0.017) + i * 0.31) % 1.0;
+      final t = ((ctx.nowSeconds * 0.21) + i * 0.31) % 1.0;
       final p = _samplePoint(ctx.pathPoints, t);
       if (p == null) continue;
       final center = p +
@@ -1536,11 +1613,15 @@ class TrailRenderer {
         final pos = center + Offset(cos(ang) * r, sin(ang) * r);
         final rotation = _rand(
           15180 + i + j,
-          -cfg.rotationVariance * pi,
-          cfg.rotationVariance * pi,
+          -cfg.rotationVariance * pi * 1.9,
+          cfg.rotationVariance * pi * 1.9,
         );
-        final scale =
-            1 + _rand(15200 + i + j, -cfg.scaleVariance, cfg.scaleVariance);
+        final scale = 1 +
+            _rand(
+              15200 + i + j,
+              -cfg.scaleVariance * 1.4,
+              cfg.scaleVariance * 1.4,
+            );
         final size = ctx.cellSize * (0.12 * scale.clamp(0.7, 1.55));
         final color = palette[(i + j + 2) % palette.length].withOpacity(0.32);
         _drawSticker(
@@ -2227,14 +2308,764 @@ class TrailRenderer {
     return out;
   }
 
-  static void _paintFireVfx(TrailRenderContext ctx) {
-    _paintHeadGlow(ctx, scale: 0.42, alpha: 0.30);
-    _paintParticles(
-      ctx,
-      colorA: const Color(0xFFFF6A2B),
-      colorB: const Color(0xFFFFD36A),
-      intensity: 1.0,
+  static Path _animatedJitterPath(
+    TrailRenderContext ctx, {
+    required double amount,
+    double phaseMultiplier = 1.0,
+  }) {
+    if (amount <= 0 || ctx.pathPoints.length < 3) {
+      return _buildSmoothPath(ctx.pathPoints);
+    }
+    final jitter = _jitterPolyline(
+      ctx.pathPoints,
+      amount: amount,
+      phase: ctx.nowSeconds * pi * 2 * phaseMultiplier,
     );
+    return _buildSmoothPath(jitter);
+  }
+
+  static void _paintSmokeBase(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.smoke;
+    final width = ctx.baseStrokeWidth * ctx.trailSkin.thickness * 0.9;
+    final wobble = (sin(ctx.nowSeconds * 1.1) * 0.5 + 0.5);
+    final path = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize *
+          cfg.sidewaysJitter *
+          (0.08 + wobble * 0.07) *
+          ctx.trailSkin.effectIntensity,
+      phaseMultiplier: 0.42,
+    );
+    final driftOffset = Offset(0, -ctx.cellSize * cfg.upwardDrift * 0.12);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    final under = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * 1.46
+      ..color = const Color(0xFF0B1018).withOpacity(0.2);
+    final core = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width
+      ..shader = LinearGradient(
+        colors: <Color>[
+          const Color(0xFFF8FBFF).withOpacity(cfg.opacityStart * 0.68),
+          const Color(0xFFD1D8E0).withOpacity(cfg.opacityStart * 0.58),
+          const Color(0xFF8D98A4).withOpacity(cfg.opacityStart * 0.48),
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ).createShader(ctx.boardRect);
+    final haze = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * 1.2
+      ..color = const Color(0xFFE2E8F0).withOpacity(0.18);
+    ctx.canvas.drawPath(path.shift(driftOffset), haze);
+    ctx.canvas.drawPath(path, under);
+    ctx.canvas.drawPath(path, core);
+    ctx.canvas.restore();
+  }
+
+  static void _paintFireBase(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final flicker =
+        (sin(ctx.nowSeconds * 10.8 + ctx.phase * pi * 2) * 0.5 + 0.5);
+    final width =
+        ctx.baseStrokeWidth * ctx.trailSkin.thickness * (1.0 + flicker * 0.08);
+    final path = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize * 0.012 * (1 + flicker * 0.7),
+      phaseMultiplier: 1.6,
+    );
+    final glow = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * 1.95
+      ..color = const Color(0xFFFF4A22).withOpacity(0.22 + flicker * 0.08);
+    final flame = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * 1.1
+      ..shader = LinearGradient(
+        colors: <Color>[
+          const Color(0xFF6F0E00).withOpacity(0.9),
+          const Color(0xFFFF5A1F).withOpacity(0.98),
+          const Color(0xFFFFD36A).withOpacity(0.95),
+        ],
+        stops: const <double>[0.0, 0.58, 1.0],
+        begin: Alignment.bottomLeft,
+        end: Alignment.topRight,
+      ).createShader(ctx.boardRect);
+    final core = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * 0.42
+      ..color = const Color(0xFFFFF3C4).withOpacity(0.75 + flicker * 0.18);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    ctx.canvas.drawPath(path, glow);
+    ctx.canvas.drawPath(path, flame);
+    ctx.canvas.drawPath(path, core);
+    ctx.canvas.restore();
+  }
+
+  static void _paintPlasmaBase(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.plasma;
+    final pulse =
+        sin(ctx.nowSeconds * cfg.pulseSpeed * pi * 2 + ctx.phase * pi * 2) *
+                0.5 +
+            0.5;
+    final width = ctx.baseStrokeWidth *
+        ctx.trailSkin.thickness *
+        cfg.plasmaWidth *
+        (1 + pulse * cfg.pulseStrength);
+    final path = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize * 0.014 * (1 + pulse * 0.4),
+      phaseMultiplier: cfg.innerFlowSpeed,
+    );
+    final glow = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * cfg.glowWidth
+      ..color = cfg.glowColor.withOpacity(0.17 + pulse * 0.08);
+    final plasma = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width
+      ..shader = LinearGradient(
+        colors: <Color>[
+          cfg.glowColor.withOpacity(0.86),
+          cfg.plasmaColor.withOpacity(0.96),
+          cfg.coreColor.withOpacity(0.92),
+        ],
+        stops: const <double>[0.0, 0.65, 1.0],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ).createShader(ctx.boardRect);
+    final core = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = max(1.0, width * cfg.coreWidth)
+      ..color = cfg.coreColor.withOpacity(0.64 + pulse * 0.2);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    ctx.canvas.drawPath(path, glow);
+    ctx.canvas.drawPath(path, plasma);
+    ctx.canvas.drawPath(path, core);
+    ctx.canvas.restore();
+  }
+
+  static void _paintGlitchBase(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.glitch;
+    final flicker =
+        (sin(ctx.nowSeconds * 17.0 + ctx.visualFrame * 0.31) * 0.5 + 0.5);
+    final width = ctx.baseStrokeWidth * ctx.trailSkin.thickness * cfg.coreWidth;
+    final path = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize * cfg.chromaticOffset * (0.35 + flicker * 0.35),
+      phaseMultiplier: 1.8,
+    );
+    final chroma = ctx.cellSize * cfg.chromaticOffset;
+    final under = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * 1.32
+      ..color = const Color(0xFF0A0B10).withOpacity(0.44);
+    final core = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width
+      ..color = cfg.coreColor.withOpacity(0.7 + flicker * 0.24);
+    final offsetA = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * 0.72
+      ..color = cfg.offsetColorA.withOpacity(0.35 + flicker * 0.2);
+    final offsetB = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * 0.72
+      ..color = cfg.offsetColorB.withOpacity(0.34 + flicker * 0.2);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    ctx.canvas.drawPath(path, under);
+    ctx.canvas.drawPath(path.shift(Offset(-chroma, 0)), offsetA);
+    ctx.canvas.drawPath(path.shift(Offset(chroma, 0)), offsetB);
+    ctx.canvas.drawPath(path, core);
+    ctx.canvas.restore();
+  }
+
+  static void _paintInkBase(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.inkLiquid;
+    final pulse = sin(ctx.nowSeconds * 1.9 + ctx.phase * pi * 2) * 0.5 + 0.5;
+    final width = ctx.baseStrokeWidth *
+        ctx.trailSkin.thickness *
+        cfg.baseWidth *
+        (1 + cfg.widthVariation * 0.18 * pulse);
+    final path = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize * cfg.edgeNoiseAmount * (0.7 + pulse * 0.5),
+      phaseMultiplier: 0.55,
+    );
+    final under = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * 1.08
+      ..color = const Color(0xFF020617).withOpacity(0.54);
+    final fill = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width
+      ..color = cfg.coreColor.withOpacity(0.92);
+    final gloss = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = max(1.0, width * 0.22)
+      ..color =
+          cfg.highlightColor.withOpacity(cfg.glossStrength + pulse * 0.12);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    ctx.canvas.drawPath(path, under);
+    ctx.canvas.drawPath(path, fill);
+    ctx.canvas.drawPath(path.shift(const Offset(-1.0, -1.0)), gloss);
+    ctx.canvas.restore();
+  }
+
+  static void _paintMagmaBase(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.magma;
+    final heat = sin(ctx.nowSeconds * cfg.heatPulseSpeed * pi * 2) * 0.5 + 0.5;
+    final width = ctx.baseStrokeWidth *
+        ctx.trailSkin.thickness *
+        cfg.magmaWidth *
+        (1 + cfg.heatPulseStrength * heat);
+    final path = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize * 0.01 * (1 + heat * 0.5),
+      phaseMultiplier: 1.1,
+    );
+    final crust = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * cfg.crustWidth
+      ..color = cfg.crustColor.withOpacity(0.94);
+    final lava = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width
+      ..shader = LinearGradient(
+        colors: <Color>[
+          cfg.magmaColor.withOpacity(0.98),
+          cfg.glowColor.withOpacity(0.95),
+          cfg.coreColor.withOpacity(0.86),
+        ],
+        begin: Alignment.bottomLeft,
+        end: Alignment.topRight,
+      ).createShader(ctx.boardRect);
+    final core = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = max(1.0, width * cfg.coreWidth)
+      ..color = cfg.coreColor.withOpacity(0.72 + heat * 0.2);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    ctx.canvas.drawPath(path, crust);
+    ctx.canvas.drawPath(path, lava);
+    ctx.canvas.drawPath(path, core);
+    ctx.canvas.restore();
+  }
+
+  static void _paintIceBase(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.ice;
+    final pulse = sin(ctx.nowSeconds * 2.1 + ctx.phase * pi * 2) * 0.5 + 0.5;
+    final width =
+        ctx.baseStrokeWidth * ctx.trailSkin.thickness * cfg.frostWidth;
+    final path = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize * cfg.crystalDetailAmount * 0.35,
+      phaseMultiplier: 0.8,
+    );
+    final glow = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * 1.34
+      ..color = cfg.glowColor.withOpacity(0.18 + pulse * 0.12);
+    final frost = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width
+      ..shader = LinearGradient(
+        colors: <Color>[
+          cfg.frostColor.withOpacity(0.95),
+          cfg.coreColor.withOpacity(0.92),
+          const Color(0xFFE0F2FF).withOpacity(0.8),
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ).createShader(ctx.boardRect);
+    final edge = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = max(1.0, width * 0.22)
+      ..color = Colors.white.withOpacity(0.42 + pulse * 0.18);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    ctx.canvas.drawPath(path, glow);
+    ctx.canvas.drawPath(path, frost);
+    ctx.canvas.drawPath(path.shift(const Offset(-0.8, -0.8)), edge);
+    ctx.canvas.restore();
+  }
+
+  static void _paintGalaxyBase(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.galaxy;
+    final pulse = sin(ctx.nowSeconds * cfg.pulseSpeed * pi * 2) * 0.5 + 0.5;
+    final width = ctx.baseStrokeWidth *
+        ctx.trailSkin.thickness *
+        cfg.nebulaWidth *
+        (1 + cfg.pulseStrength * pulse);
+    final path = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize * 0.013 * (1 + pulse * 0.5),
+      phaseMultiplier: cfg.innerDriftSpeed * 0.32,
+    );
+    final glow = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * cfg.glowWidth
+      ..color = cfg.glowColor.withOpacity(0.12 + pulse * 0.07);
+    final nebula = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width
+      ..shader = LinearGradient(
+        colors: <Color>[
+          cfg.nebulaColorA.withOpacity(0.92),
+          cfg.nebulaColorB.withOpacity(0.9),
+          const Color(0xFFF0E7FF).withOpacity(0.75),
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ).createShader(ctx.boardRect);
+    final core = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = max(1.0, width * cfg.coreWidth)
+      ..color = cfg.coreColor.withOpacity(0.56 + pulse * 0.2);
+    final drift = Offset(
+      sin(ctx.nowSeconds * cfg.innerDriftSpeed * 0.43) * ctx.cellSize * 0.03,
+      cos(ctx.nowSeconds * cfg.innerDriftSpeed * 0.37) * ctx.cellSize * 0.03,
+    );
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    ctx.canvas.drawPath(path, glow);
+    ctx.canvas.drawPath(path.shift(drift), nebula);
+    ctx.canvas.drawPath(path, core);
+    ctx.canvas.restore();
+  }
+
+  static void _paintInkBrushBase(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.ink;
+    final pulse = sin(ctx.nowSeconds * 2.35) * 0.5 + 0.5;
+    final width = ctx.baseStrokeWidth *
+        ctx.trailSkin.thickness *
+        cfg.baseWidth *
+        (1 + cfg.widthVariance * 0.24 * pulse);
+    final path = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize * cfg.edgeRoughness * (0.75 + pulse * 0.55),
+      phaseMultiplier: 0.72,
+    );
+    final smear = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * 1.18
+      ..color = ctx.trailSkin.primaryColor.withOpacity(0.2);
+    final body = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width
+      ..shader = LinearGradient(
+        colors: <Color>[
+          ctx.trailSkin.primaryColor.withOpacity(0.95),
+          ctx.trailSkin.secondaryColor.withOpacity(0.92),
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ).createShader(ctx.boardRect);
+    final edge = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = max(1.0, width * 0.2)
+      ..color = Colors.white.withOpacity(0.22);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    ctx.canvas.drawPath(path.shift(const Offset(-1.2, 1.0)), smear);
+    ctx.canvas.drawPath(path, body);
+    ctx.canvas.drawPath(path.shift(const Offset(-0.8, -0.8)), edge);
+    ctx.canvas.restore();
+  }
+
+  static void _paintElectricArcBase(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.arc;
+    final pulse = sin(ctx.nowSeconds * 12.0 + ctx.phase * pi * 2) * 0.5 + 0.5;
+    final width = ctx.baseStrokeWidth *
+        ctx.trailSkin.thickness *
+        cfg.mainWidth *
+        (1 + pulse * 0.08);
+    final path = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize * 0.016 * (1 + pulse * 0.6),
+      phaseMultiplier: 2.2,
+    );
+    final glow = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * (1.8 + cfg.glowStrength * 0.8)
+      ..color = const Color(0xFF3EC9FF).withOpacity(0.2 + pulse * 0.12);
+    final bolt = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width
+      ..shader = const LinearGradient(
+        colors: <Color>[
+          Color(0xFF76E6FF),
+          Color(0xFFFFFFFF),
+          Color(0xFF44AEFF),
+        ],
+      ).createShader(ctx.boardRect);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    ctx.canvas.drawPath(path, glow);
+    ctx.canvas.drawPath(path, bolt);
+    ctx.canvas.restore();
+  }
+
+  static void _paintGoldenThreadBase(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.golden;
+    final shimmer = sin(ctx.nowSeconds * 4.8 + ctx.phase * pi * 2) * 0.5 + 0.5;
+    final width =
+        ctx.baseStrokeWidth * ctx.trailSkin.thickness * cfg.threadWidth;
+    final path = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize * 0.006,
+      phaseMultiplier: 0.4,
+    );
+    final glow = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * 1.8
+      ..color =
+          const Color(0xFFFFC74A).withOpacity(cfg.glowOpacity + shimmer * 0.12);
+    final gold = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width
+      ..shader = const LinearGradient(
+        colors: <Color>[
+          Color(0xFF8A5A00),
+          Color(0xFFFFD35A),
+          Color(0xFFFFF1B8),
+        ],
+      ).createShader(ctx.boardRect);
+    final highlight = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = max(1.0, width * 0.2)
+      ..color =
+          Colors.white.withOpacity(0.3 + shimmer * cfg.highlightStrength * 0.3);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    ctx.canvas.drawPath(path, glow);
+    ctx.canvas.drawPath(path, gold);
+    ctx.canvas.drawPath(path.shift(const Offset(-0.8, -0.8)), highlight);
+    ctx.canvas.restore();
+  }
+
+  static void _paintGoldenAuraBase(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.aura;
+    final pulse =
+        sin(ctx.nowSeconds * cfg.pulseSpeed * pi * 2 + ctx.phase * pi * 2) *
+                0.5 +
+            0.5;
+    final base = ctx.baseStrokeWidth * ctx.trailSkin.thickness;
+    final path = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize * cfg.edgeNoiseAmount * (0.4 + pulse * 0.3),
+      phaseMultiplier: cfg.edgeNoiseSpeed,
+    );
+    final glow = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = base * cfg.glowWidth * (1 + pulse * cfg.pulseStrength)
+      ..color = cfg.glowColor.withOpacity(0.14 + pulse * 0.11);
+    final aura = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = base * cfg.auraWidth
+      ..color = cfg.auraColor.withOpacity(0.55 + pulse * 0.16);
+    final core = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = max(1.0, base * cfg.coreWidth)
+      ..color = cfg.coreColor.withOpacity(0.86);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    ctx.canvas.drawPath(path, glow);
+    ctx.canvas.drawPath(path, aura);
+    ctx.canvas.drawPath(path, core);
+    ctx.canvas.restore();
+  }
+
+  static void _paintHolidaySparkBase(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.holidaySpark;
+    final pulse = sin(ctx.nowSeconds * cfg.pulseSpeed * pi * 2) * 0.5 + 0.5;
+    final width = ctx.baseStrokeWidth * ctx.trailSkin.thickness * cfg.coreWidth;
+    final path = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize * 0.008 * (1 + pulse * 0.45),
+      phaseMultiplier: 1.0,
+    );
+    final glow = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * cfg.glowWidth
+      ..color = cfg.glowColor.withOpacity(0.16 + pulse * 0.1);
+    final ribbon = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width
+      ..shader = LinearGradient(
+        colors: <Color>[
+          cfg.sparkleColors[2].withOpacity(0.95),
+          cfg.sparkleColors[3].withOpacity(0.92),
+          cfg.sparkleColors[1].withOpacity(0.86),
+        ],
+      ).createShader(ctx.boardRect);
+    final core = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = max(1.0, width * 0.24)
+      ..color = cfg.sparkleColors.first.withOpacity(0.82 + pulse * 0.16);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    ctx.canvas.drawPath(path, glow);
+    ctx.canvas.drawPath(path, ribbon);
+    ctx.canvas.drawPath(path, core);
+    ctx.canvas.restore();
+  }
+
+  static void _paintUpsideBase(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.upside;
+    final pulse =
+        sin(ctx.nowSeconds * cfg.pulseSpeed * pi * 2 + 0.6) * 0.5 + 0.5;
+    final width = ctx.baseStrokeWidth * ctx.trailSkin.thickness * cfg.auraWidth;
+    final path = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize * 0.014 * (1 + pulse * 0.65),
+      phaseMultiplier: 1.35,
+    );
+    final aura = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * cfg.glowWidth
+      ..color = cfg.glowColor.withOpacity(0.12 + pulse * 0.12);
+    final core = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = max(1.0, width * cfg.coreWidth)
+      ..shader = LinearGradient(
+        colors: <Color>[
+          cfg.coreColor.withOpacity(0.94),
+          cfg.auraColor.withOpacity(0.86),
+          cfg.boltColor.withOpacity(0.7),
+        ],
+      ).createShader(ctx.boardRect);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    ctx.canvas.drawPath(path, aura);
+    ctx.canvas.drawPath(path, core);
+    ctx.canvas.restore();
+  }
+
+  static void _paintBinaryRainBase(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.binaryRain;
+    final pulse = sin(ctx.nowSeconds * cfg.pulseSpeed * pi * 2) * 0.5 + 0.5;
+    final width = ctx.baseStrokeWidth * ctx.trailSkin.thickness * cfg.coreWidth;
+    final path = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize * 0.008 * (1 + pulse * 0.4),
+      phaseMultiplier: 1.3,
+    );
+    final glow = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width * cfg.glowWidth
+      ..color = cfg.glowColor.withOpacity(0.16 + pulse * 0.11);
+    final core = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
+      ..strokeWidth = width
+      ..shader = LinearGradient(
+        colors: <Color>[
+          cfg.coreColor.withOpacity(0.95),
+          cfg.binaryColor.withOpacity(0.9),
+          const Color(0xFFD7FFE9).withOpacity(0.84),
+        ],
+      ).createShader(ctx.boardRect);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    ctx.canvas.drawPath(path, glow);
+    ctx.canvas.drawPath(path, core);
+    ctx.canvas.restore();
+  }
+
+  static void _paintFireVfx(TrailRenderContext ctx) {
+    final cfg = ctx.trailSkin.particle;
+    _paintHeadGlow(ctx, scale: 0.45, alpha: 0.34);
+    final count = max(8, min(40, cfg.count + 8));
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    for (var i = 0; i < count; i++) {
+      final t = ((ctx.nowSeconds * 0.75) + i * 0.083) % 1.0;
+      final p = _samplePoint(ctx.pathPoints, t);
+      final tan = _sampleTangent(ctx.pathPoints, t);
+      if (p == null || tan == null) continue;
+      final n = Offset(-tan.dy, tan.dx);
+      final rise = ((ctx.nowSeconds * 1.3) + i * 0.41) % 1.0;
+      final offset = n * _rand(2100 + i, -1, 1) * ctx.cellSize * 0.09 +
+          Offset(0, -ctx.cellSize * rise * 0.16);
+      final radius = ctx.cellSize * _rand(2130 + i, 0.018, 0.05);
+      final alpha = (1.0 - rise).clamp(0.0, 1.0) * 0.62;
+      ctx.canvas.drawCircle(
+        p + offset,
+        radius,
+        Paint()
+          ..color = Color.lerp(
+            const Color(0xFFFF6A2B),
+            const Color(0xFFFFE08A),
+            _rand(2160 + i, 0.0, 1.0),
+          )!
+              .withOpacity(alpha),
+      );
+    }
+    final flickers = max(4, min(20, ctx.pathPoints.length * 2));
+    for (var i = 0; i < flickers; i++) {
+      final t = (i / flickers + ctx.nowSeconds * 0.4) % 1.0;
+      final p = _samplePoint(ctx.pathPoints, t);
+      if (p == null) continue;
+      final h = ctx.cellSize * _rand(2200 + i, 0.08, 0.2);
+      ctx.canvas.drawLine(
+        p,
+        p + Offset(_rand(2230 + i, -0.1, 0.1) * ctx.cellSize, -h),
+        Paint()
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = max(0.8, ctx.cellSize * 0.016)
+          ..color = const Color(0xFFFFB84F).withOpacity(0.18),
+      );
+    }
+    ctx.canvas.restore();
   }
 
   static void _paintLaserVfx(TrailRenderContext ctx) {
@@ -2266,18 +3097,243 @@ class TrailRenderer {
     );
   }
 
-  static void _paintPlasmaTrail(TrailRenderContext ctx) =>
-      _paintGenericParticleVfx(ctx);
-  static void _paintGlitchTrail(TrailRenderContext ctx) =>
-      _paintGenericParticleVfx(ctx);
-  static void _paintInkTrail(TrailRenderContext ctx) =>
-      _paintGenericParticleVfx(ctx);
-  static void _paintMagmaTrail(TrailRenderContext ctx) =>
-      _paintGenericParticleVfx(ctx);
-  static void _paintIceTrail(TrailRenderContext ctx) =>
-      _paintGenericParticleVfx(ctx);
-  static void _paintGalaxyTrail(TrailRenderContext ctx) =>
-      _paintGenericParticleVfx(ctx);
+  static void _paintPlasmaTrail(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.plasma;
+    _paintHeadGlow(ctx, scale: 0.38, alpha: 0.3);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    final arcCount = max(5, min(18, ctx.pathPoints.length * 2));
+    for (var i = 0; i < arcCount; i++) {
+      final t = ((ctx.nowSeconds * 0.9) + i * 0.12) % 1.0;
+      final p = _samplePoint(ctx.pathPoints, t);
+      final tan = _sampleTangent(ctx.pathPoints, t);
+      if (p == null || tan == null) continue;
+      final n = Offset(-tan.dy, tan.dx);
+      final a = p + n * ctx.cellSize * _rand(2600 + i, -0.09, 0.09);
+      final b = p + n * ctx.cellSize * _rand(2630 + i, -0.22, 0.22);
+      ctx.canvas.drawLine(
+        a,
+        b,
+        Paint()
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = max(0.8, ctx.cellSize * 0.018)
+          ..color = cfg.coreColor.withOpacity(0.24),
+      );
+    }
+    _paintParticles(
+      ctx,
+      colorA: cfg.plasmaColor,
+      colorB: cfg.glowColor,
+      intensity: 1.15,
+    );
+    ctx.canvas.restore();
+  }
+
+  static void _paintGlitchTrail(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.glitch;
+    final path = _buildSmoothPath(ctx.pathPoints);
+    final shift =
+        ctx.cellSize * cfg.chromaticOffset * (0.7 + cfg.flickerStrength);
+    final jitter = sin(ctx.nowSeconds * 16.0 + ctx.visualFrame * 0.4) *
+        ctx.cellSize *
+        0.04;
+    final jittered = path.shift(Offset(jitter, -jitter * 0.5));
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    ctx.canvas.drawPath(
+      jittered.shift(Offset(-shift, 0)),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..strokeWidth = max(1.0, ctx.baseStrokeWidth * cfg.coreWidth * 0.55)
+        ..color = cfg.offsetColorA.withOpacity(0.26),
+    );
+    ctx.canvas.drawPath(
+      jittered.shift(Offset(shift, 0)),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..strokeWidth = max(1.0, ctx.baseStrokeWidth * cfg.coreWidth * 0.55)
+        ..color = cfg.offsetColorB.withOpacity(0.26),
+    );
+    final fragments = max(10, min(42, (ctx.pathPoints.length * 5.5).round()));
+    for (var i = 0; i < fragments; i++) {
+      final t = ((ctx.nowSeconds * 0.55) + i * 0.071) % 1.0;
+      final p = _samplePoint(ctx.pathPoints, t);
+      if (p == null) continue;
+      final w = ctx.cellSize * _rand(2700 + i, 0.05, 0.14);
+      final h = ctx.cellSize * _rand(2730 + i, 0.02, 0.08);
+      final rect = Rect.fromCenter(
+        center: p +
+            Offset(
+              _rand(2760 + i + ctx.visualFrame, -1, 1) * ctx.cellSize * 0.18,
+              _rand(2790 + i + ctx.visualFrame, -1, 1) * ctx.cellSize * 0.05,
+            ),
+        width: w,
+        height: h,
+      );
+      final color = i.isEven ? cfg.offsetColorA : cfg.offsetColorB;
+      ctx.canvas.drawRect(rect, Paint()..color = color.withOpacity(0.2));
+    }
+    ctx.canvas.restore();
+  }
+
+  static void _paintInkTrail(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.inkLiquid;
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    final edges = max(8, min(26, ctx.pathPoints.length * 2));
+    for (var i = 0; i < edges; i++) {
+      final t = ((ctx.nowSeconds * 0.25) + i * 0.11) % 1.0;
+      final p = _samplePoint(ctx.pathPoints, t);
+      final tan = _sampleTangent(ctx.pathPoints, t);
+      if (p == null || tan == null) continue;
+      final n = Offset(-tan.dy, tan.dx);
+      final side = n * _rand(2860 + i, -1, 1) * ctx.cellSize * 0.12;
+      final len = ctx.cellSize * _rand(2890 + i, 0.05, 0.14);
+      ctx.canvas.drawLine(
+        p + side,
+        p + side + Offset(0, len),
+        Paint()
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = max(0.8, ctx.cellSize * 0.014)
+          ..color = cfg.highlightColor.withOpacity(0.18),
+      );
+    }
+    final drops = max(
+        5, min(16, (ctx.pathPoints.length * cfg.dropletFrequency * 3).round()));
+    for (var i = 0; i < drops; i++) {
+      final t = ((ctx.nowSeconds * 0.32) + i * 0.17) % 1.0;
+      final p = _samplePoint(ctx.pathPoints, t);
+      if (p == null) continue;
+      final radius = ctx.cellSize * cfg.dropletSize * _rand(2920 + i, 0.8, 1.8);
+      final fall = ((ctx.nowSeconds * 0.5) + i * 0.23) % 1.0;
+      ctx.canvas.drawCircle(
+        p +
+            Offset(_rand(2950 + i, -0.08, 0.08) * ctx.cellSize,
+                fall * ctx.cellSize * 0.16),
+        radius,
+        Paint()..color = cfg.coreColor.withOpacity((1 - fall) * 0.34),
+      );
+    }
+    ctx.canvas.restore();
+  }
+
+  static void _paintMagmaTrail(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.magma;
+    _paintHeadGlow(ctx, scale: 0.38, alpha: 0.32);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    final bubbleCount = max(5, min(20, (ctx.pathPoints.length * 1.9).round()));
+    for (var i = 0; i < bubbleCount; i++) {
+      final t = ((ctx.nowSeconds * 0.38) + i * 0.137) % 1.0;
+      final p = _samplePoint(ctx.pathPoints, t);
+      if (p == null) continue;
+      final rise = ((ctx.nowSeconds * 0.62) + i * 0.21) % 1.0;
+      final radius = ctx.cellSize * _rand(3000 + i, 0.02, 0.06);
+      final center = p +
+          Offset(_rand(3030 + i, -0.1, 0.1) * ctx.cellSize,
+              -rise * ctx.cellSize * 0.1);
+      ctx.canvas.drawCircle(
+        center,
+        radius,
+        Paint()..color = cfg.coreColor.withOpacity((1 - rise) * 0.35),
+      );
+      ctx.canvas.drawCircle(
+        center,
+        radius * 0.52,
+        Paint()..color = cfg.magmaColor.withOpacity((1 - rise) * 0.5),
+      );
+    }
+    _paintParticles(
+      ctx,
+      colorA: cfg.magmaColor,
+      colorB: cfg.coreColor,
+      intensity: 1.0,
+    );
+    ctx.canvas.restore();
+  }
+
+  static void _paintIceTrail(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.ice;
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    final crystalCount = max(8, min(28, (ctx.pathPoints.length * 2.6).round()));
+    for (var i = 0; i < crystalCount; i++) {
+      final t = ((ctx.nowSeconds * 0.21) + i * 0.093) % 1.0;
+      final p = _samplePoint(ctx.pathPoints, t);
+      final tan = _sampleTangent(ctx.pathPoints, t);
+      if (p == null || tan == null) continue;
+      final n = Offset(-tan.dy, tan.dx);
+      final origin = p + n * _rand(3100 + i, -0.12, 0.12) * ctx.cellSize;
+      final len = ctx.cellSize * _rand(3130 + i, 0.04, 0.11);
+      final a = origin + n * len;
+      final b = origin - n * len;
+      ctx.canvas.drawLine(
+        a,
+        b,
+        Paint()
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = max(0.8, ctx.cellSize * 0.012)
+          ..color = cfg.coreColor.withOpacity(0.32),
+      );
+    }
+    final snowCount = max(8, min(26, (ctx.pathPoints.length * 2.2).round()));
+    for (var i = 0; i < snowCount; i++) {
+      final t = ((ctx.nowSeconds * 0.28) + i * 0.127) % 1.0;
+      final p = _samplePoint(ctx.pathPoints, t);
+      if (p == null) continue;
+      final drift = Offset(
+        _rand(3160 + i, -0.14, 0.14) * ctx.cellSize,
+        ((ctx.nowSeconds * 0.42 + i * 0.19) % 1.0) * ctx.cellSize * 0.11,
+      );
+      final r = ctx.cellSize * _rand(3190 + i, 0.007, 0.016);
+      ctx.canvas.drawCircle(
+        p + drift,
+        r,
+        Paint()..color = Colors.white.withOpacity(0.5),
+      );
+    }
+    ctx.canvas.restore();
+  }
+
+  static void _paintGalaxyTrail(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.galaxy;
+    _paintHeadGlow(ctx, scale: 0.46, alpha: 0.28);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    final stars = max(10, min(34, (ctx.pathPoints.length * 2.8).round()));
+    for (var i = 0; i < stars; i++) {
+      final flow = ctx.nowSeconds * (0.06 + cfg.innerDriftSpeed * 0.06);
+      final t = (((i + 0.5) / stars) + flow) % 1.0;
+      final p = _samplePoint(ctx.pathPoints, t);
+      if (p == null) continue;
+      final twinkle = (sin(ctx.nowSeconds * 2.4 + i * 1.7) * 0.5 + 0.5);
+      final radius =
+          ctx.cellSize * _rand(3220 + i, 0.006, 0.02) * (0.7 + twinkle * 0.8);
+      final drift = Offset(
+        sin(ctx.nowSeconds * 0.7 + i) * ctx.cellSize * 0.05,
+        cos(ctx.nowSeconds * 0.5 + i * 0.5) * ctx.cellSize * 0.05,
+      );
+      ctx.canvas.drawCircle(
+        p + drift,
+        radius,
+        Paint()
+          ..color = Color.lerp(cfg.nebulaColorB, Colors.white, 0.55)!
+              .withOpacity(0.22 + twinkle * 0.5),
+      );
+    }
+    ctx.canvas.restore();
+  }
+
   static void _paintSpeedForceTrail(TrailRenderContext ctx) =>
       _paintLaserVfx(ctx);
   static void _paintWebTrail(TrailRenderContext ctx) {
@@ -2298,7 +3354,7 @@ class TrailRenderer {
     final cfg = ctx.trailSkin.webLegendary;
     const intensity = 0.68;
     final wBase =
-        ctx.baseStrokeWidth * ctx.trailSkin.thickness * cfg.mainWidth * 1.08;
+        ctx.baseStrokeWidth * ctx.trailSkin.thickness * cfg.mainWidth * 1.26;
     final pulse =
         sin(ctx.phase * pi * 2 * (1.1 + cfg.highlightSpeed * 0.8)) * 0.5 + 0.5;
     final path = _buildSmoothPath(
@@ -2363,6 +3419,7 @@ class TrailRenderer {
 
   static void _paintWebLegendaryTrail(TrailRenderContext ctx) {
     if (ctx.pathPoints.length < 2) return;
+    _paintWebLegendaryMicroStrands(ctx);
     _paintWebLegendaryHighlight(ctx);
     _paintWebLegendaryBridges(ctx);
     _paintWebLegendaryNodeBursts(ctx);
@@ -2371,22 +3428,368 @@ class TrailRenderer {
     _paintWebLegendaryGlitchFlash(ctx);
   }
 
-  static void _paintInkBrushTrail(TrailRenderContext ctx) =>
-      _paintGenericParticleVfx(ctx);
-  static void _paintElectricArcTrail(TrailRenderContext ctx) =>
-      _paintLaserVfx(ctx);
-  static void _paintGoldenThreadTrail(TrailRenderContext ctx) =>
-      _paintGenericParticleVfx(ctx);
-  static void _paintGoldenAuraTrail(TrailRenderContext ctx) =>
-      _paintGenericParticleVfx(ctx);
-  static void _paintHolidaySparkTrail(TrailRenderContext ctx) =>
-      _paintGenericParticleVfx(ctx);
-  static void _paintUpsideTrail(TrailRenderContext ctx) =>
-      _paintGenericParticleVfx(ctx);
-  static void _paintBinaryRainTrail(TrailRenderContext ctx) =>
-      _paintGenericParticleVfx(ctx);
-  static void _paintSmokeTrail(TrailRenderContext ctx) =>
-      _paintGenericParticleVfx(ctx);
+  static void _paintWebLegendaryMicroStrands(TrailRenderContext ctx) {
+    final points = ctx.pathPoints;
+    if (points.length < 2) return;
+    final cfg = ctx.trailSkin.webLegendary;
+    final count = max(10, min(38, (points.length * 2.2).round()));
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    for (var i = 0; i < count; i++) {
+      final t = ((ctx.nowSeconds * 0.26) + i * 0.061) % 1.0;
+      final p = _samplePoint(points, t);
+      final tan = _sampleTangent(points, t);
+      if (p == null || tan == null) continue;
+      final n = Offset(-tan.dy, tan.dx);
+      final half = ctx.cellSize * _rand(6300 + i, 0.06, 0.18);
+      final center = p + n * _rand(6330 + i, -0.15, 0.15) * ctx.cellSize;
+      final a = center - tan * half;
+      final b = center + tan * half;
+      ctx.canvas.drawLine(
+        a,
+        b,
+        Paint()
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = max(0.7, ctx.cellSize * 0.012)
+          ..color = const Color(0xFFEFF7FF)
+              .withOpacity(0.14 + _rand(6360 + i, 0.0, 0.16)),
+      );
+      if (i.isEven) {
+        ctx.canvas.drawLine(
+          a + n * (ctx.cellSize * cfg.chromaticOffsetStrength * 0.2),
+          b + n * (ctx.cellSize * cfg.chromaticOffsetStrength * 0.2),
+          Paint()
+            ..strokeCap = StrokeCap.round
+            ..strokeWidth = max(0.6, ctx.cellSize * 0.01)
+            ..color = const Color(0xFFFF5BBE).withOpacity(0.08),
+        );
+      }
+    }
+    ctx.canvas.restore();
+  }
+
+  static void _paintInkBrushTrail(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.ink;
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    final lagPx = ctx.cellSize * 0.06;
+    final lagPath = _buildSmoothPath(
+      ctx.pathPoints
+          .map((p) => Offset(
+                p.dx - lagPx * (sin(ctx.nowSeconds * 2.1) * 0.5 + 0.5),
+                p.dy + lagPx * 0.35,
+              ))
+          .toList(),
+    );
+    ctx.canvas.drawPath(
+      lagPath,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..strokeWidth =
+            ctx.baseStrokeWidth * ctx.trailSkin.thickness * cfg.baseWidth * 0.85
+        ..color = ctx.trailSkin.secondaryColor.withOpacity(0.2),
+    );
+    final dripCount = max(
+        4, min(14, (ctx.pathPoints.length * cfg.splatterRate * 2.8).round()));
+    for (var i = 0; i < dripCount; i++) {
+      final t = ((ctx.nowSeconds * 0.3) + i * 0.19) % 1.0;
+      final p = _samplePoint(ctx.pathPoints, t);
+      if (p == null) continue;
+      final fall = ((ctx.nowSeconds * 0.55) + i * 0.27) % 1.0;
+      final len =
+          ctx.cellSize * _rand(3300 + i, 0.05, 0.18) * (1 - fall * 0.55);
+      ctx.canvas.drawLine(
+        p,
+        p + Offset(_rand(3330 + i, -0.05, 0.05) * ctx.cellSize, len),
+        Paint()
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = max(0.8, ctx.cellSize * 0.013)
+          ..color = ctx.trailSkin.primaryColor.withOpacity(0.26),
+      );
+    }
+    ctx.canvas.restore();
+  }
+
+  static void _paintElectricArcTrail(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.arc;
+    _paintHeadGlow(ctx, scale: 0.34, alpha: 0.26);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    final segments = max(6, min(24, (ctx.pathPoints.length * 2.5).round()));
+    for (var i = 0; i < segments; i++) {
+      final t = ((ctx.nowSeconds * 0.92) + i * 0.11) % 1.0;
+      final p = _samplePoint(ctx.pathPoints, t);
+      final tan = _sampleTangent(ctx.pathPoints, t);
+      if (p == null || tan == null) continue;
+      final n = Offset(-tan.dy, tan.dx);
+      final len = ctx.cellSize * cfg.branchLength * _rand(3360 + i, 0.4, 1.2);
+      final end = p + tan * len + n * len * _rand(3390 + i, -0.5, 0.5);
+      ctx.canvas.drawLine(
+        p,
+        end,
+        Paint()
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = max(0.8, ctx.cellSize * 0.014)
+          ..color = const Color(0xFFCCF5FF).withOpacity(0.36),
+      );
+    }
+    _paintParticles(
+      ctx,
+      colorA: const Color(0xFF72D6FF),
+      colorB: const Color(0xFFEAF7FF),
+      intensity: 0.95,
+    );
+    ctx.canvas.restore();
+  }
+
+  static void _paintGoldenThreadTrail(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.golden;
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    final shimmerT = (ctx.nowSeconds * 0.22) % 1.0;
+    final shimmerPoint = _samplePoint(ctx.pathPoints, shimmerT);
+    final shimmerTan = _sampleTangent(ctx.pathPoints, shimmerT);
+    if (shimmerPoint != null && shimmerTan != null) {
+      final streakPaint = Paint()
+        ..strokeCap = StrokeCap.round
+        ..strokeWidth = max(1.0, ctx.cellSize * 0.025)
+        ..color = Colors.white.withOpacity(0.52);
+      ctx.canvas.drawLine(
+        shimmerPoint - shimmerTan * (ctx.cellSize * 0.22),
+        shimmerPoint + shimmerTan * (ctx.cellSize * 0.22),
+        streakPaint,
+      );
+    }
+    final sparkleCount = max(6,
+        min(22, (ctx.pathPoints.length * cfg.sparkleFrequency * 4.2).round()));
+    for (var i = 0; i < sparkleCount; i++) {
+      final t = ((ctx.nowSeconds * 0.4) + i * 0.13) % 1.0;
+      final p = _samplePoint(ctx.pathPoints, t);
+      if (p == null) continue;
+      final twinkle = sin(ctx.nowSeconds * 4.1 + i * 0.9) * 0.5 + 0.5;
+      ctx.canvas.drawCircle(
+        p +
+            Offset(_rand(3420 + i, -0.08, 0.08) * ctx.cellSize,
+                _rand(3450 + i, -0.08, 0.08) * ctx.cellSize),
+        ctx.cellSize * _rand(3480 + i, 0.007, 0.02),
+        Paint()
+          ..color = const Color(0xFFFFE9A8).withOpacity(0.16 + twinkle * 0.42),
+      );
+    }
+    ctx.canvas.restore();
+  }
+
+  static void _paintGoldenAuraTrail(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.aura;
+    _paintHeadGlow(ctx, scale: 0.4, alpha: 0.24);
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    final particles = max(
+        8, min(28, (ctx.pathPoints.length * cfg.sparkFrequency * 3.6).round()));
+    for (var i = 0; i < particles; i++) {
+      final t = ((ctx.nowSeconds * 0.34) + i * 0.101) % 1.0;
+      final p = _samplePoint(ctx.pathPoints, t);
+      final tan = _sampleTangent(ctx.pathPoints, t);
+      if (p == null || tan == null) continue;
+      final n = Offset(-tan.dy, tan.dx);
+      final rise = ((ctx.nowSeconds * cfg.sparkRiseSpeed) + i * 0.2) % 1.0;
+      final center = p +
+          n * _rand(3510 + i, -0.12, 0.12) * ctx.cellSize -
+          Offset(0, rise * ctx.cellSize * 0.12);
+      final radius = ctx.cellSize * _rand(3540 + i, 0.01, 0.03);
+      final alpha = (1 - rise).clamp(0.0, 1.0) * 0.42;
+      ctx.canvas.drawCircle(
+        center,
+        radius,
+        Paint()
+          ..color =
+              Color.lerp(cfg.auraColor, Colors.white, 0.45)!.withOpacity(alpha),
+      );
+    }
+    ctx.canvas.restore();
+  }
+
+  static void _paintHolidaySparkTrail(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.holidaySpark;
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    final twinkleCount = max(8,
+        min(30, (ctx.pathPoints.length * cfg.sparkleFrequency * 4.8).round()));
+    for (var i = 0; i < twinkleCount; i++) {
+      final t = ((ctx.nowSeconds * 0.45) + i * 0.087) % 1.0;
+      final p = _samplePoint(ctx.pathPoints, t);
+      if (p == null) continue;
+      final color = cfg.sparkleColors[i % cfg.sparkleColors.length];
+      final twinkle = sin(ctx.nowSeconds * 5.0 + i) * 0.5 + 0.5;
+      final radius = ctx.cellSize * _rand(3570 + i, 0.008, 0.022);
+      final center = p +
+          Offset(
+            _rand(3600 + i, -0.12, 0.12) * ctx.cellSize,
+            _rand(3630 + i, -0.12, 0.12) * ctx.cellSize,
+          );
+      ctx.canvas.drawCircle(
+        center,
+        radius,
+        Paint()..color = color.withOpacity(0.12 + twinkle * 0.46),
+      );
+    }
+    ctx.canvas.restore();
+  }
+
+  static void _paintUpsideTrail(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.upside;
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    final distortPath = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize * 0.018,
+      phaseMultiplier: 1.8,
+    );
+    ctx.canvas.drawPath(
+      distortPath.shift(
+        Offset(
+          sin(ctx.nowSeconds * 8.0) * ctx.cellSize * 0.03,
+          cos(ctx.nowSeconds * 7.3) * ctx.cellSize * 0.03,
+        ),
+      ),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..strokeWidth = max(1.0, ctx.baseStrokeWidth * 0.24)
+        ..color = cfg.boltColor.withOpacity(0.2),
+    );
+    final bolts = max(5,
+        min(16, (ctx.pathPoints.length * cfg.redBoltFrequency * 3.2).round()));
+    for (var i = 0; i < bolts; i++) {
+      final t = ((ctx.nowSeconds * 0.48) + i * 0.14) % 1.0;
+      final p = _samplePoint(ctx.pathPoints, t);
+      final tan = _sampleTangent(ctx.pathPoints, t);
+      if (p == null || tan == null) continue;
+      final n = Offset(-tan.dy, tan.dx);
+      final len = ctx.cellSize * cfg.redBoltLength * _rand(3660 + i, 0.6, 1.35);
+      final a = p + n * len * _rand(3690 + i, -0.6, 0.6);
+      final b = p - n * len * _rand(3720 + i, -0.6, 0.6);
+      ctx.canvas.drawLine(
+        a,
+        b,
+        Paint()
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = max(0.8, ctx.cellSize * 0.013)
+          ..color = cfg.boltColor.withOpacity(0.23),
+      );
+    }
+    ctx.canvas.restore();
+  }
+
+  static void _paintBinaryRainTrail(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.binaryRain;
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    final glyphCount = max(
+      8,
+      min(28, (ctx.pathPoints.length * cfg.binaryDensity * 7.5).round()),
+    );
+    for (var i = 0; i < glyphCount; i++) {
+      final t = ((ctx.nowSeconds * 0.34) + i * 0.097) % 1.0;
+      final p = _samplePoint(ctx.pathPoints, t);
+      if (p == null) continue;
+      final fall = ((ctx.nowSeconds * cfg.binarySpeed) + i * 0.17) % 1.0;
+      final pos = p +
+          Offset(
+            _rand(3750 + i, -0.1, 0.1) * ctx.cellSize,
+            (fall - 0.5) * ctx.cellSize * 0.35,
+          );
+      _paintBinaryGlyph(
+        canvas: ctx.canvas,
+        text: i.isEven ? '0' : '1',
+        position: pos,
+        cellSize: ctx.cellSize,
+        color:
+            cfg.binaryColor.withOpacity(cfg.binaryOpacity * (1 - fall * 0.55)),
+      );
+    }
+    ctx.canvas.restore();
+  }
+
+  static void _paintSmokeTrail(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.smoke;
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+    final particleCount = max(
+      8,
+      min(30, (ctx.pathPoints.length * cfg.spawnRate * 0.22).round()),
+    );
+    for (var i = 0; i < particleCount; i++) {
+      final t = ((ctx.nowSeconds * 0.19) + i * 0.081) % 1.0;
+      final p = _samplePoint(ctx.pathPoints, t);
+      final tan = _sampleTangent(ctx.pathPoints, t);
+      if (p == null || tan == null) continue;
+      final n = Offset(-tan.dy, tan.dx);
+      final life = ((ctx.nowSeconds * 0.42) + i * 0.23) % 1.0;
+      final fade = (1 - life).clamp(0.0, 1.0);
+      final size = ctx.cellSize *
+          _rand(3780 + i, cfg.minSize, cfg.maxSize) *
+          (0.72 + life * 0.58);
+      final center = p +
+          n *
+              _rand(3810 + i, -1, 1) *
+              cfg.sidewaysJitter *
+              ctx.cellSize *
+              0.18 +
+          Offset(0, -life * cfg.upwardDrift * ctx.cellSize * 0.42);
+      if (ctx.smokeSprites.isNotEmpty) {
+        final sprite = ctx.smokeSprites[i % ctx.smokeSprites.length];
+        _drawSmokeSprite(
+          ctx.canvas,
+          sprite,
+          center,
+          size,
+          _rand(3840 + i, -pi, pi),
+          (cfg.opacityStart * fade).clamp(0.0, 1.0),
+        );
+      } else {
+        ctx.canvas.drawCircle(
+          center,
+          size * 0.5,
+          Paint()
+            ..color = const Color(0xFFDCE5EE)
+                .withOpacity(cfg.opacityStart * fade * 0.48),
+        );
+      }
+    }
+    final wispPath = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize * cfg.sidewaysJitter * 0.1,
+      phaseMultiplier: 0.31,
+    );
+    ctx.canvas.drawPath(
+      wispPath.shift(
+        Offset(
+          sin(ctx.nowSeconds * 1.7) * ctx.cellSize * 0.05,
+          -ctx.cellSize * 0.02,
+        ),
+      ),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..strokeWidth = max(1.0, ctx.baseStrokeWidth * 0.2)
+        ..color = const Color(0xFFEFF5FF).withOpacity(0.14),
+    );
+    ctx.canvas.restore();
+  }
+
   static void _paintComicVfx(TrailRenderContext ctx) =>
       _paintGenericParticleVfx(ctx);
 
