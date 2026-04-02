@@ -493,6 +493,7 @@ class InProgressLevelSnapshot {
     required this.hintsUsed,
     required this.rewindsUsed,
     required this.mistakesUsed,
+    required this.energyConsumed,
   });
 
   final List<int> path;
@@ -500,6 +501,7 @@ class InProgressLevelSnapshot {
   final int hintsUsed;
   final int rewindsUsed;
   final int mistakesUsed;
+  final bool energyConsumed;
 
   factory InProgressLevelSnapshot.fromJson(Map<String, dynamic> json) {
     final pathRaw = json['path'];
@@ -530,6 +532,7 @@ class InProgressLevelSnapshot {
       hintsUsed: readInt(json['hintsUsed']),
       rewindsUsed: readInt(json['rewindsUsed']),
       mistakesUsed: readInt(json['mistakesUsed']),
+      energyConsumed: json['energyConsumed'] == true,
     );
   }
 
@@ -540,6 +543,7 @@ class InProgressLevelSnapshot {
       'hintsUsed': hintsUsed,
       'rewindsUsed': rewindsUsed,
       'mistakesUsed': mistakesUsed,
+      'energyConsumed': energyConsumed,
     };
   }
 }

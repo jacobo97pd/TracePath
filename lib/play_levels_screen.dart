@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'coins_service.dart';
 import 'pack_level_repository.dart';
 import 'progress_service.dart';
+import 'services/energy_service.dart';
 import 'ui/components/coin_display.dart';
 
 class _WorldTabOption {
@@ -114,11 +115,13 @@ class PlayLevelsScreen extends StatefulWidget {
     super.key,
     required this.progressService,
     required this.coinsService,
+    required this.energyService,
     this.packId = 'world_01',
   });
 
   final ProgressService progressService;
   final CoinsService coinsService;
+  final EnergyService energyService;
   final String packId;
 
   @override
@@ -143,10 +146,14 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
   int _selectedLevelIndex = 1;
   PackLevelRecord? _selectedRecord;
   bool _isLoading = true;
+  Timer? _energyCountdownTimer;
 
   @override
   void initState() {
     super.initState();
+    widget.energyService.addListener(_handleEnergyChanged);
+    _startEnergyTicker();
+    unawaited(widget.energyService.refresh());
     _loadPack();
   }
 
@@ -160,10 +167,29 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
 
   @override
   void dispose() {
+    widget.energyService.removeListener(_handleEnergyChanged);
+    _energyCountdownTimer?.cancel();
     _ambientController.dispose();
     _mapScrollController.dispose();
     _chipScrollController.dispose();
     super.dispose();
+  }
+
+  void _handleEnergyChanged() {
+    if (!mounted) return;
+    setState(() {});
+  }
+
+  void _startEnergyTicker() {
+    _energyCountdownTimer?.cancel();
+    _energyCountdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      final remaining = widget.energyService.snapshot.timeUntilReset();
+      if (remaining <= const Duration(seconds: 1)) {
+        unawaited(widget.energyService.refresh());
+      }
+      setState(() {});
+    });
   }
 
   Future<void> _loadPack() async {
@@ -178,8 +204,8 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
       fallback: continueIndex,
     );
     final initialLevel = total <= 0 ? 1 : savedCurrent.clamp(1, total);
-    final record =
-        await PackLevelRepository.instance.getLevel(widget.packId, initialLevel);
+    final record = await PackLevelRepository.instance
+        .getLevel(widget.packId, initialLevel);
     if (!mounted) return;
     setState(() {
       _totalLevels = total;
@@ -236,7 +262,8 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
   void _scheduleChipReveal() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_chipScrollController.hasClients) return;
-      final worldIndex = _worldTabs.indexWhere((tab) => tab.packId == widget.packId);
+      final worldIndex =
+          _worldTabs.indexWhere((tab) => tab.packId == widget.packId);
       if (worldIndex < 0) return;
       final target = math.max(0.0, worldIndex * 112.0 - 40.0);
       _chipScrollController.animateTo(
@@ -251,14 +278,138 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
     _selectLevel(levelIndex);
   }
 
-  void _playSelectedLevel() {
+  Future<void> _playSelectedLevel() async {
+    final energy = await widget.energyService.refresh();
+    if (energy.current <= 0) {
+      await _showOutOfEnergyDialog();
+      return;
+    }
     unawaited(
       widget.progressService.setCurrentLevelForPack(
         widget.packId,
         _selectedLevelIndex,
       ),
     );
+    if (!mounted) return;
     context.go('/play/${widget.packId}/$_selectedLevelIndex');
+  }
+
+  Future<void> _showOutOfEnergyDialog() async {
+    if (!mounted) return;
+    final snapshot = await widget.energyService.refresh();
+    if (!mounted) return;
+    final offer = EnergyService.batteryOffers.first;
+    final canUseBattery = snapshot.batteryCount > 0;
+    final resetText = _formatDuration(snapshot.timeUntilReset());
+    await showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF131E31),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+            side: BorderSide(color: Colors.white.withOpacity(0.10)),
+          ),
+          title: const Text(
+            'No energy',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+          ),
+          content: Text(
+            canUseBattery
+                ? 'You are out of energy. Wait $resetText for reset, or use a battery now.'
+                : 'You are out of energy. Wait $resetText for reset, or buy a battery.',
+            style: const TextStyle(color: Color(0xFFB8C7E6), height: 1.3),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+            if (canUseBattery)
+              FilledButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  final result =
+                      await widget.energyService.useBatteryAndRefill();
+                  if (!mounted) return;
+                  if (!result.success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Could not use battery right now.'),
+                      ),
+                    );
+                    return;
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Energy restored to ${result.snapshot.current}/${result.snapshot.max}.',
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('Use battery'),
+              )
+            else
+              FilledButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  final result =
+                      await widget.energyService.buyBatteryPackWithCoins(
+                    offer: offer,
+                  );
+                  if (!mounted) return;
+                  if (!result.success) {
+                    final text = result.failureReason ==
+                            EnergyBatteryPurchaseFailureReason.notEnoughCoins
+                        ? 'Not enough coins to buy a battery.'
+                        : 'Battery purchase failed. Try again.';
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(text)),
+                    );
+                    return;
+                  }
+                  if (result.newCoinsBalance != null) {
+                    await widget.coinsService
+                        .syncCoinsFromRemote(result.newCoinsBalance!);
+                  }
+                  final refill =
+                      await widget.energyService.useBatteryAndRefill();
+                  if (!mounted) return;
+                  if (refill.success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Battery purchased and used. Energy ${refill.snapshot.current}/${refill.snapshot.max}.',
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Battery purchased. Batteries: ${result.snapshot.batteryCount}.',
+                      ),
+                    ),
+                  );
+                },
+                child: Text('Buy (${offer.coinCost} coins)'),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  String _formatDuration(Duration duration) {
+    final d = duration.isNegative ? Duration.zero : duration;
+    final hours = d.inHours;
+    final minutes = d.inMinutes.remainder(60);
+    final seconds = d.inSeconds.remainder(60);
+    return '${hours.toString().padLeft(2, '0')}:'
+        '${minutes.toString().padLeft(2, '0')}:'
+        '${seconds.toString().padLeft(2, '0')}';
   }
 
   void _openSelectedLevelRanking() {
@@ -287,6 +438,10 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
             .length;
         final continueIndex = _continueIndex(_totalLevels);
         final currentNode = continueIndex;
+        final energy = widget.energyService.snapshot;
+        final energyText =
+            '${energy.current}/${energy.max} - reset ${_formatDuration(energy.timeUntilReset())}';
+        final canPlaySelectedLevel = energy.current > 0;
 
         return Scaffold(
           backgroundColor: const Color(0xFF08111F),
@@ -313,8 +468,25 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                               subtitle:
                                   '${_totalLevels.toString()} levels - $solvedCount completed',
                               coins: widget.coinsService.coins,
+                              energyText: energyText,
+                              energyDepleted: energy.current <= 0,
                               accent: palette.accent,
                               compact: _compact,
+                              onEnergyTap: () {
+                                if (energy.current <= 0) {
+                                  unawaited(_showOutOfEnergyDialog());
+                                  return;
+                                }
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Energy ${energy.current}/${energy.max}. Reset in ${_formatDuration(energy.timeUntilReset())}.',
+                                    ),
+                                    duration:
+                                        const Duration(milliseconds: 1400),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           SizedBox(height: _compact ? 10 : 18),
@@ -333,9 +505,8 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                               physics: const BouncingScrollPhysics(),
                               slivers: [
                                 SliverPadding(
-                                  padding:
-                                      EdgeInsets.symmetric(
-                                          horizontal: _compact ? 12 : 16),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: _compact ? 12 : 16),
                                   sliver: SliverToBoxAdapter(
                                     child: _WorldProgressCard(
                                       title: worldInfo.title,
@@ -363,9 +534,12 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                                     itemCount: _totalLevels,
                                     itemBuilder: (context, index) {
                                       final levelIndex = index + 1;
-                                      final completed = _isCompleted(levelIndex);
-                                      final unlocked = levelIndex <= continueIndex;
-                                      final isCurrent = levelIndex == currentNode;
+                                      final completed =
+                                          _isCompleted(levelIndex);
+                                      final unlocked =
+                                          levelIndex <= continueIndex;
+                                      final isCurrent =
+                                          levelIndex == currentNode;
                                       final isSelected =
                                           levelIndex == _selectedLevelIndex;
                                       final alignment =
@@ -380,7 +554,8 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                                               Positioned.fill(
                                                 child: IgnorePointer(
                                                   child: CustomPaint(
-                                                    painter: _LevelConnectorPainter(
+                                                    painter:
+                                                        _LevelConnectorPainter(
                                                       startAlignment: alignment,
                                                       endAlignment: index.isEven
                                                           ? 0.82
@@ -388,13 +563,15 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                                                       color: unlocked
                                                           ? palette.line
                                                           : Colors.white
-                                                              .withOpacity(0.08),
+                                                              .withOpacity(
+                                                                  0.08),
                                                     ),
                                                   ),
                                                 ),
                                               ),
                                             Align(
-                                              alignment: Alignment(alignment, 0),
+                                              alignment:
+                                                  Alignment(alignment, 0),
                                               child: _LevelMapNode(
                                                 levelIndex: levelIndex,
                                                 completed: completed,
@@ -431,8 +608,10 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                     record: _selectedRecord,
                     levelIndex: _selectedLevelIndex,
                     accent: palette.accent,
-                    canPlay: true,
-                    onPlay: _playSelectedLevel,
+                    canPlay: canPlaySelectedLevel,
+                    onPlay: canPlaySelectedLevel
+                        ? () => unawaited(_playSelectedLevel())
+                        : () => unawaited(_showOutOfEnergyDialog()),
                     onRanking: _openSelectedLevelRanking,
                     compact: _compact,
                   ),
@@ -448,15 +627,21 @@ class _WorldHeaderBar extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.coins,
+    required this.energyText,
+    required this.energyDepleted,
     required this.accent,
     required this.compact,
+    required this.onEnergyTap,
   });
 
   final String title;
   final String subtitle;
   final int coins;
+  final String energyText;
+  final bool energyDepleted;
   final Color accent;
   final bool compact;
+  final VoidCallback onEnergyTap;
 
   @override
   Widget build(BuildContext context) {
@@ -496,18 +681,64 @@ class _WorldHeaderBar extends StatelessWidget {
           ),
         ),
         SizedBox(width: compact ? 8 : 12),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(999),
-            boxShadow: [
-              BoxShadow(
-                color: accent.withOpacity(0.18),
-                blurRadius: 18,
-                offset: const Offset(0, 8),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(999),
+                boxShadow: [
+                  BoxShadow(
+                    color: accent.withOpacity(0.18),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: CoinDisplay(coins: coins),
+              child: CoinDisplay(coins: coins),
+            ),
+            const SizedBox(height: 6),
+            InkWell(
+              onTap: onEnergyTap,
+              borderRadius: BorderRadius.circular(999),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF18253A),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: energyDepleted
+                        ? const Color(0xFFFF7E8A)
+                        : const Color(0xFF4ADE80),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.battery_charging_full_rounded,
+                      size: 13,
+                      color: energyDepleted
+                          ? const Color(0xFFFF7E8A)
+                          : const Color(0xFF4ADE80),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      energyText,
+                      style: TextStyle(
+                        color: energyDepleted
+                            ? const Color(0xFFFFC4CD)
+                            : const Color(0xFFD4FFE2),
+                        fontSize: compact ? 10 : 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -621,7 +852,8 @@ class _WorldChipSelector extends StatelessWidget {
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: compact ? 12 : 14,
-                        fontWeight: selected ? FontWeight.w800 : FontWeight.w700,
+                        fontWeight:
+                            selected ? FontWeight.w800 : FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -939,12 +1171,10 @@ class _LevelMapNode extends StatelessWidget {
               Text(
                 '$levelIndex',
                 style: TextStyle(
-                  color: unlocked
-                      ? Colors.white
-                      : Colors.white.withOpacity(0.38),
-                  fontSize: selected
-                      ? (compact ? 16 : 19)
-                      : (compact ? 14 : 17),
+                  color:
+                      unlocked ? Colors.white : Colors.white.withOpacity(0.38),
+                  fontSize:
+                      selected ? (compact ? 16 : 19) : (compact ? 14 : 17),
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -1232,7 +1462,8 @@ class _AmbientBackdrop extends StatelessWidget {
         Positioned(
           top: 180 - drift,
           right: -60,
-          child: _BlurOrb(color: palette.secondary.withOpacity(0.15), size: 240),
+          child:
+              _BlurOrb(color: palette.secondary.withOpacity(0.15), size: 240),
         ),
         Positioned(
           bottom: 70 + drift,
@@ -1312,7 +1543,8 @@ _WorldInfo _worldInfoForPack(String packId) {
 }
 
 _WorldPalette _paletteForPack(String packId) {
-  final index = math.max(0, _worldTabs.indexWhere((tab) => tab.packId == packId));
+  final index =
+      math.max(0, _worldTabs.indexWhere((tab) => tab.packId == packId));
   const accents = <Color>[
     Color(0xFF6EE7FF),
     Color(0xFF71D7FF),

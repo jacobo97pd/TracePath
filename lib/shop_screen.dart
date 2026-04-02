@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:async';
@@ -13,6 +13,7 @@ import 'shop/coin_pack_catalog_service.dart';
 import 'shop_image_preloader.dart';
 import 'services/iap_service.dart';
 import 'services/user_inventory_service.dart';
+import 'services/energy_service.dart';
 import 'trail/trail_catalog.dart';
 import 'trail/trail_skin.dart';
 import 'l10n/l10n.dart';
@@ -27,10 +28,12 @@ class ShopScreen extends StatefulWidget {
     super.key,
     required this.coinsService,
     required this.skinCatalogService,
+    required this.energyService,
   });
 
   final CoinsService coinsService;
   final SkinCatalogService skinCatalogService;
+  final EnergyService energyService;
 
   static const List<CoinTrailDef> _coinTrails = <CoinTrailDef>[
     CoinTrailDef(id: 'trail_classic', name: 'Classic', costCoins: 0),
@@ -173,13 +176,11 @@ class ShopScreen extends StatefulWidget {
     'trail_punk_riff': 'Neon punk wave with high attitude.',
     'trail_punk_riff_verdant':
         'Punk riff variant in acid green and lime tones.',
-    'trail_punk_riff_ember':
-        'Punk riff variant with hot red-orange energy.',
+    'trail_punk_riff_ember': 'Punk riff variant with hot red-orange energy.',
     'trail_punk_riff_prism':
         'Punk riff multicolor mix with high contrast accents.',
     'trail_graffiti': 'Street-art line with spray accents.',
-    'trail_urban_graffiti':
-        'Heavy spray-paint feel with layered stamps.',
+    'trail_urban_graffiti': 'Heavy spray-paint feel with layered stamps.',
     'trail_halftone_explosion': 'Pop-art halftone impacts on movement.',
     'trail_sticker_bomb': 'Sticker collage aesthetic with playful chaos.',
     'trail_glitch_print': 'Printed glitch texture with RGB offsets.',
@@ -244,6 +245,8 @@ class _ShopScreenState extends State<ShopScreen> {
   @override
   void initState() {
     super.initState();
+    widget.energyService.addListener(_onEnergyChanged);
+    unawaited(widget.energyService.refresh());
     _coinPacksFuture = Future<CoinPackCatalogResult>.value(
       _coinPackCatalogService.localFallbackResult(
         reason: 'boot_fast_fallback',
@@ -260,8 +263,14 @@ class _ShopScreenState extends State<ShopScreen> {
 
   @override
   void dispose() {
+    widget.energyService.removeListener(_onEnergyChanged);
     _iapService.dispose();
     super.dispose();
+  }
+
+  void _onEnergyChanged() {
+    if (!mounted) return;
+    setState(() {});
   }
 
   Future<void> _refreshCoinPacksInBackground() async {
@@ -292,6 +301,7 @@ class _ShopScreenState extends State<ShopScreen> {
         widget.coinsService,
         widget.skinCatalogService,
         _iapService,
+        widget.energyService,
       ]),
       builder: (context, _) {
         final skins = widget.skinCatalogService.items.where((item) {
@@ -869,8 +879,9 @@ class _ShopScreenState extends State<ShopScreen> {
           final owned = widget.coinsService.ownsTrail(entry.id);
           final selected = widget.coinsService.selectedTrail == entry.id;
           final cost = entry.costCoins ?? 0;
-          final canBuy =
-              entry.availableInShop && !owned && widget.coinsService.coins >= cost;
+          final canBuy = entry.availableInShop &&
+              !owned &&
+              widget.coinsService.coins >= cost;
           return _TrailShopCard(
             key: ValueKey<String>('trail-${entry.id}'),
             trailId: entry.id,
@@ -925,7 +936,8 @@ class _ShopScreenState extends State<ShopScreen> {
           ? configuredName
           : (catalogName.isNotEmpty ? catalogName : _humanizeTrailId(id));
       final description = _resolveTrailDescription(id, context);
-      final hasPrice = configured.costCoins != null && configured.costCoins! >= 0;
+      final hasPrice =
+          configured.costCoins != null && configured.costCoins! >= 0;
       out.add(
         _TrailShopMeta(
           id: id,
@@ -946,8 +958,9 @@ class _ShopScreenState extends State<ShopScreen> {
       out.add(
         _TrailShopMeta(
           id: id,
-          displayName:
-              catalog.name.trim().isNotEmpty ? catalog.name.trim() : _humanizeTrailId(id),
+          displayName: catalog.name.trim().isNotEmpty
+              ? catalog.name.trim()
+              : _humanizeTrailId(id),
           description: _resolveTrailDescription(id, context),
           costCoins: null,
           availableInShop: false,
@@ -1066,6 +1079,9 @@ class _ShopScreenState extends State<ShopScreen> {
                 ),
               ],
             ),
+            const SizedBox(height: 8),
+            _buildEnergyBatterySection(context),
+            const SizedBox(height: 12),
             const SizedBox(height: 6),
             if (_iapService.isStoreLoading)
               const Text(
@@ -1200,6 +1216,175 @@ class _ShopScreenState extends State<ShopScreen> {
         );
       },
     );
+  }
+
+  Widget _buildEnergyBatterySection(BuildContext context) {
+    final energy = widget.energyService.snapshot;
+    final timeLeft = _formatDurationShort(energy.timeUntilReset());
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF142238),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF2C3E5E)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.battery_charging_full_rounded,
+                color: Color(0xFF6EE7B7),
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  'Energy batteries',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              Text(
+                'Energy ${energy.current}/${energy.max}',
+                style: const TextStyle(
+                  color: Color(0xFFCBEAD8),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Batteries: ${energy.batteryCount} - Reset in $timeLeft',
+            style: const TextStyle(
+              color: Color(0xFF9EC2E9),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 10),
+          if (energy.batteryCount > 0)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FilledButton.tonal(
+                onPressed: () => unawaited(_useBatteryFromShop()),
+                child: const Text('Use 1 battery now'),
+              ),
+            ),
+          const SizedBox(height: 8),
+          ...EnergyService.batteryOffers.map(
+            (offer) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0F1B2F),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFF2E4468)),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            offer.title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            offer.subtitle,
+                            style: const TextStyle(
+                              color: Color(0xFF9FB0D3),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    FilledButton(
+                      onPressed: () => unawaited(_buyBatteryFromShop(offer)),
+                      child: Text('Buy ${offer.coinCost}'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _useBatteryFromShop() async {
+    final result = await widget.energyService.useBatteryAndRefill();
+    if (!mounted) return;
+    if (!result.success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not use battery right now.'),
+        ),
+      );
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Energy restored to ${result.snapshot.current}/${result.snapshot.max}.',
+        ),
+      ),
+    );
+  }
+
+  Future<void> _buyBatteryFromShop(EnergyCatalogItem offer) async {
+    final result = await widget.energyService.buyBatteryPackWithCoins(
+      offer: offer,
+    );
+    if (!mounted) return;
+    if (!result.success) {
+      final text = result.failureReason ==
+              EnergyBatteryPurchaseFailureReason.notEnoughCoins
+          ? 'Not enough coins for this battery pack.'
+          : 'Battery purchase failed. Please try again.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(text)),
+      );
+      return;
+    }
+    if (result.newCoinsBalance != null) {
+      await widget.coinsService.syncCoinsFromRemote(result.newCoinsBalance!);
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Purchased ${offer.batteryUnits} battery(s). Total: ${result.snapshot.batteryCount}.',
+        ),
+      ),
+    );
+  }
+
+  String _formatDurationShort(Duration duration) {
+    final safe = duration.isNegative ? Duration.zero : duration;
+    final hours = safe.inHours;
+    final minutes = safe.inMinutes.remainder(60);
+    final seconds = safe.inSeconds.remainder(60);
+    return '${hours.toString().padLeft(2, '0')}:'
+        '${minutes.toString().padLeft(2, '0')}:'
+        '${seconds.toString().padLeft(2, '0')}';
   }
 
   Widget _buildCoinPackInlineInfo(
@@ -2782,9 +2967,8 @@ class _TrailShopCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final resolvedName =
         trailName.trim().isNotEmpty ? trailName.trim() : preview.name.trim();
-    final safeTrailName = resolvedName.isNotEmpty
-        ? resolvedName
-        : _humanizeTrailId(trailId);
+    final safeTrailName =
+        resolvedName.isNotEmpty ? resolvedName : _humanizeTrailId(trailId);
     final safeDescription = trailDescription.trim().isNotEmpty
         ? trailDescription.trim()
         : _missingDescriptionLabel(context);
@@ -3079,4 +3263,3 @@ class _TrailPreviewPainter extends CustomPainter {
     return oldDelegate.skin.id != skin.id;
   }
 }
-

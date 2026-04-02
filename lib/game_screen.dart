@@ -35,6 +35,7 @@ import 'services/live_duel_service.dart';
 import 'services/friend_challenge_service.dart';
 import 'services/level_report_service.dart';
 import 'services/streak_service.dart';
+import 'services/energy_service.dart';
 import 'trail/trail_catalog.dart';
 import 'trail/trail_skin.dart';
 import 'services/wallet_history_service.dart';
@@ -54,6 +55,7 @@ class GameScreen extends StatefulWidget {
     required this.achievementsService,
     required this.leaderboardService,
     required this.coinsService,
+    required this.energyService,
     this.liveDuelArgs,
     this.friendChallengeArgs,
   });
@@ -65,6 +67,7 @@ class GameScreen extends StatefulWidget {
   final AchievementsService achievementsService;
   final LeaderboardService leaderboardService;
   final CoinsService coinsService;
+  final EnergyService energyService;
   final LiveDuelGameArgs? liveDuelArgs;
   final FriendChallengeGameArgs? friendChallengeArgs;
 
@@ -174,6 +177,9 @@ class _GameScreenState extends State<GameScreen>
   bool _isLevelReported = false;
   bool _reportStatusLoading = false;
   bool _reportSubmitting = false;
+  bool _attemptEnergyConsumed = false;
+  bool _energyConsumeInFlight = false;
+  bool _energyGateLocked = false;
 
   @override
   void initState() {
@@ -195,6 +201,10 @@ class _GameScreenState extends State<GameScreen>
     unawaited(_adsService.loadRewardedAd());
     unawaited(_refreshManualAdQuota());
     unawaited(_loadReportStatus());
+    widget.energyService.addListener(_handleEnergyChanged);
+    if (_usesEnergySystem) {
+      unawaited(widget.energyService.refresh());
+    }
   }
 
   @override
@@ -209,6 +219,7 @@ class _GameScreenState extends State<GameScreen>
 
   @override
   void dispose() {
+    widget.energyService.removeListener(_handleEnergyChanged);
     _hintTimer?.cancel();
     _clockTimer?.cancel();
     _coinRewardTimer?.cancel();
@@ -272,6 +283,8 @@ class _GameScreenState extends State<GameScreen>
       _hintsUsed = savedInProgress?.hintsUsed ?? 0;
       _rewindsUsed = savedInProgress?.rewindsUsed ?? 0;
       _mistakesUsed = savedInProgress?.mistakesUsed ?? 0;
+      _attemptEnergyConsumed = savedInProgress?.energyConsumed ?? false;
+      _energyConsumeInFlight = false;
       _runStartedAt = restoredStartTime;
       _ghostPlaybackStartedAt = restoredStartTime;
       _recordedGhostFrames = <GhostFrame>[];
@@ -304,6 +317,9 @@ class _GameScreenState extends State<GameScreen>
       _isLevelReported = false;
       _reportStatusLoading = false;
       _elapsedAtSolve = null;
+      _energyGateLocked = _usesEnergySystem &&
+          !_attemptEnergyConsumed &&
+          widget.energyService.snapshot.current <= 0;
       if (!_isLiveDuelMode && !_isFriendChallengeMode) {
         _recordGhostFrame(_status.path, force: true);
         unawaited(_loadGhostRunForLevel(_currentLevelId));
@@ -345,6 +361,9 @@ class _GameScreenState extends State<GameScreen>
         _isLevelLoading = false;
       });
       _persistInProgressLevel(_status.path);
+      if (_usesEnergySystem) {
+        unawaited(_syncEnergyGateAfterLoad());
+      }
       unawaited(_maybeShowVariantTutorial(level));
       unawaited(_loadReportStatus());
     } catch (error) {
@@ -554,6 +573,9 @@ class _GameScreenState extends State<GameScreen>
     );
     final isDark = brightness == Brightness.dark;
     final duelControlsLocked = _isLiveDuelMode && _liveInteractionLocked;
+    final energyControlsLocked =
+        _usesEnergySystem && (_energyGateLocked || _energyConsumeInFlight);
+    final controlsLocked = duelControlsLocked || energyControlsLocked;
 
     return Scaffold(
       backgroundColor: const Color(0xFF05070C),
@@ -616,6 +638,12 @@ class _GameScreenState extends State<GameScreen>
                         onWalletTap: () => context.go('/shop'),
                         showRanking: !_isFriendChallengeMode,
                         compact: liveCompact,
+                        energyText: _usesEnergySystem
+                            ? 'Energy ${widget.energyService.snapshot.current}/${widget.energyService.snapshot.max}'
+                            : null,
+                        energySubtext: _usesEnergySystem
+                            ? 'Reset ${_formatDurationShort(widget.energyService.snapshot.timeUntilReset())}'
+                            : null,
                       ),
                       SizedBox(height: sectionGap),
                       if (_isFriendChallengeMode) ...[
@@ -636,6 +664,17 @@ class _GameScreenState extends State<GameScreen>
                           ),
                         ],
                         SizedBox(height: compactGap),
+                      ],
+                      if (_usesEnergySystem &&
+                          !_attemptEnergyConsumed &&
+                          _energyGateLocked) ...[
+                        _EnergyLockedBanner(
+                          remainingText: _formatDurationShort(
+                            widget.energyService.snapshot.timeUntilReset(),
+                          ),
+                          onOpenShop: () => context.go('/shop'),
+                        ),
+                        const SizedBox(height: 10),
                       ],
                       if (!_isLiveDuelMode && !_isFriendChallengeMode) ...[
                         if (_ghostRun != null)
@@ -692,8 +731,9 @@ class _GameScreenState extends State<GameScreen>
                                             opponentTrailColor:
                                                 const Color(0xFFE2538A),
                                             isInteractionLocked:
-                                                _isLiveDuelMode &&
-                                                    _liveInteractionLocked,
+                                                (_isLiveDuelMode &&
+                                                        _liveInteractionLocked) ||
+                                                    energyControlsLocked,
                                             onInvalidMove: (_) {
                                               setState(() {
                                                 _mistakesUsed++;
@@ -731,7 +771,7 @@ class _GameScreenState extends State<GameScreen>
                           Expanded(
                             child: _GameActionButton(
                               label: 'Undo',
-                              onTap: duelControlsLocked ? null : _handleUndo,
+                              onTap: controlsLocked ? null : _handleUndo,
                               backgroundColor: isDark
                                   ? const Color(0xFF2B2B2F)
                                   : const Color(0xFFEDEDED),
@@ -744,7 +784,7 @@ class _GameScreenState extends State<GameScreen>
                           Expanded(
                             child: _GameActionButton(
                               label: 'Restart',
-                              onTap: duelControlsLocked ? null : _handleReset,
+                              onTap: controlsLocked ? null : _handleReset,
                               outlined: true,
                               borderColor: const Color(0xFF6B6E76),
                               foregroundColor: isDark
@@ -758,7 +798,7 @@ class _GameScreenState extends State<GameScreen>
                               label: _unlimitedHintsForTesting
                                   ? 'Hint (INF)'
                                   : 'Hint ($_hintsLeft)',
-                              onTap: duelControlsLocked ? null : _handleHint,
+                              onTap: controlsLocked ? null : _handleHint,
                               outlined: true,
                               visuallyEnabled:
                                   _unlimitedHintsForTesting || _hintsLeft > 0,
@@ -1421,9 +1461,8 @@ class _GameScreenState extends State<GameScreen>
     if (_isLevelReported || _reportSubmitting) return;
 
     final started = _runStartedAt;
-    final elapsedSec = started == null
-        ? 0
-        : DateTime.now().difference(started).inSeconds;
+    final elapsedSec =
+        started == null ? 0 : DateTime.now().difference(started).inSeconds;
     if (elapsedSec < _minSecondsBeforeReport) {
       await GameToast.show(
         context,
@@ -1514,7 +1553,8 @@ class _GameScreenState extends State<GameScreen>
         );
       }
 
-      await widget.progressService.setCurrentLevelForPack(widget.packId, nextLevel);
+      await widget.progressService
+          .setCurrentLevelForPack(widget.packId, nextLevel);
 
       if (!mounted) return;
       setState(() => _isLevelReported = true);
@@ -1570,7 +1610,8 @@ class _GameScreenState extends State<GameScreen>
         debugPrint('[report-level] unexpected error: $e');
         final boxed = _extractWrappedReportError(e);
         if (boxed != null) {
-          debugPrint('[report-level] wrapped code=${boxed.$1} message=${boxed.$2}');
+          debugPrint(
+              '[report-level] wrapped code=${boxed.$1} message=${boxed.$2}');
         }
         debugPrint('$st');
       }
@@ -1612,9 +1653,7 @@ class _GameScreenState extends State<GameScreen>
       if (value is num) return value != 0;
       if (value is String) {
         final normalized = value.trim().toLowerCase();
-        return normalized == '1' ||
-            normalized == 'true' ||
-            normalized == 'yes';
+        return normalized == '1' || normalized == 'true' || normalized == 'yes';
       }
     }
     return false;
@@ -1707,6 +1746,14 @@ class _GameScreenState extends State<GameScreen>
     return Color.lerp(begin, end, _pathColorController.value);
   }
 
+  void _handleEnergyChanged() {
+    if (!mounted || !_usesEnergySystem) return;
+    setState(() {
+      _energyGateLocked =
+          !_attemptEnergyConsumed && widget.energyService.snapshot.current <= 0;
+    });
+  }
+
   void _handleReset() {
     HapticFeedback.selectionClick();
     setState(() {
@@ -1768,9 +1815,25 @@ class _GameScreenState extends State<GameScreen>
 
   void _handleBoardChange(GameBoardChange change) {
     _clearHint();
+    if (_usesEnergySystem &&
+        !_attemptEnergyConsumed &&
+        _energyGateLocked &&
+        change.type == GameBoardChangeType.add) {
+      _boardController.reset();
+      return;
+    }
+    if (_usesEnergySystem &&
+        !_attemptEnergyConsumed &&
+        _energyConsumeInFlight &&
+        change.type == GameBoardChangeType.add) {
+      return;
+    }
     switch (change.type) {
       case GameBoardChangeType.add:
         HapticFeedback.selectionClick();
+        if (_usesEnergySystem && !_attemptEnergyConsumed) {
+          unawaited(_consumeEnergyForAttempt(change.path));
+        }
         break;
       case GameBoardChangeType.backtrack:
       case GameBoardChangeType.rewind:
@@ -1786,6 +1849,161 @@ class _GameScreenState extends State<GameScreen>
     _scheduleLiveTrailPublish(
       change.path,
       state: _completionHandled ? 'finished' : 'drawing',
+    );
+  }
+
+  Future<void> _syncEnergyGateAfterLoad() async {
+    if (!_usesEnergySystem) return;
+    final snapshot = await widget.energyService.refresh();
+    if (!mounted || _status.solved) return;
+    setState(() {
+      _energyGateLocked = !_attemptEnergyConsumed && snapshot.current <= 0;
+    });
+    if (_energyGateLocked) {
+      unawaited(_showEnergyDepletedDialog());
+    }
+  }
+
+  Future<void> _consumeEnergyForAttempt(List<int> latestPath) async {
+    if (!_usesEnergySystem ||
+        _attemptEnergyConsumed ||
+        _energyConsumeInFlight) {
+      return;
+    }
+    setState(() {
+      _energyConsumeInFlight = true;
+    });
+    final result = await widget.energyService.consumeForNormalPuzzle();
+    if (!mounted) return;
+    if (result.success) {
+      setState(() {
+        _attemptEnergyConsumed = true;
+        _energyConsumeInFlight = false;
+        _energyGateLocked = false;
+      });
+      _persistInProgressLevel(latestPath);
+      return;
+    }
+    setState(() {
+      _energyConsumeInFlight = false;
+      _energyGateLocked = true;
+    });
+    _boardController.reset();
+    _persistInProgressLevel(const <int>[]);
+    unawaited(_showEnergyDepletedDialog());
+  }
+
+  Future<void> _showEnergyDepletedDialog() async {
+    if (!mounted || !_usesEnergySystem) return;
+    final snapshot = await widget.energyService.refresh();
+    if (!mounted) return;
+    final canUseBattery = snapshot.batteryCount > 0;
+    final offer = EnergyService.batteryOffers.first;
+    final resetText = _formatDurationShort(snapshot.timeUntilReset());
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF131E31),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+            side: BorderSide(color: Colors.white.withOpacity(0.10)),
+          ),
+          title: const Text(
+            'No energy',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+          ),
+          content: Text(
+            canUseBattery
+                ? 'You are out of energy. Wait $resetText for reset, or use a battery.'
+                : 'You are out of energy. Wait $resetText for reset, or buy a battery.',
+            style: const TextStyle(color: Color(0xFFB8C7E6), height: 1.3),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Close'),
+            ),
+            if (canUseBattery)
+              FilledButton(
+                onPressed: () async {
+                  Navigator.of(dialogContext).pop();
+                  final useResult =
+                      await widget.energyService.useBatteryAndRefill();
+                  if (!mounted) return;
+                  if (!useResult.success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Could not use battery right now.'),
+                      ),
+                    );
+                    return;
+                  }
+                  setState(() {
+                    _energyGateLocked = false;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Energy restored to ${useResult.snapshot.current}/${useResult.snapshot.max}.',
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('Use battery'),
+              )
+            else
+              FilledButton(
+                onPressed: () async {
+                  Navigator.of(dialogContext).pop();
+                  final purchaseResult =
+                      await widget.energyService.buyBatteryPackWithCoins(
+                    offer: offer,
+                  );
+                  if (!mounted) return;
+                  if (!purchaseResult.success) {
+                    final text = purchaseResult.failureReason ==
+                            EnergyBatteryPurchaseFailureReason.notEnoughCoins
+                        ? 'Not enough coins to buy a battery.'
+                        : 'Battery purchase failed. Try again.';
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(text)),
+                    );
+                    return;
+                  }
+                  if (purchaseResult.newCoinsBalance != null) {
+                    await widget.coinsService
+                        .syncCoinsFromRemote(purchaseResult.newCoinsBalance!);
+                  }
+                  final refill =
+                      await widget.energyService.useBatteryAndRefill();
+                  if (!mounted) return;
+                  if (refill.success) {
+                    setState(() {
+                      _energyGateLocked = false;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Battery purchased and used. Energy ${refill.snapshot.current}/${refill.snapshot.max}.',
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Battery purchased. Batteries: ${purchaseResult.snapshot.batteryCount}.',
+                      ),
+                    ),
+                  );
+                },
+                child: Text('Buy (${offer.coinCost} coins)'),
+              ),
+          ],
+        );
+      },
     );
   }
 
@@ -2332,7 +2550,12 @@ class _GameScreenState extends State<GameScreen>
           _lastRecordedGhostPos = null;
           _elapsedAtSolve = null;
           _showCelebration = false;
+          _attemptEnergyConsumed = false;
+          _energyConsumeInFlight = false;
+          _energyGateLocked =
+              _usesEnergySystem && widget.energyService.snapshot.current <= 0;
         });
+        _persistInProgressLevel(const <int>[]);
         if (!_isLiveDuelMode && !_isFriendChallengeMode) {
           _recordGhostFrame(const <int>[], force: true);
           unawaited(_loadGhostRunForLevel(_currentLevelId));
@@ -2620,6 +2843,8 @@ class _GameScreenState extends State<GameScreen>
 
   bool get _isFriendChallengeMode => widget.friendChallengeArgs != null;
 
+  bool get _usesEnergySystem => !_isLiveDuelMode && !_isFriendChallengeMode;
+
   String get _currentLevelId => '${widget.packId}_${widget.levelIndex}';
 
   String get _ghostUid {
@@ -2748,6 +2973,7 @@ class _GameScreenState extends State<GameScreen>
       hintsUsed: _hintsUsed,
       rewindsUsed: _rewindsUsed,
       mistakesUsed: _mistakesUsed,
+      energyConsumed: _attemptEnergyConsumed,
     );
     unawaited(
       widget.progressService.saveInProgressLevel(
@@ -4067,6 +4293,8 @@ class _GameplayHeader extends StatelessWidget {
     required this.onWalletTap,
     this.showRanking = true,
     this.compact = false,
+    this.energyText,
+    this.energySubtext,
   });
 
   final String levelText;
@@ -4077,6 +4305,8 @@ class _GameplayHeader extends StatelessWidget {
   final VoidCallback onWalletTap;
   final bool showRanking;
   final bool compact;
+  final String? energyText;
+  final String? energySubtext;
 
   @override
   Widget build(BuildContext context) {
@@ -4119,6 +4349,28 @@ class _GameplayHeader extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
+              if ((energyText ?? '').isNotEmpty) ...[
+                SizedBox(height: compact ? 1 : 2),
+                Text(
+                  energyText!,
+                  style: TextStyle(
+                    color: const Color(0xFF9EE3B8),
+                    fontSize: compact ? 10 : 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+              if ((energySubtext ?? '').isNotEmpty) ...[
+                SizedBox(height: compact ? 1 : 2),
+                Text(
+                  energySubtext!,
+                  style: TextStyle(
+                    color: const Color(0xFF7FB89C),
+                    fontSize: compact ? 9 : 10,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -4141,6 +4393,56 @@ class _GameplayHeader extends StatelessWidget {
         SizedBox(width: compact ? 6 : 8),
         _WalletPill(coins: walletCoins, onTap: onWalletTap),
       ],
+    );
+  }
+}
+
+class _EnergyLockedBanner extends StatelessWidget {
+  const _EnergyLockedBanner({
+    required this.remainingText,
+    required this.onOpenShop,
+  });
+
+  final String remainingText;
+  final VoidCallback onOpenShop;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A1630),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFFF8AA2)),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.battery_alert_rounded,
+            size: 16,
+            color: Color(0xFFFF98AE),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Energy empty. Reset in $remainingText.',
+              style: const TextStyle(
+                color: Color(0xFFFFD6DF),
+                fontWeight: FontWeight.w700,
+                fontSize: 12.5,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: onOpenShop,
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFFFFC7D4),
+              visualDensity: VisualDensity.compact,
+            ),
+            child: const Text('Batteries'),
+          ),
+        ],
+      ),
     );
   }
 }
