@@ -50,6 +50,7 @@ import 'services/ads_service.dart';
 import 'services/inbox_service.dart';
 import 'services/live_duel_service.dart';
 import 'services/presence_service.dart';
+import 'services/energy_service.dart';
 import 'ui/components/coin_reward_overlay.dart';
 import 'ui/components/app_game_backdrop.dart';
 import 'l10n/l10n.dart';
@@ -94,6 +95,7 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
   final progressService = ProgressService(prefs);
   final coinsService = CoinsService(prefs);
+  final energyService = EnergyService(prefs);
   final authService = AuthService(prefs);
   final skinCatalogService = SkinCatalogService(prefs);
   final statsService = StatsService(prefs, progressService);
@@ -125,6 +127,7 @@ Future<void> main() async {
     MyApp(
       progressService: progressService,
       coinsService: coinsService,
+      energyService: energyService,
       authService: authService,
       skinCatalogService: skinCatalogService,
       statsService: statsService,
@@ -145,6 +148,7 @@ class MyApp extends StatefulWidget {
     super.key,
     required this.progressService,
     required this.coinsService,
+    required this.energyService,
     required this.authService,
     required this.skinCatalogService,
     required this.statsService,
@@ -156,6 +160,7 @@ class MyApp extends StatefulWidget {
 
   final ProgressService progressService;
   final CoinsService coinsService;
+  final EnergyService energyService;
   final AuthService authService;
   final SkinCatalogService skinCatalogService;
   final StatsService statsService;
@@ -212,6 +217,7 @@ class _MyAppState extends State<MyApp> {
               return PlayLevelsScreen(
                 progressService: widget.progressService,
                 coinsService: widget.coinsService,
+                energyService: widget.energyService,
               );
             },
           ),
@@ -222,6 +228,7 @@ class _MyAppState extends State<MyApp> {
               return PlayLevelsScreen(
                 progressService: widget.progressService,
                 coinsService: widget.coinsService,
+                energyService: widget.energyService,
                 packId: packId,
               );
             },
@@ -271,6 +278,7 @@ class _MyAppState extends State<MyApp> {
             builder: (context, state) => ShopScreen(
               coinsService: widget.coinsService,
               skinCatalogService: widget.skinCatalogService,
+              energyService: widget.energyService,
             ),
           ),
           GoRoute(
@@ -311,6 +319,7 @@ class _MyAppState extends State<MyApp> {
             leaderboardService: widget.leaderboardService,
             liveDuelArgs: duelArgs,
             friendChallengeArgs: friendChallengeArgs,
+            energyService: widget.energyService,
           );
         },
       ),

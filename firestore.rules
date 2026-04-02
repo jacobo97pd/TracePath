@@ -16,6 +16,7 @@ service cloud.firestore {
         'friend_challenge',
         'level_challenge',
         'live_duel_invite',
+        'system_reward',
         'system_news'
       ];
     }
@@ -136,6 +137,10 @@ service cloud.firestore {
       }
 
       match /reported_levels/{levelId} {
+        allow read, write: if isSelf(uid);
+      }
+
+      match /daily_rewards/{dailyKey} {
         allow read, write: if isSelf(uid);
       }
 

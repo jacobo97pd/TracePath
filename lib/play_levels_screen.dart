@@ -1,12 +1,16 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'coins_service.dart';
 import 'pack_level_repository.dart';
 import 'progress_service.dart';
+import 'services/app_firestore.dart';
+import 'services/energy_service.dart';
 import 'ui/components/coin_display.dart';
 
 class _WorldTabOption {
@@ -114,11 +118,13 @@ class PlayLevelsScreen extends StatefulWidget {
     super.key,
     required this.progressService,
     required this.coinsService,
+    required this.energyService,
     this.packId = 'world_01',
   });
 
   final ProgressService progressService;
   final CoinsService coinsService;
+  final EnergyService energyService;
   final String packId;
 
   @override
@@ -127,6 +133,8 @@ class PlayLevelsScreen extends StatefulWidget {
 
 class _PlayLevelsScreenState extends State<PlayLevelsScreen>
     with SingleTickerProviderStateMixin {
+  static const String _qaBypassUid = 'arfxuI4FhHV4eXYPdplpqpJUqRl2';
+
   double get _mapRowExtent => _compact ? 92 : 112;
   bool get _compact => _screenWidth < 390;
   double _screenWidth = 390;
@@ -143,10 +151,18 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
   int _selectedLevelIndex = 1;
   PackLevelRecord? _selectedRecord;
   bool _isLoading = true;
+  bool _metaLoading = true;
+  Timer? _energyCountdownTimer;
+  final Map<String, int> _worldTotalLevelsByPack = <String, int>{};
+  Set<String> _reportedLevelIds = <String>{};
 
   @override
   void initState() {
     super.initState();
+    widget.energyService.addListener(_handleEnergyChanged);
+    _startEnergyTicker();
+    unawaited(widget.energyService.refresh());
+    unawaited(_loadWorldMetaAndReportedLevels());
     _loadPack();
   }
 
@@ -160,16 +176,47 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
 
   @override
   void dispose() {
+    widget.energyService.removeListener(_handleEnergyChanged);
+    _energyCountdownTimer?.cancel();
     _ambientController.dispose();
     _mapScrollController.dispose();
     _chipScrollController.dispose();
     super.dispose();
   }
 
+  void _handleEnergyChanged() {
+    if (!mounted) return;
+    setState(() {});
+  }
+
+  void _startEnergyTicker() {
+    _energyCountdownTimer?.cancel();
+    _energyCountdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      final remaining = widget.energyService.snapshot.timeUntilReset();
+      if (remaining <= const Duration(seconds: 1)) {
+        unawaited(widget.energyService.refresh());
+      }
+      setState(() {});
+    });
+  }
+
   Future<void> _loadPack() async {
     setState(() {
       _isLoading = true;
     });
+    await _loadWorldMetaAndReportedLevels();
+
+    final requestedPackId = widget.packId;
+    final selectedPackUnlocked = _isWorldUnlocked(requestedPackId);
+    if (!selectedPackUnlocked) {
+      final fallbackPack = _latestUnlockedPackId();
+      if (mounted && fallbackPack != requestedPackId) {
+        context.go('/play/$fallbackPack');
+      }
+      return;
+    }
+
     await PackLevelRepository.instance.loadPack(widget.packId);
     final total = await PackLevelRepository.instance.totalLevels(widget.packId);
     final continueIndex = _continueIndex(total);
@@ -178,8 +225,8 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
       fallback: continueIndex,
     );
     final initialLevel = total <= 0 ? 1 : savedCurrent.clamp(1, total);
-    final record =
-        await PackLevelRepository.instance.getLevel(widget.packId, initialLevel);
+    final record = await PackLevelRepository.instance
+        .getLevel(widget.packId, initialLevel);
     if (!mounted) return;
     setState(() {
       _totalLevels = total;
@@ -189,6 +236,42 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
     });
     _scheduleAutoScroll(initialLevel);
     _scheduleChipReveal();
+  }
+
+  Future<void> _loadWorldMetaAndReportedLevels() async {
+    if (_worldTotalLevelsByPack.isNotEmpty && !_metaLoading) return;
+    if (_metaLoading && _worldTotalLevelsByPack.isNotEmpty) return;
+
+    setState(() {
+      _metaLoading = true;
+    });
+
+    for (final tab in _worldTabs) {
+      await PackLevelRepository.instance.loadPack(tab.packId);
+      final total = PackLevelRepository.instance.totalLevelsSync(tab.packId);
+      _worldTotalLevelsByPack[tab.packId] = total;
+    }
+
+    final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
+    final nextReported = <String>{};
+    if (uid.isNotEmpty) {
+      try {
+        final snap = await AppFirestore.instance()
+            .collection('users')
+            .doc(uid)
+            .get(const GetOptions(source: Source.serverAndCache));
+        final data = snap.data() ?? const <String, dynamic>{};
+        nextReported.addAll(_extractReportedLevelIds(data));
+      } catch (_) {
+        // Keep gameplay available even if report metadata cannot be fetched.
+      }
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _reportedLevelIds = nextReported;
+      _metaLoading = false;
+    });
   }
 
   int _continueIndex(int total) {
@@ -209,6 +292,127 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
       solved = i;
     }
     return solved;
+  }
+
+  bool get _isQaBypassUser {
+    final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
+    return uid == _qaBypassUid;
+  }
+
+  bool _isWorldUnlocked(String packId) {
+    if (_isQaBypassUser) return true;
+
+    final index = _worldTabs.indexWhere((tab) => tab.packId == packId);
+    if (index <= 0) return true;
+
+    for (var i = 0; i < index; i++) {
+      final prevPackId = _worldTabs[i].packId;
+      final total = _worldTotalLevelsByPack[prevPackId] ?? 0;
+      if (total <= 0) return false;
+      final solvedOrReported = _effectiveSolvedCount(prevPackId, total);
+      if (solvedOrReported < total) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  String _latestUnlockedPackId() {
+    if (_isQaBypassUser) return widget.packId;
+    var latest = _worldTabs.first.packId;
+    for (final tab in _worldTabs) {
+      if (_isWorldUnlocked(tab.packId)) {
+        latest = tab.packId;
+      } else {
+        break;
+      }
+    }
+    return latest;
+  }
+
+  int _completedCountForPack(String packId, int total) {
+    if (total <= 0) return 0;
+    var count = 0;
+    for (var i = 1; i <= total; i++) {
+      if (widget.progressService.isCompleted(packId, i)) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  int _effectiveSolvedCount(String packId, int total) {
+    if (total <= 0) return 0;
+    final completed = _completedCountForPack(packId, total);
+    if (_reportedLevelIds.isEmpty) return completed;
+
+    var reportedOnly = 0;
+    for (final levelId in _reportedLevelIds) {
+      final reportedIndex = _parseReportedLevelIndex(
+        packId: packId,
+        levelId: levelId,
+      );
+      if (reportedIndex == null ||
+          reportedIndex <= 0 ||
+          reportedIndex > total) {
+        continue;
+      }
+      if (!widget.progressService.isCompleted(packId, reportedIndex)) {
+        reportedOnly++;
+      }
+    }
+    return (completed + reportedOnly).clamp(0, total);
+  }
+
+  int? _parseReportedLevelIndex({
+    required String packId,
+    required String levelId,
+  }) {
+    final normalized = levelId.trim();
+    if (normalized.isEmpty) return null;
+
+    final underscorePrefix = '${packId}_';
+    if (normalized.startsWith(underscorePrefix)) {
+      return int.tryParse(normalized.substring(underscorePrefix.length));
+    }
+
+    final colonPrefix = '$packId:';
+    if (normalized.startsWith(colonPrefix)) {
+      return int.tryParse(normalized.substring(colonPrefix.length));
+    }
+
+    return null;
+  }
+
+  Set<String> _extractReportedLevelIds(Map<String, dynamic> userData) {
+    final out = <String>{};
+
+    final idsRaw = userData['reportedLevelIds'];
+    if (idsRaw is Iterable) {
+      for (final item in idsRaw) {
+        if (item is String && item.trim().isNotEmpty) {
+          out.add(item.trim());
+        }
+      }
+    }
+
+    final mapRaw = userData['reportedLevels'];
+    if (mapRaw is Map) {
+      for (final entry in mapRaw.entries) {
+        final key = entry.key.toString().trim();
+        if (key.isEmpty) continue;
+        final value = entry.value;
+        final isReported = value == true ||
+            value == 1 ||
+            (value is String &&
+                (value.trim().toLowerCase() == 'true' ||
+                    value.trim() == '1' ||
+                    value.trim().toLowerCase() == 'yes'));
+        if (isReported) out.add(key);
+      }
+    }
+
+    return out;
   }
 
   Future<void> _selectLevel(int levelIndex) async {
@@ -236,7 +440,8 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
   void _scheduleChipReveal() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_chipScrollController.hasClients) return;
-      final worldIndex = _worldTabs.indexWhere((tab) => tab.packId == widget.packId);
+      final worldIndex =
+          _worldTabs.indexWhere((tab) => tab.packId == widget.packId);
       if (worldIndex < 0) return;
       final target = math.max(0.0, worldIndex * 112.0 - 40.0);
       _chipScrollController.animateTo(
@@ -248,17 +453,160 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
   }
 
   void _handleNodeTap(int levelIndex, bool unlocked) {
+    if (!unlocked) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'World locked. Complete or report all levels in previous world first.',
+          ),
+          duration: Duration(milliseconds: 1100),
+        ),
+      );
+      return;
+    }
     _selectLevel(levelIndex);
   }
 
-  void _playSelectedLevel() {
+  Future<void> _playSelectedLevel() async {
+    if (!_isWorldUnlocked(widget.packId)) {
+      final fallbackPack = _latestUnlockedPackId();
+      if (mounted && fallbackPack != widget.packId) {
+        context.go('/play/$fallbackPack');
+      }
+      return;
+    }
+
+    final energy = await widget.energyService.refresh();
+    if (energy.current <= 0) {
+      await _showOutOfEnergyDialog();
+      return;
+    }
     unawaited(
       widget.progressService.setCurrentLevelForPack(
         widget.packId,
         _selectedLevelIndex,
       ),
     );
+    if (!mounted) return;
     context.go('/play/${widget.packId}/$_selectedLevelIndex');
+  }
+
+  Future<void> _showOutOfEnergyDialog() async {
+    if (!mounted) return;
+    final snapshot = await widget.energyService.refresh();
+    if (!mounted) return;
+    final offer = EnergyService.batteryOffers.first;
+    final canUseBattery = snapshot.batteryCount > 0;
+    final resetText = _formatDuration(snapshot.timeUntilReset());
+    await showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF131E31),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+            side: BorderSide(color: Colors.white.withOpacity(0.10)),
+          ),
+          title: const Text(
+            'No energy',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+          ),
+          content: Text(
+            canUseBattery
+                ? 'You are out of energy. Wait $resetText for reset, or use a battery now.'
+                : 'You are out of energy. Wait $resetText for reset, or buy a battery.',
+            style: const TextStyle(color: Color(0xFFB8C7E6), height: 1.3),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+            if (canUseBattery)
+              FilledButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  final result =
+                      await widget.energyService.useBatteryAndRefill();
+                  if (!mounted) return;
+                  if (!result.success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Could not use battery right now.'),
+                      ),
+                    );
+                    return;
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Energy restored to ${result.snapshot.current}/${result.snapshot.max}.',
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('Use battery'),
+              )
+            else
+              FilledButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  final result =
+                      await widget.energyService.buyBatteryPackWithCoins(
+                    offer: offer,
+                  );
+                  if (!mounted) return;
+                  if (!result.success) {
+                    final text = result.failureReason ==
+                            EnergyBatteryPurchaseFailureReason.notEnoughCoins
+                        ? 'Not enough coins to buy a battery.'
+                        : 'Battery purchase failed. Try again.';
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(text)),
+                    );
+                    return;
+                  }
+                  if (result.newCoinsBalance != null) {
+                    await widget.coinsService
+                        .syncCoinsFromRemote(result.newCoinsBalance!);
+                  }
+                  final refill =
+                      await widget.energyService.useBatteryAndRefill();
+                  if (!mounted) return;
+                  if (refill.success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Battery purchased and used. Energy ${refill.snapshot.current}/${refill.snapshot.max}.',
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Battery purchased. Batteries: ${result.snapshot.batteryCount}.',
+                      ),
+                    ),
+                  );
+                },
+                child: Text('Buy (${offer.coinCost} coins)'),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  String _formatDuration(Duration duration) {
+    final d = duration.isNegative ? Duration.zero : duration;
+    final hours = d.inHours;
+    final minutes = d.inMinutes.remainder(60);
+    final seconds = d.inSeconds.remainder(60);
+    return '${hours.toString().padLeft(2, '0')}:'
+        '${minutes.toString().padLeft(2, '0')}:'
+        '${seconds.toString().padLeft(2, '0')}';
   }
 
   void _openSelectedLevelRanking() {
@@ -282,11 +630,15 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
         _ambientController,
       ]),
       builder: (context, _) {
-        final solvedCount = List<int>.generate(_totalLevels, (i) => i + 1)
-            .where(_isCompleted)
-            .length;
+        final solvedCount = _effectiveSolvedCount(widget.packId, _totalLevels);
         final continueIndex = _continueIndex(_totalLevels);
         final currentNode = continueIndex;
+        final energy = widget.energyService.snapshot;
+        final selectedWorldUnlocked = _isWorldUnlocked(widget.packId);
+        final energyText =
+            '${energy.current}/${energy.max} - reset ${_formatDuration(energy.timeUntilReset())}';
+        final canPlaySelectedLevel =
+            energy.current > 0 && selectedWorldUnlocked;
 
         return Scaffold(
           backgroundColor: const Color(0xFF08111F),
@@ -313,8 +665,25 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                               subtitle:
                                   '${_totalLevels.toString()} levels - $solvedCount completed',
                               coins: widget.coinsService.coins,
+                              energyText: energyText,
+                              energyDepleted: energy.current <= 0,
                               accent: palette.accent,
                               compact: _compact,
+                              onEnergyTap: () {
+                                if (energy.current <= 0) {
+                                  unawaited(_showOutOfEnergyDialog());
+                                  return;
+                                }
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Energy ${energy.current}/${energy.max}. Reset in ${_formatDuration(energy.timeUntilReset())}.',
+                                    ),
+                                    duration:
+                                        const Duration(milliseconds: 1400),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           SizedBox(height: _compact ? 10 : 18),
@@ -322,6 +691,10 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                             controller: _chipScrollController,
                             tabs: _worldTabs,
                             selectedPackId: widget.packId,
+                            unlockedPackIds: _worldTabs
+                                .where((tab) => _isWorldUnlocked(tab.packId))
+                                .map((tab) => tab.packId)
+                                .toSet(),
                             onSelected: (packId) => context.go('/play/$packId'),
                             accent: palette.accent,
                             compact: _compact,
@@ -333,9 +706,8 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                               physics: const BouncingScrollPhysics(),
                               slivers: [
                                 SliverPadding(
-                                  padding:
-                                      EdgeInsets.symmetric(
-                                          horizontal: _compact ? 12 : 16),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: _compact ? 12 : 16),
                                   sliver: SliverToBoxAdapter(
                                     child: _WorldProgressCard(
                                       title: worldInfo.title,
@@ -363,9 +735,12 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                                     itemCount: _totalLevels,
                                     itemBuilder: (context, index) {
                                       final levelIndex = index + 1;
-                                      final completed = _isCompleted(levelIndex);
-                                      final unlocked = levelIndex <= continueIndex;
-                                      final isCurrent = levelIndex == currentNode;
+                                      final completed =
+                                          _isCompleted(levelIndex);
+                                      final unlocked = selectedWorldUnlocked &&
+                                          levelIndex <= continueIndex;
+                                      final isCurrent =
+                                          levelIndex == currentNode;
                                       final isSelected =
                                           levelIndex == _selectedLevelIndex;
                                       final alignment =
@@ -380,7 +755,8 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                                               Positioned.fill(
                                                 child: IgnorePointer(
                                                   child: CustomPaint(
-                                                    painter: _LevelConnectorPainter(
+                                                    painter:
+                                                        _LevelConnectorPainter(
                                                       startAlignment: alignment,
                                                       endAlignment: index.isEven
                                                           ? 0.82
@@ -388,13 +764,15 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                                                       color: unlocked
                                                           ? palette.line
                                                           : Colors.white
-                                                              .withOpacity(0.08),
+                                                              .withOpacity(
+                                                                  0.08),
                                                     ),
                                                   ),
                                                 ),
                                               ),
                                             Align(
-                                              alignment: Alignment(alignment, 0),
+                                              alignment:
+                                                  Alignment(alignment, 0),
                                               child: _LevelMapNode(
                                                 levelIndex: levelIndex,
                                                 completed: completed,
@@ -431,8 +809,10 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                     record: _selectedRecord,
                     levelIndex: _selectedLevelIndex,
                     accent: palette.accent,
-                    canPlay: true,
-                    onPlay: _playSelectedLevel,
+                    canPlay: canPlaySelectedLevel,
+                    onPlay: canPlaySelectedLevel
+                        ? () => unawaited(_playSelectedLevel())
+                        : () => unawaited(_showOutOfEnergyDialog()),
                     onRanking: _openSelectedLevelRanking,
                     compact: _compact,
                   ),
@@ -448,15 +828,21 @@ class _WorldHeaderBar extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.coins,
+    required this.energyText,
+    required this.energyDepleted,
     required this.accent,
     required this.compact,
+    required this.onEnergyTap,
   });
 
   final String title;
   final String subtitle;
   final int coins;
+  final String energyText;
+  final bool energyDepleted;
   final Color accent;
   final bool compact;
+  final VoidCallback onEnergyTap;
 
   @override
   Widget build(BuildContext context) {
@@ -496,18 +882,64 @@ class _WorldHeaderBar extends StatelessWidget {
           ),
         ),
         SizedBox(width: compact ? 8 : 12),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(999),
-            boxShadow: [
-              BoxShadow(
-                color: accent.withOpacity(0.18),
-                blurRadius: 18,
-                offset: const Offset(0, 8),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(999),
+                boxShadow: [
+                  BoxShadow(
+                    color: accent.withOpacity(0.18),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: CoinDisplay(coins: coins),
+              child: CoinDisplay(coins: coins),
+            ),
+            const SizedBox(height: 6),
+            InkWell(
+              onTap: onEnergyTap,
+              borderRadius: BorderRadius.circular(999),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF18253A),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: energyDepleted
+                        ? const Color(0xFFFF7E8A)
+                        : const Color(0xFF4ADE80),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.battery_charging_full_rounded,
+                      size: 13,
+                      color: energyDepleted
+                          ? const Color(0xFFFF7E8A)
+                          : const Color(0xFF4ADE80),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      energyText,
+                      style: TextStyle(
+                        color: energyDepleted
+                            ? const Color(0xFFFFC4CD)
+                            : const Color(0xFFD4FFE2),
+                        fontSize: compact ? 10 : 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -551,6 +983,7 @@ class _WorldChipSelector extends StatelessWidget {
     required this.controller,
     required this.tabs,
     required this.selectedPackId,
+    required this.unlockedPackIds,
     required this.onSelected,
     required this.accent,
     required this.compact,
@@ -559,6 +992,7 @@ class _WorldChipSelector extends StatelessWidget {
   final ScrollController controller;
   final List<_WorldTabOption> tabs;
   final String selectedPackId;
+  final Set<String> unlockedPackIds;
   final ValueChanged<String> onSelected;
   final Color accent;
   final bool compact;
@@ -574,12 +1008,13 @@ class _WorldChipSelector extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
           final tab = tabs[index];
+          final worldUnlocked = unlockedPackIds.contains(tab.packId);
           final selected = tab.packId == selectedPackId;
           return AnimatedContainer(
             duration: const Duration(milliseconds: 220),
             curve: Curves.easeOutCubic,
             decoration: BoxDecoration(
-              gradient: selected
+              gradient: selected && worldUnlocked
                   ? LinearGradient(
                       colors: [
                         accent.withOpacity(0.95),
@@ -587,14 +1022,18 @@ class _WorldChipSelector extends StatelessWidget {
                       ],
                     )
                   : null,
-              color: selected ? null : const Color(0xFF152234),
+              color: selected && worldUnlocked
+                  ? null
+                  : worldUnlocked
+                      ? const Color(0xFF152234)
+                      : const Color(0xFF101A29),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: selected
+                color: selected && worldUnlocked
                     ? Colors.white.withOpacity(0.16)
-                    : Colors.white.withOpacity(0.08),
+                    : Colors.white.withOpacity(worldUnlocked ? 0.08 : 0.05),
               ),
-              boxShadow: selected
+              boxShadow: selected && worldUnlocked
                   ? [
                       BoxShadow(
                         color: accent.withOpacity(0.26),
@@ -606,7 +1045,7 @@ class _WorldChipSelector extends StatelessWidget {
             ),
             child: InkWell(
               borderRadius: BorderRadius.circular(20),
-              onTap: () => onSelected(tab.packId),
+              onTap: worldUnlocked ? () => onSelected(tab.packId) : null,
               child: Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: compact ? 12 : 16,
@@ -619,19 +1058,46 @@ class _WorldChipSelector extends StatelessWidget {
                     Text(
                       tab.title,
                       style: TextStyle(
-                        color: Colors.white,
+                        color: worldUnlocked
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.52),
                         fontSize: compact ? 12 : 14,
-                        fontWeight: selected ? FontWeight.w800 : FontWeight.w700,
+                        fontWeight: selected && worldUnlocked
+                            ? FontWeight.w800
+                            : FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      tab.subtitle,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(selected ? 0.84 : 0.56),
-                        fontSize: compact ? 10 : 11,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            tab.subtitle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(
+                                !worldUnlocked
+                                    ? 0.42
+                                    : selected
+                                        ? 0.84
+                                        : 0.56,
+                              ),
+                              fontSize: compact ? 10 : 11,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        if (!worldUnlocked) ...[
+                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.lock_rounded,
+                            size: compact ? 11 : 12,
+                            color: Colors.white.withOpacity(0.5),
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),
@@ -939,12 +1405,10 @@ class _LevelMapNode extends StatelessWidget {
               Text(
                 '$levelIndex',
                 style: TextStyle(
-                  color: unlocked
-                      ? Colors.white
-                      : Colors.white.withOpacity(0.38),
-                  fontSize: selected
-                      ? (compact ? 16 : 19)
-                      : (compact ? 14 : 17),
+                  color:
+                      unlocked ? Colors.white : Colors.white.withOpacity(0.38),
+                  fontSize:
+                      selected ? (compact ? 16 : 19) : (compact ? 14 : 17),
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -1232,7 +1696,8 @@ class _AmbientBackdrop extends StatelessWidget {
         Positioned(
           top: 180 - drift,
           right: -60,
-          child: _BlurOrb(color: palette.secondary.withOpacity(0.15), size: 240),
+          child:
+              _BlurOrb(color: palette.secondary.withOpacity(0.15), size: 240),
         ),
         Positioned(
           bottom: 70 + drift,
@@ -1312,7 +1777,8 @@ _WorldInfo _worldInfoForPack(String packId) {
 }
 
 _WorldPalette _paletteForPack(String packId) {
-  final index = math.max(0, _worldTabs.indexWhere((tab) => tab.packId == packId));
+  final index =
+      math.max(0, _worldTabs.indexWhere((tab) => tab.packId == packId));
   const accents = <Color>[
     Color(0xFF6EE7FF),
     Color(0xFF71D7FF),

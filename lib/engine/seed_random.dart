@@ -47,13 +47,13 @@ List<T> shuffle<T>(List<T> arr, Rng rng) {
 }
 
 int getDailySeed({DateTime? now}) {
-  final date = now ?? DateTime.now();
+  final date = (now ?? DateTime.now()).toUtc();
   final dateStr = 'daily-${date.year}-${date.month}-${date.day}';
   return hashString(dateStr);
 }
 
 String getTodayString({DateTime? now}) {
-  final date = now ?? DateTime.now();
+  final date = (now ?? DateTime.now()).toUtc();
   final mm = date.month.toString().padLeft(2, '0');
   final dd = date.day.toString().padLeft(2, '0');
   return '${date.year}-$mm-$dd';

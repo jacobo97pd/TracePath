@@ -6,6 +6,7 @@ enum InboxItemType {
   friendChallenge,
   levelChallenge,
   liveDuelInvite,
+  systemReward,
   systemNews,
   unknown,
 }
@@ -26,6 +27,9 @@ class InboxItem {
     required this.ctaType,
     required this.ctaPayload,
     required this.relatedType,
+    required this.subtype,
+    required this.rewardCoins,
+    required this.claimed,
   });
 
   final String id;
@@ -42,6 +46,9 @@ class InboxItem {
   final String ctaType;
   final String ctaPayload;
   final String relatedType;
+  final String subtype;
+  final int rewardCoins;
+  final bool claimed;
 
   bool get isPendingFriendRequest =>
       type == InboxItemType.friendRequest && status == 'pending';
@@ -49,6 +56,13 @@ class InboxItem {
   bool get hasCta =>
       ctaType.isNotEmpty &&
       relatedType.trim().toLowerCase() != 'live_duel_invite';
+
+  bool get isAllAchievementsReward =>
+      type == InboxItemType.systemReward &&
+      subtype.trim().toLowerCase() == 'all_achievements_completed';
+
+  bool get canClaimAllAchievementsReward =>
+      isAllAchievementsReward && !claimed && rewardCoins > 0;
 
   String get senderDisplayName {
     if (fromUsername.trim().isNotEmpty) return fromUsername.trim();
@@ -76,6 +90,9 @@ class InboxItem {
       ctaType: (data['ctaType'] as String?)?.trim() ?? '',
       ctaPayload: (data['ctaPayload'] as String?)?.trim() ?? '',
       relatedType: (data['relatedType'] as String?)?.trim() ?? '',
+      subtype: (data['subtype'] as String?)?.trim() ?? '',
+      rewardCoins: _readInt(data['rewardCoins']),
+      claimed: data['claimed'] == true,
     );
   }
 
@@ -91,10 +108,18 @@ class InboxItem {
         return InboxItemType.levelChallenge;
       case 'live_duel_invite':
         return InboxItemType.liveDuelInvite;
+      case 'system_reward':
+        return InboxItemType.systemReward;
       case 'system_news':
         return InboxItemType.systemNews;
       default:
         return InboxItemType.unknown;
     }
+  }
+
+  static int _readInt(Object? value) {
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value.trim()) ?? 0;
+    return 0;
   }
 }

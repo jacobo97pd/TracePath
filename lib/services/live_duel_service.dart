@@ -1045,6 +1045,45 @@ class LiveDuelService {
     });
   }
 
+  Stream<List<LiveMatch>> watchMyRecentMatches({int limit = 12}) async* {
+    final uid = await _requireUid();
+    final safeLimit = limit <= 0 ? 12 : limit;
+    yield* _db()
+        .collection('liveMatches')
+        .where('playerUids', arrayContains: uid)
+        .snapshots()
+        .asyncMap((snap) async {
+      final matches = <LiveMatch>[];
+      for (final doc in snap.docs) {
+        final data = doc.data();
+        final status = _readString(data['status']);
+        if (status != 'finished' && status != 'cancelled') continue;
+        final playersSnap = await doc.reference.collection('players').get();
+        final players = <String, LiveMatchPlayer>{};
+        for (final p in playersSnap.docs) {
+          players[p.id] = LiveMatchPlayer.fromFirestore(p.data());
+        }
+        final match =
+            LiveMatch.fromFirestore(id: doc.id, data: data, players: players);
+        if (!match.playerUids.contains(uid)) continue;
+        matches.add(match);
+      }
+      matches.sort((a, b) {
+        final at = (a.finishedAt ?? a.resultResolvedAt ?? a.createdAt)
+                ?.millisecondsSinceEpoch ??
+            0;
+        final bt = (b.finishedAt ?? b.resultResolvedAt ?? b.createdAt)
+                ?.millisecondsSinceEpoch ??
+            0;
+        return bt.compareTo(at);
+      });
+      if (matches.length > safeLimit) {
+        return matches.take(safeLimit).toList(growable: false);
+      }
+      return matches;
+    });
+  }
+
   Future<Map<String, bool>> busyMapForUids(List<String> uids) async {
     final out = <String, bool>{};
     for (final uid in uids) {

@@ -173,7 +173,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ((data['playerName'] as String?)?.trim().isNotEmpty ==
                                 true)
                             ? (data['playerName'] as String).trim()
-                            : (authName.isNotEmpty ? authName : l10n.homePlayerName);
+                            : (authName.isNotEmpty
+                                ? authName
+                                : l10n.homePlayerName);
                     final username =
                         (data['username'] as String?)?.trim() ?? '';
                     final highestLevelReached =
@@ -503,7 +505,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Expanded(
                             child: _LoadoutMiniCard(
                               title: l10n.shopTabSkins,
-                              name: selectedCatalogItem?.name ?? l10n.profileDefaultName,
+                              name: selectedCatalogItem?.name ??
+                                  l10n.profileDefaultName,
                               tag: l10n.shopEquipped,
                               icon: Icons.face_rounded,
                               preview: Container(
@@ -637,6 +640,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             : null,
                                     onCta: item.hasCta
                                         ? () => unawaited(_handleInboxCta(item))
+                                        : null,
+                                    onClaim: item.canClaimAllAchievementsReward
+                                        ? () => _claimInboxReward(item)
                                         : null,
                                     onDelete: item.read &&
                                             !item.isPendingFriendRequest
@@ -834,6 +840,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (_) {}
   }
 
+  Future<void> _claimInboxReward(InboxItem item) async {
+    if (!item.canClaimAllAchievementsReward) return;
+    try {
+      final granted = await _inboxService.claimAllAchievementsReward(
+        uid: '',
+        messageId: item.id,
+      );
+      if (!mounted) return;
+      if (granted) {
+        await widget.coinsService
+            .syncCoinsFromRemote(widget.coinsService.coins + item.rewardCoins);
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              context.l10n.profileRewardClaimed(item.rewardCoins),
+            ),
+            duration: const Duration(milliseconds: 1200),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.profileRewardAlreadyClaimed),
+            duration: Duration(milliseconds: 1000),
+          ),
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[profile] claim reward failed id=${item.id} error=$e');
+      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.profileRewardClaimFailed),
+          duration: Duration(milliseconds: 1200),
+        ),
+      );
+    }
+  }
+
   Future<void> _acceptFriendRequest(InboxItem item) async {
     final fromUid = item.fromUid.trim();
     if (fromUid.isEmpty) return;
@@ -844,8 +892,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Friend request accepted'),
+        SnackBar(
+          content: Text(context.l10n.profileFriendRequestAccepted),
           duration: Duration(milliseconds: 900),
         ),
       );
@@ -874,16 +922,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Friend request declined'),
+        SnackBar(
+          content: Text(context.l10n.profileFriendRequestDeclined),
           duration: Duration(milliseconds: 900),
         ),
       );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not decline friend request'),
+        SnackBar(
+          content: Text(context.l10n.profileFriendRequestDeclineFailed),
           duration: Duration(milliseconds: 900),
         ),
       );
@@ -925,13 +973,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         case InboxItemType.levelChallenge:
           await _sendGenericDeclineResponse(
             item: item,
-            title: 'Challenge declined',
-            bodySuffix: 'declined your challenge.',
+            title: context.l10n.profileChallengeDeclinedTitle,
+            bodySuffix: context.l10n.profileChallengeDeclinedBodySuffix,
           );
           await _deleteInboxItem(item);
           break;
         case InboxItemType.friendRequest:
         case InboxItemType.friendAccept:
+        case InboxItemType.systemReward:
         case InboxItemType.systemNews:
         case InboxItemType.unknown:
           return;
@@ -939,8 +988,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Challenge declined'),
+        SnackBar(
+          content: Text(context.l10n.profileChallengeDeclined),
           duration: Duration(milliseconds: 900),
         ),
       );
@@ -951,8 +1000,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not decline challenge'),
+        SnackBar(
+          content: Text(context.l10n.profileChallengeDeclineFailed),
           duration: Duration(milliseconds: 900),
         ),
       );
@@ -966,11 +1015,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }) async {
     final targetUid = item.fromUid.trim();
     if (targetUid.isEmpty) return;
+    final fallbackPlayerName = context.l10n.homePlayerName;
     final me = await _readCurrentUserSocialProfile();
     final username = (me['username'] as String?)?.trim() ?? '';
     final playerName = (me['playerName'] as String?)?.trim().isNotEmpty == true
         ? (me['playerName'] as String).trim()
-        : 'Player';
+        : fallbackPlayerName;
     final avatarId = (me['avatarId'] as String?)?.trim().isNotEmpty == true
         ? (me['avatarId'] as String).trim()
         : 'default';
@@ -1001,11 +1051,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }) async {
     final targetUid = item.fromUid.trim();
     if (targetUid.isEmpty) return;
+    final fallbackPlayerName = context.l10n.homePlayerName;
     final me = await _readCurrentUserSocialProfile();
     final username = (me['username'] as String?)?.trim() ?? '';
     final playerName = (me['playerName'] as String?)?.trim().isNotEmpty == true
         ? (me['playerName'] as String).trim()
-        : 'Player';
+        : fallbackPlayerName;
     final avatarId = (me['avatarId'] as String?)?.trim().isNotEmpty == true
         ? (me['avatarId'] as String).trim()
         : 'default';
@@ -1069,8 +1120,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (item.type == InboxItemType.levelChallenge) {
           await _sendGenericAcceptedResponse(
             item: item,
-            title: 'Challenge accepted',
-            bodySuffix: 'accepted your challenge.',
+            title: context.l10n.profileChallengeAcceptedTitle,
+            bodySuffix: context.l10n.profileChallengeAcceptedBodySuffix,
           );
         }
         if (ctaPayload.isNotEmpty) {
@@ -1101,18 +1152,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
         barrierColor: Colors.black.withOpacity(0.82),
         builder: (context) => AlertDialog(
           backgroundColor: const Color(0xFF111827),
-          title: const Text(
-            'Función no disponible',
-            style: TextStyle(color: Colors.white),
+          title: Text(
+            context.l10n.profileFunctionUnavailableTitle,
+            style: const TextStyle(color: Colors.white),
           ),
-          content: const Text(
-            'Esta función solo está disponible cuando compres y equipes una skin.',
-            style: TextStyle(color: Color(0xFFB6C2DA)),
+          content: Text(
+            context.l10n.profileFunctionUnavailableBody,
+            style: const TextStyle(color: Color(0xFFB6C2DA)),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Entendido'),
+              child: Text(context.l10n.profileUnderstand),
             ),
           ],
         ),
@@ -1157,15 +1208,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await showDialog<void>(
         context: context,
         barrierColor: Colors.black.withOpacity(0.82),
-        builder: (context) => const AlertDialog(
-          backgroundColor: Color(0xFF111827),
+        builder: (context) => AlertDialog(
+          backgroundColor: const Color(0xFF111827),
           title: Text(
-            'Card unavailable',
-            style: TextStyle(color: Colors.white),
+            context.l10n.profileCardUnavailableTitle,
+            style: const TextStyle(color: Colors.white),
           ),
           content: Text(
-            'There is no card for this skin yet.',
-            style: TextStyle(color: Color(0xFFB6C2DA)),
+            context.l10n.profileCardUnavailableBody,
+            style: const TextStyle(color: Color(0xFFB6C2DA)),
           ),
         ),
       );
@@ -1391,9 +1442,9 @@ class _ProfileProgressCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'World Progress',
-            style: TextStyle(
+          Text(
+            context.l10n.profileWorldProgressTitle,
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w800,
               fontSize: 14,
@@ -1414,7 +1465,10 @@ class _ProfileProgressCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '$solvedLevels / $milestoneTarget levels completed',
+                context.l10n.profileLevelsCompleted(
+                  solvedLevels,
+                  milestoneTarget,
+                ),
                 style: const TextStyle(
                   color: Color(0xFF9CB1D8),
                   fontSize: 12,
@@ -1422,7 +1476,7 @@ class _ProfileProgressCard extends StatelessWidget {
                 ),
               ),
               Text(
-                'Highest $highestLevel',
+                context.l10n.profileHighestLevelValue(highestLevel),
                 style: const TextStyle(
                   color: Color(0xFF9CB1D8),
                   fontSize: 12,
@@ -1507,8 +1561,7 @@ class _LoadoutMiniCard extends StatelessWidget {
               ),
               const SizedBox(height: 5),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: const Color(0xFF1C3154),
                   borderRadius: BorderRadius.circular(999),
@@ -1561,6 +1614,8 @@ class _ProfileInventorySheetState extends State<_ProfileInventorySheet>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   late final Map<String, String> _resolvedSkinPreviewById;
+  late String _selectedSkinId;
+  late String _selectedTrailId;
   String? _focusSkinId;
   String? _focusTrailId;
   bool _isEquipping = false;
@@ -1574,8 +1629,10 @@ class _ProfileInventorySheetState extends State<_ProfileInventorySheet>
       initialIndex: widget.initialTab.clamp(0, 1),
       vsync: this,
     );
-    _focusSkinId = widget.selectedSkinId;
-    _focusTrailId = widget.selectedTrailId;
+    _selectedSkinId = widget.selectedSkinId;
+    _selectedTrailId = widget.selectedTrailId;
+    _focusSkinId = _selectedSkinId;
+    _focusTrailId = _selectedTrailId;
     unawaited(_resolveMissingSkinPreviews());
   }
 
@@ -1588,7 +1645,7 @@ class _ProfileInventorySheetState extends State<_ProfileInventorySheet>
   @override
   Widget build(BuildContext context) {
     final focusedSkin = widget.ownedSkins.firstWhere(
-      (s) => s.id == (_focusSkinId ?? widget.selectedSkinId),
+      (s) => s.id == (_focusSkinId ?? _selectedSkinId),
       orElse: () => widget.ownedSkins.isNotEmpty
           ? widget.ownedSkins.first
           : const SkinCatalogItem(
@@ -1598,7 +1655,7 @@ class _ProfileInventorySheetState extends State<_ProfileInventorySheet>
             ),
     );
     final focusedTrail = widget.ownedTrails.firstWhere(
-      (t) => t.id == (_focusTrailId ?? widget.selectedTrailId),
+      (t) => t.id == (_focusTrailId ?? _selectedTrailId),
       orElse: () => widget.ownedTrails.isNotEmpty
           ? widget.ownedTrails.first
           : TrailCatalog.classic,
@@ -1672,21 +1729,22 @@ class _ProfileInventorySheetState extends State<_ProfileInventorySheet>
                 children: [
                   _InventorySkinsTab(
                     items: widget.ownedSkins,
-                    selectedSkinId: widget.selectedSkinId,
-                    focusedSkinId: _focusSkinId ?? widget.selectedSkinId,
+                    selectedSkinId: _selectedSkinId,
+                    focusedSkinId: _focusSkinId ?? _selectedSkinId,
                     skinPreviewById: _resolvedSkinPreviewById,
                     onFocus: (id) => setState(() => _focusSkinId = id),
                     onEquip: _isEquipping
                         ? null
                         : () async {
                             final skin = focusedSkin;
-                            if (skin.id == widget.selectedSkinId) return;
+                            if (skin.id == _selectedSkinId) return;
                             setState(() => _isEquipping = true);
                             try {
                               await widget.onEquipSkin(skin);
                               if (!mounted) return;
                               setState(() {
                                 _isEquipping = false;
+                                _selectedSkinId = skin.id;
                                 _focusSkinId = skin.id;
                               });
                             } finally {
@@ -1698,20 +1756,21 @@ class _ProfileInventorySheetState extends State<_ProfileInventorySheet>
                   ),
                   _InventoryTrailsTab(
                     items: widget.ownedTrails,
-                    selectedTrailId: widget.selectedTrailId,
-                    focusedTrailId: _focusTrailId ?? widget.selectedTrailId,
+                    selectedTrailId: _selectedTrailId,
+                    focusedTrailId: _focusTrailId ?? _selectedTrailId,
                     onFocus: (id) => setState(() => _focusTrailId = id),
                     onEquip: _isEquipping
                         ? null
                         : () async {
                             final trail = focusedTrail;
-                            if (trail.id == widget.selectedTrailId) return;
+                            if (trail.id == _selectedTrailId) return;
                             setState(() => _isEquipping = true);
                             try {
                               await widget.onEquipTrail(trail);
                               if (!mounted) return;
                               setState(() {
                                 _isEquipping = false;
+                                _selectedTrailId = trail.id;
                                 _focusTrailId = trail.id;
                               });
                             } finally {
@@ -1745,7 +1804,8 @@ class _ProfileInventorySheetState extends State<_ProfileInventorySheet>
       for (final raw in candidates) {
         final trimmed = raw.trim();
         if (trimmed.isEmpty) continue;
-        final fromCache = widget.skinCatalogService.toRenderablePath(trimmed).trim();
+        final fromCache =
+            widget.skinCatalogService.toRenderablePath(trimmed).trim();
         if (fromCache.startsWith('http://') ||
             fromCache.startsWith('https://') ||
             fromCache.startsWith('assets/') ||
@@ -2717,7 +2777,9 @@ class _TrailWardrobeCarouselState extends State<_TrailWardrobeCarousel> {
                         padding: const EdgeInsets.symmetric(vertical: 10),
                       ),
                       child: Text(
-                        equipped ? context.l10n.shopEquipped : context.l10n.shopEquip,
+                        equipped
+                            ? context.l10n.shopEquipped
+                            : context.l10n.shopEquip,
                       ),
                     ),
                   ),
@@ -2799,7 +2861,7 @@ class _AchievementsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader(title: 'Achievements'),
+        SectionHeader(title: context.l10n.profileAchievementsTitle),
         const SizedBox(height: 10),
         Container(
           decoration: BoxDecoration(
@@ -2812,7 +2874,7 @@ class _AchievementsSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '$unlocked / $total unlocked',
+                context.l10n.profileAchievementsProgress(unlocked, total),
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w800,
@@ -2980,8 +3042,12 @@ class _AchievementMedalCard extends StatelessWidget {
             const Spacer(),
             Text(
               unlocked
-                  ? 'Completed${state.unlockedAt != null ? ' • ${formatDateTime(state.unlockedAt!)}' : ''}'
-                  : 'Locked',
+                  ? context.l10n.profileAchievementCompleted(
+                      state.unlockedAt != null
+                          ? ' • ${formatDateTime(state.unlockedAt!)}'
+                          : '',
+                    )
+                  : context.l10n.profileAchievementLocked,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -3054,8 +3120,12 @@ class _AchievementMedalCard extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 unlocked
-                    ? 'Unlocked${state.unlockedAt != null ? ' on ${formatDateTime(state.unlockedAt!)}' : ''}'
-                    : 'Locked',
+                    ? context.l10n.profileAchievementUnlocked(
+                        state.unlockedAt != null
+                            ? ' ${context.l10n.profileAchievementOnDate(formatDateTime(state.unlockedAt!))}'
+                            : '',
+                      )
+                    : context.l10n.profileAchievementLocked,
                 style: TextStyle(
                   color: unlocked ? accent : const Color(0xFF8CA0C8),
                   fontSize: 13,
@@ -3185,6 +3255,7 @@ class _InboxItemCard extends StatelessWidget {
     this.onAccept,
     this.onDecline,
     this.onCta,
+    this.onClaim,
     this.onDelete,
   });
 
@@ -3193,6 +3264,7 @@ class _InboxItemCard extends StatelessWidget {
   final VoidCallback? onAccept;
   final VoidCallback? onDecline;
   final VoidCallback? onCta;
+  final VoidCallback? onClaim;
   final VoidCallback? onDelete;
 
   @override
@@ -3246,7 +3318,7 @@ class _InboxItemCard extends StatelessWidget {
                   ),
                   if (item.createdAt != null)
                     Text(
-                      _relativeDate(item.createdAt!),
+                      _relativeDate(context, item.createdAt!),
                       style: const TextStyle(
                         color: Color(0xFF8CA0C8),
                         fontSize: 11,
@@ -3269,7 +3341,7 @@ class _InboxItemCard extends StatelessWidget {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: onAccept,
-                        child: const Text('Accept'),
+                        child: Text(context.l10n.accept),
                       ),
                     ),
                   if (onAccept != null) const SizedBox(width: 8),
@@ -3277,16 +3349,27 @@ class _InboxItemCard extends StatelessWidget {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: onDecline,
-                        child: const Text('Decline'),
+                        child: Text(context.l10n.decline),
                       ),
                     ),
                   if (onDecline != null && onCta != null)
+                    const SizedBox(width: 8),
+                  if ((onDecline != null || onCta != null) && onClaim != null)
                     const SizedBox(width: 8),
                   if (onCta != null)
                     Expanded(
                       child: ElevatedButton(
                         onPressed: onCta,
-                        child: const Text('Open'),
+                        child: Text(context.l10n.profileInboxOpen),
+                      ),
+                    ),
+                  if (onClaim != null)
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: onClaim,
+                        child: Text(
+                          context.l10n.profileInboxClaim(item.rewardCoins),
+                        ),
                       ),
                     ),
                   if (onDelete != null)
@@ -3318,6 +3401,8 @@ class _InboxItemCard extends StatelessWidget {
         return Icons.sports_esports_rounded;
       case InboxItemType.liveDuelInvite:
         return Icons.sports_martial_arts_rounded;
+      case InboxItemType.systemReward:
+        return Icons.card_giftcard_rounded;
       case InboxItemType.systemNews:
         return Icons.campaign_rounded;
       case InboxItemType.unknown:
@@ -3325,10 +3410,10 @@ class _InboxItemCard extends StatelessWidget {
     }
   }
 
-  String _relativeDate(DateTime dt) {
+  String _relativeDate(BuildContext context, DateTime dt) {
     final now = DateTime.now();
     final diff = now.difference(dt);
-    if (diff.inMinutes < 1) return 'now';
+    if (diff.inMinutes < 1) return context.l10n.profileInboxNow;
     if (diff.inHours < 1) return '${diff.inMinutes}m';
     if (diff.inDays < 1) return '${diff.inHours}h';
     if (diff.inDays < 7) return '${diff.inDays}d';
@@ -3641,6 +3726,41 @@ class _ProfileHeaderAvatarState extends State<_ProfileHeaderAvatar> {
   int _index = 0;
   bool _notifiedExhausted = false;
 
+  List<String> _googleVariants(String rawUrl) {
+    final out = <String>[];
+    final trimmed = rawUrl.trim();
+    if (trimmed.isEmpty) return out;
+    void add(String value) {
+      final v = value.trim();
+      if (v.isEmpty) return;
+      if (!out.contains(v)) out.add(v);
+    }
+
+    add(trimmed);
+    final uri = Uri.tryParse(trimmed);
+    final host = (uri?.host ?? '').toLowerCase();
+    final isGoogleHost = host.contains('googleusercontent.com') ||
+        host.contains('gstatic.com') ||
+        host.contains('googleapis.com');
+    if (!isGoogleHost) return out;
+
+    // Variant 1: enforce a larger stable suffix for googleusercontent avatars.
+    final resizedSuffix = trimmed.replaceAllMapped(
+      RegExp(r'=s\d+(-c)?$'),
+      (_) => '=s256-c',
+    );
+    add(resizedSuffix);
+
+    // Variant 2: force sz query for providers that use query-based sizing.
+    if (uri != null) {
+      final query = Map<String, String>.from(uri.queryParameters);
+      query['sz'] = '256';
+      add(uri.replace(queryParameters: query).toString());
+    }
+
+    return out;
+  }
+
   List<_AvatarCandidate> get _candidates {
     final list = <_AvatarCandidate>[];
     final google = widget.googleAvatarUrl.trim();
@@ -3659,12 +3779,16 @@ class _ProfileHeaderAvatarState extends State<_ProfileHeaderAvatar> {
         list.add(_AvatarCandidate(type: 'skin', path: skin));
       }
       if (google.isNotEmpty) {
-        list.add(_AvatarCandidate(type: 'google', path: google));
+        for (final variant in _googleVariants(google)) {
+          list.add(_AvatarCandidate(type: 'google', path: variant));
+        }
       }
       return list;
     }
     if (google.isNotEmpty) {
-      list.add(_AvatarCandidate(type: 'google', path: google));
+      for (final variant in _googleVariants(google)) {
+        list.add(_AvatarCandidate(type: 'google', path: variant));
+      }
     }
     for (final skin in dedupSkins) {
       list.add(_AvatarCandidate(type: 'skin', path: skin));
@@ -3738,6 +3862,14 @@ class _ProfileAvatarImageCandidate extends StatelessWidget {
     }
     if (path.startsWith('http://') || path.startsWith('https://')) {
       if (_isGoogleAvatarUrl(path)) {
+        if (kIsWeb) {
+          return buildNetworkImageCompat(
+            url: path,
+            fit: BoxFit.cover,
+            filterQuality: FilterQuality.high,
+            fallback: _AvatarFailureSignal(onFailed: onFailed),
+          );
+        }
         return Image.network(
           path,
           fit: BoxFit.cover,

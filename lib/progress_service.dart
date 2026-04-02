@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_data.dart';
 import 'engine/seed_random.dart';
+import 'services/daily_puzzle_service.dart';
 
 class ProgressService extends ChangeNotifier {
   ProgressService(this._prefs) {
@@ -23,6 +24,8 @@ class ProgressService extends ChangeNotifier {
   static const String _versusPlayedCountKey = 'versus_played_count';
   static const String _versusRecordedMatchIdsKey = 'versus_recorded_match_ids';
   static const String _worldCurrentLevelPrefix = 'world_current_level:';
+  static const String _lastPlayedCampaignLevelKey =
+      'last_played_campaign_level';
   static const String _inProgressLevelPrefix = 'in_progress_level:';
 
   final SharedPreferences _prefs;
@@ -178,7 +181,7 @@ class ProgressService extends ChangeNotifier {
       return 0;
     }
 
-    final today = _dateOnly(now ?? DateTime.now());
+    final today = _dailyCycleDate(now: now);
     final diffDays = today.difference(lastDate).inDays;
     final stored = _prefs.getInt(_dailyStreakKey) ?? 0;
     if (diffDays <= 1) {
@@ -191,12 +194,29 @@ class ProgressService extends ChangeNotifier {
   }
 
   bool isDailyCompleted({DateTime? now}) {
-    return lastDailyCompletedDate == getTodayString(now: now);
+    return isDailyCompletedForKey(
+      DailyPuzzleService.currentDailyKey(now: now),
+    );
+  }
+
+  bool isDailyCompletedForKey(String dailyKey) {
+    return lastDailyCompletedDate == dailyKey.trim();
   }
 
   Future<void> markDailyCompleted({DateTime? now}) async {
-    final date = _dateOnly(now ?? DateTime.now());
-    final todayKey = getTodayString(now: date);
+    final date = _dailyCycleDate(now: now);
+    final todayKey = DailyPuzzleService.currentDailyKey(now: now);
+    await markDailyCompletedForKey(todayKey, now: date);
+  }
+
+  Future<void> markDailyCompletedForKey(
+    String dailyKey, {
+    DateTime? now,
+  }) async {
+    final normalizedDailyKey = dailyKey.trim();
+    if (normalizedDailyKey.isEmpty) return;
+    final date = _dailyCycleDate(now: now);
+    final todayKey = normalizedDailyKey;
     if (lastDailyCompletedDate == todayKey) {
       return;
     }
@@ -332,11 +352,65 @@ class ProgressService extends ChangeNotifier {
     return raw;
   }
 
+  CampaignResumeTarget getCampaignResumeTarget({
+    String defaultPackId = 'world_01',
+  }) {
+    final lastPlayedRaw = _prefs.getString(_lastPlayedCampaignLevelKey);
+    final lastPlayed = _parseResumeTarget(lastPlayedRaw);
+    if (lastPlayed != null) {
+      final currentForPack = getCurrentLevelForPack(
+        lastPlayed.packId,
+        fallback: lastPlayed.levelIndex,
+      );
+      return CampaignResumeTarget(
+        packId: lastPlayed.packId,
+        levelIndex: currentForPack > 0 ? currentForPack : lastPlayed.levelIndex,
+      );
+    }
+
+    final targets = <CampaignResumeTarget>[];
+    for (final key in _prefs.getKeys()) {
+      if (!key.startsWith(_worldCurrentLevelPrefix)) continue;
+      final packId = key.substring(_worldCurrentLevelPrefix.length).trim();
+      if (packId.isEmpty) continue;
+      final level = getCurrentLevelForPack(packId, fallback: 1);
+      targets.add(CampaignResumeTarget(
+        packId: packId,
+        levelIndex: level <= 0 ? 1 : level,
+      ));
+    }
+
+    if (targets.isNotEmpty) {
+      targets.sort((a, b) {
+        final scoreA = _resumeTargetSortScore(a);
+        final scoreB = _resumeTargetSortScore(b);
+        final byScore = scoreB.compareTo(scoreA);
+        if (byScore != 0) return byScore;
+        return b.packId.compareTo(a.packId);
+      });
+      return targets.first;
+    }
+
+    return CampaignResumeTarget(
+      packId: defaultPackId,
+      levelIndex: getCurrentLevelForPack(defaultPackId, fallback: 1),
+    );
+  }
+
   Future<void> setCurrentLevelForPack(String packId, int levelIndex) async {
     final safeLevel = levelIndex <= 0 ? 1 : levelIndex;
     final current = getCurrentLevelForPack(packId, fallback: 1);
+    var changed = false;
     if (safeLevel > current) {
       await _prefs.setInt(_worldCurrentLevelKey(packId), safeLevel);
+      changed = true;
+    }
+    final lastRouteValue = '$packId:$safeLevel';
+    if (_prefs.getString(_lastPlayedCampaignLevelKey) != lastRouteValue) {
+      await _prefs.setString(_lastPlayedCampaignLevelKey, lastRouteValue);
+      changed = true;
+    }
+    if (changed) {
       notifyListeners();
     }
   }
@@ -448,8 +522,9 @@ class ProgressService extends ChangeNotifier {
     return 'best_score:$mode:$runId';
   }
 
-  DateTime _dateOnly(DateTime date) {
-    return DateTime(date.year, date.month, date.day);
+  DateTime _dailyCycleDate({DateTime? now}) {
+    final utc = (now ?? DateTime.now()).toUtc();
+    return DateTime.utc(utc.year, utc.month, utc.day);
   }
 
   DateTime? _parseDate(String value) {
@@ -465,6 +540,39 @@ class ProgressService extends ChangeNotifier {
     }
     return DateTime(year, month, day);
   }
+
+  CampaignResumeTarget? _parseResumeTarget(String? raw) {
+    final value = (raw ?? '').trim();
+    if (value.isEmpty) return null;
+    final idx = value.lastIndexOf(':');
+    if (idx <= 0 || idx >= value.length - 1) return null;
+    final packId = value.substring(0, idx).trim();
+    final level = int.tryParse(value.substring(idx + 1).trim());
+    if (packId.isEmpty || level == null || level <= 0) return null;
+    return CampaignResumeTarget(packId: packId, levelIndex: level);
+  }
+
+  int _resumeTargetSortScore(CampaignResumeTarget target) {
+    final packOrder = _campaignPackOrder(target.packId);
+    return (packOrder * 1000) + target.levelIndex;
+  }
+
+  int _campaignPackOrder(String packId) {
+    final match =
+        RegExp(r'^world_(\d+)$').firstMatch(packId.trim().toLowerCase());
+    if (match == null) return 0;
+    return int.tryParse(match.group(1) ?? '') ?? 0;
+  }
+}
+
+class CampaignResumeTarget {
+  const CampaignResumeTarget({
+    required this.packId,
+    required this.levelIndex,
+  });
+
+  final String packId;
+  final int levelIndex;
 }
 
 class InProgressLevelSnapshot {
@@ -474,6 +582,7 @@ class InProgressLevelSnapshot {
     required this.hintsUsed,
     required this.rewindsUsed,
     required this.mistakesUsed,
+    required this.energyConsumed,
   });
 
   final List<int> path;
@@ -481,6 +590,7 @@ class InProgressLevelSnapshot {
   final int hintsUsed;
   final int rewindsUsed;
   final int mistakesUsed;
+  final bool energyConsumed;
 
   factory InProgressLevelSnapshot.fromJson(Map<String, dynamic> json) {
     final pathRaw = json['path'];
@@ -511,6 +621,7 @@ class InProgressLevelSnapshot {
       hintsUsed: readInt(json['hintsUsed']),
       rewindsUsed: readInt(json['rewindsUsed']),
       mistakesUsed: readInt(json['mistakesUsed']),
+      energyConsumed: json['energyConsumed'] == true,
     );
   }
 
@@ -521,6 +632,7 @@ class InProgressLevelSnapshot {
       'hintsUsed': hintsUsed,
       'rewindsUsed': rewindsUsed,
       'mistakesUsed': mistakesUsed,
+      'energyConsumed': energyConsumed,
     };
   }
 }

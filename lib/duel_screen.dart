@@ -156,10 +156,37 @@ class _DuelScreenState extends State<DuelScreen> {
                   subtitle: context.l10n.duelHistorySubtitle,
                 ),
                 const SizedBox(height: 10),
-                _InlineInfoCard(
-                  icon: Icons.history_rounded,
-                  title: context.l10n.duelHistoryComingSoonTitle,
-                  subtitle: context.l10n.duelHistoryComingSoonSubtitle,
+                StreamBuilder<List<LiveMatch>>(
+                  stream: _liveDuelService.watchMyRecentMatches(limit: 12),
+                  builder: (context, snapshot) {
+                    final matches = snapshot.data ?? const <LiveMatch>[];
+                    if (snapshot.hasError) {
+                      return _InlineInfoCard(
+                        icon: Icons.history_toggle_off_rounded,
+                        title: context.l10n.duelActiveLoadErrorTitle,
+                        subtitle: context.l10n.duelTryAgainLater,
+                      );
+                    }
+                    if (matches.isEmpty) {
+                      return _InlineInfoCard(
+                        icon: Icons.history_rounded,
+                        title: context.l10n.duelHistoryComingSoonTitle,
+                        subtitle: context.l10n.duelHistoryComingSoonSubtitle,
+                      );
+                    }
+                    return Column(
+                      children: [
+                        for (final match in matches)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: _HistoryMatchCard(
+                              match: match,
+                              currentUid: _uid,
+                            ),
+                          ),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
@@ -459,7 +486,8 @@ class _DuelHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.flash_on_rounded, color: Color(0xFF9EC5FF), size: 22),
+          const Icon(Icons.flash_on_rounded,
+              color: Color(0xFF9EC5FF), size: 22),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -503,7 +531,8 @@ class _DuelPrimaryCta extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PrimaryCtaButton(
-      label: busy ? context.l10n.duelCreating : context.l10n.duelChallengeFriend,
+      label:
+          busy ? context.l10n.duelCreating : context.l10n.duelChallengeFriend,
       icon: busy ? null : Icons.flash_on_rounded,
       onTap: onTap,
     );
@@ -676,7 +705,9 @@ class _ActiveMatchCard extends StatelessWidget {
     final opponentPlayer = match.players[opponentUid];
     final opponentName = (opponentPlayer?.username.trim().isNotEmpty ?? false)
         ? opponentPlayer!.username.trim()
-        : (opponentUid.isEmpty ? context.l10n.duelUnknownOpponent : opponentUid);
+        : (opponentUid.isEmpty
+            ? context.l10n.duelUnknownOpponent
+            : opponentUid);
     final status = switch (match.status) {
       LiveMatchStatus.pending => context.l10n.duelStatusPending,
       LiveMatchStatus.countdown => context.l10n.duelStatusCountdown,
@@ -730,5 +761,124 @@ class _ActiveMatchCard extends StatelessWidget {
   }
 }
 
+class _HistoryMatchCard extends StatelessWidget {
+  const _HistoryMatchCard({
+    required this.match,
+    required this.currentUid,
+  });
 
+  final LiveMatch match;
+  final String currentUid;
 
+  @override
+  Widget build(BuildContext context) {
+    final opponentUid = match.opponentUid(currentUid);
+    final myPlayer = match.players[currentUid];
+    final opponentPlayer = match.players[opponentUid];
+    final opponentName = (opponentPlayer?.username.trim().isNotEmpty ?? false)
+        ? opponentPlayer!.username.trim()
+        : (opponentUid.isEmpty
+            ? context.l10n.duelUnknownOpponent
+            : opponentUid);
+    final myTimeMs = myPlayer?.finishedAtMsFromStart ?? 0;
+    final oppTimeMs = opponentPlayer?.finishedAtMsFromStart ?? 0;
+    final statusLabel = switch (match.status) {
+      LiveMatchStatus.pending => context.l10n.duelStatusPending,
+      LiveMatchStatus.countdown => context.l10n.duelStatusCountdown,
+      LiveMatchStatus.playing => context.l10n.duelStatusPlaying,
+      LiveMatchStatus.finished => context.l10n.duelStatusFinished,
+      LiveMatchStatus.cancelled => context.l10n.duelStatusCancelled,
+    };
+    final outcome = _matchOutcomeLabel(
+      match: match,
+      currentUid: currentUid,
+      statusLabel: statusLabel,
+    );
+
+    return GameCard(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            match.winnerUid == currentUid
+                ? Icons.emoji_events_rounded
+                : Icons.history_rounded,
+            color: match.winnerUid == currentUid
+                ? const Color(0xFFF7D36A)
+                : const Color(0xFF9EC5FF),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.l10n.duelVersusOpponent(opponentName),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  context.l10n.duelLevelAndStatus(match.levelId, statusLabel),
+                  style: const TextStyle(
+                    color: Color(0xFF9EB0D2),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'You ${_formatDuelTime(myTimeMs)} · Opp ${_formatDuelTime(oppTimeMs)}',
+                  style: const TextStyle(
+                    color: Color(0xFF9EB0D2),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1F3356),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: const Color(0xFF355687)),
+            ),
+            child: Text(
+              outcome,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static String _matchOutcomeLabel({
+    required LiveMatch match,
+    required String currentUid,
+    required String statusLabel,
+  }) {
+    if (match.winnerUid.trim().isNotEmpty) {
+      if (match.winnerUid.trim() == currentUid) return 'Victory';
+      if (match.loserUid.trim() == currentUid) return 'Defeat';
+      return 'Finished';
+    }
+    return statusLabel;
+  }
+
+  static String _formatDuelTime(int ms) {
+    if (ms <= 0) return '--';
+    final seconds = ms / 1000.0;
+    return '${seconds.toStringAsFixed(2)}s';
+  }
+}

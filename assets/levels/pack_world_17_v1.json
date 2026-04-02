@@ -1,7 +1,7 @@
 {
   "packId": "world_17",
   "version": "pack_world_17_v1",
-  "count": 18,
+  "count": 19,
   "world": 17,
   "levels": [
     {
@@ -2058,6 +2058,134 @@
         "variant": "classic",
         "canonical_hash": "5b27a97df19e49ae6be3e50add18dea3d93ae3ba01115b99a00f9bf2a66c6b31",
         "imported_at": "2026-03-29T21:46:37Z"
+      }
+    },
+    {
+      "id": "linkedin-editor-375",
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "clues": [
+        {
+          "n": 1,
+          "x": 3,
+          "y": 5
+        },
+        {
+          "n": 2,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "n": 3,
+          "x": 5,
+          "y": 5
+        },
+        {
+          "n": 4,
+          "x": 5,
+          "y": 3
+        },
+        {
+          "n": 5,
+          "x": 2,
+          "y": 0
+        },
+        {
+          "n": 6,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "n": 7,
+          "x": 0,
+          "y": 2
+        },
+        {
+          "n": 8,
+          "x": 2,
+          "y": 3
+        },
+        {
+          "n": 9,
+          "x": 2,
+          "y": 2
+        },
+        {
+          "n": 10,
+          "x": 3,
+          "y": 2
+        },
+        {
+          "n": 11,
+          "x": 4,
+          "y": 1
+        },
+        {
+          "n": 12,
+          "x": 1,
+          "y": 4
+        }
+      ],
+      "walls": [
+        {
+          "cell1": 1,
+          "cell2": 7
+        },
+        {
+          "cell1": 2,
+          "cell2": 8
+        },
+        {
+          "cell1": 3,
+          "cell2": 9
+        },
+        {
+          "cell1": 4,
+          "cell2": 10
+        },
+        {
+          "cell1": 6,
+          "cell2": 7
+        },
+        {
+          "cell1": 10,
+          "cell2": 11
+        },
+        {
+          "cell1": 15,
+          "cell2": 21
+        },
+        {
+          "cell1": 16,
+          "cell2": 17
+        },
+        {
+          "cell1": 16,
+          "cell2": 22
+        },
+        {
+          "cell1": 20,
+          "cell2": 21
+        },
+        {
+          "cell1": 32,
+          "cell2": 33
+        }
+      ],
+      "difficultyTag": "d2",
+      "source": "linkedin_editor",
+      "source_pack": "pack_linkedin_editor_v1",
+      "source_origin": "linkedin_editor",
+      "variant": "classic",
+      "canonical_hash": "eb149229d41b5cd09e25f9b3ce23aa4bba1a6fa5ee613cac9175854798e00a0a",
+      "meta": {
+        "source_pack": "pack_linkedin_editor_v1",
+        "source_origin": "linkedin_editor",
+        "variant": "classic",
+        "canonical_hash": "eb149229d41b5cd09e25f9b3ce23aa4bba1a6fa5ee613cac9175854798e00a0a",
+        "imported_from": "c:\\Users\\jacob\\Downloads\\niveles_linkedin_editor.json"
       }
     }
   ]
