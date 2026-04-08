@@ -55,7 +55,7 @@ import 'services/onboarding_service.dart';
 import 'ui/components/coin_reward_overlay.dart';
 import 'ui/components/app_game_backdrop.dart';
 import 'l10n/l10n.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'l10n/app_localizations.dart';
 
 // Temporary diagnostics switch:
 // Set to true to skip notification initialization and isolate startup issues in release.

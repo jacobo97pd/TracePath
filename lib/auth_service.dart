@@ -67,7 +67,8 @@ class AuthService extends ChangeNotifier {
     final user = _firebaseAuthOrNull?.currentUser;
     if (user != null) {
       final providers = user.providerData.map((p) => p.providerId).toSet();
-      _mode = providers.contains('apple.com') ? AuthMode.apple : AuthMode.google;
+      _mode =
+          providers.contains('apple.com') ? AuthMode.apple : AuthMode.google;
       _displayName =
           user.displayName ?? _displayName ?? user.email?.split('@').first;
       _email = user.email ?? _email;
@@ -100,7 +101,8 @@ class AuthService extends ChangeNotifier {
         final user = credential.user;
         debugPrint('TRACE web popup user: ${user?.uid}');
         if (user == null) return 'Google login failed';
-        _displayName = user.displayName ?? user.email?.split('@').first ?? 'Player';
+        _displayName =
+            user.displayName ?? user.email?.split('@').first ?? 'Player';
         _email = user.email;
         _avatarUrl = user.photoURL;
       } else {
@@ -120,8 +122,9 @@ class AuthService extends ChangeNotifier {
         final result = await firebaseAuth.signInWithCredential(credential);
         final user = result.user;
         debugPrint('TRACE firebase sign in OK: ${user?.uid}');
-        _displayName =
-            user?.displayName ?? account.displayName ?? account.email.split('@').first;
+        _displayName = user?.displayName ??
+            account.displayName ??
+            account.email.split('@').first;
         _email = user?.email ?? account.email;
         _avatarUrl = user?.photoURL ?? account.photoUrl;
       }
@@ -152,9 +155,16 @@ class AuthService extends ChangeNotifier {
     }
 
     try {
-      final available = await SignInWithApple.isAvailable();
+      var available = true;
+      try {
+        available = await SignInWithApple.isAvailable();
+      } catch (e) {
+        debugPrint('TRACE apple isAvailable check failed: $e');
+      }
       if (!available) {
-        return 'Sign in with Apple no disponible en este dispositivo.';
+        debugPrint(
+          'TRACE apple isAvailable=false, continuing to credential request anyway.',
+        );
       }
 
       final rawNonce = _generateNonce();
@@ -189,7 +199,9 @@ class AuthService extends ChangeNotifier {
       _mode = AuthMode.apple;
       _displayName = (user.displayName ?? '').trim().isNotEmpty
           ? user.displayName
-          : (fullName.isNotEmpty ? fullName : (user.email?.split('@').first ?? 'Player'));
+          : (fullName.isNotEmpty
+              ? fullName
+              : (user.email?.split('@').first ?? 'Player'));
       _email = user.email;
       _avatarUrl = user.photoURL;
 
@@ -205,7 +217,8 @@ class AuthService extends ChangeNotifier {
       }
       return 'Apple login failed: ${e.message}';
     } on FirebaseAuthException catch (e, st) {
-      debugPrint('TRACE apple sign in FirebaseAuthException: ${e.code} ${e.message}');
+      debugPrint(
+          'TRACE apple sign in FirebaseAuthException: ${e.code} ${e.message}');
       debugPrint('TRACE apple sign in STACK: $st');
       return 'Apple login failed: ${e.message ?? e.code}';
     } catch (e, st) {
@@ -229,7 +242,8 @@ class AuthService extends ChangeNotifier {
         );
       } catch (e) {
         if (kDebugMode) {
-          debugPrint('[presence] signOut offline write failed uid=$uid error=$e');
+          debugPrint(
+              '[presence] signOut offline write failed uid=$uid error=$e');
         }
       }
     }
@@ -300,7 +314,8 @@ class AuthService extends ChangeNotifier {
       notifyListeners();
       return null;
     } on FirebaseAuthException catch (e, st) {
-      debugPrint('TRACE delete account FirebaseAuthException: ${e.code} ${e.message}');
+      debugPrint(
+          'TRACE delete account FirebaseAuthException: ${e.code} ${e.message}');
       debugPrint('TRACE delete account stack: $st');
       if (e.code == 'requires-recent-login') {
         return 'Por seguridad, vuelve a iniciar sesion y reintenta eliminar la cuenta.';
@@ -316,7 +331,8 @@ class AuthService extends ChangeNotifier {
       }
       return 'No se pudo eliminar la cuenta: ${e.message ?? e.code}';
     } on FirebaseException catch (e, st) {
-      debugPrint('TRACE delete account FirebaseException: ${e.code} ${e.message}');
+      debugPrint(
+          'TRACE delete account FirebaseException: ${e.code} ${e.message}');
       debugPrint('TRACE delete account stack: $st');
       if (_isFirestoreInternalAssertion(e)) {
         return 'Error interno temporal de Firestore Web. Recarga la app y vuelve a intentarlo.';
@@ -413,7 +429,8 @@ class AuthService extends ChangeNotifier {
         await _deleteCollection(userRef.collection(path));
       } catch (e, st) {
         if (kDebugMode) {
-          debugPrint('[delete-account] subcollection cleanup failed path=$path error=$e');
+          debugPrint(
+              '[delete-account] subcollection cleanup failed path=$path error=$e');
           debugPrint('$st');
         }
         // Best-effort cleanup: do not block account deletion for secondary data.
@@ -458,7 +475,8 @@ class AuthService extends ChangeNotifier {
         await db.collection('usernames').doc(username).delete();
       } catch (e, st) {
         if (kDebugMode) {
-          debugPrint('[delete-account] username index delete failed key=$username error=$e');
+          debugPrint(
+              '[delete-account] username index delete failed key=$username error=$e');
           debugPrint('$st');
         }
       }
@@ -473,7 +491,8 @@ class AuthService extends ChangeNotifier {
         await db.collection('emails').doc(email).delete();
       } catch (e, st) {
         if (kDebugMode) {
-          debugPrint('[delete-account] email index delete failed key=$email error=$e');
+          debugPrint(
+              '[delete-account] email index delete failed key=$email error=$e');
           debugPrint('$st');
         }
       }
@@ -505,7 +524,8 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  Future<void> _upsertUserFromAuth(User user, {required String provider}) async {
+  Future<void> _upsertUserFromAuth(User user,
+      {required String provider}) async {
     final uid = user.uid.trim();
     if (uid.isEmpty) return;
 

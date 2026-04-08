@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import 'auth_service.dart';
 import 'l10n/l10n.dart';
@@ -19,35 +18,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _busy = false;
-  bool _appleAvailable = false;
   bool get _isApplePlatform =>
       !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
-
-  @override
-  void initState() {
-    super.initState();
-    _appleAvailable = _isApplePlatform;
-    _loadAppleAvailability();
-  }
-
-  Future<void> _loadAppleAvailability() async {
-    if (!_isApplePlatform) {
-      return;
-    }
-    try {
-      final available = await SignInWithApple.isAvailable();
-      if (!mounted) return;
-      setState(() {
-        _appleAvailable = available;
-      });
-    } catch (_) {
-      // Keep the button visible on iOS even if the availability probe fails.
-      if (!mounted) return;
-      setState(() {
-        _appleAvailable = true;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -213,15 +185,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _onAppleTap() async {
-    if (!_appleAvailable) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Sign in with Apple no disponible en este dispositivo.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
     setState(() => _busy = true);
     final error = await widget.authService.signInWithApple();
     if (!mounted) return;
