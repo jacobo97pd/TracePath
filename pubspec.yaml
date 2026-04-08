@@ -22,6 +22,7 @@ dependencies:
   file_picker: ^8.1.2
   image: ^4.2.0
   google_sign_in: ^6.2.2
+  sign_in_with_apple: ^6.1.4
   firebase_core: ^3.8.0
   firebase_auth: ^5.3.3
   cloud_firestore: ^5.5.0
@@ -33,6 +34,8 @@ dependencies:
   animate_do: ^4.2.0
   url_launcher: ^6.3.1
   package_info_plus: ^8.1.2
+  video_player: ^2.9.2
+  lottie: ^3.1.2
 
 dev_dependencies:
   flutter_test:
@@ -77,6 +80,7 @@ flutter:
     - assets/levels/pack_world_17_v1.json
     - assets/branding/logo_tracePath.png
     - assets/branding/splash_tracePath.png
+    - assets/branding/splash_video_trace_path.mp4
     - assets/branding/coin_tracepath.png
     - assets/branding/shop_tracepath.png
     - assets/shop/coin_packs/saco_pequeno.webp
@@ -87,6 +91,8 @@ flutter:
     - assets/shop/coin_packs/lote_super_epico.webp
     - assets/shop/icons/
     - assets/ui/cards/
+    - assets/ui/completed_animation.lottie
+    - assets/ui/completed_animation.json
     - assets/skins/
     - assets/trails/
     - assets/trails/comic_spiderverse/

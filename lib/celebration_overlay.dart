@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class CelebrationOverlay extends StatefulWidget {
   const CelebrationOverlay({
@@ -252,6 +253,9 @@ class _CompletedBadge extends StatelessWidget {
     required this.glowPulse,
   });
 
+  static const String _completedLottieAsset =
+      'assets/ui/completed_animation.json';
+
   final Color accentColor;
   final double glowPulse;
 
@@ -264,7 +268,7 @@ class _CompletedBadge extends StatelessWidget {
     );
     return Container(
       constraints: BoxConstraints(maxWidth: maxBadgeWidth),
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
         gradient: const LinearGradient(
@@ -293,46 +297,55 @@ class _CompletedBadge extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Flexible(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _StarGlyph(rotation: -0.22),
-                  const SizedBox(width: 10),
-                  Text(
-                    'COMPLETED!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: const Color(0xFFF6FAFF),
-                      fontSize: 42,
-                      fontWeight: FontWeight.w900,
-                      height: 1.0,
-                      letterSpacing: 2.7,
-                      shadows: [
-                        const Shadow(
-                          color: Color(0xE60C152A),
-                          blurRadius: 12,
-                          offset: Offset(0, 3),
+      child: SizedBox(
+        height: 170,
+        child: Center(
+          child: Transform.scale(
+            scale: 2.6,
+            child: Lottie.asset(
+              _completedLottieAsset,
+              fit: BoxFit.contain,
+              repeat: true,
+              errorBuilder: (context, error, stackTrace) {
+                return FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _StarGlyph(rotation: -0.22),
+                      const SizedBox(width: 10),
+                      Text(
+                        'COMPLETED!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: const Color(0xFFF6FAFF),
+                          fontSize: 42,
+                          fontWeight: FontWeight.w900,
+                          height: 1.0,
+                          letterSpacing: 2.7,
+                          shadows: [
+                            const Shadow(
+                              color: Color(0xE60C152A),
+                              blurRadius: 12,
+                              offset: Offset(0, 3),
+                            ),
+                            Shadow(
+                              color: accentColor
+                                  .withOpacity(0.35 + glowPulse * 0.22),
+                              blurRadius: 22 + glowPulse * 8,
+                            ),
+                          ],
                         ),
-                        Shadow(
-                          color: accentColor.withOpacity(0.35 + glowPulse * 0.22),
-                          blurRadius: 22 + glowPulse * 8,
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 10),
+                      _StarGlyph(rotation: 0.22),
+                    ],
                   ),
-                  const SizedBox(width: 10),
-                  _StarGlyph(rotation: 0.22),
-                ],
-              ),
+                );
+              },
             ),
           ),
-        ],
+        ),
       ),
     );
   }
