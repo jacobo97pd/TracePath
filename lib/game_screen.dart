@@ -966,7 +966,7 @@ class _GameScreenState extends State<GameScreen>
                 Positioned.fill(
                   child: CelebrationOverlay(
                     visible: _showCelebration,
-                    duration: const Duration(milliseconds: 1150),
+                    duration: const Duration(milliseconds: 2800),
                     accentColor: gameTheme.pathColor,
                     isDark: isDark,
                     loop: true,

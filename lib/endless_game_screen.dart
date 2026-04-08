@@ -259,7 +259,7 @@ class _EndlessGameScreenState extends State<EndlessGameScreen> {
             Positioned.fill(
               child: CelebrationOverlay(
                 visible: _showCelebration,
-                duration: const Duration(milliseconds: 1150),
+                duration: const Duration(milliseconds: 2800),
                 accentColor: gameTheme.pathColor,
                 isDark: Theme.of(context).brightness == Brightness.dark,
                 loop: true,
