@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'coins_service.dart';
+import 'l10n/l10n.dart';
 import 'pack_level_repository.dart';
 import 'progress_service.dart';
 import 'services/app_firestore.dart';
@@ -16,101 +17,29 @@ import 'ui/components/coin_display.dart';
 class _WorldTabOption {
   const _WorldTabOption({
     required this.packId,
-    required this.title,
-    required this.subtitle,
   });
 
   final String packId;
-  final String title;
-  final String subtitle;
 }
 
 const List<_WorldTabOption> _worldTabs = <_WorldTabOption>[
-  _WorldTabOption(
-    packId: 'world_01',
-    title: 'W1 Forest',
-    subtitle: 'Gentle opener',
-  ),
-  _WorldTabOption(
-    packId: 'world_02',
-    title: 'W2 Coast',
-    subtitle: 'Clean flows',
-  ),
-  _WorldTabOption(
-    packId: 'world_03',
-    title: 'W3 Dunes',
-    subtitle: 'Longer reads',
-  ),
-  _WorldTabOption(
-    packId: 'world_04',
-    title: 'W4 Grove',
-    subtitle: 'Tighter turns',
-  ),
-  _WorldTabOption(
-    packId: 'world_05',
-    title: 'W5 Peaks',
-    subtitle: 'Steeper climb',
-  ),
-  _WorldTabOption(
-    packId: 'world_06',
-    title: 'W6 Neon',
-    subtitle: 'Variant hints',
-  ),
-  _WorldTabOption(
-    packId: 'world_07',
-    title: 'W7 Echo',
-    subtitle: 'False comfort',
-  ),
-  _WorldTabOption(
-    packId: 'world_08',
-    title: 'W8 Tundra',
-    subtitle: 'Cool precision',
-  ),
-  _WorldTabOption(
-    packId: 'world_09',
-    title: 'W9 Ember',
-    subtitle: 'Hot rhythm',
-  ),
-  _WorldTabOption(
-    packId: 'world_10',
-    title: 'W10 Ruins',
-    subtitle: 'Dense layouts',
-  ),
-  _WorldTabOption(
-    packId: 'world_11',
-    title: 'W11 Vault',
-    subtitle: 'Careful reads',
-  ),
-  _WorldTabOption(
-    packId: 'world_12',
-    title: 'W12 Orbit',
-    subtitle: 'Mixed rules',
-  ),
-  _WorldTabOption(
-    packId: 'world_13',
-    title: 'W13 Rift',
-    subtitle: 'Hard pivots',
-  ),
-  _WorldTabOption(
-    packId: 'world_14',
-    title: 'W14 Tempest',
-    subtitle: 'Faster thinking',
-  ),
-  _WorldTabOption(
-    packId: 'world_15',
-    title: 'W15 Obsidian',
-    subtitle: 'Heavy pressure',
-  ),
-  _WorldTabOption(
-    packId: 'world_16',
-    title: 'W16 Zenith',
-    subtitle: 'Late game mix',
-  ),
-  _WorldTabOption(
-    packId: 'world_17',
-    title: 'W17 Crown',
-    subtitle: 'Final challenge',
-  ),
+  _WorldTabOption(packId: 'world_01'),
+  _WorldTabOption(packId: 'world_02'),
+  _WorldTabOption(packId: 'world_03'),
+  _WorldTabOption(packId: 'world_04'),
+  _WorldTabOption(packId: 'world_05'),
+  _WorldTabOption(packId: 'world_06'),
+  _WorldTabOption(packId: 'world_07'),
+  _WorldTabOption(packId: 'world_08'),
+  _WorldTabOption(packId: 'world_09'),
+  _WorldTabOption(packId: 'world_10'),
+  _WorldTabOption(packId: 'world_11'),
+  _WorldTabOption(packId: 'world_12'),
+  _WorldTabOption(packId: 'world_13'),
+  _WorldTabOption(packId: 'world_14'),
+  _WorldTabOption(packId: 'world_15'),
+  _WorldTabOption(packId: 'world_16'),
+  _WorldTabOption(packId: 'world_17'),
 ];
 
 class PlayLevelsScreen extends StatefulWidget {
@@ -455,9 +384,9 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
   void _handleNodeTap(int levelIndex, bool unlocked) {
     if (!unlocked) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'World locked. Complete or report all levels in previous world first.',
+            context.l10n.playLevelsWorldLockedCompletePrevious,
           ),
           duration: Duration(milliseconds: 1100),
         ),
@@ -507,20 +436,21 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
             borderRadius: BorderRadius.circular(18),
             side: BorderSide(color: Colors.white.withOpacity(0.10)),
           ),
-          title: const Text(
-            'No energy',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+          title: Text(
+            context.l10n.energyNoEnergyTitle,
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.w800),
           ),
           content: Text(
             canUseBattery
-                ? 'You are out of energy. Wait $resetText for reset, or use a battery now.'
-                : 'You are out of energy. Wait $resetText for reset, or buy a battery.',
+                ? context.l10n.energyOutWithBattery(resetText)
+                : context.l10n.energyOutWithoutBattery(resetText),
             style: const TextStyle(color: Color(0xFFB8C7E6), height: 1.3),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
+              child: Text(context.l10n.liveDuelBack),
             ),
             if (canUseBattery)
               FilledButton(
@@ -531,8 +461,8 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                   if (!mounted) return;
                   if (!result.success) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Could not use battery right now.'),
+                      SnackBar(
+                        content: Text(context.l10n.energyCouldNotUseBattery),
                       ),
                     );
                     return;
@@ -540,12 +470,15 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'Energy restored to ${result.snapshot.current}/${result.snapshot.max}.',
+                        context.l10n.energyRestored(
+                          result.snapshot.current,
+                          result.snapshot.max,
+                        ),
                       ),
                     ),
                   );
                 },
-                child: const Text('Use battery'),
+                child: Text(context.l10n.energyUseBattery),
               )
             else
               FilledButton(
@@ -559,8 +492,8 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                   if (!result.success) {
                     final text = result.failureReason ==
                             EnergyBatteryPurchaseFailureReason.notEnoughCoins
-                        ? 'Not enough coins to buy a battery.'
-                        : 'Battery purchase failed. Try again.';
+                        ? context.l10n.energyNotEnoughCoinsBattery
+                        : context.l10n.energyBatteryPurchaseFailed;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(text)),
                     );
@@ -577,7 +510,10 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          'Battery purchased and used. Energy ${refill.snapshot.current}/${refill.snapshot.max}.',
+                          context.l10n.energyBatteryPurchasedAndUsed(
+                            refill.snapshot.current,
+                            refill.snapshot.max,
+                          ),
                         ),
                       ),
                     );
@@ -586,12 +522,14 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'Battery purchased. Batteries: ${result.snapshot.batteryCount}.',
+                        context.l10n.energyBatteryPurchasedCount(
+                          result.snapshot.batteryCount,
+                        ),
                       ),
                     ),
                   );
                 },
-                child: Text('Buy (${offer.coinCost} coins)'),
+                child: Text(context.l10n.energyBuyBattery(offer.coinCost)),
               ),
           ],
         );
@@ -621,7 +559,7 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
   Widget build(BuildContext context) {
     _screenWidth = MediaQuery.of(context).size.width;
     final palette = _paletteForPack(widget.packId);
-    final worldInfo = _worldInfoForPack(widget.packId);
+    final worldInfo = _worldInfoForPack(context, widget.packId);
 
     return AnimatedBuilder(
       animation: Listenable.merge(<Listenable>[
@@ -635,8 +573,11 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
         final currentNode = continueIndex;
         final energy = widget.energyService.snapshot;
         final selectedWorldUnlocked = _isWorldUnlocked(widget.packId);
-        final energyText =
-            '${energy.current}/${energy.max} - reset ${_formatDuration(energy.timeUntilReset())}';
+        final energyText = context.l10n.playLevelsEnergyStatus(
+          energy.current,
+          energy.max,
+          _formatDuration(energy.timeUntilReset()),
+        );
         final canPlaySelectedLevel =
             energy.current > 0 && selectedWorldUnlocked;
 
@@ -663,7 +604,10 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                             child: _WorldHeaderBar(
                               title: worldInfo.title,
                               subtitle:
-                                  '${_totalLevels.toString()} levels - $solvedCount completed',
+                                  context.l10n.playLevelsWorldProgressSummary(
+                                _totalLevels,
+                                solvedCount,
+                              ),
                               coins: widget.coinsService.coins,
                               energyText: energyText,
                               energyDepleted: energy.current <= 0,
@@ -677,7 +621,13 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
-                                      'Energy ${energy.current}/${energy.max}. Reset in ${_formatDuration(energy.timeUntilReset())}.',
+                                      context.l10n.playLevelsEnergyDetailed(
+                                        energy.current,
+                                        energy.max,
+                                        _formatDuration(
+                                          energy.timeUntilReset(),
+                                        ),
+                                      ),
                                     ),
                                     duration:
                                         const Duration(milliseconds: 1400),
@@ -1056,7 +1006,7 @@ class _WorldChipSelector extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      tab.title,
+                      _localizedWorldTitle(context, tab.packId),
                       style: TextStyle(
                         color: worldUnlocked
                             ? Colors.white
@@ -1073,7 +1023,7 @@ class _WorldChipSelector extends StatelessWidget {
                       children: [
                         Flexible(
                           child: Text(
-                            tab.subtitle,
+                            _localizedWorldSubtitle(context, tab.packId),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -1228,7 +1178,10 @@ class _WorldProgressCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  '$solvedCount completed - ${math.max(totalLevels - solvedCount, 0)} to go',
+                  context.l10n.playLevelsCompletedToGo(
+                    solvedCount,
+                    math.max(totalLevels - solvedCount, 0),
+                  ),
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.72),
                     fontSize: compact ? 12 : 13,
@@ -1251,7 +1204,8 @@ class _WorldProgressCard extends StatelessWidget {
                   ),
                 ),
                 icon: Icon(Icons.play_arrow_rounded, size: compact ? 16 : 18),
-                label: Text('Continue L$continueIndex'),
+                label:
+                    Text(context.l10n.playLevelsContinueLevel(continueIndex)),
               ),
             ],
           ),
@@ -1454,8 +1408,8 @@ class _SelectedLevelCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final level = record?.level;
-    final difficultyLabel = _difficultyLabel(record?.difficultyTag);
-    final variant = _variantLabel(level?.id);
+    final difficultyLabel = _difficultyLabel(context, record?.difficultyTag);
+    final variant = _variantLabel(context, level?.id);
     final sizeLabel = level == null ? '--' : '${level.width}x${level.height}';
 
     return Container(
@@ -1508,7 +1462,7 @@ class _SelectedLevelCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Selected Level',
+                  context.l10n.playLevelsSelectedLevel,
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.56),
                     fontSize: compact ? 11 : 12,
@@ -1517,7 +1471,10 @@ class _SelectedLevelCard extends StatelessWidget {
                 ),
                 SizedBox(height: compact ? 2 : 4),
                 Text(
-                  'Level $levelIndex • $variant',
+                  context.l10n.playLevelsSelectedLevelVariant(
+                    levelIndex,
+                    variant,
+                  ),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 19,
@@ -1553,7 +1510,11 @@ class _SelectedLevelCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(18),
                   ),
                 ),
-                child: Text(canPlay ? 'Play' : 'Locked'),
+                child: Text(
+                  canPlay
+                      ? context.l10n.playLevelsPlay
+                      : context.l10n.playLevelsLocked,
+                ),
               ),
               const SizedBox(height: 8),
               OutlinedButton(
@@ -1567,7 +1528,7 @@ class _SelectedLevelCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                child: const Text('Ranking'),
+                child: Text(context.l10n.playLevelsRanking),
               ),
             ],
           ),
@@ -1761,19 +1722,30 @@ class _WorldPalette {
   final Color line;
 }
 
-_WorldInfo _worldInfoForPack(String packId) {
+_WorldInfo _worldInfoForPack(BuildContext context, String packId) {
   final index = _worldTabs.indexWhere((tab) => tab.packId == packId);
   if (index < 0) {
-    return const _WorldInfo(
-      title: 'World',
-      subtitle: 'Puzzle journey',
+    return _WorldInfo(
+      title: context.l10n.playWorldFallbackTitle,
+      subtitle: context.l10n.playWorldFallbackSubtitle,
     );
   }
-  final tab = _worldTabs[index];
   return _WorldInfo(
-    title: tab.title.replaceFirst('W${index + 1} ', 'World ${index + 1} - '),
-    subtitle: tab.subtitle,
+    title: context.l10n.playWorldTitle(index + 1),
+    subtitle: _localizedWorldSubtitle(context, packId),
   );
+}
+
+String _localizedWorldTitle(BuildContext context, String packId) {
+  final index = _worldTabs.indexWhere((tab) => tab.packId == packId);
+  if (index < 0) return context.l10n.playWorldFallbackTitle;
+  return context.l10n.playWorldTitle(index + 1);
+}
+
+String _localizedWorldSubtitle(BuildContext context, String packId) {
+  final index = _worldTabs.indexWhere((tab) => tab.packId == packId);
+  if (index < 0) return context.l10n.playWorldFallbackSubtitle;
+  return context.l10n.playWorldSubtitle(index + 1);
 }
 
 _WorldPalette _paletteForPack(String packId) {
@@ -1811,39 +1783,39 @@ _WorldPalette _paletteForPack(String packId) {
   );
 }
 
-String _difficultyLabel(String? difficultyTag) {
+String _difficultyLabel(BuildContext context, String? difficultyTag) {
   switch (difficultyTag) {
     case 'd1':
-      return 'Warm-up';
+      return context.l10n.playLevelsDifficultyWarmup;
     case 'd2':
-      return 'Easy';
+      return context.l10n.playLevelsDifficultyEasy;
     case 'd3':
-      return 'Medium';
+      return context.l10n.playLevelsDifficultyMedium;
     case 'd4':
-      return 'Hard';
+      return context.l10n.playLevelsDifficultyHard;
     case 'd5':
-      return 'Expert';
+      return context.l10n.playLevelsDifficultyExpert;
     default:
-      return 'Classic';
+      return context.l10n.playLevelsDifficultyClassic;
   }
 }
 
-String _variantLabel(String? levelId) {
+String _variantLabel(BuildContext context, String? levelId) {
   final id = (levelId ?? '').toLowerCase();
   if (id.contains('multiples_roman') || id.contains('multiples-roman')) {
-    return 'Multiples Roman';
+    return context.l10n.playLevelsVariantMultiplesRoman;
   }
   if (id.contains('alphabet_reverse') || id.contains('alphabet-reverse')) {
-    return 'Alphabet Reverse';
+    return context.l10n.playLevelsVariantAlphabetReverse;
   }
   if (id.contains('alphabet')) {
-    return 'Alphabet';
+    return context.l10n.playLevelsVariantAlphabet;
   }
   if (id.contains('multiples')) {
-    return 'Multiples';
+    return context.l10n.playLevelsVariantMultiples;
   }
   if (id.contains('roman')) {
-    return 'Roman';
+    return context.l10n.playLevelsVariantRoman;
   }
-  return 'Classic';
+  return context.l10n.playLevelsVariantClassic;
 }

@@ -764,8 +764,8 @@ class _SocialScreenState extends State<SocialScreen> {
                                       ),
                                       Text(
                                         f.isOnline
-                                            ? 'Invite to a live 1v1 duel · Online'
-                                            : 'Invite to a live 1v1 duel · Offline',
+                                            ? 'Invite to a live 1v1 duel - Online'
+                                            : 'Invite to a live 1v1 duel - Offline',
                                         style: TextStyle(
                                           color: const Color(0xFF9EB0D2),
                                           fontSize: 12,
@@ -1019,7 +1019,7 @@ class _SocialScreenState extends State<SocialScreen> {
         if (entry.moves > 0) '${entry.moves} moves',
         if (entry.stars > 0) '${entry.stars} stars',
       ];
-      secondaryText = parts.isEmpty ? null : parts.join(' · ');
+      secondaryText = parts.isEmpty ? null : parts.join(' - ');
     }
 
     final skinPreviewUrl = await _getSkinPreviewUrl(equippedSkinId);
@@ -1512,7 +1512,7 @@ class _FriendCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Skin: ${friend.equippedSkinId} · Trail: ${friend.equippedTrailId}',
+                      'Skin: ${friend.equippedSkinId} - Trail: ${friend.equippedTrailId}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -1523,7 +1523,7 @@ class _FriendCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      friend.isOnline ? 'En línea' : 'Desconectado',
+                      friend.isOnline ? 'En linea' : 'Desconectado',
                       style: TextStyle(
                         color: friend.isOnline
                             ? const Color(0xFF6EE7A0)
@@ -1736,7 +1736,7 @@ class _RankRow extends StatelessWidget {
                     [
                       if (moves > 0) '${moves}m',
                       if (stars > 0) '$stars stars',
-                    ].join(' · '),
+                    ].join(' - '),
                     style: const TextStyle(
                       color: Color(0xFF8FA6CF),
                       fontSize: 11,

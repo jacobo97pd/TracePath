@@ -36,6 +36,7 @@ import 'services/friend_challenge_service.dart';
 import 'services/level_report_service.dart';
 import 'services/streak_service.dart';
 import 'services/energy_service.dart';
+import 'services/onboarding_service.dart';
 import 'trail/trail_catalog.dart';
 import 'trail/trail_skin.dart';
 import 'services/wallet_history_service.dart';
@@ -44,6 +45,7 @@ import 'ui/components/game_toast.dart';
 import 'services/ads_service.dart';
 import 'ui/components/ghost_replay_overlay.dart';
 import 'ui/components/rewarded_ad_offer_dialog.dart';
+import 'l10n/l10n.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({
@@ -365,6 +367,7 @@ class _GameScreenState extends State<GameScreen>
         unawaited(_syncEnergyGateAfterLoad());
       }
       unawaited(_maybeShowVariantTutorial(level));
+      unawaited(_maybeShowCoreTutorial(level));
       unawaited(_loadReportStatus());
     } catch (error) {
       if (!mounted || generation != _levelLoadGeneration) {
@@ -385,7 +388,7 @@ class _GameScreenState extends State<GameScreen>
     final alreadyShown = prefs.getBool(key) ?? false;
     if (alreadyShown || !mounted) return;
 
-    final info = _variantTutorialInfo(variant);
+    final info = _variantTutorialInfo(context, variant);
     await showDialog<void>(
       context: context,
       barrierDismissible: true,
@@ -431,7 +434,7 @@ class _GameScreenState extends State<GameScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Example: ${info.$3}',
+                  context.l10n.gameVariantExample(info.$3),
                   style: const TextStyle(
                     color: Color(0xFF93C5FD),
                     fontSize: 13,
@@ -451,12 +454,54 @@ class _GameScreenState extends State<GameScreen>
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text('Got it'),
+                    child: Text(context.l10n.gameGotIt),
                   ),
                 ),
               ],
             ),
           ),
+        );
+      },
+    );
+    await prefs.setBool(key, true);
+  }
+
+  Future<void> _maybeShowCoreTutorial(Level level) async {
+    if (!_isTutorialPack || !mounted) return;
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'core_tutorial_intro_shown_v1';
+    final shown = prefs.getBool(key) ?? false;
+    if (shown) return;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF111827),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: Color(0xFF355687)),
+          ),
+          title: Text(
+            context.l10n.gameHowToPlayTitle,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          content: Text(
+            context.l10n.gameCoreTutorialBody,
+            style: TextStyle(
+              color: Color(0xFFD6E4FF),
+              height: 1.35,
+            ),
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(context.l10n.gameLetsGo),
+            ),
+          ],
         );
       },
     );
@@ -473,42 +518,46 @@ class _GameScreenState extends State<GameScreen>
     return null;
   }
 
-  (String, String, String) _variantTutorialInfo(String variant) {
+  (String, String, String) _variantTutorialInfo(
+    BuildContext context,
+    String variant,
+  ) {
+    final l10n = context.l10n;
     switch (variant) {
       case 'alphabet':
         return (
-          'Alphabet Mode',
-          'Connect cells in alphabetical order following the path clues.',
+          l10n.gameVariantAlphabetTitle,
+          l10n.gameVariantAlphabetBody,
           'A -> B -> C -> D',
         );
       case 'alphabet_reverse':
         return (
-          'Reverse Alphabet Mode',
-          'Connect cells in reverse alphabetical order.',
+          l10n.gameVariantAlphabetReverseTitle,
+          l10n.gameVariantAlphabetReverseBody,
           'Z -> Y -> X -> W',
         );
       case 'multiples':
         return (
-          'Multiples Mode',
-          'Numbers are multiples of a base. Follow increasing multiples in order.',
+          l10n.gameVariantMultiplesTitle,
+          l10n.gameVariantMultiplesBody,
           '3, 6, 9, 12 ...',
         );
       case 'multiples_roman':
         return (
-          'Roman Multiples Mode',
-          'Follow increasing multiples shown as roman numerals.',
+          l10n.gameVariantRomanMultiplesTitle,
+          l10n.gameVariantRomanMultiplesBody,
           'III, VI, IX, XII ...',
         );
       case 'roman':
         return (
-          'Roman Numerals Mode',
-          'Follow the sequence of roman numerals in order.',
+          l10n.gameVariantRomanTitle,
+          l10n.gameVariantRomanBody,
           'I -> II -> III -> IV',
         );
       default:
         return (
-          'Variant Mode',
-          'Follow the clue sequence in the correct order.',
+          l10n.gameVariantDefaultTitle,
+          l10n.gameVariantDefaultBody,
           '1 -> 2 -> 3',
         );
     }
@@ -521,25 +570,25 @@ class _GameScreenState extends State<GameScreen>
     if (!supportsPack) {
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(child: Text('Pack not found')),
+        body: Center(child: Text(context.l10n.gamePackNotFound)),
       );
     }
     if (_isLevelLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Loading level')),
+        appBar: AppBar(title: Text(context.l10n.gameLoadingLevel)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
     if (_levelLoadError != null || _level == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Level unavailable')),
+        appBar: AppBar(title: Text(context.l10n.gameLevelUnavailable)),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Could not load this level.'),
+                Text(context.l10n.gameCouldNotLoadLevel),
                 if (kDebugMode && _levelLoadError != null) ...[
                   const SizedBox(height: 8),
                   Text(
@@ -556,7 +605,7 @@ class _GameScreenState extends State<GameScreen>
                     });
                     _loadLevelAsync();
                   },
-                  child: const Text('Retry'),
+                  child: Text(context.l10n.commonRetry),
                 ),
               ],
             ),
@@ -623,8 +672,10 @@ class _GameScreenState extends State<GameScreen>
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _GameplayHeader(
-                        levelText:
-                            'Level ${widget.levelIndex} / $_packLevelCount',
+                        levelText: context.l10n.gameLevelProgress(
+                          widget.levelIndex,
+                          _packLevelCount,
+                        ),
                         timerText: _elapsedText,
                         onBack: () {
                           if (context.canPop()) {
@@ -639,10 +690,18 @@ class _GameScreenState extends State<GameScreen>
                         showRanking: !_isFriendChallengeMode,
                         compact: liveCompact,
                         energyText: _usesEnergySystem
-                            ? 'Energy ${widget.energyService.snapshot.current}/${widget.energyService.snapshot.max}'
+                            ? context.l10n.gameEnergyCounter(
+                                widget.energyService.snapshot.current,
+                                widget.energyService.snapshot.max,
+                              )
                             : null,
                         energySubtext: _usesEnergySystem
-                            ? 'Reset ${_formatDurationShort(widget.energyService.snapshot.timeUntilReset())}'
+                            ? context.l10n.gameEnergyResetIn(
+                                _formatDurationShort(
+                                  widget.energyService.snapshot
+                                      .timeUntilReset(),
+                                ),
+                              )
                             : null,
                       ),
                       SizedBox(height: sectionGap),
@@ -659,7 +718,7 @@ class _GameScreenState extends State<GameScreen>
                         if (_liveLostBeforeFinish) ...[
                           SizedBox(height: liveCompact ? 6 : 8),
                           _LiveDuelResolvedBanner(
-                            text: 'Duel finished. Board locked.',
+                            text: context.l10n.gameDuelFinishedBoardLocked,
                             compact: liveCompact,
                           ),
                         ],
@@ -770,7 +829,7 @@ class _GameScreenState extends State<GameScreen>
                         children: [
                           Expanded(
                             child: _GameActionButton(
-                              label: 'Undo',
+                              label: context.l10n.gameUndo,
                               onTap: controlsLocked ? null : _handleUndo,
                               backgroundColor: isDark
                                   ? const Color(0xFF2B2B2F)
@@ -783,7 +842,7 @@ class _GameScreenState extends State<GameScreen>
                           SizedBox(width: actionButtonGap),
                           Expanded(
                             child: _GameActionButton(
-                              label: 'Restart',
+                              label: context.l10n.gameRestart,
                               onTap: controlsLocked ? null : _handleReset,
                               outlined: true,
                               borderColor: const Color(0xFF6B6E76),
@@ -796,8 +855,8 @@ class _GameScreenState extends State<GameScreen>
                           Expanded(
                             child: _GameActionButton(
                               label: _unlimitedHintsForTesting
-                                  ? 'Hint (INF)'
-                                  : 'Hint ($_hintsLeft)',
+                                  ? context.l10n.gameHintInfinite
+                                  : context.l10n.gameHintCount(_hintsLeft),
                               onTap: controlsLocked ? null : _handleHint,
                               outlined: true,
                               visuallyEnabled:
@@ -828,10 +887,10 @@ class _GameScreenState extends State<GameScreen>
                           ),
                           label: Text(
                             _reportSubmitting
-                                ? 'Reporting...'
+                                ? context.l10n.gameReporting
                                 : (_isLevelReported
-                                    ? 'Reported'
-                                    : 'Report Level'),
+                                    ? context.l10n.gameReported
+                                    : context.l10n.gameReportLevel),
                           ),
                           style: TextButton.styleFrom(
                             foregroundColor: const Color(0xFF9FB4D6),
@@ -845,7 +904,7 @@ class _GameScreenState extends State<GameScreen>
                         children: [
                           Expanded(
                             child: _GameActionButton(
-                              label: 'Watch Ad',
+                              label: context.l10n.gameWatchAd,
                               onTap: (_manualAdBusy ||
                                       _manualAdsLimitReached ||
                                       _manualAdCooldownRemaining >
@@ -862,7 +921,7 @@ class _GameScreenState extends State<GameScreen>
                           SizedBox(width: actionButtonGap),
                           Expanded(
                             child: _GameActionButton(
-                              label: 'Ad Status',
+                              label: context.l10n.gameAdStatus,
                               onTap: () => unawaited(_showAdDiagnostics()),
                               outlined: true,
                               borderColor: const Color(0xFF60A5FA),
@@ -873,10 +932,10 @@ class _GameScreenState extends State<GameScreen>
                       ),
                       if (_manualAdsLimitReached) ...[
                         SizedBox(height: infoGap),
-                        const Align(
+                        Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            'Daily limit reached. No more ads available today.',
+                            context.l10n.gameDailyAdLimitReached,
                             style: TextStyle(
                               color: Color(0xFF94A3B8),
                               fontSize: 12,
@@ -890,7 +949,9 @@ class _GameScreenState extends State<GameScreen>
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            'Next ad in ${_formatDurationShort(_manualAdCooldownRemaining)}',
+                            context.l10n.gameNextAdIn(
+                              _formatDurationShort(_manualAdCooldownRemaining),
+                            ),
                             style: const TextStyle(
                               color: Color(0xFF94A3B8),
                               fontSize: 12,
@@ -953,7 +1014,11 @@ class _GameScreenState extends State<GameScreen>
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    'LEVEL COMPLETE! ${_coinRewardAmount >= 0 ? '+' : ''}$_coinRewardAmount',
+                                    context.l10n.gameLevelCompleteReward(
+                                      _coinRewardAmount >= 0
+                                          ? '+$_coinRewardAmount'
+                                          : '$_coinRewardAmount',
+                                    ),
                                     style: const TextStyle(
                                       color: Color(0xFFEFFEF5),
                                       fontWeight: FontWeight.w900,
@@ -1147,9 +1212,9 @@ class _GameScreenState extends State<GameScreen>
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (snapshot.hasError) {
-                  return const _InLevelRankingEmpty(
-                    title: 'Ranking unavailable',
-                    subtitle: 'Try again in a moment.',
+                  return _InLevelRankingEmpty(
+                    title: context.l10n.gameRankingUnavailable,
+                    subtitle: context.l10n.gameTryAgainMoment,
                   );
                 }
                 final rows = snapshot.data ?? const <_InLevelRankRowData>[];
@@ -1173,10 +1238,10 @@ class _GameScreenState extends State<GameScreen>
                             color: Color(0xFFFFD166),
                           ),
                           const SizedBox(width: 8),
-                          const Expanded(
+                          Expanded(
                             child: Text(
-                              'Friends Ranking',
-                              style: TextStyle(
+                              context.l10n.gameFriendsRanking,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w800,
@@ -1184,7 +1249,7 @@ class _GameScreenState extends State<GameScreen>
                             ),
                           ),
                           Text(
-                            'Level ${widget.levelIndex}',
+                            context.l10n.gameLevelLabel(widget.levelIndex),
                             style: const TextStyle(
                               color: Color(0xFF9FB0D3),
                               fontSize: 12,
@@ -1197,10 +1262,9 @@ class _GameScreenState extends State<GameScreen>
                     const Divider(height: 1, color: Color(0xFF29374F)),
                     Expanded(
                       child: rows.isEmpty
-                          ? const _InLevelRankingEmpty(
-                              title: 'No friends have played this level yet.',
-                              subtitle:
-                                  'Complete the level and invite friends to compete.',
+                          ? _InLevelRankingEmpty(
+                              title: context.l10n.gameNoFriendsRankingTitle,
+                              subtitle: context.l10n.gameNoFriendsRankingBody,
                             )
                           : ListView.separated(
                               padding:
@@ -1466,9 +1530,10 @@ class _GameScreenState extends State<GameScreen>
     if (elapsedSec < _minSecondsBeforeReport) {
       await GameToast.show(
         context,
-        title: 'Report unavailable',
-        message:
-            'Play at least $_minSecondsBeforeReport seconds before reporting this level.',
+        title: context.l10n.gameReportUnavailableTitle,
+        message: context.l10n.gameReportUnavailableBody(
+          _minSecondsBeforeReport,
+        ),
         type: GameToastType.info,
       );
       return;
@@ -1478,22 +1543,22 @@ class _GameScreenState extends State<GameScreen>
           context: context,
           builder: (context) => AlertDialog(
             backgroundColor: const Color(0xFF111827),
-            title: const Text(
-              'Report this level?',
-              style: TextStyle(color: Colors.white),
+            title: Text(
+              context.l10n.gameReportConfirmTitle,
+              style: const TextStyle(color: Colors.white),
             ),
-            content: const Text(
-              'If this level is unsolvable, you can report it and unlock the next one.',
-              style: TextStyle(color: Color(0xFFB6C2DA)),
+            content: Text(
+              context.l10n.gameReportConfirmBody,
+              style: const TextStyle(color: Color(0xFFB6C2DA)),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancel'),
+                child: Text(context.l10n.commonCancel),
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Report & Skip'),
+                child: Text(context.l10n.gameReportAndSkip),
               ),
             ],
           ),
@@ -1506,8 +1571,8 @@ class _GameScreenState extends State<GameScreen>
     if (uid.isEmpty) {
       await GameToast.show(
         context,
-        title: 'Sign-in required',
-        message: 'Please sign in to report and skip levels.',
+        title: context.l10n.gameSignInRequiredTitle,
+        message: context.l10n.gameSignInRequiredBody,
         type: GameToastType.info,
       );
       return;
@@ -1533,8 +1598,8 @@ class _GameScreenState extends State<GameScreen>
         }
         await GameToast.show(
           context,
-          title: 'Already reported',
-          message: 'This level was already reported from this account.',
+          title: context.l10n.gameAlreadyReportedTitle,
+          message: context.l10n.gameAlreadyReportedBody,
           type: GameToastType.info,
         );
         return;
@@ -1561,8 +1626,8 @@ class _GameScreenState extends State<GameScreen>
 
       await GameToast.show(
         context,
-        title: 'Level reported',
-        message: 'Report sent. Next level unlocked.',
+        title: context.l10n.gameLevelReportedTitle,
+        message: context.l10n.gameLevelReportedBody,
         type: GameToastType.info,
       );
 
@@ -1582,8 +1647,9 @@ class _GameScreenState extends State<GameScreen>
       if (!mounted) return;
       await GameToast.show(
         context,
-        title: 'Could not report level',
+        title: context.l10n.gameCouldNotReportTitle,
         message: _friendlyReportError(
+          context: context,
           code: e.code,
           fallbackMessage: e.message,
         ),
@@ -1598,8 +1664,9 @@ class _GameScreenState extends State<GameScreen>
       if (!mounted) return;
       await GameToast.show(
         context,
-        title: 'Could not report level',
+        title: context.l10n.gameCouldNotReportTitle,
         message: _friendlyReportError(
+          context: context,
           code: e.code,
           fallbackMessage: e.message,
         ),
@@ -1619,8 +1686,9 @@ class _GameScreenState extends State<GameScreen>
       if (!mounted) return;
       await GameToast.show(
         context,
-        title: 'Could not report level',
+        title: context.l10n.gameCouldNotReportTitle,
         message: _friendlyReportError(
+          context: context,
           code: wrapped?.$1,
           fallbackMessage: wrapped?.$2 ?? e.toString(),
         ),
@@ -1665,44 +1733,46 @@ class _GameScreenState extends State<GameScreen>
   }
 
   String _friendlyReportError({
+    required BuildContext context,
     required String? code,
     String? fallbackMessage,
   }) {
+    final l10n = context.l10n;
     final normalized = (code ?? '').trim().toLowerCase();
     if (normalized == 'permission-denied') {
-      return 'Permissions blocked this action. Please try again later.';
+      return l10n.gameReportErrorPermissionDenied;
     }
     if (normalized == 'endpoint-not-configured') {
-      return 'Report endpoint is not configured in this build.';
+      return l10n.gameReportErrorEndpointNotConfigured;
     }
     if (normalized == 'invalid-endpoint') {
-      return 'Report endpoint URL is invalid.';
+      return l10n.gameReportErrorInvalidEndpoint;
     }
     if (normalized == 'timeout') {
-      return 'Report request timed out. Please retry.';
+      return l10n.gameReportErrorTimeout;
     }
     if (normalized == 'network-failed') {
-      return 'Network issue while reporting. Please try again.';
+      return l10n.gameReportErrorNetwork;
     }
     if (normalized.startsWith('http-')) {
-      return 'Server rejected the report. Please try again in a moment.';
+      return l10n.gameReportErrorServerRejected;
     }
     if (normalized == 'unavailable' || normalized == 'network-request-failed') {
-      return 'Network issue while reporting. Please try again.';
+      return l10n.gameReportErrorNetwork;
     }
     if (normalized == 'unauthenticated') {
-      return 'Please sign in again and retry.';
+      return l10n.gameReportErrorUnauthenticated;
     }
     final fb = (fallbackMessage ?? '').trim();
     final fbLower = fb.toLowerCase();
     if (fbLower.contains('permission-denied')) {
-      return 'Permissions blocked this action. Please try again later.';
+      return l10n.gameReportErrorPermissionDenied;
     }
     if (fbLower.contains('network') || fbLower.contains('unavailable')) {
-      return 'Network issue while reporting. Please try again.';
+      return l10n.gameReportErrorNetwork;
     }
     if (fb.isNotEmpty && fb.length < 120) return fb;
-    return 'Could not report this level right now. Please try again.';
+    return l10n.gameReportErrorGeneric;
   }
 
   (String?, String?)? _extractWrappedReportError(Object error) {
@@ -1783,8 +1853,8 @@ class _GameScreenState extends State<GameScreen>
         GameToast.show(
           context,
           type: GameToastType.info,
-          title: 'Hint',
-          message: 'No hints left',
+          title: context.l10n.gameHintTitle,
+          message: context.l10n.gameNoHintsLeft,
           duration: const Duration(milliseconds: 1400),
         ),
       );
@@ -1909,20 +1979,23 @@ class _GameScreenState extends State<GameScreen>
             borderRadius: BorderRadius.circular(18),
             side: BorderSide(color: Colors.white.withOpacity(0.10)),
           ),
-          title: const Text(
-            'No energy',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+          title: Text(
+            context.l10n.energyNoEnergyTitle,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+            ),
           ),
           content: Text(
             canUseBattery
-                ? 'You are out of energy. Wait $resetText for reset, or use a battery.'
-                : 'You are out of energy. Wait $resetText for reset, or buy a battery.',
+                ? context.l10n.energyOutWithBattery(resetText)
+                : context.l10n.energyOutWithoutBattery(resetText),
             style: const TextStyle(color: Color(0xFFB8C7E6), height: 1.3),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Close'),
+              child: Text(context.l10n.commonClose),
             ),
             if (canUseBattery)
               FilledButton(
@@ -1933,8 +2006,8 @@ class _GameScreenState extends State<GameScreen>
                   if (!mounted) return;
                   if (!useResult.success) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Could not use battery right now.'),
+                      SnackBar(
+                        content: Text(context.l10n.energyCouldNotUseBattery),
                       ),
                     );
                     return;
@@ -1945,12 +2018,15 @@ class _GameScreenState extends State<GameScreen>
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'Energy restored to ${useResult.snapshot.current}/${useResult.snapshot.max}.',
+                        context.l10n.energyRestored(
+                          useResult.snapshot.current,
+                          useResult.snapshot.max,
+                        ),
                       ),
                     ),
                   );
                 },
-                child: const Text('Use battery'),
+                child: Text(context.l10n.energyUseBattery),
               )
             else
               FilledButton(
@@ -1964,8 +2040,8 @@ class _GameScreenState extends State<GameScreen>
                   if (!purchaseResult.success) {
                     final text = purchaseResult.failureReason ==
                             EnergyBatteryPurchaseFailureReason.notEnoughCoins
-                        ? 'Not enough coins to buy a battery.'
-                        : 'Battery purchase failed. Try again.';
+                        ? context.l10n.energyNotEnoughCoinsBattery
+                        : context.l10n.energyBatteryPurchaseFailed;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(text)),
                     );
@@ -1985,7 +2061,10 @@ class _GameScreenState extends State<GameScreen>
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          'Battery purchased and used. Energy ${refill.snapshot.current}/${refill.snapshot.max}.',
+                          context.l10n.energyBatteryPurchasedAndUsed(
+                            refill.snapshot.current,
+                            refill.snapshot.max,
+                          ),
                         ),
                       ),
                     );
@@ -1994,12 +2073,14 @@ class _GameScreenState extends State<GameScreen>
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'Battery purchased. Batteries: ${purchaseResult.snapshot.batteryCount}.',
+                        context.l10n.energyBatteryPurchasedCount(
+                          purchaseResult.snapshot.batteryCount,
+                        ),
                       ),
                     ),
                   );
                 },
-                child: Text('Buy (${offer.coinCost} coins)'),
+                child: Text(context.l10n.energyBuyBattery(offer.coinCost)),
               ),
           ],
         );
@@ -2142,8 +2223,8 @@ class _GameScreenState extends State<GameScreen>
       GameToast.show(
         context,
         type: GameToastType.info,
-        title: 'Almost there',
-        message: 'Finish on $finalLabel to complete the level.',
+        title: context.l10n.gameAlmostThereTitle,
+        message: context.l10n.gameAlmostThereBody(finalLabel),
         duration: const Duration(milliseconds: 1800),
       ),
     );
@@ -2180,8 +2261,8 @@ class _GameScreenState extends State<GameScreen>
         GameToast.show(
           context,
           type: GameToastType.social,
-          title: 'Time!',
-          message: 'Waiting for duel result...',
+          title: context.l10n.gameTimeTitle,
+          message: context.l10n.gameWaitingForDuelResult,
           duration: const Duration(milliseconds: 1400),
         ),
       );
@@ -2207,18 +2288,19 @@ class _GameScreenState extends State<GameScreen>
               '/victory',
               extra: VictoryScreenArgs(
                 zipNumber: widget.levelIndex,
-                headline: 'Friendly Challenge Complete',
+                headline: context.l10n.gameFriendlyChallengeCompleteHeadline,
                 timeText: _elapsedText,
                 averageText: '--:--',
                 streak: widget.progressService.getDailyStreak(),
-                primaryLabel: 'Replay',
+                primaryLabel: context.l10n.gameReplay,
                 primaryActionId: 'replay',
                 accentColor: gameTheme.pathColor,
                 coinsEarned: 0,
                 adBonusCoins: 0,
                 levelId: levelId,
-                shareText: 'Friendly challenge done in $_elapsedText.',
-                copyText: 'Friendly challenge | $_elapsedText',
+                shareText:
+                    context.l10n.gameFriendlyChallengeShare(_elapsedText),
+                copyText: context.l10n.gameFriendlyChallengeCopy(_elapsedText),
               ),
             ),
           ) ??
@@ -2275,6 +2357,9 @@ class _GameScreenState extends State<GameScreen>
       () => widget.progressService
           .markCompleted(widget.packId, widget.levelIndex),
     );
+    if (_isTutorialPack) {
+      unawaited(OnboardingService.instance.markFirstLevelCompleted());
+    }
     await _runCompletionStep(
       'progress.clearInProgress',
       () => widget.progressService.clearInProgressLevel(
@@ -2302,8 +2387,8 @@ class _GameScreenState extends State<GameScreen>
         GameToast.show(
           context,
           type: GameToastType.info,
-          title: 'Level already completed',
-          message: 'No coin reward on replay',
+          title: context.l10n.gameLevelAlreadyCompletedTitle,
+          message: context.l10n.gameNoCoinRewardReplay,
           duration: const Duration(milliseconds: 2000),
         ),
       );
@@ -2315,8 +2400,8 @@ class _GameScreenState extends State<GameScreen>
         GameToast.show(
           context,
           type: GameToastType.achievement,
-          title: 'New Best',
-          message: 'You beat your ghost!',
+          title: context.l10n.gameNewBestTitle,
+          message: context.l10n.gameBeatYourGhost,
           duration: const Duration(milliseconds: 2100),
         ),
       );
@@ -2411,7 +2496,7 @@ class _GameScreenState extends State<GameScreen>
         GameToast.show(
           context,
           type: GameToastType.achievement,
-          title: 'Achievement Unlocked',
+          title: context.l10n.gameAchievementUnlocked,
           message: first.title,
           duration: const Duration(milliseconds: 2300),
         ),
@@ -2497,27 +2582,37 @@ class _GameScreenState extends State<GameScreen>
     final average = widget.statsService
         .averageTimeMsForDifficulty(level.difficulty)
         ?.round();
-    final hasNext = widget.levelIndex < _packLevelCount;
+    final hasNext = _isTutorialPack || widget.levelIndex < _packLevelCount;
     final action = await _runCompletionStep<String?>(
           'navigation.pushVictory',
           () => context.push<String>(
             '/victory',
             extra: VictoryScreenArgs(
               zipNumber: widget.levelIndex,
-              headline: defaultVictoryHeadline(breakdown.finalScore),
+              headline: defaultVictoryHeadline(context, breakdown.finalScore),
               timeText: _elapsedText,
               averageText: _formatMs(average),
               streak: widget.progressService.getDailyStreak(),
-              primaryLabel: hasNext ? 'Next Level' : 'Play Again',
+              primaryLabel: _isTutorialPack
+                  ? context.l10n.gameContinueTutorial
+                  : (hasNext
+                      ? context.l10n.victoryPrimaryNextLevel
+                      : context.l10n.victoryPrimaryPlayAgain),
               primaryActionId: hasNext ? 'next' : 'replay',
               accentColor: gameTheme.pathColor,
               coinsEarned: rewardTotal,
               adBonusCoins: rewardedAdBonus,
               levelId: levelId,
-              shareText:
-                  'I solved Zip #${widget.levelIndex} in $_elapsedText. Score ${breakdown.finalScore}.',
-              copyText:
-                  'Zip #${widget.levelIndex} - $_elapsedText - Streak ${widget.progressService.getDailyStreak()} \u{1F525}',
+              shareText: context.l10n.gameVictoryShareText(
+                widget.levelIndex,
+                _elapsedText,
+                breakdown.finalScore,
+              ),
+              copyText: context.l10n.gameVictoryCopyText(
+                widget.levelIndex,
+                _elapsedText,
+                widget.progressService.getDailyStreak(),
+              ),
             ),
           ),
         ) ??
@@ -2532,6 +2627,10 @@ class _GameScreenState extends State<GameScreen>
         setState(() {
           _showCelebration = false;
         });
+        if (_isTutorialPack) {
+          context.go('/shop');
+          break;
+        }
         context.go('/play/${widget.packId}/${widget.levelIndex + 1}');
         break;
       case 'replay':
@@ -2603,8 +2702,8 @@ class _GameScreenState extends State<GameScreen>
         GameToast.show(
           context,
           type: GameToastType.info,
-          title: 'Rewarded ad unavailable',
-          message: 'Continuing without bonus.',
+          title: context.l10n.gameRewardedAdUnavailableTitle,
+          message: context.l10n.gameContinuingWithoutBonus,
           duration: const Duration(milliseconds: 1800),
         ),
       );
@@ -2615,8 +2714,8 @@ class _GameScreenState extends State<GameScreen>
       GameToast.show(
         context,
         type: GameToastType.coins,
-        title: 'Bonus reward',
-        message: '+$bonusCoins coins',
+        title: context.l10n.gameBonusRewardTitle,
+        message: context.l10n.gameBonusCoins(bonusCoins),
         duration: const Duration(milliseconds: 2000),
       ),
     );
@@ -2639,8 +2738,8 @@ class _GameScreenState extends State<GameScreen>
           GameToast.show(
             context,
             type: GameToastType.info,
-            title: 'Daily limit reached',
-            message: 'No more ads available today',
+            title: context.l10n.gameDailyLimitReachedTitle,
+            message: context.l10n.gameNoMoreAdsToday,
             duration: const Duration(milliseconds: 1800),
           ),
         );
@@ -2652,9 +2751,10 @@ class _GameScreenState extends State<GameScreen>
           GameToast.show(
             context,
             type: GameToastType.info,
-            title: 'Please wait',
-            message:
-                'Next ad in ${_formatDurationShort(quota.cooldownRemaining)}',
+            title: context.l10n.gamePleaseWaitTitle,
+            message: context.l10n.gameNextAdIn(
+              _formatDurationShort(quota.cooldownRemaining),
+            ),
             duration: const Duration(milliseconds: 1800),
           ),
         );
@@ -2673,8 +2773,8 @@ class _GameScreenState extends State<GameScreen>
           GameToast.show(
             context,
             type: GameToastType.info,
-            title: 'Rewarded ad unavailable',
-            message: 'Please try again in a moment.',
+            title: context.l10n.gameRewardedAdUnavailableTitle,
+            message: context.l10n.gameTryAgainMoment,
             duration: const Duration(milliseconds: 1800),
           ),
         );
@@ -2685,8 +2785,8 @@ class _GameScreenState extends State<GameScreen>
         GameToast.show(
           context,
           type: GameToastType.coins,
-          title: 'Ad reward',
-          message: '+$bonusCoins coins',
+          title: context.l10n.gameAdRewardTitle,
+          message: context.l10n.gameBonusCoins(bonusCoins),
           duration: const Duration(milliseconds: 1900),
         ),
       );
@@ -2708,18 +2808,24 @@ class _GameScreenState extends State<GameScreen>
       builder: (context) {
         return AlertDialog(
           backgroundColor: const Color(0xFF111827),
-          title: const Text(
-            'Rewarded Ad Status',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+          title: Text(
+            context.l10n.gameRewardedAdStatusTitle,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+            ),
           ),
           content: Text(
-            'Loaded: ${hasAd ? 'YES' : 'NO'}\nLoading: ${isLoading ? 'YES' : 'NO'}',
+            context.l10n.gameRewardedAdStatusBody(
+              hasAd ? context.l10n.commonYes : context.l10n.commonNo,
+              isLoading ? context.l10n.commonYes : context.l10n.commonNo,
+            ),
             style: const TextStyle(color: Color(0xFFCBD5E1)),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
+              child: Text(context.l10n.commonClose),
             ),
             FilledButton(
               onPressed: () async {
@@ -2731,13 +2837,13 @@ class _GameScreenState extends State<GameScreen>
                   GameToast.show(
                     this.context,
                     type: GameToastType.info,
-                    title: 'Ad reload requested',
-                    message: 'Trying to load a rewarded ad.',
+                    title: this.context.l10n.gameAdReloadRequestedTitle,
+                    message: this.context.l10n.gameAdReloadRequestedBody,
                     duration: const Duration(milliseconds: 1500),
                   ),
                 );
               },
-              child: const Text('Reload'),
+              child: Text(context.l10n.commonReload),
             ),
           ],
         );
@@ -2843,7 +2949,11 @@ class _GameScreenState extends State<GameScreen>
 
   bool get _isFriendChallengeMode => widget.friendChallengeArgs != null;
 
-  bool get _usesEnergySystem => !_isLiveDuelMode && !_isFriendChallengeMode;
+  bool get _isTutorialPack =>
+      widget.packId.trim().toLowerCase() == OnboardingService.tutorialPackId;
+
+  bool get _usesEnergySystem =>
+      !_isLiveDuelMode && !_isFriendChallengeMode && !_isTutorialPack;
 
   String get _currentLevelId => '${widget.packId}_${widget.levelIndex}';
 
@@ -3261,7 +3371,7 @@ class _GameScreenState extends State<GameScreen>
                               if (sender.trim().isNotEmpty) ...[
                                 SizedBox(height: compact ? 6 : 8),
                                 Text(
-                                  '$sender reacted',
+                                  context.l10n.gameReacted(sender),
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: const Color(0xFFD8EEFF),
@@ -3322,7 +3432,7 @@ class _GameScreenState extends State<GameScreen>
           GameToast.show(
             context,
             type: GameToastType.achievement,
-            title: 'Achievement Unlocked',
+            title: context.l10n.gameAchievementUnlocked,
             message: versusUnlocked.title,
             duration: const Duration(milliseconds: 2300),
           ),
@@ -3432,21 +3542,21 @@ class _GameScreenState extends State<GameScreen>
     if (_liveWinnerAnnouncementKey == key) return;
     _liveWinnerAnnouncementKey = key;
     final won = winnerUid == uid;
+    final l10n = context.l10n;
+    final title = won ? l10n.gameDuelYouWonTitle : l10n.gameDuelYouLostTitle;
+    final subtitle =
+        won ? l10n.gameDuelYouFinishedFirst : l10n.gameDuelFriendFinishedFirst;
     _showLiveResultOverlay(
-      won ? 'YOU WON!' : 'YOU LOST ;(',
-      subtitle: won
-          ? 'You finished first in the duel.'
-          : 'Your friend finished first.',
+      title,
+      subtitle: subtitle,
       emoji: won ? '\u{1F3C6}' : '\u{1F622}',
       won: won,
     );
     await GameToast.show(
       context,
       type: GameToastType.social,
-      title: won ? 'YOU WON!' : 'YOU LOST ;(',
-      message: won
-          ? 'You finished first in the duel.'
-          : 'Your friend finished first.',
+      title: title,
+      message: subtitle,
       duration: const Duration(milliseconds: 2200),
     );
   }
@@ -3497,9 +3607,10 @@ class _GameScreenState extends State<GameScreen>
       await GameToast.show(
         context,
         type: GameToastType.info,
-        title: 'Live duel',
-        message:
-            'Finished in ${_formatGhostTime(elapsedMs)}. Waiting result...',
+        title: context.l10n.liveDuelTitle,
+        message: context.l10n.gameLiveDuelFinishedWaiting(
+          _formatGhostTime(elapsedMs),
+        ),
         duration: const Duration(milliseconds: 1900),
       );
       return;
@@ -3513,23 +3624,26 @@ class _GameScreenState extends State<GameScreen>
     final oppAbandoned =
         opponentPlayer?.state == LiveMatchPlayerState.abandoned;
 
-    String title = 'Live duel result';
-    String message = 'Draw';
+    final l10n = context.l10n;
+    String title = l10n.gameLiveDuelResultTitle;
+    String message = l10n.liveDuelDraw;
     if (myAbandoned) {
-      title = 'Defeat';
-      message = 'You abandoned';
+      title = l10n.liveDuelDefeat;
+      message = l10n.liveDuelYouAbandoned;
     } else if (oppAbandoned) {
-      title = 'You won \u{1F642}';
-      message = 'Opponent abandoned';
+      title = l10n.liveDuelYouWonSmiley;
+      message = l10n.gameOpponentAbandoned;
     } else if (winnerUid.isEmpty) {
-      title = 'Draw';
-      message = reason == 'both_abandoned' ? 'Duel cancelled' : 'Draw';
+      title = l10n.liveDuelDraw;
+      message = reason == 'both_abandoned'
+          ? l10n.liveDuelCancelled
+          : l10n.liveDuelDraw;
     } else if (winnerUid == uid) {
-      title = 'You won \u{1F642}';
-      message = 'You won the duel';
+      title = l10n.liveDuelYouWonSmiley;
+      message = l10n.liveDuelYouWonDuel;
     } else {
-      title = 'Defeat';
-      message = 'You lost the duel';
+      title = l10n.liveDuelDefeat;
+      message = l10n.liveDuelYouLost;
     }
 
     if (!mounted) return;
@@ -3582,7 +3696,7 @@ class _GameScreenState extends State<GameScreen>
                     ),
                     const SizedBox(height: 14),
                     _duelResultRow(
-                      'Your time',
+                      l10n.liveDuelYourTime,
                       _formatGhostTime(
                         (myPlayer?.finishedAtMsFromStart ?? 0) > 0
                             ? (myPlayer?.finishedAtMsFromStart ?? 0)
@@ -3590,16 +3704,16 @@ class _GameScreenState extends State<GameScreen>
                       ),
                     ),
                     _duelResultRow(
-                      'Opponent time',
+                      l10n.liveDuelOpponentTime,
                       _formatGhostTime(
                           opponentPlayer?.finishedAtMsFromStart ?? 0),
                     ),
-                    _duelResultRow('Level', match.levelId),
+                    _duelResultRow(l10n.gameLevel, match.levelId),
                     _duelResultRow(
-                      'Opponent',
+                      l10n.liveDuelOpponent,
                       opponentPlayer?.username.trim().isNotEmpty == true
                           ? opponentPlayer!.username.trim()
-                          : 'Player',
+                          : l10n.gamePlayer,
                     ),
                     const SizedBox(height: 12),
                     _buildDuelEmoteTray(
@@ -3626,21 +3740,24 @@ class _GameScreenState extends State<GameScreen>
                               } catch (e) {
                                 if (!sheetContext.mounted) return;
                                 setLocalState(() => rematchBusy = false);
-                                var err = 'Could not create rematch';
+                                var err = l10n.liveDuelCouldNotCreateRematch;
                                 final txt = e.toString();
                                 if (txt.contains('ALREADY_IN_ACTIVE_DUEL')) {
-                                  err = 'Finish your active duel first';
+                                  err = l10n.liveDuelFinishActiveFirst;
                                 } else if (txt
                                     .contains('TARGET_IN_ACTIVE_DUEL')) {
-                                  err = 'Opponent is busy in another duel';
+                                  err = l10n.liveDuelOpponentBusyAnother;
                                 }
                                 ScaffoldMessenger.of(sheetContext).showSnackBar(
                                   SnackBar(content: Text(err)),
                                 );
                               }
                             },
-                      child:
-                          Text(rematchBusy ? 'Creating rematch...' : 'Rematch'),
+                      child: Text(
+                        rematchBusy
+                            ? l10n.liveDuelCreatingRematch
+                            : l10n.liveDuelRematch,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     OutlinedButton(
@@ -3649,7 +3766,7 @@ class _GameScreenState extends State<GameScreen>
                         if (!mounted) return;
                         context.go('/play');
                       },
-                      child: const Text('Leave'),
+                      child: Text(l10n.liveDuelLeave),
                     ),
                   ],
                 ),
@@ -3714,9 +3831,9 @@ class _GameScreenState extends State<GameScreen>
     if (lastMs > 0 && nowMs - lastMs < 1600) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Emote cooldown'),
-          duration: Duration(milliseconds: 900),
+        SnackBar(
+          content: Text(context.l10n.liveDuelEmoteCooldown),
+          duration: const Duration(milliseconds: 900),
         ),
       );
       return;
@@ -3737,11 +3854,11 @@ class _GameScreenState extends State<GameScreen>
     } catch (e) {
       _pushLiveEmoteDebug('send emote fail id=$emoteId error=$e');
       if (!mounted) return;
-      var msg = 'Could not send emote';
+      var msg = context.l10n.liveDuelCouldNotSendEmote;
       if (e.toString().contains('EMOTE_COOLDOWN')) {
-        msg = 'Emote cooldown';
+        msg = context.l10n.liveDuelEmoteCooldown;
       } else if (e.toString().contains('EMOTES_DISABLED')) {
-        msg = 'Emotes available after duel result';
+        msg = context.l10n.gameEmotesAfterDuelResult;
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -3752,20 +3869,39 @@ class _GameScreenState extends State<GameScreen>
     }
   }
 
-  List<_DuelEmoteDef> get _duelEmotes => const <_DuelEmoteDef>[
-        _DuelEmoteDef(id: 'laugh', label: 'Laugh', glyph: '\u{1F602}'),
-        _DuelEmoteDef(id: 'cool', label: 'Cool', glyph: '\u{1F60E}'),
-        _DuelEmoteDef(id: 'wow', label: 'Wow', glyph: '\u{1F62E}'),
-        _DuelEmoteDef(id: 'cry', label: 'Cry', glyph: '\u{1F622}'),
-        _DuelEmoteDef(id: 'clap', label: 'Clap', glyph: '\u{1F44F}'),
-        _DuelEmoteDef(id: 'heart', label: 'Heart', glyph: '\u{2764}\u{FE0F}'),
-      ];
+  List<_DuelEmoteDef> get _duelEmotes {
+    final l10n = context.l10n;
+    return <_DuelEmoteDef>[
+      _DuelEmoteDef(
+        id: 'laugh',
+        label: l10n.gameEmoteLaugh,
+        glyph: '\u{1F602}',
+      ),
+      _DuelEmoteDef(id: 'cool', label: l10n.gameEmoteCool, glyph: '\u{1F60E}'),
+      _DuelEmoteDef(id: 'wow', label: l10n.gameEmoteWow, glyph: '\u{1F62E}'),
+      _DuelEmoteDef(id: 'cry', label: l10n.gameEmoteCry, glyph: '\u{1F622}'),
+      _DuelEmoteDef(
+        id: 'clap',
+        label: l10n.gameEmoteClap,
+        glyph: '\u{1F44F}',
+      ),
+      _DuelEmoteDef(
+        id: 'heart',
+        label: l10n.gameEmoteHeart,
+        glyph: '\u{2764}\u{FE0F}',
+      ),
+    ];
+  }
 
   _DuelEmoteDef _duelEmoteById(String id) {
     for (final item in _duelEmotes) {
       if (item.id == id) return item;
     }
-    return const _DuelEmoteDef(id: 'wow', label: 'Wow', glyph: '\u{1F62E}');
+    return _DuelEmoteDef(
+      id: 'wow',
+      label: context.l10n.gameEmoteWow,
+      glyph: '\u{1F62E}',
+    );
   }
 
   Widget _duelResultRow(String label, String value) {
@@ -3796,21 +3932,22 @@ class _GameScreenState extends State<GameScreen>
   }
 
   String _duelStateLabel(LiveMatchPlayerState? state) {
+    final l10n = context.l10n;
     switch (state) {
       case LiveMatchPlayerState.finished:
-        return 'Finished';
+        return l10n.liveDuelStateFinished;
       case LiveMatchPlayerState.abandoned:
-        return 'Abandoned';
+        return l10n.liveDuelStateAbandoned;
       case LiveMatchPlayerState.playing:
-        return 'Drawing...';
+        return l10n.liveDuelStatePlaying;
       case LiveMatchPlayerState.ready:
-        return 'Ready';
+        return l10n.liveDuelStateReady;
       case LiveMatchPlayerState.joined:
-        return 'Joined';
+        return l10n.liveDuelStateJoined;
       case LiveMatchPlayerState.invited:
-        return 'Invited';
+        return l10n.liveDuelStateInvited;
       case null:
-        return 'Waiting...';
+        return l10n.liveDuelWaitingPlayer;
     }
   }
 }
@@ -4378,7 +4515,7 @@ class _GameplayHeader extends StatelessWidget {
         if (showRanking)
           IconButton(
             onPressed: onRankingTap,
-            tooltip: 'Friends ranking',
+            tooltip: context.l10n.gameFriendsRanking,
             style: IconButton.styleFrom(
               backgroundColor: const Color(0xFF243044),
               foregroundColor: const Color(0xFFFFD166),
@@ -4425,7 +4562,7 @@ class _EnergyLockedBanner extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Energy empty. Reset in $remainingText.',
+              context.l10n.gameEnergyEmptyResetIn(remainingText),
               style: const TextStyle(
                 color: Color(0xFFFFD6DF),
                 fontWeight: FontWeight.w700,
@@ -4439,7 +4576,7 @@ class _EnergyLockedBanner extends StatelessWidget {
               foregroundColor: const Color(0xFFFFC7D4),
               visualDensity: VisualDensity.compact,
             ),
-            child: const Text('Batteries'),
+            child: Text(context.l10n.gameBatteries),
           ),
         ],
       ),
@@ -4477,7 +4614,7 @@ class _GhostRaceInfoBar extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Ghost best: $bestTimeText',
+              context.l10n.gameGhostBest(bestTimeText),
               style: const TextStyle(
                 color: Color(0xFFD7E5FF),
                 fontWeight: FontWeight.w700,
@@ -4492,7 +4629,7 @@ class _GhostRaceInfoBar extends StatelessWidget {
               minimumSize: const Size(86, 30),
             ),
             child: Text(
-              enabled ? 'Ghost: ON' : 'Ghost: OFF',
+              enabled ? context.l10n.gameGhostOn : context.l10n.gameGhostOff,
               style: TextStyle(
                 color:
                     enabled ? const Color(0xFF6DD6FF) : const Color(0xFF8FA6CF),
@@ -4532,10 +4669,10 @@ class _GhostPendingInfoBar extends StatelessWidget {
             color: Color(0xFF8FB5FF),
           ),
           const SizedBox(width: 8),
-          const Expanded(
+          Expanded(
             child: Text(
-              'Ghost available after first completion',
-              style: TextStyle(
+              context.l10n.gameGhostAvailableAfterFirst,
+              style: const TextStyle(
                 color: Color(0xFFB8C8E8),
                 fontWeight: FontWeight.w600,
                 fontSize: 12.5,
@@ -4549,7 +4686,7 @@ class _GhostPendingInfoBar extends StatelessWidget {
               minimumSize: const Size(86, 30),
             ),
             child: Text(
-              enabled ? 'Ghost: ON' : 'Ghost: OFF',
+              enabled ? context.l10n.gameGhostOn : context.l10n.gameGhostOff,
               style: TextStyle(
                 color:
                     enabled ? const Color(0xFF6DD6FF) : const Color(0xFF8FA6CF),
@@ -4579,26 +4716,26 @@ class _FriendChallengeInfoBar extends StatelessWidget {
         ),
         border: Border.all(color: const Color(0xFF4A5E8A)),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.sports_score_rounded,
             color: Color(0xFF89E6FF),
             size: 18,
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Friendly Challenge',
-              style: TextStyle(
+              context.l10n.friendChallengeTitle,
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w800,
               ),
             ),
           ),
           Text(
-            'No ranking impact',
-            style: TextStyle(
+            context.l10n.gameNoRankingImpact,
+            style: const TextStyle(
               color: Color(0xFFB8CAE8),
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -4647,7 +4784,7 @@ class _LiveDuelStatusBar extends StatelessWidget {
           SizedBox(width: compact ? 6 : 8),
           Expanded(
             child: Text(
-              'VS $opponentName',
+              context.l10n.duelVersusOpponent(opponentName),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(

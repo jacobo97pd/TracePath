@@ -3,7 +3,7 @@
   "appTitle": "TracePath",
   "victoryDataMissing": "Victory data missing",
   "liveDuelInviteTitle": "Live Duel Invite",
-  "liveDuelInviteBody": "{from} challenged you to a live duel.\nDo you want to accept?",
+  "liveDuelInviteBody": "{from} challenged you to a live duel.\nDo you want to accept",
   "@liveDuelInviteBody": {
     "placeholders": {
       "from": {}
@@ -53,7 +53,7 @@
   "homeJumpToNextPuzzle": "Jump into your next puzzle",
   "homeContinue": "Continue",
   "homeContinueFirstRun": "Start your first run",
-  "homeContinueResumeLevel": "Level {level} · Pick up where you left off",
+  "homeContinueResumeLevel": "Level {level} Pick up where you left off",
   "@homeContinueResumeLevel": {
     "placeholders": {
       "level": {
@@ -133,7 +133,7 @@
       "name": {}
     }
   },
-  "duelLevelAndStatus": "Level: {level} · {status}",
+  "duelLevelAndStatus": "Level: {level} {status}",
   "@duelLevelAndStatus": {
     "placeholders": {
       "level": {},
@@ -216,7 +216,7 @@
   "profileGuestMode": "Guest mode",
   "profileGoogleAccount": "Google account",
   "profileLogout": "Logout",
-  "profileLogoutConfirm": "Do you want to sign out?",
+  "profileLogoutConfirm": "Do you want to sign out'",
   "profileCancel": "Cancel",
   "profileSignedOut": "Signed out",
   "profileDefaultName": "Default",
@@ -350,5 +350,884 @@
   "loginContinueGuest": "Continue as Guest",
   "loginGuestModeHint": "Guest mode: no friends, no challenges.",
   "loginConnecting": "Connecting...",
-  "loginContinueGoogle": "Continue with Google"
+  "loginContinueGoogle": "Continue with Google",
+  "cardsCollectionTitle": "Card Collection",
+  "cardsCollectionEmpty": "No cards unlocked yet.\nBuy or unlock skins to collect cards.",
+  "cardsRarityLegendary": "Legendary",
+  "cardsRarityEpic": "Epic",
+  "cardsRarityRare": "Rare",
+  "cardsRarityCommon": "Common",
+  "campaignTitle": "Campaign",
+  "campaignLoading": "Loading...",
+  "campaignPreparingStatus": "Preparing pack status",
+  "campaignLoadError": "Could not load campaign packs.",
+  "campaignPackClassic": "Balanced introduction",
+  "campaignPackArchitect": "More walls and tighter planning",
+  "campaignPackExpert": "Larger boards and harder routes",
+  "leaderboardFriendsTitleWithLevel": "Friends ranking - L{level}",
+  "@leaderboardFriendsTitleWithLevel": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "leaderboardFriendsTitle": "Friends ranking",
+  "leaderboardLevelPack": "Level {level} - {packId}",
+  "@leaderboardLevelPack": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      },
+      "packId": {}
+    }
+  },
+  "leaderboardNoFriendsScores": "No friends scores yet for this level.",
+  "leaderboardUnavailable": "Friends ranking unavailable right now.",
+  "dailyTitle": "Daily",
+  "dailyUnknownLoadError": "Unknown daily load error",
+  "dailyLoadError": "Could not load daily puzzle.",
+  "dailyRetry": "Retry",
+  "dailyChallengeTitle": "Daily Challenge",
+  "dailyNextPuzzleIn": "Next puzzle in {countdown}",
+  "@dailyNextPuzzleIn": {
+    "placeholders": {
+      "countdown": {}
+    }
+  },
+  "dailyRewardLabel": "Reward",
+  "dailyCoinsReward": "{coins} coins",
+  "@dailyCoinsReward": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "dailyStreakLabel": "Streak",
+  "dailyBestTimeLabel": "Best Time",
+  "dailyPlayAgain": "Play Again",
+  "dailyPlayDaily": "Play Daily",
+  "dailyAttemptsSummary": "Attempts today: {attempts} - Best score: {bestScore}",
+  "@dailyAttemptsSummary": {
+    "placeholders": {
+      "attempts": {
+        "type": "int"
+      },
+      "bestScore": {}
+    }
+  },
+  "dailyNewPersonalBestToday": "New personal best today",
+  "dailyCompletedTitle": "Daily completed",
+  "dailySavedWithPartialSync": "Saved with partial sync issue. Try again later.",
+  "dailyRewardSyncFailed": "Reward sync failed. Please try again.",
+  "dailyAchievementUnlocked": "Achievement Unlocked",
+  "dailyRewardToastTitle": "Daily reward",
+  "dailyRewardToastMessage": "+{coins} coins",
+  "@dailyRewardToastMessage": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "dailyShareText": "Daily complete in {time}.",
+  "@dailyShareText": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "dailyCopyText": "Zip #{day} - {time} - Streak {streak} ",
+  "@dailyCopyText": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "time": {},
+      "streak": {
+        "type": "int"
+      }
+    }
+  },
+  "liveDuelTitle": "Live Duel",
+  "liveDuelCouldNotUpdateReady": "Could not update ready state",
+  "liveDuelAcceptInviteFirst": "Accept the duel invite first",
+  "liveDuelAlreadyClosed": "This duel is already closed",
+  "liveDuelOpponent": "Opponent",
+  "liveDuelReacted": "{sender} reacted",
+  "@liveDuelReacted": {
+    "placeholders": {
+      "sender": {}
+    }
+  },
+  "liveDuelUnavailableNow": "Live duel unavailable right now.",
+  "liveDuelMatchNotFound": "Match not found",
+  "liveDuelYou": "You",
+  "liveDuelWaitingPlayer": "Waiting player...",
+  "liveDuelLeave": "Leave duel",
+  "liveDuelHeroYouAbandoned": "YOU ABANDONED",
+  "liveDuelHeroYouWin": "YOU WIN!",
+  "liveDuelHeroDraw": "DRAW",
+  "liveDuelHeroYouLost": "YOU LOST",
+  "liveDuelInvitationReceived": "Invitation received",
+  "liveDuelWaitingFriendJoin": "Waiting for your friend to join...",
+  "liveDuelOpponentReady": "Opponent is ready",
+  "liveDuelOpponentJoinedWaitingReady": "Opponent joined, waiting ready",
+  "liveDuelOpponentNotJoined": "Opponent has not joined yet",
+  "liveDuelAccepting": "Accepting...",
+  "liveDuelAcceptDuel": "Accept duel",
+  "liveDuelSaving": "Saving...",
+  "liveDuelUnready": "Unready",
+  "liveDuelReady": "Ready",
+  "liveDuelAcceptFirstThenReady": "Accept first, then mark Ready.",
+  "liveDuelGo": "GO!",
+  "liveDuelStartingIn": "Starting in {value}...",
+  "@liveDuelStartingIn": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "liveDuelStartingMatch": "Starting match...",
+  "liveDuelWaitingRoom": "Waiting Room",
+  "liveDuelGetReady": "Get Ready",
+  "liveDuelMatchStarted": "Match Started",
+  "liveDuelMatchResult": "Match Result",
+  "liveDuelMatchCancelled": "Match Cancelled",
+  "liveDuelYouAbandoned": "You abandoned",
+  "liveDuelYouWonSmiley": "You won ",
+  "liveDuelDraw": "Draw",
+  "liveDuelDefeat": "Defeat",
+  "liveDuelDefeatByAbandon": "Defeat by abandon",
+  "liveDuelWinByAbandon": "Win by abandon",
+  "liveDuelYouWonDuel": "You won the duel",
+  "liveDuelNoWinner": "No winner",
+  "liveDuelYouLost": "You lost",
+  "liveDuelYourTime": "Your time",
+  "liveDuelOpponentTime": "Opponent time",
+  "liveDuelCouldNotCreateRematch": "Could not create rematch",
+  "liveDuelOpponentBusyAnother": "Opponent is busy in another duel",
+  "liveDuelFinishActiveFirst": "Finish your active duel first",
+  "liveDuelCreatingRematch": "Creating rematch...",
+  "liveDuelRematch": "Rematch",
+  "liveDuelBack": "Back",
+  "liveDuelEmoteCooldown": "Emote cooldown",
+  "liveDuelCouldNotSendEmote": "Could not send emote",
+  "liveDuelInviteExpired": "Invitation expired",
+  "liveDuelCountdownExpired": "Countdown expired",
+  "liveDuelMatchTimedOut": "Match timed out",
+  "liveDuelCancelled": "Duel cancelled",
+  "liveDuelStateInvited": "Invited",
+  "liveDuelStateJoined": "Joined",
+  "liveDuelStateReady": "Ready",
+  "liveDuelStatePlaying": "Playing",
+  "liveDuelStateFinished": "Finished",
+  "liveDuelStateAbandoned": "Abandoned",
+  "victoryChallengeOnlyLevelRuns": "This challenge is only available for level runs.",
+  "victoryAddFriendsFirst": "Add friends first to send in-game challenges.",
+  "victoryChallengeFriendTitle": "Challenge a friend",
+  "victoryChallengeFriendSubtitle": "Send a live duel invite with a random puzzle",
+  "victoryInviteOnline": "Invite to a live 1v1 duel - Online",
+  "victoryInviteOffline": "Invite to a live 1v1 duel - Offline",
+  "victoryLiveInviteSent": "Live duel invite sent",
+  "victoryChallengeSendError": "Could not send challenge right now",
+  "victoryChallengeBlockedByRules": "Challenge blocked by Firestore rules",
+  "victoryChallengeSetupNotReady": "Challenge setup is not ready yet. Try again in a moment.",
+  "victoryFinishActiveDuelFirst": "Finish your active duel first",
+  "victoryFriendAlreadyInDuel": "{name} is already in another duel",
+  "@victoryFriendAlreadyInDuel": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "victoryNoPuzzlesForDuel": "No puzzles available for duel",
+  "victoryStatTime": "Time",
+  "victoryStatBestTime": "Best time",
+  "victoryCoinsWithAd": "Coins (+{coins} ad)",
+  "@victoryCoinsWithAd": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "victoryCoinsReward": "Coins reward",
+  "victoryLevelComplete": "LEVEL COMPLETE",
+  "victoryCurrentStreak": "Current streak: {streak}",
+  "@victoryCurrentStreak": {
+    "placeholders": {
+      "streak": {
+        "type": "int"
+      }
+    }
+  },
+  "victoryFriendsRanking": "Friends ranking",
+  "victoryReplay": "Replay",
+  "victoryChallengeFriendCta": "Challenge Friend",
+  "socialTitle": "Social",
+  "socialHubTitle": "Social Hub",
+  "socialHubSubtitle": "Friends, rankings and challenges",
+  "socialFriendsLabel": "Friends",
+  "socialBestRankLabel": "Best Rank",
+  "socialTopTimeLabel": "Top Time",
+  "socialGlobalTierLabel": "Global Tier",
+  "socialFriendActionsTitle": "Friend Actions",
+  "socialFriendActionsSubtitle": "Set your handle and add friends by username or UID",
+  "socialSetUsernameHint": "Set your username",
+  "socialSave": "Save",
+  "socialFriendLookupHint": "Friend username, email or UID",
+  "socialAdd": "Add",
+  "socialFriendsSectionTitle": "Friends",
+  "socialFriendsSectionSubtitle": "Your rivals and teammates",
+  "socialFriendsWithCount": "Friends ({count})",
+  "@socialFriendsWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "socialNoFriendsTitle": "No friends added yet",
+  "socialNoFriendsSubtitle": "Add friends to compete on rankings and send challenges.",
+  "socialGlobalTop10Title": "Global Top 10",
+  "socialGlobalTop10Subtitle": "Best players in the world",
+  "socialNoGlobalScoresTitle": "No global scores yet",
+  "socialNoGlobalScoresSubtitle": "Complete levels to appear in the world ranking.",
+  "socialChallengesTitle": "Challenges",
+  "socialChallengesSubtitle": "Invite or challenge your friends now",
+  "socialChallengeFriend": "Challenge Friend",
+  "socialInviteFriend": "Invite Friend",
+  "socialFriendRequestTitle": "Friend Request",
+  "socialFriendRequestSent": "Friend request sent",
+  "socialCouldNotSendRequest": "Could not send friend request",
+  "socialCannotAddSelf": "You can't add yourself",
+  "socialInvalidEmail": "Invalid email format",
+  "socialUserNotFound": "User not found",
+  "socialAlreadyFriends": "You are already friends",
+  "socialRequestAlreadySent": "Friend request already sent",
+  "socialRequestAlreadyReceived": "This user already sent you a request",
+  "socialNeedSignIn": "You need to be signed in",
+  "socialRulesBlockedAction": "Firestore rules blocked this action",
+  "socialAddFriendsFirstForChallenges": "Add friends first to send challenges.",
+  "socialChallengeFriendSheetTitle": "Challenge a friend",
+  "socialChallengeFriendSheetSubtitle": "Send a real-time live duel invite",
+  "socialLiveInviteOnline": "Invite to a live 1v1 duel - Online",
+  "socialLiveInviteOffline": "Invite to a live 1v1 duel - Offline",
+  "socialLiveInviteSentTitle": "Live duel invite sent",
+  "socialLiveInviteSentBody": "Waiting for {name} to accept.",
+  "@socialLiveInviteSentBody": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "socialCouldNotSendChallenge": "Could not send challenge right now.",
+  "socialChallengeBlockedByRules": "Challenge blocked by Firestore rules.",
+  "socialChallengeSetupNotReady": "Challenge setup is not ready yet. Try again in a moment.",
+  "socialFinishCurrentLiveDuelFirst": "Finish your current live duel first.",
+  "socialFriendAlreadyInLiveDuel": "{name} is already in another live duel.",
+  "@socialFriendAlreadyInLiveDuel": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "socialNoPuzzlesForLiveDuel": "No puzzles available for live duel.",
+  "socialRemoveFriendTitle": "Remove friend",
+  "socialRemoveFriendBody": "Are you sure you want to remove this friend'",
+  "socialUsernameTitle": "Username",
+  "socialUsernameNotAvailable": "Username not available",
+  "socialUsernameUpdated": "Username updated",
+  "socialUsernameAlreadyUsed": "Username already in use",
+  "socialUsernameInvalid": "Invalid username (3-20, letters/numbers/._)",
+  "socialRulesBlockedUsernameWrite": "Firestore rules blocked username write",
+  "socialCouldNotSaveUsername": "Could not save username",
+  "socialInviteReadyTitle": "Invite Ready",
+  "socialInviteReadyBody": "Invite copied. Share it on WhatsApp or email.",
+  "socialMovesShort": "{count} moves",
+  "@socialMovesShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "socialStarsShort": "{count} stars",
+  "@socialStarsShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "socialGuestLockedTitle": "Social is locked in Guest mode",
+  "socialGuestLockedSubtitle": "Sign in with Google from Home to challenge friends and view rankings.",
+  "socialGoHome": "Go Home",
+  "socialSkinTrail": "Skin: {skin} - Trail: {trail}",
+  "@socialSkinTrail": {
+    "placeholders": {
+      "skin": {},
+      "trail": {}
+    }
+  },
+  "socialOnline": "Online",
+  "socialOffline": "Offline",
+  "socialStatusLabel": "Status",
+  "socialSkinLabel": "Skin",
+  "socialTrailLabel": "Trail",
+  "socialReadyToCompete": "Ready to compete",
+  "energyNoEnergyTitle": "No energy",
+  "energyOutWithBattery": "You are out of energy. Wait {reset} for reset, or use a battery now.",
+  "@energyOutWithBattery": {
+    "placeholders": {
+      "reset": {}
+    }
+  },
+  "energyOutWithoutBattery": "You are out of energy. Wait {reset} for reset, or buy a battery.",
+  "@energyOutWithoutBattery": {
+    "placeholders": {
+      "reset": {}
+    }
+  },
+  "energyCouldNotUseBattery": "Could not use battery right now.",
+  "energyRestored": "Energy restored to {current}/{max}.",
+  "@energyRestored": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "energyUseBattery": "Use battery",
+  "energyNotEnoughCoinsBattery": "Not enough coins to buy a battery.",
+  "energyBatteryPurchaseFailed": "Battery purchase failed. Try again.",
+  "energyBatteryPurchasedAndUsed": "Battery purchased and used. Energy {current}/{max}.",
+  "@energyBatteryPurchasedAndUsed": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "energyBatteryPurchasedCount": "Battery purchased. Batteries: {count}.",
+  "@energyBatteryPurchasedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "energyBuyBattery": "Buy ({coins} coins)",
+  "@energyBuyBattery": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "playLevelsCompletedToGo": "{completed} completed - {remaining} to go",
+  "@playLevelsCompletedToGo": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "remaining": {
+        "type": "int"
+      }
+    }
+  },
+  "playLevelsContinueLevel": "Continue L{level}",
+  "@playLevelsContinueLevel": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "playLevelsRanking": "Ranking",
+  "commonCancel": "Cancel",
+  "commonClose": "Close",
+  "commonNo": "No",
+  "commonOk": "OK",
+  "commonReload": "Reload",
+  "commonRetry": "Retry",
+  "commonYes": "Yes",
+  "gameGotIt": "Got it",
+  "gameHowToPlayTitle": "How to play",
+  "gameCoreTutorialBody": "1) Start at number 1.\n2) Drag to connect numbers in order (1,2,3...).\n3) Even with few numbers, you must fill every cell of the board.\n4) If you make a mistake, use Undo or Restart.",
+  "gameLetsGo": "Let's go",
+  "gameVariantAlphabetTitle": "Alphabet Mode",
+  "gameVariantAlphabetBody": "Connect cells in alphabetical order following the path clues.",
+  "gameVariantAlphabetReverseTitle": "Reverse Alphabet Mode",
+  "gameVariantAlphabetReverseBody": "Connect cells in reverse alphabetical order.",
+  "gameVariantMultiplesTitle": "Multiples Mode",
+  "gameVariantMultiplesBody": "Numbers are multiples of a base. Follow increasing multiples in order.",
+  "gameVariantRomanMultiplesTitle": "Roman Multiples Mode",
+  "gameVariantRomanMultiplesBody": "Follow increasing multiples shown as roman numerals.",
+  "gameVariantRomanTitle": "Roman Numerals Mode",
+  "gameVariantRomanBody": "Follow the sequence of roman numerals in order.",
+  "gameVariantDefaultTitle": "Variant Mode",
+  "gameVariantDefaultBody": "Follow the clue sequence in the correct order.",
+  "gameVariantExample": "Example: {example}",
+  "@gameVariantExample": {
+    "placeholders": {
+      "example": {}
+    }
+  },
+  "gamePackNotFound": "Pack not found",
+  "gameLoadingLevel": "Loading level",
+  "gameLevelUnavailable": "Level unavailable",
+  "gameCouldNotLoadLevel": "Could not load this level.",
+  "gameEnergyCounter": "Energy {current}/{max}",
+  "@gameEnergyCounter": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "gameEnergyResetIn": "Reset {time}",
+  "@gameEnergyResetIn": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "gameDuelFinishedBoardLocked": "Duel finished. Board locked.",
+  "gameUndo": "Undo",
+  "gameRestart": "Restart",
+  "gameHintInfinite": "Hint (INF)",
+  "gameHintCount": "Hint ({count})",
+  "@gameHintCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "gameReporting": "Reporting...",
+  "gameReported": "Reported",
+  "gameReportLevel": "Report level",
+  "gameWatchAd": "Watch Ad",
+  "gameAdStatus": "Ad Status",
+  "gameDailyAdLimitReached": "Daily limit reached. No more ads available today.",
+  "gameNextAdIn": "Next ad in {time}",
+  "@gameNextAdIn": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "gameLevelCompleteReward": "LEVEL COMPLETE! {reward}",
+  "@gameLevelCompleteReward": {
+    "placeholders": {
+      "reward": {}
+    }
+  },
+  "gameRankingUnavailable": "Ranking unavailable",
+  "gameTryAgainMoment": "Try again in a moment.",
+  "gameFriendsRanking": "Friends ranking",
+  "gameLevelLabel": "Level {level}",
+  "@gameLevelLabel": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "gameNoFriendsRankingTitle": "No friends have played this level yet.",
+  "gameNoFriendsRankingBody": "Complete the level and invite friends to compete.",
+  "gameReportUnavailableTitle": "Report unavailable",
+  "gameReportUnavailableBody": "Play at least {seconds} seconds before reporting this level.",
+  "@gameReportUnavailableBody": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "gameReportConfirmTitle": "Report this level'",
+  "gameReportConfirmBody": "If this level is unsolvable, you can report it and unlock the next one.",
+  "gameReportAndSkip": "Report & Skip",
+  "gameSignInRequiredTitle": "Sign-in required",
+  "gameSignInRequiredBody": "Please sign in to report and skip levels.",
+  "gameAlreadyReportedTitle": "Already reported",
+  "gameAlreadyReportedBody": "This level was already reported from this account.",
+  "gameLevelReportedTitle": "Level reported",
+  "gameLevelReportedBody": "Report sent. Next level unlocked.",
+  "gameCouldNotReportTitle": "Could not report level",
+  "gameReportErrorPermissionDenied": "Permissions blocked this action. Please try again later.",
+  "gameReportErrorEndpointNotConfigured": "Report endpoint is not configured in this build.",
+  "gameReportErrorInvalidEndpoint": "Report endpoint URL is invalid.",
+  "gameReportErrorTimeout": "Report request timed out. Please retry.",
+  "gameReportErrorNetwork": "Network issue while reporting. Please try again.",
+  "gameReportErrorServerRejected": "Server rejected the report. Please try again in a moment.",
+  "gameReportErrorUnauthenticated": "Please sign in again and retry.",
+  "gameReportErrorGeneric": "Could not report this level right now. Please try again.",
+  "gameHintTitle": "Hint",
+  "gameNoHintsLeft": "No hints left",
+  "gameAlmostThereTitle": "Almost there",
+  "gameAlmostThereBody": "Finish on {label} to complete the level.",
+  "@gameAlmostThereBody": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "gameTimeTitle": "Time!",
+  "gameWaitingForDuelResult": "Waiting for duel result...",
+  "gameLevelAlreadyCompletedTitle": "Level already completed",
+  "gameNoCoinRewardReplay": "No coin reward on replay",
+  "gameNewBestTitle": "New best",
+  "gameBeatYourGhost": "You beat your ghost!",
+  "gameAchievementUnlocked": "Achievement unlocked",
+  "gameRewardedAdUnavailableTitle": "Rewarded ad unavailable",
+  "gameContinuingWithoutBonus": "Continuing without bonus.",
+  "gameBonusRewardTitle": "Bonus reward",
+  "gameBonusCoins": "+{coins} coins",
+  "@gameBonusCoins": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "gameDailyLimitReachedTitle": "Daily limit reached",
+  "gameNoMoreAdsToday": "No more ads available today",
+  "gamePleaseWaitTitle": "Please wait",
+  "gameAdRewardTitle": "Ad reward",
+  "gameRewardedAdStatusTitle": "Rewarded ad status",
+  "gameRewardedAdStatusBody": "Loaded: {loaded}\nLoading: {loading}",
+  "@gameRewardedAdStatusBody": {
+    "placeholders": {
+      "loaded": {},
+      "loading": {}
+    }
+  },
+  "gameAdReloadRequestedTitle": "Ad reload requested",
+  "gameAdReloadRequestedBody": "Trying to load a rewarded ad.",
+  "gameDuelYouWonTitle": "YOU WON!",
+  "gameDuelYouLostTitle": "YOU LOST ;(",
+  "gameDuelYouFinishedFirst": "You finished first in the duel.",
+  "gameDuelFriendFinishedFirst": "Your friend finished first.",
+  "gameLiveDuelFinishedWaiting": "Finished in {time}. Waiting result...",
+  "@gameLiveDuelFinishedWaiting": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "gameLiveDuelResultTitle": "Live duel result",
+  "gameOpponentAbandoned": "Opponent abandoned",
+  "gameLevel": "Level",
+  "gameOpponent": "Opponent",
+  "gamePlayer": "Player",
+  "gameEmotesAfterDuelResult": "Emotes available after duel result",
+  "gameEmoteLaugh": "Laugh",
+  "gameEmoteCool": "Cool",
+  "gameEmoteWow": "Wow",
+  "gameEmoteCry": "Cry",
+  "gameEmoteClap": "Clap",
+  "gameEmoteHeart": "Heart",
+  "gameEnergyEmptyResetIn": "Energy empty. Reset in {time}.",
+  "@gameEnergyEmptyResetIn": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "gameBatteries": "Batteries",
+  "gameGhostBest": "Ghost best: {time}",
+  "@gameGhostBest": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "gameGhostOn": "Ghost: ON",
+  "gameGhostOff": "Ghost: OFF",
+  "gameGhostAvailableAfterFirst": "Ghost available after first completion",
+  "gameNoRankingImpact": "No ranking impact",
+  "shopTrailEffects": "Trail Effects",
+  "shopCoinPacksUnavailable": "Coin packs unavailable",
+  "shopCouldNotLoadCoinPacksRetry": "Could not load coin packs. Please retry.",
+  "shopCheckConnectionRetry": "Please check your connection and retry.",
+  "shopNoCoinPacksAvailable": "No coin packs available",
+  "shopStoreProductsUnavailableNow": "Store products are not available right now. Please try again later.",
+  "shopRestore": "Restore",
+  "shopLoadingStoreProducts": "Loading store products...",
+  "shopStoreUnavailable": "Store unavailable",
+  "shopPurchasesDisabledBrowse": "You can still browse all coin packs. Purchases are disabled right now.",
+  "shopShowingLocalCatalogFallback": "Showing local catalog fallback",
+  "shopEnergyBatteries": "Energy batteries",
+  "shopBatteriesResetIn": "Batteries: {count} - Reset in {time}",
+  "@shopBatteriesResetIn": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "time": {}
+    }
+  },
+  "shopUseOneBatteryNow": "Use 1 battery now",
+  "shopProcessingPurchase": "Processing purchase...",
+  "shopPurchasedBatteries": "Purchased {units} battery(s). Total: {total}.",
+  "@shopPurchasedBatteries": {
+    "placeholders": {
+      "units": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "shopPurchaseSuccessful": "Purchase successful",
+  "shopConfirmPurchaseTitle": "Confirm purchase",
+  "shopConfirmPurchaseBody": "Do you want to buy \"{name}\" for {coins} coins'",
+  "@shopConfirmPurchaseBody": {
+    "placeholders": {
+      "name": {},
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "shopBuyNow": "Buy now",
+  "playWorldFallbackTitle": "World",
+  "playWorldFallbackSubtitle": "Puzzle journey",
+  "playWorldTitle": "World {number}",
+  "playWorldSubtitle": "Puzzle journey {number}",
+  "@playWorldTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "@playWorldSubtitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingInProgress": "In progress",
+  "onboardingGoNow": "Go now",
+  "duelHistoryTimes": "You {youTime} Opp {opponentTime}",
+  "@duelHistoryTimes": {
+    "placeholders": {
+      "youTime": {},
+      "opponentTime": {}
+    }
+  },
+  "duelStatusVictory": "Victory",
+  "duelStatusDefeat": "Defeat",
+  "playLevelsWorldLockedCompletePrevious": "World locked. Complete or report all levels in previous world first.",
+  "playLevelsEnergyStatus": "{current}/{max} - reset {time}",
+  "@playLevelsEnergyStatus": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      },
+      "time": {}
+    }
+  },
+  "playLevelsWorldProgressSummary": "{total} levels - {completed} completed",
+  "@playLevelsWorldProgressSummary": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "completed": {
+        "type": "int"
+      }
+    }
+  },
+  "playLevelsEnergyDetailed": "Energy {current}/{max}. Reset in {time}.",
+  "@playLevelsEnergyDetailed": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      },
+      "time": {}
+    }
+  },
+  "playLevelsSelectedLevel": "Selected Level",
+  "playLevelsSelectedLevelVariant": "Level {level} {variant}",
+  "@playLevelsSelectedLevelVariant": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      },
+      "variant": {}
+    }
+  },
+  "playLevelsPlay": "Play",
+  "playLevelsLocked": "Locked",
+  "playLevelsDifficultyWarmup": "Warm-up",
+  "playLevelsDifficultyEasy": "Easy",
+  "playLevelsDifficultyMedium": "Medium",
+  "playLevelsDifficultyHard": "Hard",
+  "playLevelsDifficultyExpert": "Expert",
+  "playLevelsDifficultyClassic": "Classic",
+  "playLevelsVariantMultiplesRoman": "Multiples Roman",
+  "playLevelsVariantAlphabetReverse": "Alphabet Reverse",
+  "playLevelsVariantAlphabet": "Alphabet",
+  "playLevelsVariantMultiples": "Multiples",
+  "playLevelsVariantRoman": "Roman",
+  "playLevelsVariantClassic": "Classic",
+  "gameLevelProgress": "Level {level} / {total}",
+  "@gameLevelProgress": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "gameFriendlyChallengeCompleteHeadline": "Friendly Challenge Complete",
+  "gameReplay": "Replay",
+  "gameFriendlyChallengeShare": "Friendly challenge done in {time}.",
+  "@gameFriendlyChallengeShare": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "gameFriendlyChallengeCopy": "Friendly challenge | {time}",
+  "@gameFriendlyChallengeCopy": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "gameContinueTutorial": "Continue Tutorial",
+  "gameVictoryShareText": "I solved Zip #{level} in {time}. Score {score}.",
+  "@gameVictoryShareText": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      },
+      "time": {},
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "gameVictoryCopyText": "Zip #{level} - {time} - Streak {streak} ",
+  "@gameVictoryCopyText": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      },
+      "time": {},
+      "streak": {
+        "type": "int"
+      }
+    }
+  },
+  "gameReacted": "{name} reacted",
+  "@gameReacted": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "victoryHeadlineFire": "You're on fire!",
+  "victoryHeadlineCrushing": "Crushing it!",
+  "victoryHeadlinePerfect": "Perfect run!",
+  "victoryHeadlineSharp": "Sharp move!",
+  "endlessTitle": "Endless",
+  "endlessDifficulty": "Difficulty {difficulty}",
+  "@endlessDifficulty": {
+    "placeholders": {
+      "difficulty": {
+        "type": "int"
+      }
+    }
+  },
+  "endlessNewRun": "New",
+  "endlessResumeAt": "Resume at {index}",
+  "@endlessResumeAt": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "endlessStartNewRun": "Start a new endless run",
+  "endlessBestSummary": "Best score: {score} | Best index: {index} | Best avg: {avg}",
+  "@endlessBestSummary": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      },
+      "index": {
+        "type": "int"
+      },
+      "avg": {}
+    }
+  },
+  "endlessCouldNotLoadPuzzle": "Could not load endless puzzle.",
+  "endlessRunSeed": "Run seed: {seed}",
+  "@endlessRunSeed": {
+    "placeholders": {
+      "seed": {
+        "type": "int"
+      }
+    }
+  },
+  "endlessSolved": "Solved!",
+  "endlessShareText": "Endless D{difficulty} #{index} in {time}.",
+  "@endlessShareText": {
+    "placeholders": {
+      "difficulty": {
+        "type": "int"
+      },
+      "index": {
+        "type": "int"
+      },
+      "time": {}
+    }
+  },
+  "endlessCopyText": "Zip #{index} - {time} - Streak {streak} ",
+  "@endlessCopyText": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "time": {},
+      "streak": {
+        "type": "int"
+      }
+    }
+  },
+  "levelsPackTitle": "{pack} levels",
+  "@levelsPackTitle": {
+    "placeholders": {
+      "pack": {}
+    }
+  },
+  "gameClear": "Clear",
+  "gameNext": "Next {value}",
+  "@gameNext": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "gameStars": "Stars {value}",
+  "@gameStars": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "victoryPrimaryNextLevel": "Next Level",
+  "victoryPrimaryPlayAgain": "Play Again",
+  "retry": "Retry"
 }

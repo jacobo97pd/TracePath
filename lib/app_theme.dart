@@ -14,6 +14,26 @@ class AppSpacing {
 class AppTheme {
   const AppTheme._();
 
+  static SnackBarThemeData _snackBarTheme() {
+    return SnackBarThemeData(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: AppColors.surfaceElevated.withOpacity(0.98),
+      contentTextStyle: AppTextStyles.body.copyWith(
+        color: AppColors.textPrimary,
+        fontWeight: FontWeight.w600,
+      ),
+      actionTextColor: AppColors.accent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: AppColors.border, width: 1),
+      ),
+      elevation: 0,
+      showCloseIcon: true,
+      closeIconColor: AppColors.textSecondary,
+      insetPadding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+    );
+  }
+
   static ThemeData light() {
     return ThemeData(
       brightness: Brightness.dark,
@@ -77,6 +97,7 @@ class AppTheme {
           side: const BorderSide(color: AppColors.border),
         ),
       ),
+      snackBarTheme: _snackBarTheme(),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: <TargetPlatform, PageTransitionsBuilder>{
           TargetPlatform.android: ZoomPageTransitionsBuilder(),
@@ -149,6 +170,7 @@ class AppTheme {
           side: const BorderSide(color: AppColors.border),
         ),
       ),
+      snackBarTheme: _snackBarTheme(),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: <TargetPlatform, PageTransitionsBuilder>{
           TargetPlatform.android: ZoomPageTransitionsBuilder(),

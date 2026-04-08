@@ -1,9 +1,10 @@
-import 'dart:math' as math;
+﻿import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'coins_service.dart';
+import 'l10n/l10n.dart';
 import 'skin_catalog_service.dart';
 import 'ui/components/network_image_compat.dart';
 import 'ui/components/zip_collectible_card.dart';
@@ -20,6 +21,7 @@ class CardsCollectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return AnimatedBuilder(
       animation: Listenable.merge([coinsService, skinCatalogService]),
       builder: (context, _) {
@@ -35,16 +37,16 @@ class CardsCollectionScreen extends StatelessWidget {
           backgroundColor: const Color(0xFF0F172A),
           appBar: AppBar(
             backgroundColor: const Color(0xFF0F172A),
-            title: const Text('Card Collection'),
+            title: Text(l10n.cardsCollectionTitle),
           ),
           body: cards.isEmpty
-              ? const Center(
+              ? Center(
                   child: Padding(
-                    padding: EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(24),
                     child: Text(
-                      'No cards unlocked yet.\nBuy or unlock skins to collect cards.',
+                      l10n.cardsCollectionEmpty,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Color(0xFF9FB0D3),
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -95,7 +97,7 @@ class CardsCollectionScreen extends StatelessWidget {
                         Row(
                           children: [
                             Text(
-                              _rarityLabel(rarity),
+                              _rarityLabel(rarity, l10n),
                               style: TextStyle(
                                 color: _rarityColor(rarity),
                                 fontSize: 11,
@@ -104,9 +106,9 @@ class CardsCollectionScreen extends StatelessWidget {
                             ),
                             const Spacer(),
                             if (isEquipped)
-                              const Text(
-                                'Equipped',
-                                style: TextStyle(
+                              Text(
+                                l10n.shopEquipped,
+                                style: const TextStyle(
                                   color: Color(0xFF8AB4FF),
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
@@ -149,16 +151,16 @@ class CardsCollectionScreen extends StatelessWidget {
     }
   }
 
-  String _rarityLabel(ZipCardRarity rarity) {
+  String _rarityLabel(ZipCardRarity rarity, dynamic l10n) {
     switch (rarity) {
       case ZipCardRarity.legendary:
-        return 'Legendary';
+        return l10n.cardsRarityLegendary;
       case ZipCardRarity.epic:
-        return 'Epic';
+        return l10n.cardsRarityEpic;
       case ZipCardRarity.rare:
-        return 'Rare';
+        return l10n.cardsRarityRare;
       case ZipCardRarity.common:
-        return 'Common';
+        return l10n.cardsRarityCommon;
     }
   }
 
@@ -589,3 +591,4 @@ class _CardArtworkState extends State<_CardArtwork> {
     return const <String>[];
   }
 }
+

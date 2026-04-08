@@ -210,7 +210,7 @@ class _EndlessGameScreenState extends State<EndlessGameScreen> {
                         _formatMs(_currentElapsedDuration.inMilliseconds),
                     chipText: 'E${widget.difficulty}',
                     nextText: _status.nextRequiredNumber.toString(),
-                    starsText: '★★★',
+                    starsText: '***',
                     onBack: () {
                       if (context.canPop()) {
                         context.pop();
@@ -438,7 +438,7 @@ class _EndlessGameScreenState extends State<EndlessGameScreen> {
         shareText:
             'Endless D${widget.difficulty} #${widget.index} in ${_formatMs(_currentElapsedDuration.inMilliseconds)}.',
         copyText:
-            'Zip #${widget.index} - ${_formatMs(_currentElapsedDuration.inMilliseconds)} - Streak ${widget.progressService.getDailyStreak()} 🔥',
+            'Zip #${widget.index} - ${_formatMs(_currentElapsedDuration.inMilliseconds)} - Streak ${widget.progressService.getDailyStreak()} FIRE',
       ),
     );
 

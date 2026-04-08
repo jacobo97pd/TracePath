@@ -51,6 +51,7 @@ import 'services/inbox_service.dart';
 import 'services/live_duel_service.dart';
 import 'services/presence_service.dart';
 import 'services/energy_service.dart';
+import 'services/onboarding_service.dart';
 import 'ui/components/coin_reward_overlay.dart';
 import 'ui/components/app_game_backdrop.dart';
 import 'l10n/l10n.dart';
@@ -102,6 +103,10 @@ Future<void> main() async {
   final adaptiveDifficultyService = AdaptiveDifficultyService(prefs);
   final leaderboardService = LeaderboardService(prefs);
   final notificationService = NotificationService(prefs);
+  await OnboardingService.instance.initialize(
+    prefs: prefs,
+    progressService: progressService,
+  );
   await LevelFingerprintStore.instance.initialize();
   final exportBasePath = await resolveExportBasePath();
   await LevelExportRegistry.instance.initialize(basePath: exportBasePath);

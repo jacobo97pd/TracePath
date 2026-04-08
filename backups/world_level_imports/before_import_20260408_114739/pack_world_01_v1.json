@@ -1,7 +1,7 @@
 {
   "packId": "world_01",
   "version": "pack_world_01_v1",
-  "count": 29,
+  "count": 28,
   "world": 1,
   "levels": [
     {
@@ -2818,94 +2818,6 @@
         "variant": "classic",
         "canonical_hash": "6668fff6094acdddca9865d7dfda6f9b7c4cbfe3e6a9d2084c870b758982e8b1",
         "imported_at": "2026-03-29T21:46:37Z"
-      }
-    },
-    {
-      "id": "linkedin-editor-377",
-      "size": {
-        "w": 6,
-        "h": 6
-      },
-      "clues": [
-        {
-          "n": 1,
-          "x": 3,
-          "y": 1
-        },
-        {
-          "n": 2,
-          "x": 0,
-          "y": 1
-        },
-        {
-          "n": 3,
-          "x": 5,
-          "y": 1
-        },
-        {
-          "n": 4,
-          "x": 5,
-          "y": 3
-        },
-        {
-          "n": 5,
-          "x": 3,
-          "y": 3
-        },
-        {
-          "n": 6,
-          "x": 3,
-          "y": 2
-        },
-        {
-          "n": 7,
-          "x": 0,
-          "y": 2
-        },
-        {
-          "n": 8,
-          "x": 0,
-          "y": 3
-        },
-        {
-          "n": 9,
-          "x": 1,
-          "y": 3
-        },
-        {
-          "n": 10,
-          "x": 0,
-          "y": 4
-        },
-        {
-          "n": 11,
-          "x": 2,
-          "y": 3
-        },
-        {
-          "n": 11,
-          "x": 5,
-          "y": 4
-        },
-        {
-          "n": 12,
-          "x": 3,
-          "y": 4
-        }
-      ],
-      "walls": [],
-      "difficultyTag": "d2",
-      "source": "linkedin_editor",
-      "source_pack": "pack_linkedin_editor_v1",
-      "source_origin": "linkedin_editor",
-      "variant": "classic",
-      "canonical_hash": "3df9caefd4eae76daa2714a775436d87dd9898460dcb10075e3d88ca6182fc5b",
-      "meta": {
-        "source_pack": "pack_linkedin_editor_v1",
-        "source_origin": "linkedin_editor",
-        "variant": "classic",
-        "canonical_hash": "3df9caefd4eae76daa2714a775436d87dd9898460dcb10075e3d88ca6182fc5b",
-        "imported_from": "C:\\Users\\jacob\\Downloads\\niveles_linkedin_editor.json"
       }
     }
   ]

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'l10n/l10n.dart';
 import 'wallet_chip.dart';
 
 class GameHeader extends StatelessWidget {
@@ -40,14 +41,14 @@ class GameHeader extends StatelessWidget {
           children: [
             _NavButton(
               icon: Icons.arrow_back_rounded,
-              label: 'Atras',
+              label: context.l10n.liveDuelBack,
               onTap: onBack,
               isDark: isDark,
             ),
             const SizedBox(width: 8),
             _NavButton(
               icon: Icons.home_rounded,
-              label: 'Home',
+              label: context.l10n.tabHome,
               onTap: onHome,
               isDark: isDark,
             ),
@@ -58,15 +59,18 @@ class GameHeader extends StatelessWidget {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: fg,
                   side: BorderSide(
-                    color: isDark ? const Color(0xFF7D7D82) : const Color(0xFF2D2D2D),
+                    color: isDark
+                        ? const Color(0xFF7D7D82)
+                        : const Color(0xFF2D2D2D),
                     width: 1.2,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 ),
-                child: const Text('Clear'),
+                child: Text(context.l10n.gameClear),
               ),
           ],
         ),
@@ -119,7 +123,7 @@ class GameHeader extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Next $nextText',
+                context.l10n.gameNext(nextText),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -127,7 +131,7 @@ class GameHeader extends StatelessWidget {
                 ),
               ),
               Text(
-                'Stars $starsText',
+                context.l10n.gameStars(starsText),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,

@@ -1,0 +1,30 @@
+{
+  "packId": "tutorial",
+  "version": "pack_tutorial_v1",
+  "count": 1,
+  "world": 0,
+  "levels": [
+    {
+      "id": "tutorial_intro_01",
+      "size": {
+        "w": 3,
+        "h": 3
+      },
+      "clues": [
+        { "n": 1, "x": 0, "y": 0 },
+        { "n": 2, "x": 1, "y": 1 },
+        { "n": 3, "x": 2, "y": 2 }
+      ],
+      "walls": [],
+      "difficultyTag": "d1",
+      "source": "tutorial",
+      "variant": "classic",
+      "meta": {
+        "source_pack": "pack_tutorial_v1",
+        "source_origin": "tutorial",
+        "variant": "classic"
+      },
+      "solution": [0, 1, 2, 5, 8, 7, 6, 3, 4]
+    }
+  ]
+}

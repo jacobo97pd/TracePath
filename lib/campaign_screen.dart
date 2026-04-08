@@ -1,16 +1,11 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'app_data.dart';
+import 'l10n/l10n.dart';
 import 'progress_service.dart';
-
-const _packDescriptions = <String, String>{
-  'classic': 'Balanced introduction',
-  'architect': 'More walls and tighter planning',
-  'expert': 'Larger boards and harder routes',
-};
 
 class CampaignScreen extends StatefulWidget {
   const CampaignScreen({super.key, required this.progressService});
@@ -70,7 +65,7 @@ class _CampaignScreenState extends State<CampaignScreen> {
 
     final items = appPacks.map((pack) {
       final unlocked = widget.progressService.isPackUnlocked(pack.id);
-      final description = _packDescriptions[pack.id] ?? '';
+      final description = _packDescription(pack.id, context.l10n);
       final requirement =
           widget.progressService.packUnlockRequirementText(pack.id);
       final subtitle = unlocked ? description : '$description\n$requirement';
@@ -90,12 +85,13 @@ class _CampaignScreenState extends State<CampaignScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     assert(() {
       debugPrint('[Campaign] build');
       return true;
     }());
     return Scaffold(
-      appBar: AppBar(title: const Text('Campaign')),
+      appBar: AppBar(title: Text(l10n.campaignTitle)),
       body: FutureBuilder<List<_PackTileModel>>(
         future: _packsFuture.timeout(const Duration(seconds: 3)),
         builder: (context, snapshot) {
@@ -104,11 +100,11 @@ class _CampaignScreenState extends State<CampaignScreen> {
               padding: const EdgeInsets.all(16),
               itemCount: appPacks.length,
               itemBuilder: (context, index) {
-                return const Card(
+                return Card(
                   child: ListTile(
-                    leading: Icon(Icons.grid_view_rounded),
-                    title: Text('Loading...'),
-                    subtitle: Text('Preparing pack status'),
+                    leading: const Icon(Icons.grid_view_rounded),
+                    title: Text(l10n.campaignLoading),
+                    subtitle: Text(l10n.campaignPreparingStatus),
                   ),
                 );
               },
@@ -122,11 +118,11 @@ class _CampaignScreenState extends State<CampaignScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('Could not load campaign packs.'),
+                    Text(l10n.campaignLoadError),
                     const SizedBox(height: 12),
                     FilledButton(
                       onPressed: _reloadPackStates,
-                      child: const Text('Retry'),
+                      child: Text(l10n.dailyRetry),
                     ),
                   ],
                 ),
@@ -179,6 +175,19 @@ class _CampaignScreenState extends State<CampaignScreen> {
     }
     return '${value[0].toUpperCase()}${value.substring(1)}';
   }
+
+  String _packDescription(String packId, dynamic l10n) {
+    switch (packId) {
+      case 'classic':
+        return l10n.campaignPackClassic;
+      case 'architect':
+        return l10n.campaignPackArchitect;
+      case 'expert':
+        return l10n.campaignPackExpert;
+      default:
+        return '';
+    }
+  }
 }
 
 class _PackTileModel {
@@ -192,3 +201,4 @@ class _PackTileModel {
   final bool unlocked;
   final String subtitle;
 }
+

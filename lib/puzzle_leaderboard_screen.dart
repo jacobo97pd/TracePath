@@ -1,8 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
+﻿import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'leaderboard_service.dart';
+import 'l10n/l10n.dart';
 import 'services/friends_ranking_service.dart';
 import 'ui/components/friends_ranking_list.dart';
 import 'ui/components/game_card.dart';
@@ -37,6 +38,7 @@ class _PuzzleLeaderboardScreenState extends State<PuzzleLeaderboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
@@ -44,7 +46,7 @@ class _PuzzleLeaderboardScreenState extends State<PuzzleLeaderboardScreen> {
         backgroundColor: const Color(0xFF0F172A),
         elevation: 0,
         title: Text(
-          'Friends ranking - L${widget.levelIndex}',
+          l10n.leaderboardFriendsTitleWithLevel(widget.levelIndex),
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w800,
@@ -69,8 +71,8 @@ class _PuzzleLeaderboardScreenState extends State<PuzzleLeaderboardScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Friends ranking',
+                  Text(
+                    l10n.leaderboardFriendsTitle,
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,
@@ -79,7 +81,10 @@ class _PuzzleLeaderboardScreenState extends State<PuzzleLeaderboardScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Level ${widget.levelIndex} - ${widget.packId}',
+                    l10n.leaderboardLevelPack(
+                      widget.levelIndex,
+                      widget.packId,
+                    ),
                     style: const TextStyle(
                       color: Color(0xFF9EB0D2),
                       fontSize: 12,
@@ -90,8 +95,8 @@ class _PuzzleLeaderboardScreenState extends State<PuzzleLeaderboardScreen> {
                   FriendsRankingList(
                     future: _future,
                     currentUid: currentUid,
-                    emptyText: 'No friends scores yet for this level.',
-                    errorText: 'Friends ranking unavailable right now.',
+                    emptyText: l10n.leaderboardNoFriendsScores,
+                    errorText: l10n.leaderboardUnavailable,
                   ),
                 ],
               ),
@@ -102,3 +107,4 @@ class _PuzzleLeaderboardScreenState extends State<PuzzleLeaderboardScreen> {
     );
   }
 }
+

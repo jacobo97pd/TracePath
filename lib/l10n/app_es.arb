@@ -2,8 +2,8 @@
   "@@locale": "es",
   "appTitle": "TracePath",
   "victoryDataMissing": "Faltan datos de victoria",
-  "liveDuelInviteTitle": "Invitación de duelo en vivo",
-  "liveDuelInviteBody": "{from} te desafió a un duelo en vivo.\n¿Quieres aceptar?",
+  "liveDuelInviteTitle": "Invitacion de duelo en vivo",
+  "liveDuelInviteBody": "{from} te desafio a un duelo en vivo.\nQuieres aceptar",
   "@liveDuelInviteBody": {
     "placeholders": {
       "from": {}
@@ -11,13 +11,13 @@
   },
   "decline": "Rechazar",
   "accept": "Aceptar",
-  "liveInviteCouldNotProcess": "No se pudo procesar la invitación",
-  "liveInviteNoLongerAvailable": "La invitación ya no está disponible",
-  "liveInviteAlreadyClosed": "Este duelo ya está cerrado",
-  "liveInviteInvalidAccount": "La invitación no es válida para esta cuenta",
-  "liveInviteInvalidPayload": "El contenido de la invitación es inválido",
-  "liveInvitePermissionsBlocked": "Los permisos bloquearon esta acción",
-  "liveInviteNetworkIssue": "Problema de red al procesar la invitación",
+  "liveInviteCouldNotProcess": "No se pudo procesar la invitacion",
+  "liveInviteNoLongerAvailable": "La invitacion ya no esta disponible",
+  "liveInviteAlreadyClosed": "Este duelo ya esta cerrado",
+  "liveInviteInvalidAccount": "La invitacion no es valida para esta cuenta",
+  "liveInviteInvalidPayload": "El contenido de la invitacion es invalido",
+  "liveInvitePermissionsBlocked": "Los permisos bloquearon esta accion",
+  "liveInviteNetworkIssue": "Problema de red al procesar la invitacion",
   "tabHome": "Inicio",
   "tabShop": "Tienda",
   "tabDuel": "Duelo",
@@ -48,12 +48,12 @@
     }
   },
   "homeTrainTitle": "Entrena tu mente",
-  "homeTrainSubtitle": "Traza caminos más rápido, mejora tu precisión y supera cada desafío.",
-  "homeStartSolving": "¡EMPIEZA A RESOLVER!",
-  "homeJumpToNextPuzzle": "Salta a tu próximo puzzle",
+  "homeTrainSubtitle": "Traza caminos mas rapido, mejora tu precision y supera cada desafio.",
+  "homeStartSolving": "EMPIEZA A RESOLVER!",
+  "homeJumpToNextPuzzle": "Salta a tu proximo puzzle",
   "homeContinue": "Continuar",
   "homeContinueFirstRun": "Empieza tu primera partida",
-  "homeContinueResumeLevel": "Nivel {level} · Retoma donde lo dejaste",
+  "homeContinueResumeLevel": "Nivel {level} Retoma donde lo dejaste",
   "@homeContinueResumeLevel": {
     "placeholders": {
       "level": {
@@ -61,10 +61,10 @@
       }
     }
   },
-  "homeQuickAccessTitle": "Accesos rápidos",
+  "homeQuickAccessTitle": "Accesos rapidos",
   "homeQuickAccessSubtitle": "Entra directo a tus modos favoritos",
   "homeQuickDailyTitle": "Puzzle diario",
-  "homeQuickDailySubtitle": "Un desafío cada día",
+  "homeQuickDailySubtitle": "Un desafio cada dia",
   "homeQuickLevelsTitle": "Niveles",
   "homeQuickLevelsSubtitle": "Elige cualquier nivel disponible",
   "homeQuickSocialTitle": "Social",
@@ -74,7 +74,7 @@
   "homeMetricLevelsSolved": "Niveles resueltos",
   "homeMetricCurrentStreak": "Racha actual",
   "homeMetricBestStreak": "Mejor racha",
-  "homeMetricHighestLevel": "Nivel más alto",
+  "homeMetricHighestLevel": "Nivel mas alto",
   "homeDailySolved": "Puzzles diarios resueltos: {count}",
   "@homeDailySolved": {
     "placeholders": {
@@ -85,35 +85,35 @@
   },
   "homeViewProfile": "Ver perfil",
   "duelHubTitle": "Centro de duelo",
-  "duelHubSubtitle": "Desafía amigos y juega partidas en vivo.",
+  "duelHubSubtitle": "Desafia amigos y juega partidas en vivo.",
   "duelCreating": "Creando duelo...",
   "duelChallengeFriend": "Desafiar a un amigo",
   "duelIncomingInvitesTitle": "Invitaciones entrantes",
-  "duelIncomingInvitesSubtitle": "Acepta o rechaza desafíos en vivo",
+  "duelIncomingInvitesSubtitle": "Acepta o rechaza desafios en vivo",
   "duelNoPendingInvitesTitle": "No hay invitaciones pendientes",
-  "duelNoPendingInvitesSubtitle": "Los nuevos desafíos aparecerán aquí.",
+  "duelNoPendingInvitesSubtitle": "Los nuevos desafios apareceran aqui.",
   "duelInviteLoadErrorTitle": "No se pudieron cargar las invitaciones",
   "duelTryAgainLater": "Intentalo de nuevo en un momento.",
   "duelActiveMatchesTitle": "Partidas activas",
   "duelActiveMatchesSubtitle": "Reanuda tus duelos en vivo",
   "duelNoActiveTitle": "No hay duelos activos",
-  "duelNoActiveSubtitle": "Empieza un desafío para jugar en vivo.",
+  "duelNoActiveSubtitle": "Empieza un desafio para jugar en vivo.",
   "duelActiveLoadErrorTitle": "No se pudieron cargar las partidas activas",
   "duelHistoryTitle": "Historial",
   "duelHistorySubtitle": "Resultados recientes de duelo",
-  "duelHistoryComingSoonTitle": "Historial próximamente",
-  "duelHistoryComingSoonSubtitle": "Tus últimos duelos se mostrarán aquí.",
+  "duelHistoryComingSoonTitle": "Historial proximamente",
+  "duelHistoryComingSoonSubtitle": "Tus ultimos duelos se mostraran aqui.",
   "duelChooseFriend": "Elige un amigo",
   "duelCouldNotLoadFriends": "No se pudieron cargar los amigos",
-  "duelNoFriendsYet": "Aún no tienes amigos",
-  "duelInviteSentText": "te envió una invitación de duelo en vivo.",
-  "duelAcceptError": "No se pudo aceptar la invitación: {error}",
+  "duelNoFriendsYet": "Aun no tienes amigos",
+  "duelInviteSentText": "te envio una invitacion de duelo en vivo.",
+  "duelAcceptError": "No se pudo aceptar la invitacion: {error}",
   "@duelAcceptError": {
     "placeholders": {
       "error": {}
     }
   },
-  "duelDeclineError": "No se pudo rechazar la invitación: {error}",
+  "duelDeclineError": "No se pudo rechazar la invitacion: {error}",
   "@duelDeclineError": {
     "placeholders": {
       "error": {}
@@ -122,7 +122,7 @@
   "duelAccept": "Aceptar",
   "duelResume": "Reanudar",
   "duelStatusPending": "Pendiente",
-  "duelStatusCountdown": "Cuenta atrás",
+  "duelStatusCountdown": "Cuenta atras",
   "duelStatusPlaying": "Jugando",
   "duelStatusFinished": "Finalizado",
   "duelStatusCancelled": "Cancelado",
@@ -133,7 +133,7 @@
       "name": {}
     }
   },
-  "duelLevelAndStatus": "Nivel: {level} · {status}",
+  "duelLevelAndStatus": "Nivel: {level} {status}",
   "@duelLevelAndStatus": {
     "placeholders": {
       "level": {},
@@ -141,12 +141,12 @@
     }
   },
   "duelErrorFinishCurrentFirst": "Termina primero tu duelo en curso.",
-  "duelErrorFriendBusy": "Este amigo ya está en otro duelo.",
+  "duelErrorFriendBusy": "Este amigo ya esta en otro duelo.",
   "duelErrorNoPuzzles": "No hay puzzles disponibles ahora mismo.",
   "duelErrorInvalidTarget": "No se pudo iniciar duelo con este amigo.",
-  "duelErrorCreateInvite": "No se pudo crear la invitación de duelo ahora mismo.",
+  "duelErrorCreateInvite": "No se pudo crear la invitacion de duelo ahora mismo.",
   "duelRemoveActiveTitle": "Eliminar partida activa",
-  "duelRemoveActiveBody": "Esta partida activa se cerrará y dejará de aparecer en esta lista.",
+  "duelRemoveActiveBody": "Esta partida activa se cerrara y dejara de aparecer en esta lista.",
   "duelKeep": "Mantener",
   "duelRemove": "Eliminar",
   "duelRemoving": "Eliminando...",
@@ -157,8 +157,8 @@
       "error": {}
     }
   },
-  "friendChallengeTitle": "Desafío amistoso",
-  "friendChallengeUnavailable": "Desafío no disponible.",
+  "friendChallengeTitle": "Desafio amistoso",
+  "friendChallengeUnavailable": "Desafio no disponible.",
   "friendChallengePuzzle": "Puzzle: {puzzleId}",
   "@friendChallengePuzzle": {
     "placeholders": {
@@ -171,7 +171,7 @@
       "mode": {}
     }
   },
-  "friendChallengePlayButton": "Jugar desafío amistoso",
+  "friendChallengePlayButton": "Jugar desafio amistoso",
   "shopTitle": "Tienda",
   "shopSkinEditorTooltip": "Editor de skins",
   "shopTabSkins": "Skins",
@@ -190,7 +190,7 @@
   },
   "shopFeaturedSkin": "Skin destacada",
   "shopPointerSkins": "Skins de puntero",
-  "shopLoadMore": "Cargar más",
+  "shopLoadMore": "Cargar mas",
   "shopOwned": "Comprado",
   "shopCoinsAmount": "{coins} monedas",
   "@shopCoinsAmount": {
@@ -212,11 +212,11 @@
   },
   "shopNewTrail": "NUEVA ESTELA",
   "shopUnlockedAndEquipped": "Desbloqueado y equipado",
-  "shopDefaultTrailDescription": "Estilo visual único para el trazo de tu ruta.",
+  "shopDefaultTrailDescription": "Estilo visual unico para el trazo de tu ruta.",
   "profileGuestMode": "Modo invitado",
   "profileGoogleAccount": "Cuenta de Google",
   "profileLogout": "Cerrar sesion",
-  "profileLogoutConfirm": "Quieres cerrar sesion?",
+  "profileLogoutConfirm": "Quieres cerrar sesion'",
   "profileCancel": "Cancelar",
   "profileSignedOut": "Sesion cerrada",
   "profileDefaultName": "Default",
@@ -350,5 +350,884 @@
   "loginContinueGuest": "Continuar como invitado",
   "loginGuestModeHint": "Modo invitado: sin amigos ni desafios.",
   "loginConnecting": "Conectando...",
-  "loginContinueGoogle": "Continuar con Google"
+  "loginContinueGoogle": "Continuar con Google",
+  "cardsCollectionTitle": "Coleccion de cartas",
+  "cardsCollectionEmpty": "Aun no tienes cartas desbloqueadas.\nCompra o desbloquea skins para coleccionarlas.",
+  "cardsRarityLegendary": "Legendaria",
+  "cardsRarityEpic": "Epica",
+  "cardsRarityRare": "Rara",
+  "cardsRarityCommon": "Comun",
+  "campaignTitle": "Campana",
+  "campaignLoading": "Cargando...",
+  "campaignPreparingStatus": "Preparando estado de pack",
+  "campaignLoadError": "No se pudieron cargar los packs de campana.",
+  "campaignPackClassic": "Introduccion equilibrada",
+  "campaignPackArchitect": "Mas muros y planificacion precisa",
+  "campaignPackExpert": "Tableros grandes y rutas dificiles",
+  "leaderboardFriendsTitleWithLevel": "Ranking de amigos - N{level}",
+  "@leaderboardFriendsTitleWithLevel": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "leaderboardFriendsTitle": "Ranking de amigos",
+  "leaderboardLevelPack": "Nivel {level} - {packId}",
+  "@leaderboardLevelPack": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      },
+      "packId": {}
+    }
+  },
+  "leaderboardNoFriendsScores": "Aun no hay tiempos de amigos en este nivel.",
+  "leaderboardUnavailable": "Ranking de amigos no disponible ahora.",
+  "dailyTitle": "Diario",
+  "dailyUnknownLoadError": "Error desconocido al cargar diario",
+  "dailyLoadError": "No se pudo cargar el puzzle diario.",
+  "dailyRetry": "Reintentar",
+  "dailyChallengeTitle": "Desafio diario",
+  "dailyNextPuzzleIn": "Siguiente puzzle en {countdown}",
+  "@dailyNextPuzzleIn": {
+    "placeholders": {
+      "countdown": {}
+    }
+  },
+  "dailyRewardLabel": "Recompensa",
+  "dailyCoinsReward": "{coins} monedas",
+  "@dailyCoinsReward": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "dailyStreakLabel": "Racha",
+  "dailyBestTimeLabel": "Mejor tiempo",
+  "dailyPlayAgain": "Jugar otra vez",
+  "dailyPlayDaily": "Jugar diario",
+  "dailyAttemptsSummary": "Intentos hoy: {attempts} - Mejor score: {bestScore}",
+  "@dailyAttemptsSummary": {
+    "placeholders": {
+      "attempts": {
+        "type": "int"
+      },
+      "bestScore": {}
+    }
+  },
+  "dailyNewPersonalBestToday": "Nuevo record personal de hoy",
+  "dailyCompletedTitle": "Diario completado",
+  "dailySavedWithPartialSync": "Guardado con sincronizacion parcial. Intenta de nuevo luego.",
+  "dailyRewardSyncFailed": "Fallo la sincronizacion de recompensa. Intentalo otra vez.",
+  "dailyAchievementUnlocked": "Logro desbloqueado",
+  "dailyRewardToastTitle": "Recompensa diaria",
+  "dailyRewardToastMessage": "+{coins} monedas",
+  "@dailyRewardToastMessage": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "dailyShareText": "Diario completado en {time}.",
+  "@dailyShareText": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "dailyCopyText": "Zip #{day} - {time} - Racha {streak} Y",
+  "@dailyCopyText": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "time": {},
+      "streak": {
+        "type": "int"
+      }
+    }
+  },
+  "liveDuelTitle": "Duelo en vivo",
+  "liveDuelCouldNotUpdateReady": "No se pudo actualizar Ready",
+  "liveDuelAcceptInviteFirst": "Acepta primero la invitacion",
+  "liveDuelAlreadyClosed": "Este duelo ya esta cerrado",
+  "liveDuelOpponent": "Rival",
+  "liveDuelReacted": "{sender} reacciono",
+  "@liveDuelReacted": {
+    "placeholders": {
+      "sender": {}
+    }
+  },
+  "liveDuelUnavailableNow": "Duelo en vivo no disponible ahora.",
+  "liveDuelMatchNotFound": "Partida no encontrada",
+  "liveDuelYou": "Tu",
+  "liveDuelWaitingPlayer": "Esperando jugador...",
+  "liveDuelLeave": "Salir del duelo",
+  "liveDuelHeroYouAbandoned": "ABANDONASTE",
+  "liveDuelHeroYouWin": "GANASTE",
+  "liveDuelHeroDraw": "EMPATE",
+  "liveDuelHeroYouLost": "PERDISTE",
+  "liveDuelInvitationReceived": "Invitacion recibida",
+  "liveDuelWaitingFriendJoin": "Esperando a que tu amigo se una...",
+  "liveDuelOpponentReady": "El rival esta listo",
+  "liveDuelOpponentJoinedWaitingReady": "El rival se unio, esperando Ready",
+  "liveDuelOpponentNotJoined": "El rival aun no se unio",
+  "liveDuelAccepting": "Aceptando...",
+  "liveDuelAcceptDuel": "Aceptar duelo",
+  "liveDuelSaving": "Guardando...",
+  "liveDuelUnready": "Quitar ready",
+  "liveDuelReady": "Ready",
+  "liveDuelAcceptFirstThenReady": "Acepta primero y luego marca Ready.",
+  "liveDuelGo": "GO!",
+  "liveDuelStartingIn": "Empieza en {value}...",
+  "@liveDuelStartingIn": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "liveDuelStartingMatch": "Iniciando partida...",
+  "liveDuelWaitingRoom": "Sala de espera",
+  "liveDuelGetReady": "Preparate",
+  "liveDuelMatchStarted": "Partida iniciada",
+  "liveDuelMatchResult": "Resultado",
+  "liveDuelMatchCancelled": "Partida cancelada",
+  "liveDuelYouAbandoned": "Abandonaste",
+  "liveDuelYouWonSmiley": "Ganaste Y",
+  "liveDuelDraw": "Empate",
+  "liveDuelDefeat": "Derrota",
+  "liveDuelDefeatByAbandon": "Derrota por abandono",
+  "liveDuelWinByAbandon": "Victoria por abandono",
+  "liveDuelYouWonDuel": "Ganaste el duelo",
+  "liveDuelNoWinner": "Sin ganador",
+  "liveDuelYouLost": "Perdiste",
+  "liveDuelYourTime": "Tu tiempo",
+  "liveDuelOpponentTime": "Tiempo rival",
+  "liveDuelCouldNotCreateRematch": "No se pudo crear revancha",
+  "liveDuelOpponentBusyAnother": "El rival esta en otro duelo",
+  "liveDuelFinishActiveFirst": "Termina tu duelo activo primero",
+  "liveDuelCreatingRematch": "Creando revancha...",
+  "liveDuelRematch": "Revancha",
+  "liveDuelBack": "Volver",
+  "liveDuelEmoteCooldown": "Cooldown de emote",
+  "liveDuelCouldNotSendEmote": "No se pudo enviar emote",
+  "liveDuelInviteExpired": "Invitacion expirada",
+  "liveDuelCountdownExpired": "Cuenta atras expirada",
+  "liveDuelMatchTimedOut": "Partida sin tiempo",
+  "liveDuelCancelled": "Duelo cancelado",
+  "liveDuelStateInvited": "Invitado",
+  "liveDuelStateJoined": "Unido",
+  "liveDuelStateReady": "Ready",
+  "liveDuelStatePlaying": "Jugando",
+  "liveDuelStateFinished": "Finalizado",
+  "liveDuelStateAbandoned": "Abandonado",
+  "victoryChallengeOnlyLevelRuns": "Este desafio solo esta disponible en niveles normales.",
+  "victoryAddFriendsFirst": "Agrega amigos primero para enviar desafios.",
+  "victoryChallengeFriendTitle": "Desafiar a un amigo",
+  "victoryChallengeFriendSubtitle": "Envia una invitacion de duelo en vivo aleatorio",
+  "victoryInviteOnline": "Invitar a duelo 1v1 en vivo - En linea",
+  "victoryInviteOffline": "Invitar a duelo 1v1 en vivo - Desconectado",
+  "victoryLiveInviteSent": "Invitacion de duelo enviada",
+  "victoryChallengeSendError": "No se pudo enviar el desafio ahora",
+  "victoryChallengeBlockedByRules": "Las reglas de Firestore bloquearon el desafio",
+  "victoryChallengeSetupNotReady": "El setup del desafio no esta listo aun. Intenta en un momento.",
+  "victoryFinishActiveDuelFirst": "Termina primero tu duelo activo",
+  "victoryFriendAlreadyInDuel": "{name} ya esta en otro duelo",
+  "@victoryFriendAlreadyInDuel": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "victoryNoPuzzlesForDuel": "No hay puzzles disponibles para duelo",
+  "victoryStatTime": "Tiempo",
+  "victoryStatBestTime": "Mejor tiempo",
+  "victoryCoinsWithAd": "Monedas (+{coins} ad)",
+  "@victoryCoinsWithAd": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "victoryCoinsReward": "Monedas recompensa",
+  "victoryLevelComplete": "NIVEL COMPLETADO",
+  "victoryCurrentStreak": "Racha actual: {streak}",
+  "@victoryCurrentStreak": {
+    "placeholders": {
+      "streak": {
+        "type": "int"
+      }
+    }
+  },
+  "victoryFriendsRanking": "Ranking de amigos",
+  "victoryReplay": "Repetir",
+  "victoryChallengeFriendCta": "Desafiar amigo",
+  "socialTitle": "Social",
+  "socialHubTitle": "Hub social",
+  "socialHubSubtitle": "Amigos, rankings y desafios",
+  "socialFriendsLabel": "Amigos",
+  "socialBestRankLabel": "Mejor rank",
+  "socialTopTimeLabel": "Top tiempo",
+  "socialGlobalTierLabel": "Tier global",
+  "socialFriendActionsTitle": "Acciones de amigos",
+  "socialFriendActionsSubtitle": "Define tu usuario y agrega amigos por username o UID",
+  "socialSetUsernameHint": "Define tu username",
+  "socialSave": "Guardar",
+  "socialFriendLookupHint": "Username, email o UID de amigo",
+  "socialAdd": "Agregar",
+  "socialFriendsSectionTitle": "Amigos",
+  "socialFriendsSectionSubtitle": "Tus rivales y companeros",
+  "socialFriendsWithCount": "Amigos ({count})",
+  "@socialFriendsWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "socialNoFriendsTitle": "Aun no tienes amigos",
+  "socialNoFriendsSubtitle": "Agrega amigos para competir y enviar desafios.",
+  "socialGlobalTop10Title": "Top 10 global",
+  "socialGlobalTop10Subtitle": "Mejores jugadores del mundo",
+  "socialNoGlobalScoresTitle": "Aun no hay scores globales",
+  "socialNoGlobalScoresSubtitle": "Completa niveles para aparecer en el ranking mundial.",
+  "socialChallengesTitle": "Desafios",
+  "socialChallengesSubtitle": "Invita o desafia a tus amigos ahora",
+  "socialChallengeFriend": "Desafiar amigo",
+  "socialInviteFriend": "Invitar amigo",
+  "socialFriendRequestTitle": "Solicitud de amistad",
+  "socialFriendRequestSent": "Solicitud enviada",
+  "socialCouldNotSendRequest": "No se pudo enviar la solicitud",
+  "socialCannotAddSelf": "No puedes agregarte a ti mismo",
+  "socialInvalidEmail": "Formato de email invalido",
+  "socialUserNotFound": "Usuario no encontrado",
+  "socialAlreadyFriends": "Ya sois amigos",
+  "socialRequestAlreadySent": "Solicitud ya enviada",
+  "socialRequestAlreadyReceived": "Ese usuario ya te envio una solicitud",
+  "socialNeedSignIn": "Debes iniciar sesion",
+  "socialRulesBlockedAction": "Las reglas de Firestore bloquearon esta accion",
+  "socialAddFriendsFirstForChallenges": "Agrega amigos primero para enviar desafios.",
+  "socialChallengeFriendSheetTitle": "Desafiar a un amigo",
+  "socialChallengeFriendSheetSubtitle": "Envia una invitacion de duelo en vivo",
+  "socialLiveInviteOnline": "Invitar a duelo 1v1 en vivo - En linea",
+  "socialLiveInviteOffline": "Invitar a duelo 1v1 en vivo - Desconectado",
+  "socialLiveInviteSentTitle": "Invitacion de duelo enviada",
+  "socialLiveInviteSentBody": "Esperando a que {name} acepte.",
+  "@socialLiveInviteSentBody": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "socialCouldNotSendChallenge": "No se pudo enviar el desafio ahora.",
+  "socialChallengeBlockedByRules": "Las reglas de Firestore bloquearon el desafio.",
+  "socialChallengeSetupNotReady": "El setup del desafio no esta listo aun. Intenta en un momento.",
+  "socialFinishCurrentLiveDuelFirst": "Termina primero tu duelo en vivo actual.",
+  "socialFriendAlreadyInLiveDuel": "{name} ya esta en otro duelo en vivo.",
+  "@socialFriendAlreadyInLiveDuel": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "socialNoPuzzlesForLiveDuel": "No hay puzzles disponibles para duelo en vivo.",
+  "socialRemoveFriendTitle": "Eliminar amigo",
+  "socialRemoveFriendBody": "Seguro que quieres eliminar a este amigo'",
+  "socialUsernameTitle": "Username",
+  "socialUsernameNotAvailable": "Username no disponible",
+  "socialUsernameUpdated": "Username actualizado",
+  "socialUsernameAlreadyUsed": "Username ya en uso",
+  "socialUsernameInvalid": "Username invalido (3-20, letras/numeros/._)",
+  "socialRulesBlockedUsernameWrite": "Las reglas de Firestore bloquearon el guardado del username",
+  "socialCouldNotSaveUsername": "No se pudo guardar el username",
+  "socialInviteReadyTitle": "Invitacion lista",
+  "socialInviteReadyBody": "Invitacion copiada. Compartela por WhatsApp o email.",
+  "socialMovesShort": "{count} movimientos",
+  "@socialMovesShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "socialStarsShort": "{count} estrellas",
+  "@socialStarsShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "socialGuestLockedTitle": "Social esta bloqueado en modo invitado",
+  "socialGuestLockedSubtitle": "Inicia sesion con Google desde Home para desafiar amigos y ver rankings.",
+  "socialGoHome": "Ir a Home",
+  "socialSkinTrail": "Skin: {skin} - Estela: {trail}",
+  "@socialSkinTrail": {
+    "placeholders": {
+      "skin": {},
+      "trail": {}
+    }
+  },
+  "socialOnline": "En linea",
+  "socialOffline": "Desconectado",
+  "socialStatusLabel": "Estado",
+  "socialSkinLabel": "Skin",
+  "socialTrailLabel": "Estela",
+  "socialReadyToCompete": "Listo para competir",
+  "energyNoEnergyTitle": "Sin energia",
+  "energyOutWithBattery": "No te queda energia. Espera {reset} al reset, o usa una bateria ahora.",
+  "@energyOutWithBattery": {
+    "placeholders": {
+      "reset": {}
+    }
+  },
+  "energyOutWithoutBattery": "No te queda energia. Espera {reset} al reset, o compra una bateria.",
+  "@energyOutWithoutBattery": {
+    "placeholders": {
+      "reset": {}
+    }
+  },
+  "energyCouldNotUseBattery": "No se pudo usar la bateria ahora.",
+  "energyRestored": "Energia restaurada a {current}/{max}.",
+  "@energyRestored": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "energyUseBattery": "Usar bateria",
+  "energyNotEnoughCoinsBattery": "No tienes monedas suficientes para comprar una bateria.",
+  "energyBatteryPurchaseFailed": "Fallo la compra de bateria. Intentalo de nuevo.",
+  "energyBatteryPurchasedAndUsed": "Bateria comprada y usada. Energia {current}/{max}.",
+  "@energyBatteryPurchasedAndUsed": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "energyBatteryPurchasedCount": "Bateria comprada. Baterias: {count}.",
+  "@energyBatteryPurchasedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "energyBuyBattery": "Comprar ({coins} monedas)",
+  "@energyBuyBattery": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "playLevelsCompletedToGo": "{completed} completados - {remaining} por completar",
+  "@playLevelsCompletedToGo": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "remaining": {
+        "type": "int"
+      }
+    }
+  },
+  "playLevelsContinueLevel": "Continuar N{level}",
+  "@playLevelsContinueLevel": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "playLevelsRanking": "Ranking",
+  "commonCancel": "Cancelar",
+  "commonClose": "Cerrar",
+  "commonNo": "No",
+  "commonOk": "OK",
+  "commonReload": "Recargar",
+  "commonRetry": "Reintentar",
+  "commonYes": "Si",
+  "gameGotIt": "Entendido",
+  "gameHowToPlayTitle": "Como jugar",
+  "gameCoreTutorialBody": "1) Empieza en el numero 1.\n2) Arrastra para conectar numeros en orden (1,2,3...).\n3) Aunque haya pocos numeros, debes rellenar todas las celdas del tablero.\n4) Si te equivocas, usa Deshacer o Reiniciar.",
+  "gameLetsGo": "Vamos",
+  "gameVariantAlphabetTitle": "Modo alfabeto",
+  "gameVariantAlphabetBody": "Conecta celdas en orden alfabetico siguiendo las pistas.",
+  "gameVariantAlphabetReverseTitle": "Modo alfabeto inverso",
+  "gameVariantAlphabetReverseBody": "Conecta celdas en orden alfabetico inverso.",
+  "gameVariantMultiplesTitle": "Modo multiplos",
+  "gameVariantMultiplesBody": "Los numeros son multiplos de una base. Sigue los multiplos en orden.",
+  "gameVariantRomanMultiplesTitle": "Modo multiplos romanos",
+  "gameVariantRomanMultiplesBody": "Sigue multiplos crecientes mostrados en numeros romanos.",
+  "gameVariantRomanTitle": "Modo numeros romanos",
+  "gameVariantRomanBody": "Sigue la secuencia de numeros romanos en orden.",
+  "gameVariantDefaultTitle": "Modo variante",
+  "gameVariantDefaultBody": "Sigue la secuencia de pistas en el orden correcto.",
+  "gameVariantExample": "Ejemplo: {example}",
+  "@gameVariantExample": {
+    "placeholders": {
+      "example": {}
+    }
+  },
+  "gamePackNotFound": "Pack no encontrado",
+  "gameLoadingLevel": "Cargando nivel",
+  "gameLevelUnavailable": "Nivel no disponible",
+  "gameCouldNotLoadLevel": "No se pudo cargar este nivel.",
+  "gameEnergyCounter": "Energia {current}/{max}",
+  "@gameEnergyCounter": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "gameEnergyResetIn": "Reset en {time}",
+  "@gameEnergyResetIn": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "gameDuelFinishedBoardLocked": "Duelo finalizado. Tablero bloqueado.",
+  "gameUndo": "Deshacer",
+  "gameRestart": "Reiniciar",
+  "gameHintInfinite": "Pista (INF)",
+  "gameHintCount": "Pista ({count})",
+  "@gameHintCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "gameReporting": "Reportando...",
+  "gameReported": "Reportado",
+  "gameReportLevel": "Reportar nivel",
+  "gameWatchAd": "Ver anuncio",
+  "gameAdStatus": "Estado anuncio",
+  "gameDailyAdLimitReached": "Limite diario alcanzado. No hay mas anuncios hoy.",
+  "gameNextAdIn": "Siguiente anuncio en {time}",
+  "@gameNextAdIn": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "gameLevelCompleteReward": "NIVEL COMPLETADO! {reward}",
+  "@gameLevelCompleteReward": {
+    "placeholders": {
+      "reward": {}
+    }
+  },
+  "gameRankingUnavailable": "Ranking no disponible",
+  "gameTryAgainMoment": "Prueba de nuevo en un momento.",
+  "gameFriendsRanking": "Ranking de amigos",
+  "gameLevelLabel": "Nivel {level}",
+  "@gameLevelLabel": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "gameNoFriendsRankingTitle": "Ningun amigo ha jugado este nivel.",
+  "gameNoFriendsRankingBody": "Completa el nivel e invita a tus amigos a competir.",
+  "gameReportUnavailableTitle": "Reporte no disponible",
+  "gameReportUnavailableBody": "Juega al menos {seconds} segundos antes de reportar este nivel.",
+  "@gameReportUnavailableBody": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "gameReportConfirmTitle": "Reportar este nivel'",
+  "gameReportConfirmBody": "Si este nivel no se puede resolver, puedes reportarlo y desbloquear el siguiente.",
+  "gameReportAndSkip": "Reportar y saltar",
+  "gameSignInRequiredTitle": "Inicio de sesion requerido",
+  "gameSignInRequiredBody": "Inicia sesion para reportar y saltar niveles.",
+  "gameAlreadyReportedTitle": "Ya reportado",
+  "gameAlreadyReportedBody": "Este nivel ya fue reportado desde esta cuenta.",
+  "gameLevelReportedTitle": "Nivel reportado",
+  "gameLevelReportedBody": "Reporte enviado. Siguiente nivel desbloqueado.",
+  "gameCouldNotReportTitle": "No se pudo reportar el nivel",
+  "gameReportErrorPermissionDenied": "Los permisos bloquearon esta accion. Intentalo mas tarde.",
+  "gameReportErrorEndpointNotConfigured": "El endpoint de reportes no esta configurado en esta build.",
+  "gameReportErrorInvalidEndpoint": "La URL del endpoint de reportes no es valida.",
+  "gameReportErrorTimeout": "La solicitud de reporte agoto el tiempo. Reintenta.",
+  "gameReportErrorNetwork": "Problema de red al reportar. Intentalo de nuevo.",
+  "gameReportErrorServerRejected": "El servidor rechazo el reporte. Intentalo en un momento.",
+  "gameReportErrorUnauthenticated": "Vuelve a iniciar sesion y reintenta.",
+  "gameReportErrorGeneric": "No se pudo reportar este nivel ahora. Intentalo de nuevo.",
+  "gameHintTitle": "Pista",
+  "gameNoHintsLeft": "No quedan pistas",
+  "gameAlmostThereTitle": "Casi listo",
+  "gameAlmostThereBody": "Termina en {label} para completar el nivel.",
+  "@gameAlmostThereBody": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "gameTimeTitle": "Tiempo!",
+  "gameWaitingForDuelResult": "Esperando resultado del duelo...",
+  "gameLevelAlreadyCompletedTitle": "Nivel ya completado",
+  "gameNoCoinRewardReplay": "Sin recompensa de monedas en repeticion",
+  "gameNewBestTitle": "Nuevo mejor tiempo",
+  "gameBeatYourGhost": "Has superado a tu fantasma!",
+  "gameAchievementUnlocked": "Logro desbloqueado",
+  "gameRewardedAdUnavailableTitle": "Anuncio recompensado no disponible",
+  "gameContinuingWithoutBonus": "Continuando sin bonus.",
+  "gameBonusRewardTitle": "Recompensa bonus",
+  "gameBonusCoins": "+{coins} monedas",
+  "@gameBonusCoins": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "gameDailyLimitReachedTitle": "Limite diario alcanzado",
+  "gameNoMoreAdsToday": "No hay mas anuncios hoy",
+  "gamePleaseWaitTitle": "Espera",
+  "gameAdRewardTitle": "Recompensa de anuncio",
+  "gameRewardedAdStatusTitle": "Estado anuncio recompensado",
+  "gameRewardedAdStatusBody": "Cargado: {loaded}\nCargando: {loading}",
+  "@gameRewardedAdStatusBody": {
+    "placeholders": {
+      "loaded": {},
+      "loading": {}
+    }
+  },
+  "gameAdReloadRequestedTitle": "Recarga de anuncio solicitada",
+  "gameAdReloadRequestedBody": "Intentando cargar un anuncio recompensado.",
+  "gameDuelYouWonTitle": "HAS GANADO!",
+  "gameDuelYouLostTitle": "HAS PERDIDO ;(",
+  "gameDuelYouFinishedFirst": "Terminaste primero en el duelo.",
+  "gameDuelFriendFinishedFirst": "Tu amigo termino primero.",
+  "gameLiveDuelFinishedWaiting": "Terminado en {time}. Esperando resultado...",
+  "@gameLiveDuelFinishedWaiting": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "gameLiveDuelResultTitle": "Resultado del duelo",
+  "gameOpponentAbandoned": "El rival abandono",
+  "gameLevel": "Nivel",
+  "gameOpponent": "Rival",
+  "gamePlayer": "Jugador",
+  "gameEmotesAfterDuelResult": "Emotes disponibles al terminar el duelo",
+  "gameEmoteLaugh": "Risa",
+  "gameEmoteCool": "Cool",
+  "gameEmoteWow": "Wow",
+  "gameEmoteCry": "Lloro",
+  "gameEmoteClap": "Aplaudir",
+  "gameEmoteHeart": "Corazon",
+  "gameEnergyEmptyResetIn": "Energia vacia. Reset en {time}.",
+  "@gameEnergyEmptyResetIn": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "gameBatteries": "Baterias",
+  "gameGhostBest": "Mejor fantasma: {time}",
+  "@gameGhostBest": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "gameGhostOn": "Fantasma: ON",
+  "gameGhostOff": "Fantasma: OFF",
+  "gameGhostAvailableAfterFirst": "Fantasma disponible tras la primera completada",
+  "gameNoRankingImpact": "Sin impacto en ranking",
+  "shopTrailEffects": "Efectos de estela",
+  "shopCoinPacksUnavailable": "Packs de monedas no disponibles",
+  "shopCouldNotLoadCoinPacksRetry": "No se pudieron cargar los packs de monedas. Reintenta.",
+  "shopCheckConnectionRetry": "Revisa tu conexion y reintenta.",
+  "shopNoCoinPacksAvailable": "No hay packs de monedas disponibles",
+  "shopStoreProductsUnavailableNow": "Los productos de tienda no estan disponibles ahora. Prueba mas tarde.",
+  "shopRestore": "Restaurar",
+  "shopLoadingStoreProducts": "Cargando productos de tienda...",
+  "shopStoreUnavailable": "Tienda no disponible",
+  "shopPurchasesDisabledBrowse": "Puedes ver los packs de monedas, pero las compras estan desactivadas ahora.",
+  "shopShowingLocalCatalogFallback": "Mostrando catalogo local de respaldo",
+  "shopEnergyBatteries": "Baterias de energia",
+  "shopBatteriesResetIn": "Baterias: {count} - Reset en {time}",
+  "@shopBatteriesResetIn": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "time": {}
+    }
+  },
+  "shopUseOneBatteryNow": "Usar 1 bateria ahora",
+  "shopProcessingPurchase": "Procesando compra...",
+  "shopPurchasedBatteries": "Compradas {units} bateria(s). Total: {total}.",
+  "@shopPurchasedBatteries": {
+    "placeholders": {
+      "units": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "shopPurchaseSuccessful": "Compra completada",
+  "shopConfirmPurchaseTitle": "Confirmar compra",
+  "shopConfirmPurchaseBody": "Quieres comprar \"{name}\" por {coins} monedas'",
+  "@shopConfirmPurchaseBody": {
+    "placeholders": {
+      "name": {},
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "shopBuyNow": "Comprar ahora",
+  "playWorldFallbackTitle": "Mundo",
+  "playWorldFallbackSubtitle": "Ruta de puzzles",
+  "playWorldTitle": "Mundo {number}",
+  "playWorldSubtitle": "Ruta de puzzles {number}",
+  "@playWorldTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "@playWorldSubtitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingInProgress": "En progreso",
+  "onboardingGoNow": "Ir ahora",
+  "duelHistoryTimes": "Tu {youTime} Rival {opponentTime}",
+  "@duelHistoryTimes": {
+    "placeholders": {
+      "youTime": {},
+      "opponentTime": {}
+    }
+  },
+  "duelStatusVictory": "Victoria",
+  "duelStatusDefeat": "Derrota",
+  "playLevelsWorldLockedCompletePrevious": "Mundo bloqueado. Completa o reporta todos los niveles del mundo anterior primero.",
+  "playLevelsEnergyStatus": "{current}/{max} - reset {time}",
+  "@playLevelsEnergyStatus": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      },
+      "time": {}
+    }
+  },
+  "playLevelsWorldProgressSummary": "{total} niveles - {completed} completados",
+  "@playLevelsWorldProgressSummary": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "completed": {
+        "type": "int"
+      }
+    }
+  },
+  "playLevelsEnergyDetailed": "Energia {current}/{max}. Reset en {time}.",
+  "@playLevelsEnergyDetailed": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      },
+      "time": {}
+    }
+  },
+  "playLevelsSelectedLevel": "Nivel seleccionado",
+  "playLevelsSelectedLevelVariant": "Nivel {level} {variant}",
+  "@playLevelsSelectedLevelVariant": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      },
+      "variant": {}
+    }
+  },
+  "playLevelsPlay": "Jugar",
+  "playLevelsLocked": "Bloqueado",
+  "playLevelsDifficultyWarmup": "Calentamiento",
+  "playLevelsDifficultyEasy": "Facil",
+  "playLevelsDifficultyMedium": "Medio",
+  "playLevelsDifficultyHard": "Dificil",
+  "playLevelsDifficultyExpert": "Experto",
+  "playLevelsDifficultyClassic": "Clasico",
+  "playLevelsVariantMultiplesRoman": "Multiplos Romanos",
+  "playLevelsVariantAlphabetReverse": "Alfabeto Inverso",
+  "playLevelsVariantAlphabet": "Alfabeto",
+  "playLevelsVariantMultiples": "Multiplos",
+  "playLevelsVariantRoman": "Romano",
+  "playLevelsVariantClassic": "Clasico",
+  "gameLevelProgress": "Nivel {level} / {total}",
+  "@gameLevelProgress": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "gameFriendlyChallengeCompleteHeadline": "Reto amistoso completado",
+  "gameReplay": "Repetir",
+  "gameFriendlyChallengeShare": "Reto amistoso completado en {time}.",
+  "@gameFriendlyChallengeShare": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "gameFriendlyChallengeCopy": "Reto amistoso | {time}",
+  "@gameFriendlyChallengeCopy": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "gameContinueTutorial": "Continuar tutorial",
+  "gameVictoryShareText": "He resuelto Zip #{level} en {time}. Puntuacion {score}.",
+  "@gameVictoryShareText": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      },
+      "time": {},
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "gameVictoryCopyText": "Zip #{level} - {time} - Racha {streak} Y",
+  "@gameVictoryCopyText": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      },
+      "time": {},
+      "streak": {
+        "type": "int"
+      }
+    }
+  },
+  "gameReacted": "{name} reacciono",
+  "@gameReacted": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "victoryHeadlineFire": "Estas que ardes!",
+  "victoryHeadlineCrushing": "Lo estas rompiendo!",
+  "victoryHeadlinePerfect": "Partida perfecta!",
+  "victoryHeadlineSharp": "Movimiento preciso!",
+  "endlessTitle": "Infinito",
+  "endlessDifficulty": "Dificultad {difficulty}",
+  "@endlessDifficulty": {
+    "placeholders": {
+      "difficulty": {
+        "type": "int"
+      }
+    }
+  },
+  "endlessNewRun": "Nuevo",
+  "endlessResumeAt": "Reanudar en {index}",
+  "@endlessResumeAt": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "endlessStartNewRun": "Iniciar nueva run infinita",
+  "endlessBestSummary": "Mejor puntuacion: {score} | Mejor indice: {index} | Mejor media: {avg}",
+  "@endlessBestSummary": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      },
+      "index": {
+        "type": "int"
+      },
+      "avg": {}
+    }
+  },
+  "endlessCouldNotLoadPuzzle": "No se pudo cargar el puzzle infinito.",
+  "endlessRunSeed": "Semilla de run: {seed}",
+  "@endlessRunSeed": {
+    "placeholders": {
+      "seed": {
+        "type": "int"
+      }
+    }
+  },
+  "endlessSolved": "Completado!",
+  "endlessShareText": "Infinito D{difficulty} #{index} en {time}.",
+  "@endlessShareText": {
+    "placeholders": {
+      "difficulty": {
+        "type": "int"
+      },
+      "index": {
+        "type": "int"
+      },
+      "time": {}
+    }
+  },
+  "endlessCopyText": "Zip #{index} - {time} - Racha {streak} Y",
+  "@endlessCopyText": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "time": {},
+      "streak": {
+        "type": "int"
+      }
+    }
+  },
+  "levelsPackTitle": "Niveles de {pack}",
+  "@levelsPackTitle": {
+    "placeholders": {
+      "pack": {}
+    }
+  },
+  "gameClear": "Limpiar",
+  "gameNext": "Siguiente {value}",
+  "@gameNext": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "gameStars": "Estrellas {value}",
+  "@gameStars": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "victoryPrimaryNextLevel": "Siguiente nivel",
+  "victoryPrimaryPlayAgain": "Jugar de nuevo",
+  "retry": "Reintentar"
 }

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import 'l10n/l10n.dart';
 import 'network_burst_overlay.dart';
 import 'models/friend_profile.dart';
 import 'services/friends_service.dart';
@@ -46,12 +47,13 @@ class VictoryScreenArgs {
   final String levelId;
 }
 
-String defaultVictoryHeadline(int seed) {
-  const headlines = <String>[
-    "You're on fire!",
-    'Crushing it!',
-    'Perfect run!',
-    'Sharp move!',
+String defaultVictoryHeadline(BuildContext context, int seed) {
+  final l10n = context.l10n;
+  final headlines = <String>[
+    l10n.victoryHeadlineFire,
+    l10n.victoryHeadlineCrushing,
+    l10n.victoryHeadlinePerfect,
+    l10n.victoryHeadlineSharp,
   ];
   return headlines[seed.abs() % headlines.length];
 }
@@ -136,12 +138,13 @@ class _VictoryScreenState extends State<VictoryScreen>
   }
 
   Future<void> _sendChallengeToFriend() async {
+    final l10n = context.l10n;
     final levelId = widget.args.levelId.trim();
     if (levelId.isEmpty) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('This challenge is only available for level runs.'),
+        SnackBar(
+          content: Text(l10n.victoryChallengeOnlyLevelRuns),
           duration: Duration(milliseconds: 1100),
         ),
       );
@@ -161,8 +164,8 @@ class _VictoryScreenState extends State<VictoryScreen>
     if (!mounted) return;
     if (friends.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Add friends first to send in-game challenges.'),
+        SnackBar(
+          content: Text(l10n.victoryAddFriendsFirst),
           duration: Duration(milliseconds: 1200),
         ),
       );
@@ -199,8 +202,8 @@ class _VictoryScreenState extends State<VictoryScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'Challenge a friend',
+                Text(
+                  l10n.victoryChallengeFriendTitle,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -209,7 +212,7 @@ class _VictoryScreenState extends State<VictoryScreen>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Send a live duel invite with a random puzzle',
+                  l10n.victoryChallengeFriendSubtitle,
                   style:
                       const TextStyle(color: Color(0xFF9EB0D2), fontSize: 12),
                 ),
@@ -246,7 +249,8 @@ class _VictoryScreenState extends State<VictoryScreen>
                                             ? f.displayName
                                                 .substring(0, 1)
                                                 .toUpperCase()
-                                            : 'P',
+                                            : l10n.homePlayerName.characters
+                                                .first,
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.w800,
@@ -278,8 +282,8 @@ class _VictoryScreenState extends State<VictoryScreen>
                                       ),
                                       Text(
                                         f.isOnline
-                                            ? 'Invite to a live 1v1 duel · Online'
-                                            : 'Invite to a live 1v1 duel · Offline',
+                                            ? l10n.victoryInviteOnline
+                                            : l10n.victoryInviteOffline,
                                         style: const TextStyle(
                                           color: Color(0xFF9EB0D2),
                                           fontSize: 12,
@@ -319,8 +323,8 @@ class _VictoryScreenState extends State<VictoryScreen>
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Live duel invite sent'),
+        SnackBar(
+          content: Text(l10n.victoryLiveInviteSent),
           duration: Duration(milliseconds: 1100),
         ),
       );
@@ -331,17 +335,17 @@ class _VictoryScreenState extends State<VictoryScreen>
             '[victory] sendLiveDuelInvite failed toUid=${friend.uid} levelId=$levelId error=$e');
       }
       if (!mounted) return;
-      var message = 'Could not send challenge right now';
+      var message = l10n.victoryChallengeSendError;
       if (e is FirebaseException && e.code == 'permission-denied') {
-        message = 'Challenge blocked by Firestore rules';
+        message = l10n.victoryChallengeBlockedByRules;
       } else if (e is FirebaseException && e.code == 'failed-precondition') {
-        message = 'Challenge setup is not ready yet. Try again in a moment.';
+        message = l10n.victoryChallengeSetupNotReady;
       } else if (e.toString().contains('ALREADY_IN_ACTIVE_DUEL')) {
-        message = 'Finish your active duel first';
+        message = l10n.victoryFinishActiveDuelFirst;
       } else if (e.toString().contains('TARGET_IN_ACTIVE_DUEL')) {
-        message = '${friend.displayName} is already in another duel';
+        message = l10n.victoryFriendAlreadyInDuel(friend.displayName);
       } else if (e.toString().contains('NO_PUZZLES_AVAILABLE')) {
-        message = 'No puzzles available for duel';
+        message = l10n.victoryNoPuzzlesForDuel;
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -354,15 +358,16 @@ class _VictoryScreenState extends State<VictoryScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final args = widget.args;
     final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
     final stats = <({String label, String value})>[
-      (label: 'Time', value: args.timeText),
-      (label: 'Best time', value: args.averageText),
+      (label: l10n.victoryStatTime, value: args.timeText),
+      (label: l10n.victoryStatBestTime, value: args.averageText),
       (
         label: args.adBonusCoins > 0
-            ? 'Coins (+${args.adBonusCoins} ad)'
-            : 'Coins reward',
+            ? l10n.victoryCoinsWithAd(args.adBonusCoins)
+            : l10n.victoryCoinsReward,
         value: '+${args.coinsEarned}',
       ),
     ];
@@ -407,7 +412,7 @@ class _VictoryScreenState extends State<VictoryScreen>
                           ),
                           const Spacer(),
                           Text(
-                            'LEVEL COMPLETE',
+                            l10n.victoryLevelComplete,
                             style: TextStyle(
                               color: args.accentColor,
                               fontWeight: FontWeight.w900,
@@ -476,7 +481,7 @@ class _VictoryScreenState extends State<VictoryScreen>
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'Current streak: ${args.streak}',
+                            l10n.victoryCurrentStreak(args.streak),
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
@@ -497,8 +502,8 @@ class _VictoryScreenState extends State<VictoryScreen>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Friends ranking',
+                              Text(
+                                l10n.victoryFriendsRanking,
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w800,
@@ -563,13 +568,13 @@ class _VictoryScreenState extends State<VictoryScreen>
                       builder: (context, constraints) {
                         final compact = constraints.maxWidth < 430;
                         final replayButton = GameButton(
-                          label: 'Replay',
+                          label: l10n.victoryReplay,
                           outlined: true,
                           expanded: true,
                           onTap: () => Navigator.of(context).pop('replay'),
                         );
                         final challengeButton = GameButton(
-                          label: 'Challenge Friend',
+                          label: l10n.victoryChallengeFriendCta,
                           outlined: true,
                           expanded: true,
                           onTap: _sendChallengeToFriend,

@@ -1,10 +1,11 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'l10n/l10n.dart';
 import 'models/live_match.dart';
 import 'services/live_duel_service.dart';
 
@@ -115,12 +116,12 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      var message = 'Could not update ready state';
+      var message = context.l10n.liveDuelCouldNotUpdateReady;
       final error = e.toString();
       if (error.contains('INVITE_NOT_ACCEPTED')) {
-        message = 'Accept the duel invite first';
+        message = context.l10n.liveDuelAcceptInviteFirst;
       } else if (error.contains('MATCH_CLOSED')) {
-        message = 'This duel is already closed';
+        message = context.l10n.liveDuelAlreadyClosed;
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message)),
@@ -223,7 +224,7 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
     if (!mounted) return;
     final sender = emote.senderUsername.trim().isNotEmpty
         ? emote.senderUsername.trim()
-        : 'Opponent';
+        : context.l10n.liveDuelOpponent;
     _showHeroIncomingEmoteOverlay(
       glyph: _emoteGlyph(emote.emoteId),
       sender: sender,
@@ -304,7 +305,7 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
                               if (sender.trim().isNotEmpty) ...[
                                 SizedBox(height: compact ? 6 : 8),
                                 Text(
-                                  '$sender reacted',
+                                  context.l10n.liveDuelReacted(sender),
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: const Color(0xFFD8EEFF),
@@ -342,6 +343,7 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final match = _match;
     final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
     final opponentUid = match?.opponentUid(uid) ?? '';
@@ -352,7 +354,7 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF071022),
       appBar: AppBar(
-        title: const Text('Live Duel'),
+        title: Text(l10n.liveDuelTitle),
       ),
       body: SafeArea(
         child: LayoutBuilder(
@@ -375,12 +377,12 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
                   ? const Center(child: CircularProgressIndicator())
                   : _error != null
                       ? _ErrorCard(
-                          message: 'Live duel unavailable right now.',
+                          message: l10n.liveDuelUnavailableNow,
                           detail: _error.toString(),
                         )
                       : match == null
-                          ? const _ErrorCard(
-                              message: 'Match not found',
+                          ? _ErrorCard(
+                              message: l10n.liveDuelMatchNotFound,
                             )
                           : Stack(
                               children: [
@@ -401,24 +403,24 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
                                         ),
                                         SizedBox(height: sectionGap),
                                         _PlayerRow(
-                                          label: 'You',
+                                          label: l10n.liveDuelYou,
                                           username:
                                               myPlayer?.username.isNotEmpty ==
                                                       true
                                                   ? myPlayer!.username
-                                                  : 'Player',
+                                                  : l10n.homePlayerName,
                                           state: myPlayer?.state ??
                                               LiveMatchPlayerState.joined,
                                           compact: compact,
                                         ),
                                         SizedBox(height: compact ? 6 : 8),
                                         _PlayerRow(
-                                          label: 'Opponent',
+                                          label: l10n.liveDuelOpponent,
                                           username:
                                               opponent?.username.isNotEmpty ==
                                                       true
                                                   ? opponent!.username
-                                                  : 'Waiting player...',
+                                                  : l10n.liveDuelWaitingPlayer,
                                           state: opponent?.state ??
                                               LiveMatchPlayerState.invited,
                                           compact: compact,
@@ -460,7 +462,7 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
                                                   )
                                                 : null,
                                           ),
-                                          child: const Text('Leave duel'),
+                                          child: Text(l10n.liveDuelLeave),
                                         ),
                                       ],
                                     ),
@@ -550,12 +552,14 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
                   ? '\u{1F91D}'
                   : (won ? '\u{1F3C6}' : '\u{1F622}');
       final title = myAbandoned
-          ? 'YOU ABANDONED'
+          ? context.l10n.liveDuelHeroYouAbandoned
           : oppAbandoned
-              ? 'YOU WIN!'
+              ? context.l10n.liveDuelHeroYouWin
               : draw
-                  ? 'DRAW'
-                  : (won ? 'YOU WIN!' : 'YOU LOST');
+                  ? context.l10n.liveDuelHeroDraw
+                  : (won
+                      ? context.l10n.liveDuelHeroYouWin
+                      : context.l10n.liveDuelHeroYouLost);
       final glow = won || oppAbandoned
           ? const Color(0xFF6CF0C2)
           : const Color(0xFFFF79A8);
@@ -644,8 +648,8 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
               SizedBox(height: compact ? 8 : 10),
               Text(
                 isInvited
-                    ? 'Invitation received'
-                    : 'Waiting for your friend to join...',
+                    ? context.l10n.liveDuelInvitationReceived
+                    : context.l10n.liveDuelWaitingFriendJoin,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: compact ? 16 : 18,
@@ -657,9 +661,9 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
               Text(
                 opponentJoined
                     ? (opponentReady
-                        ? 'Opponent is ready'
-                        : 'Opponent joined, waiting ready')
-                    : 'Opponent has not joined yet',
+                        ? context.l10n.liveDuelOpponentReady
+                        : context.l10n.liveDuelOpponentJoinedWaitingReady)
+                    : context.l10n.liveDuelOpponentNotJoined,
                 style: TextStyle(
                   color: Color(0xFFAED2FF),
                   fontSize: compact ? 12 : 13,
@@ -686,7 +690,11 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
                         ? const VisualDensity(horizontal: -1, vertical: -1)
                         : null,
                   ),
-                  child: Text(_accepting ? 'Accepting...' : 'Accept duel'),
+                  child: Text(
+                    _accepting
+                        ? context.l10n.liveDuelAccepting
+                        : context.l10n.liveDuelAcceptDuel,
+                  ),
                 ),
               SizedBox(height: compact ? 6 : 8),
               FilledButton(
@@ -700,13 +708,17 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
                       : null,
                 ),
                 child: Text(
-                  _readyBusy ? 'Saving...' : (iAmReady ? 'Unready' : 'Ready'),
+                  _readyBusy
+                      ? context.l10n.liveDuelSaving
+                      : (iAmReady
+                          ? context.l10n.liveDuelUnready
+                          : context.l10n.liveDuelReady),
                 ),
               ),
               if (inviteNotAccepted) ...[
                 SizedBox(height: compact ? 6 : 8),
                 Text(
-                  'Accept first, then mark Ready.',
+                  context.l10n.liveDuelAcceptFirstThenReady,
                   style: TextStyle(
                     color: Color(0xFFAED2FF),
                     fontSize: compact ? 11 : 12,
@@ -739,7 +751,9 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
               border: Border.all(color: const Color(0xFF345E93)),
             ),
             child: Text(
-              text == 'GO!' ? 'GO!' : 'Starting in $text...',
+              text == 'GO!'
+                  ? context.l10n.liveDuelGo
+                  : context.l10n.liveDuelStartingIn(text),
               style: TextStyle(
                 color: const Color(0xFFAED2FF),
                 fontSize: compact ? 12.5 : 13.5,
@@ -754,7 +768,7 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
           child: Padding(
             padding: EdgeInsets.only(top: compact ? 6 : 8),
             child: Text(
-              'Starting match...',
+              context.l10n.liveDuelStartingMatch,
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
@@ -774,18 +788,18 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
   }
 
   String _titleFor(LiveMatch? match) {
-    if (match == null) return 'Live Duel';
+    if (match == null) return context.l10n.liveDuelTitle;
     switch (match.status) {
       case LiveMatchStatus.pending:
-        return 'Waiting Room';
+        return context.l10n.liveDuelWaitingRoom;
       case LiveMatchStatus.countdown:
-        return 'Get Ready';
+        return context.l10n.liveDuelGetReady;
       case LiveMatchStatus.playing:
-        return 'Match Started';
+        return context.l10n.liveDuelMatchStarted;
       case LiveMatchStatus.finished:
-        return 'Match Result';
+        return context.l10n.liveDuelMatchResult;
       case LiveMatchStatus.cancelled:
-        return 'Match Cancelled';
+        return context.l10n.liveDuelMatchCancelled;
     }
   }
 
@@ -804,17 +818,23 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
     final draw = winnerUid.isEmpty;
     final won = winnerUid == uid;
     final title = myAbandoned
-        ? 'You abandoned'
+        ? context.l10n.liveDuelYouAbandoned
         : oppAbandoned
-            ? 'You won \u{1F642}'
+            ? context.l10n.liveDuelYouWonSmiley
             : draw
-                ? 'Draw'
-                : (won ? 'You won \u{1F642}' : 'Defeat');
+                ? context.l10n.liveDuelDraw
+                : (won
+                    ? context.l10n.liveDuelYouWonSmiley
+                    : context.l10n.liveDuelDefeat);
     final subtitle = myAbandoned
-        ? 'Defeat by abandon'
+        ? context.l10n.liveDuelDefeatByAbandon
         : oppAbandoned
-            ? 'Win by abandon'
-            : (won ? 'You won the duel' : (draw ? 'No winner' : 'You lost'));
+            ? context.l10n.liveDuelWinByAbandon
+            : (won
+                ? context.l10n.liveDuelYouWonDuel
+                : (draw
+                    ? context.l10n.liveDuelNoWinner
+                    : context.l10n.liveDuelYouLost));
     return Container(
       padding: EdgeInsets.fromLTRB(
         compact ? 10 : 12,
@@ -851,14 +871,17 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
             ),
           ),
           SizedBox(height: compact ? 8 : 10),
-          _resultRow('Your time', _formatTime(me?.finishedAtMsFromStart ?? 0)),
           _resultRow(
-              'Opponent',
+            context.l10n.liveDuelYourTime,
+            _formatTime(me?.finishedAtMsFromStart ?? 0),
+          ),
+          _resultRow(
+              context.l10n.liveDuelOpponent,
               (opp?.username.trim().isNotEmpty == true)
                   ? opp!.username.trim()
-                  : 'Player'),
+                  : context.l10n.homePlayerName),
           _resultRow(
-            'Opponent time',
+            context.l10n.liveDuelOpponentTime,
             _formatTime(opp?.finishedAtMsFromStart ?? 0),
           ),
           SizedBox(height: compact ? 6 : 8),
@@ -877,12 +900,12 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
                     } catch (e) {
                       if (!mounted) return;
                       setState(() => _rematchBusy = false);
-                      var msg = 'Could not create rematch';
+                      var msg = context.l10n.liveDuelCouldNotCreateRematch;
                       final txt = e.toString();
                       if (txt.contains('TARGET_IN_ACTIVE_DUEL')) {
-                        msg = 'Opponent is busy in another duel';
+                        msg = context.l10n.liveDuelOpponentBusyAnother;
                       } else if (txt.contains('ALREADY_IN_ACTIVE_DUEL')) {
-                        msg = 'Finish your active duel first';
+                        msg = context.l10n.liveDuelFinishActiveFirst;
                       }
                       ScaffoldMessenger.of(context)
                           .showSnackBar(SnackBar(content: Text(msg)));
@@ -894,7 +917,11 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
                   ? const VisualDensity(horizontal: -1, vertical: -1)
                   : null,
             ),
-            child: Text(_rematchBusy ? 'Creating rematch...' : 'Rematch'),
+            child: Text(
+              _rematchBusy
+                  ? context.l10n.liveDuelCreatingRematch
+                  : context.l10n.liveDuelRematch,
+            ),
           ),
           SizedBox(height: dense ? 4 : 6),
           OutlinedButton(
@@ -905,7 +932,7 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
                   ? const VisualDensity(horizontal: -1, vertical: -1)
                   : null,
             ),
-            child: const Text('Back'),
+            child: Text(context.l10n.liveDuelBack),
           ),
         ],
       ),
@@ -972,8 +999,8 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
     if (_lastEmoteSentAtMs > 0 && nowMs - _lastEmoteSentAtMs < 1600) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Emote cooldown'),
+        SnackBar(
+          content: Text(context.l10n.liveDuelEmoteCooldown),
           duration: Duration(milliseconds: 900),
         ),
       );
@@ -990,8 +1017,8 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not send emote'),
+        SnackBar(
+          content: Text(context.l10n.liveDuelCouldNotSendEmote),
           duration: Duration(milliseconds: 900),
         ),
       );
@@ -1001,12 +1028,12 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
   Widget _buildCancelled(LiveMatch match) {
     final reason = match.reason.trim();
     final message = reason == 'invite_expired'
-        ? 'Invitation expired'
+        ? context.l10n.liveDuelInviteExpired
         : reason == 'countdown_timeout'
-            ? 'Countdown expired'
+            ? context.l10n.liveDuelCountdownExpired
             : reason == 'playing_timeout'
-                ? 'Match timed out'
-                : 'Duel cancelled';
+                ? context.l10n.liveDuelMatchTimedOut
+                : context.l10n.liveDuelCancelled;
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
       decoration: BoxDecoration(
@@ -1017,8 +1044,8 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            'Duel cancelled',
+          Text(
+            context.l10n.liveDuelCancelled,
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -1040,7 +1067,7 @@ class _LiveDuelScreenState extends State<LiveDuelScreen> {
               minimumSize: const Size.fromHeight(40),
               visualDensity: const VisualDensity(horizontal: -1, vertical: -1),
             ),
-            child: const Text('Back'),
+            child: Text(context.l10n.liveDuelBack),
           ),
         ],
       ),
@@ -1176,7 +1203,7 @@ class _PlayerRow extends StatelessWidget {
             ),
           ),
           Text(
-            _stateLabel(state),
+            _stateLabel(context, state),
             style: TextStyle(
               color: Color(0xFF7DE2FF),
               fontWeight: FontWeight.w700,
@@ -1188,20 +1215,20 @@ class _PlayerRow extends StatelessWidget {
     );
   }
 
-  String _stateLabel(LiveMatchPlayerState state) {
+  String _stateLabel(BuildContext context, LiveMatchPlayerState state) {
     switch (state) {
       case LiveMatchPlayerState.invited:
-        return 'Invited';
+        return context.l10n.liveDuelStateInvited;
       case LiveMatchPlayerState.joined:
-        return 'Joined';
+        return context.l10n.liveDuelStateJoined;
       case LiveMatchPlayerState.ready:
-        return 'Ready';
+        return context.l10n.liveDuelStateReady;
       case LiveMatchPlayerState.playing:
-        return 'Playing';
+        return context.l10n.liveDuelStatePlaying;
       case LiveMatchPlayerState.finished:
-        return 'Finished';
+        return context.l10n.liveDuelStateFinished;
       case LiveMatchPlayerState.abandoned:
-        return 'Abandoned';
+        return context.l10n.liveDuelStateAbandoned;
     }
   }
 }
@@ -1253,3 +1280,4 @@ class _ErrorCard extends StatelessWidget {
     );
   }
 }
+

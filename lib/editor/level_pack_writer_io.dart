@@ -14,7 +14,7 @@ Future<SaveToGeneralPackResult> saveLevelToGeneralPack(
   if (file == null) {
     return const SaveToGeneralPackResult(
       added: false,
-      message: 'No se encontró assets/levels/pack_all_v1.json',
+      message: 'No se encontro assets/levels/pack_all_v1.json',
     );
   }
 
@@ -23,7 +23,7 @@ Future<SaveToGeneralPackResult> saveLevelToGeneralPack(
   if (decoded is! Map<String, dynamic>) {
     return const SaveToGeneralPackResult(
       added: false,
-      message: 'Formato inválido de pack_all_v1.json',
+      message: 'Formato invalido de pack_all_v1.json',
     );
   }
 

@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'coins_service.dart';
 import 'l10n/l10n.dart';
 import 'progress_service.dart';
+import 'services/onboarding_service.dart';
 import 'theme/app_colors.dart';
 import 'ui/avatar_utils.dart';
 import 'ui/components/coin_display.dart';
@@ -84,12 +85,27 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 18),
                     const _HeroBanner(),
                     const SizedBox(height: 14),
-                    _PrimaryPlayCta(onTap: () => context.go('/play')),
+                    _PrimaryPlayCta(
+                      key: OnboardingService.instance.homePlayCtaKey,
+                      onTap: () {
+                        final onboarding = OnboardingService.instance;
+                        if (onboarding.shouldLaunchTutorialFromHomeCta) {
+                          context.go(onboarding.tutorialRoute);
+                          return;
+                        }
+                        context.go('/play');
+                      },
+                    ),
                     const SizedBox(height: 12),
                     _ContinueCard(
                       nextLevel: nextSuggestedLevel,
                       solved: solved,
                       onTap: () {
+                        final onboarding = OnboardingService.instance;
+                        if (onboarding.shouldLaunchTutorialFromHomeCta) {
+                          context.go(onboarding.tutorialRoute);
+                          return;
+                        }
                         unawaited(
                           progressService.setCurrentLevelForPack(
                             resumeTarget.packId,
@@ -372,7 +388,7 @@ class _HeroBanner extends StatelessWidget {
 }
 
 class _PrimaryPlayCta extends StatelessWidget {
-  const _PrimaryPlayCta({required this.onTap});
+  const _PrimaryPlayCta({super.key, required this.onTap});
 
   final VoidCallback onTap;
 

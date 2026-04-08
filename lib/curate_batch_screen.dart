@@ -644,7 +644,7 @@ class _CurateBatchScreenState extends State<CurateBatchScreen> {
           title:
               Text(item.fileName, maxLines: 1, overflow: TextOverflow.ellipsis),
           subtitle: Text(
-            '${item.status.name} • ${item.gridSize}x${item.gridSize} • conf ${(item.confidence * 100).toStringAsFixed(0)}%',
+            '${item.status.name} - ${item.gridSize}x${item.gridSize} - conf ${(item.confidence * 100).toStringAsFixed(0)}%',
           ),
           leading: item.imageBytes == null
               ? CircleAvatar(child: Text('${globalIndex + 1}'))

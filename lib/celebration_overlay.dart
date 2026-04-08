@@ -348,7 +348,7 @@ class _StarGlyph extends StatelessWidget {
     return Transform.rotate(
       angle: rotation * math.pi,
       child: const Text(
-        '✦',
+        '*',
         style: TextStyle(
           color: Color(0xFFDCE8FF),
           fontSize: 18,

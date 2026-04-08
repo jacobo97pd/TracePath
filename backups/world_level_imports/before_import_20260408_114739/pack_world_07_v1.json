@@ -1,7 +1,7 @@
 {
   "packId": "world_07",
   "version": "pack_world_07_v1",
-  "count": 26,
+  "count": 25,
   "world": 7,
   "levels": [
     {
@@ -2823,121 +2823,6 @@
         "variant": "classic",
         "canonical_hash": "4911d3f058d106f5bc30f6ffba96f527af276c18e0bb029f4c0f7d92ea0d9066",
         "imported_from": "c:\\Users\\jacob\\Downloads\\niveles_linkedin_editor.json"
-      }
-    },
-    {
-      "id": "linkedin-editor-383",
-      "size": {
-        "w": 7,
-        "h": 7
-      },
-      "clues": [
-        {
-          "n": 1,
-          "x": 3,
-          "y": 1
-        },
-        {
-          "n": 2,
-          "x": 1,
-          "y": 3
-        },
-        {
-          "n": 3,
-          "x": 1,
-          "y": 1
-        },
-        {
-          "n": 4,
-          "x": 2,
-          "y": 1
-        },
-        {
-          "n": 5,
-          "x": 4,
-          "y": 1
-        },
-        {
-          "n": 6,
-          "x": 5,
-          "y": 1
-        },
-        {
-          "n": 7,
-          "x": 5,
-          "y": 5
-        },
-        {
-          "n": 8,
-          "x": 5,
-          "y": 3
-        },
-        {
-          "n": 9,
-          "x": 4,
-          "y": 3
-        },
-        {
-          "n": 10,
-          "x": 4,
-          "y": 5
-        },
-        {
-          "n": 11,
-          "x": 1,
-          "y": 5
-        },
-        {
-          "n": 12,
-          "x": 2,
-          "y": 5
-        },
-        {
-          "n": 13,
-          "x": 2,
-          "y": 3
-        },
-        {
-          "n": 14,
-          "x": 3,
-          "y": 3
-        },
-        {
-          "n": 15,
-          "x": 3,
-          "y": 5
-        }
-      ],
-      "walls": [
-        {
-          "cell1": 3,
-          "cell2": 10
-        },
-        {
-          "cell1": 19,
-          "cell2": 26
-        },
-        {
-          "cell1": 22,
-          "cell2": 29
-        },
-        {
-          "cell1": 38,
-          "cell2": 45
-        }
-      ],
-      "difficultyTag": "d3",
-      "source": "linkedin_editor",
-      "source_pack": "pack_linkedin_editor_v1",
-      "source_origin": "linkedin_editor",
-      "variant": "classic",
-      "canonical_hash": "450480136a2bd46f9dc48c1545f708abedb21c73a1c0ea09a16de5f164143826",
-      "meta": {
-        "source_pack": "pack_linkedin_editor_v1",
-        "source_origin": "linkedin_editor",
-        "variant": "classic",
-        "canonical_hash": "450480136a2bd46f9dc48c1545f708abedb21c73a1c0ea09a16de5f164143826",
-        "imported_from": "C:\\Users\\jacob\\Downloads\\niveles_linkedin_editor.json"
       }
     }
   ]

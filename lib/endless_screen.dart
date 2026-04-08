@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'l10n/l10n.dart';
 import 'progress_service.dart';
 import 'stats_service.dart';
 
@@ -20,14 +21,16 @@ class EndlessScreen extends StatelessWidget {
       animation: Listenable.merge([progressService, statsService]),
       builder: (context, child) {
         return Scaffold(
-          appBar: AppBar(title: const Text('Endless')),
+          appBar: AppBar(title: Text(context.l10n.endlessTitle)),
           body: ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: 5,
             itemBuilder: (context, index) {
               final difficulty = index + 1;
-              final hasRun = progressService.getEndlessRunSeed(difficulty) != null;
-              final currentIndex = progressService.getEndlessRunIndex(difficulty);
+              final hasRun =
+                  progressService.getEndlessRunSeed(difficulty) != null;
+              final currentIndex =
+                  progressService.getEndlessRunIndex(difficulty);
               final best = statsService.endlessBestForDifficulty(difficulty);
               final bestIndex = best.bestIndexReached;
               final bestScore = best.bestScore;
@@ -35,7 +38,7 @@ class EndlessScreen extends StatelessWidget {
 
               return Card(
                 child: ListTile(
-                  title: Text('Difficulty $difficulty'),
+                  title: Text(context.l10n.endlessDifficulty(difficulty)),
                   isThreeLine: true,
                   trailing: hasRun
                       ? TextButton(
@@ -46,7 +49,7 @@ class EndlessScreen extends StatelessWidget {
                             }
                             context.go('/endless/$difficulty/1');
                           },
-                          child: const Text('New'),
+                          child: Text(context.l10n.endlessNewRun),
                         )
                       : null,
                   contentPadding: const EdgeInsets.symmetric(
@@ -56,24 +59,32 @@ class EndlessScreen extends StatelessWidget {
                   minVerticalPadding: 10,
                   dense: false,
                   subtitleTextStyle: Theme.of(context).textTheme.bodyMedium,
-                  visualDensity: const VisualDensity(horizontal: 0, vertical: 0),
+                  visualDensity:
+                      const VisualDensity(horizontal: 0, vertical: 0),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         hasRun
-                            ? 'Resume at $currentIndex'
-                            : 'Start a new endless run',
+                            ? context.l10n.endlessResumeAt(currentIndex)
+                            : context.l10n.endlessStartNewRun,
                       ),
                       Text(
-                        'Best score: $bestScore | Best index: $bestIndex${bestAvgMs == null ? '' : ' | Best avg: ${_formatMs(bestAvgMs.round())}'}',
+                        context.l10n.endlessBestSummary(
+                          bestScore,
+                          bestIndex,
+                          bestAvgMs == null
+                              ? '--'
+                              : _formatMs(bestAvgMs.round()),
+                        ),
                       ),
                     ],
                   ),
                   onTap: () async {
-                    final startIndex = progressService.getEndlessRunSeed(difficulty) == null
-                        ? 1
-                        : progressService.getEndlessRunIndex(difficulty);
+                    final startIndex =
+                        progressService.getEndlessRunSeed(difficulty) == null
+                            ? 1
+                            : progressService.getEndlessRunIndex(difficulty);
                     await progressService.ensureEndlessRun(difficulty);
                     if (!context.mounted) {
                       return;

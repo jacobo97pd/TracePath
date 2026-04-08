@@ -56,6 +56,8 @@ class PackLevelRepository {
         'assets/levels/pack_variant_multiples_roman_v1.json',
     'pack_variant_multiples_roman_v1':
         'assets/levels/pack_variant_multiples_roman_v1.json',
+    'tutorial': 'assets/levels/pack_tutorial_v1.json',
+    'pack_tutorial_v1': 'assets/levels/pack_tutorial_v1.json',
     'world_01': 'assets/levels/pack_world_01_v1.json',
     'pack_world_01_v1': 'assets/levels/pack_world_01_v1.json',
     'world_02': 'assets/levels/pack_world_02_v1.json',
@@ -193,8 +195,7 @@ class PackLevelRepository {
     final metrics = node['metrics'] is Map
         ? Map<String, dynamic>.from(node['metrics'] as Map)
         : const <String, dynamic>{};
-    final difficultyTag =
-        (node['difficultyTag'] as String?) ??
+    final difficultyTag = (node['difficultyTag'] as String?) ??
         _difficultyTagFromMetrics(metrics) ??
         'd1';
     final difficulty = int.tryParse(difficultyTag.replaceFirst('d', '')) ?? 1;

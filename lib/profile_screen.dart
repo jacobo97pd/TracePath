@@ -662,6 +662,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   states: widget.achievementsService.states,
                   formatDateTime: _formatDateTime,
                 ),
+                const SizedBox(height: 16),
+                GameCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Cuenta',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Eliminar tu cuenta borra tus datos de juego y no se puede deshacer.',
+                        style: TextStyle(
+                          color: Color(0xFF9CB1D8),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: _onDeleteAccountPressed,
+                          icon: const Icon(Icons.delete_forever_rounded),
+                          label: const Text('Eliminar cuenta'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFFFFB4B4),
+                            side: const BorderSide(color: Color(0xFFB94A4A)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -1345,6 +1387,107 @@ class _ProfileScreenState extends State<ProfileScreen> {
       SnackBar(
         content: Text(l10n.profileSignedOut),
         duration: Duration(milliseconds: 900),
+      ),
+    );
+  }
+
+  Future<void> _onDeleteAccountPressed() async {
+    if (widget.authService.isGuest) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('En modo invitado no hay cuenta para eliminar.'),
+          duration: Duration(milliseconds: 1300),
+        ),
+      );
+      return;
+    }
+
+    final firstConfirm = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: const Color(0xFF111827),
+            title: const Text(
+              'Eliminar cuenta',
+              style: TextStyle(color: Colors.white),
+            ),
+            content: const Text(
+              'Esta accion eliminara tu cuenta y tus datos de juego. Esta accion no se puede deshacer.',
+              style: TextStyle(color: Color(0xFFB6C2DA)),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(context.l10n.profileCancel),
+              ),
+              FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFFB3261E),
+                ),
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Continuar'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+    if (!firstConfirm || !mounted) return;
+
+    final finalConfirm = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: const Color(0xFF111827),
+            title: const Text(
+              'Confirmacion final',
+              style: TextStyle(color: Colors.white),
+            ),
+            content: const Text(
+              'Confirma que quieres eliminar la cuenta definitivamente.',
+              style: TextStyle(color: Color(0xFFB6C2DA)),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(context.l10n.profileCancel),
+              ),
+              FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFFB3261E),
+                ),
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Eliminar definitivamente'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+    if (!finalConfirm || !mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text('Eliminando cuenta...'),
+        duration: Duration(milliseconds: 900),
+      ),
+    );
+
+    final error = await widget.authService.deleteCurrentAccount();
+    if (!mounted) return;
+    if (error != null) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(error),
+          duration: const Duration(milliseconds: 2000),
+        ),
+      );
+      return;
+    }
+
+    context.go('/home');
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text('Cuenta eliminada correctamente'),
+        duration: Duration(milliseconds: 1400),
       ),
     );
   }
@@ -3044,7 +3187,7 @@ class _AchievementMedalCard extends StatelessWidget {
               unlocked
                   ? context.l10n.profileAchievementCompleted(
                       state.unlockedAt != null
-                          ? ' • ${formatDateTime(state.unlockedAt!)}'
+                          ? ' - ${formatDateTime(state.unlockedAt!)}'
                           : '',
                     )
                   : context.l10n.profileAchievementLocked,

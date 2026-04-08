@@ -317,7 +317,7 @@ class _DuelScreenState extends State<DuelScreen> {
                                     const SizedBox(width: 10),
                                     Expanded(
                                       child: Text(
-                                        '$username · ${friend.isOnline ? 'Online' : 'Offline'}',
+                                        '$username - ${friend.isOnline ? 'Online' : 'Offline'}',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 14,
@@ -831,7 +831,7 @@ class _HistoryMatchCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'You ${_formatDuelTime(myTimeMs)} · Opp ${_formatDuelTime(oppTimeMs)}',
+                  'You ${_formatDuelTime(myTimeMs)} - Opp ${_formatDuelTime(oppTimeMs)}',
                   style: const TextStyle(
                     color: Color(0xFF9EB0D2),
                     fontSize: 11,

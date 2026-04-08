@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'app_data.dart';
+import 'l10n/l10n.dart';
 import 'progress_service.dart';
 
 class LevelsScreen extends StatelessWidget {
@@ -19,12 +20,12 @@ class LevelsScreen extends StatelessWidget {
     if (getPackById(packId) == null) {
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(child: Text('Pack not found')),
+        body: Center(child: Text(context.l10n.gamePackNotFound)),
       );
     }
     if (!progressService.isPackUnlocked(packId)) {
       return Scaffold(
-        appBar: AppBar(title: Text('$packId levels')),
+        appBar: AppBar(title: Text(context.l10n.levelsPackTitle(packId))),
         body: Center(
           child: Text(progressService.packUnlockRequirementText(packId)),
         ),
@@ -44,12 +45,13 @@ class LevelsScreen extends StatelessWidget {
             nextLevel = displayedLevelCount;
           }
         }
-        final solvedCount = List<int>.generate(displayedLevelCount, (i) => i + 1)
-            .where((i) => progressService.isCompleted(packId, i))
-            .length;
+        final solvedCount =
+            List<int>.generate(displayedLevelCount, (i) => i + 1)
+                .where((i) => progressService.isCompleted(packId, i))
+                .length;
         return Scaffold(
           appBar: AppBar(
-            title: Text('${_titleCase(packId)} Levels'),
+            title: Text(context.l10n.levelsPackTitle(_titleCase(packId))),
             actions: [
               Padding(
                 padding: const EdgeInsets.only(right: 12),

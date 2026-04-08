@@ -3085,7 +3085,7 @@ class _TrailShopCard extends StatelessWidget {
   String _missingDescriptionLabel(BuildContext context) {
     final language = Localizations.localeOf(context).languageCode.toLowerCase();
     return language == 'es'
-        ? 'Sin descripción disponible'
+        ? 'Sin descripcion disponible'
         : 'Description not available';
   }
 
@@ -3207,7 +3207,7 @@ class _TrailPreviewPainter extends CustomPainter {
       ),
       maxLines: 1,
       textDirection: TextDirection.ltr,
-      ellipsis: 'â€¦',
+      ellipsis: '...',
     )..layout(maxWidth: 52);
     tp.paint(canvas, const Offset(12, 12));
 

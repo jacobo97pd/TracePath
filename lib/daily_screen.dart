@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import 'app_data.dart';
 import 'achievements_service.dart';
@@ -18,6 +19,7 @@ import 'score_calculator.dart';
 import 'services/daily_puzzle_service.dart';
 import 'stats_service.dart';
 import 'victory_screen.dart';
+import 'l10n/l10n.dart';
 import 'ui/components/game_toast.dart';
 
 class DailyScreen extends StatefulWidget {
@@ -129,7 +131,7 @@ class _DailyScreenState extends State<DailyScreen> {
       }
       setState(() {
         _isLoading = false;
-        _loadError = lastError ?? 'Unknown daily load error';
+        _loadError = lastError ?? context.l10n.dailyUnknownLoadError;
       });
     } catch (_) {}
   }
@@ -139,20 +141,20 @@ class _DailyScreenState extends State<DailyScreen> {
     final level = _level;
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Daily')),
+        appBar: AppBar(title: Text(context.l10n.dailyTitle)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
     if (_loadError != null || level == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Daily')),
+        appBar: AppBar(title: Text(context.l10n.dailyTitle)),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Could not load daily puzzle.'),
+                Text(context.l10n.dailyLoadError),
                 if (kDebugMode && _loadError != null) ...[
                   const SizedBox(height: 8),
                   Text(
@@ -169,7 +171,7 @@ class _DailyScreenState extends State<DailyScreen> {
                     });
                     _loadDailyLevel();
                   },
-                  child: const Text('Retry'),
+                  child: Text(context.l10n.dailyRetry),
                 ),
               ],
             ),
@@ -195,7 +197,10 @@ class _DailyScreenState extends State<DailyScreen> {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final nextPuzzleIn = _timeUntilNextDailyPuzzle();
-                final formattedDate = _formatDailyDate(DateTime.now());
+                final formattedDate = _formatDailyDate(
+                  DateTime.now(),
+                  Localizations.localeOf(context).languageCode,
+                );
 
                 return Stack(
                   children: [
@@ -231,15 +236,16 @@ class _DailyScreenState extends State<DailyScreen> {
                                     context.go('/');
                                   }
                                 },
-                                icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                                icon: const Icon(
+                                    Icons.arrow_back_ios_new_rounded),
                               ),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Daily Challenge',
+                                    Text(
+                                      context.l10n.dailyChallengeTitle,
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 24,
@@ -281,7 +287,9 @@ class _DailyScreenState extends State<DailyScreen> {
                               ],
                             ),
                             child: Text(
-                              'Next puzzle in ${_formatCountdown(nextPuzzleIn)}',
+                              context.l10n.dailyNextPuzzleIn(
+                                _formatCountdown(nextPuzzleIn),
+                              ),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
@@ -294,16 +302,17 @@ class _DailyScreenState extends State<DailyScreen> {
                             children: [
                               Expanded(
                                 child: _DailyInfoCard(
-                                  label: 'Reward',
-                                  value:
-                                      '${DailyPuzzleService.dailyRewardCoins} coins',
+                                  label: context.l10n.dailyRewardLabel,
+                                  value: context.l10n.dailyCoinsReward(
+                                    DailyPuzzleService.dailyRewardCoins,
+                                  ),
                                   accent: const Color(0xFF4E8CFF),
                                 ),
                               ),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: _DailyInfoCard(
-                                  label: 'Streak',
+                                  label: context.l10n.dailyStreakLabel,
                                   value: '$streak',
                                   accent: const Color(0xFF4AE0C5),
                                 ),
@@ -311,7 +320,7 @@ class _DailyScreenState extends State<DailyScreen> {
                               const SizedBox(width: 10),
                               Expanded(
                                 child: _DailyInfoCard(
-                                  label: 'Best Time',
+                                  label: context.l10n.dailyBestTimeLabel,
                                   value: _formatMs(bestAttempt?.timeMs),
                                   accent: const Color(0xFF6E8BFF),
                                 ),
@@ -322,7 +331,8 @@ class _DailyScreenState extends State<DailyScreen> {
                           Expanded(
                             child: Center(
                               child: ConstrainedBox(
-                                constraints: const BoxConstraints(maxWidth: 620),
+                                constraints:
+                                    const BoxConstraints(maxWidth: 620),
                                 child: AspectRatio(
                                   aspectRatio: 1,
                                   child: DecoratedBox(
@@ -335,7 +345,8 @@ class _DailyScreenState extends State<DailyScreen> {
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: gameTheme.pathColor.withOpacity(0.2),
+                                          color: gameTheme.pathColor
+                                              .withOpacity(0.2),
                                           blurRadius: 26,
                                           offset: const Offset(0, 12),
                                         ),
@@ -364,7 +375,8 @@ class _DailyScreenState extends State<DailyScreen> {
                               Expanded(
                                 child: FilledButton.icon(
                                   style: FilledButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16),
                                     backgroundColor: const Color(0xFF4E8CFF),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(18),
@@ -379,8 +391,8 @@ class _DailyScreenState extends State<DailyScreen> {
                                   icon: const Icon(Icons.play_arrow_rounded),
                                   label: Text(
                                     completedToday || _status.solved
-                                        ? 'Play Again'
-                                        : 'Play Daily',
+                                        ? context.l10n.dailyPlayAgain
+                                        : context.l10n.dailyPlayDaily,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w800,
                                       fontSize: 16,
@@ -395,7 +407,8 @@ class _DailyScreenState extends State<DailyScreen> {
                                     horizontal: 18,
                                     vertical: 16,
                                   ),
-                                  side: const BorderSide(color: Color(0xFF3E5A87)),
+                                  side: const BorderSide(
+                                      color: Color(0xFF3E5A87)),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
                                   ),
@@ -410,7 +423,10 @@ class _DailyScreenState extends State<DailyScreen> {
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            'Attempts today: ${leaderboard.length} - Best score: ${bestAttempt?.score ?? '--'}',
+                            context.l10n.dailyAttemptsSummary(
+                              leaderboard.length,
+                              '${bestAttempt?.score ?? '--'}',
+                            ),
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               color: Color(0xFF9EB2D9),
@@ -419,12 +435,12 @@ class _DailyScreenState extends State<DailyScreen> {
                             ),
                           ),
                           if (_lastLeaderboardUpdate?.isPersonalBest == true)
-                            const Padding(
-                              padding: EdgeInsets.only(top: 4),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
                               child: Text(
-                                'New personal best today',
+                                context.l10n.dailyNewPersonalBestToday,
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Color(0xFF89E2C8),
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
@@ -562,8 +578,8 @@ class _DailyScreenState extends State<DailyScreen> {
         GameToast.show(
           context,
           type: GameToastType.info,
-          title: 'Daily completed',
-          message: 'Saved with partial sync issue. Try again later.',
+          title: context.l10n.dailyCompletedTitle,
+          message: context.l10n.dailySavedWithPartialSync,
           duration: const Duration(milliseconds: 2600),
         ),
       );
@@ -594,8 +610,8 @@ class _DailyScreenState extends State<DailyScreen> {
           GameToast.show(
             context,
             type: GameToastType.info,
-            title: 'Daily completed',
-            message: 'Reward sync failed. Please try again.',
+            title: context.l10n.dailyCompletedTitle,
+            message: context.l10n.dailyRewardSyncFailed,
             duration: const Duration(milliseconds: 2400),
           ),
         );
@@ -626,7 +642,8 @@ class _DailyScreenState extends State<DailyScreen> {
       );
     } catch (e, st) {
       if (kDebugMode) {
-        debugPrint('[daily] stats/achievements error key=$_dailyDateKey error=$e');
+        debugPrint(
+            '[daily] stats/achievements error key=$_dailyDateKey error=$e');
         debugPrint('$st');
       }
     }
@@ -639,7 +656,8 @@ class _DailyScreenState extends State<DailyScreen> {
       ),
     ).finalScore;
     try {
-      await widget.progressService.setBestDailyScoreIfHigher(_dailyDateKey, score);
+      await widget.progressService
+          .setBestDailyScoreIfHigher(_dailyDateKey, score);
       final leaderboardUpdate = await widget.statsService.recordDailyAttempt(
         dateKey: _dailyDateKey,
         attempt: DailyAttempt(
@@ -657,7 +675,8 @@ class _DailyScreenState extends State<DailyScreen> {
       }
     } catch (e, st) {
       if (kDebugMode) {
-        debugPrint('[daily] leaderboard write error key=$_dailyDateKey error=$e');
+        debugPrint(
+            '[daily] leaderboard write error key=$_dailyDateKey error=$e');
         debugPrint('$st');
       }
     }
@@ -670,7 +689,7 @@ class _DailyScreenState extends State<DailyScreen> {
         GameToast.show(
           context,
           type: GameToastType.achievement,
-          title: 'Achievement Unlocked',
+          title: context.l10n.dailyAchievementUnlocked,
           message: first.title,
           duration: const Duration(milliseconds: 2300),
         ),
@@ -681,8 +700,10 @@ class _DailyScreenState extends State<DailyScreen> {
         GameToast.show(
           context,
           type: GameToastType.coins,
-          title: 'Daily reward',
-          message: '+${DailyPuzzleService.dailyRewardCoins} coins',
+          title: context.l10n.dailyRewardToastTitle,
+          message: context.l10n.dailyRewardToastMessage(
+            DailyPuzzleService.dailyRewardCoins,
+          ),
           duration: const Duration(milliseconds: 1900),
         ),
       );
@@ -700,17 +721,21 @@ class _DailyScreenState extends State<DailyScreen> {
       '/victory',
       extra: VictoryScreenArgs(
         zipNumber: level.difficulty * 100 + DateTime.now().day,
-        headline: defaultVictoryHeadline(score),
+        headline: defaultVictoryHeadline(context, score),
         timeText: _formatMs(_currentElapsedDuration.inMilliseconds),
         averageText: _formatMs(average),
         streak: streak,
-        primaryLabel: 'Play Again',
+        primaryLabel: context.l10n.dailyPlayAgain,
         primaryActionId: 'replay',
         accentColor: gameTheme.pathColor,
-        shareText:
-            'Daily complete in ${_formatMs(_currentElapsedDuration.inMilliseconds)}.',
-        copyText:
-            'Zip #${DateTime.now().day} - ${_formatMs(_currentElapsedDuration.inMilliseconds)} - Streak $streak 🔥',
+        shareText: context.l10n.dailyShareText(
+          _formatMs(_currentElapsedDuration.inMilliseconds),
+        ),
+        copyText: context.l10n.dailyCopyText(
+          DateTime.now().day,
+          _formatMs(_currentElapsedDuration.inMilliseconds),
+          streak,
+        ),
       ),
     );
 
@@ -779,22 +804,8 @@ class _DailyScreenState extends State<DailyScreen> {
     return '$hh:$mm:$ss';
   }
 
-  String _formatDailyDate(DateTime date) {
-    const months = <String>[
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  String _formatDailyDate(DateTime date, String locale) {
+    return DateFormat.yMMMMd(locale).format(date);
   }
 
   GameTheme _resolveTheme(BuildContext context) {
