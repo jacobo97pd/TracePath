@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:lottie/lottie.dart';
 
 import 'l10n/l10n.dart';
 import 'network_burst_overlay.dart';
@@ -69,6 +70,8 @@ class VictoryScreen extends StatefulWidget {
 
 class _VictoryScreenState extends State<VictoryScreen>
     with TickerProviderStateMixin {
+  static const String _victoryLottieUrl =
+      'https://lottie.host/5c1f438c-20dc-4c8c-a4b1-45174d2d9283/5phqzIkuor.lottie';
   final FriendsRankingService _friendsRankingService = FriendsRankingService();
   final FriendsService _friendsService = FriendsService();
   final LiveDuelService _liveDuelService = LiveDuelService();
@@ -135,6 +138,26 @@ class _VictoryScreenState extends State<VictoryScreen>
 
   Future<List<FriendsRankingRow>> _loadFriendsRanking() async {
     return _friendsRankingService.loadForLevel(widget.args.levelId);
+  }
+
+  Future<LottieComposition?> _decodeDotLottie(List<int> bytes) {
+    return LottieComposition.decodeZip(
+      bytes,
+      filePicker: (files) {
+        for (final file in files) {
+          final name = file.name.toLowerCase();
+          if (name.startsWith('animations/') && name.endsWith('.json')) {
+            return file;
+          }
+        }
+        for (final file in files) {
+          if (file.name.toLowerCase().endsWith('.json')) {
+            return file;
+          }
+        }
+        return files.first;
+      },
+    );
   }
 
   Future<void> _sendChallengeToFriend() async {
@@ -411,12 +434,28 @@ class _VictoryScreenState extends State<VictoryScreen>
                             icon: const Icon(Icons.arrow_back_rounded),
                           ),
                           const Spacer(),
-                          Text(
-                            l10n.victoryLevelComplete,
-                            style: TextStyle(
-                              color: args.accentColor,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1.1,
+                          SizedBox(
+                            height: 64,
+                            width: 64,
+                            child: Lottie.network(
+                              _victoryLottieUrl,
+                              fit: BoxFit.contain,
+                              repeat: false,
+                              decoder: _decodeDotLottie,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Center(
+                                  child: Text(
+                                    l10n.victoryLevelComplete,
+                                    style: TextStyle(
+                                      color: args.accentColor,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 1.1,
+                                      fontSize: 12,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           const Spacer(),

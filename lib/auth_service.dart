@@ -1,13 +1,18 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'services/app_firestore.dart';
 
-enum AuthMode { none, guest, google }
+enum AuthMode { none, guest, google, apple }
 
 class AuthService extends ChangeNotifier {
   AuthService(this._prefs) {
@@ -53,6 +58,7 @@ class AuthService extends ChangeNotifier {
     _mode = switch (raw) {
       'guest' => AuthMode.guest,
       'google' => AuthMode.google,
+      'apple' => AuthMode.apple,
       _ => AuthMode.none,
     };
     _displayName = _prefs.getString(_nameKey);
@@ -60,8 +66,10 @@ class AuthService extends ChangeNotifier {
     _avatarUrl = _prefs.getString(_avatarKey);
     final user = _firebaseAuthOrNull?.currentUser;
     if (user != null) {
-      _mode = AuthMode.google;
-      _displayName = user.displayName ?? _displayName ?? user.email?.split('@').first;
+      final providers = user.providerData.map((p) => p.providerId).toSet();
+      _mode = providers.contains('apple.com') ? AuthMode.apple : AuthMode.google;
+      _displayName =
+          user.displayName ?? _displayName ?? user.email?.split('@').first;
       _email = user.email ?? _email;
       _avatarUrl = user.photoURL ?? _avatarUrl;
     }
@@ -92,7 +100,6 @@ class AuthService extends ChangeNotifier {
         final user = credential.user;
         debugPrint('TRACE web popup user: ${user?.uid}');
         if (user == null) return 'Google login failed';
-        _mode = AuthMode.google;
         _displayName = user.displayName ?? user.email?.split('@').first ?? 'Player';
         _email = user.email;
         _avatarUrl = user.photoURL;
@@ -113,11 +120,18 @@ class AuthService extends ChangeNotifier {
         final result = await firebaseAuth.signInWithCredential(credential);
         final user = result.user;
         debugPrint('TRACE firebase sign in OK: ${user?.uid}');
-        _mode = AuthMode.google;
-        _displayName = user?.displayName ?? account.displayName ?? account.email.split('@').first;
+        _displayName =
+            user?.displayName ?? account.displayName ?? account.email.split('@').first;
         _email = user?.email ?? account.email;
         _avatarUrl = user?.photoURL ?? account.photoUrl;
       }
+
+      final user = firebaseAuth.currentUser;
+      if (user != null) {
+        await _upsertUserFromAuth(user, provider: 'google');
+      }
+
+      _mode = AuthMode.google;
       await _persist();
       notifyListeners();
       return null;
@@ -125,6 +139,79 @@ class AuthService extends ChangeNotifier {
       debugPrint('TRACE google sign in ERROR: $e');
       debugPrint('TRACE google sign in STACK: $st');
       return 'Google login failed: $e';
+    }
+  }
+
+  Future<String?> signInWithApple() async {
+    final firebaseAuth = _firebaseAuthOrNull;
+    if (firebaseAuth == null) {
+      return 'Firebase no configurado en este dispositivo.';
+    }
+    if (kIsWeb) {
+      return 'Apple login solo esta disponible en iOS.';
+    }
+
+    try {
+      final available = await SignInWithApple.isAvailable();
+      if (!available) {
+        return 'Sign in with Apple no disponible en este dispositivo.';
+      }
+
+      final rawNonce = _generateNonce();
+      final nonce = _sha256ofString(rawNonce);
+
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: <AppleIDAuthorizationScopes>[
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: nonce,
+      );
+
+      final oauthCredential = OAuthProvider('apple.com').credential(
+        idToken: appleCredential.identityToken,
+        rawNonce: rawNonce,
+      );
+
+      final result = await firebaseAuth.signInWithCredential(oauthCredential);
+      final user = result.user;
+      if (user == null) {
+        return 'Apple login failed';
+      }
+
+      final firstName = appleCredential.givenName?.trim() ?? '';
+      final lastName = appleCredential.familyName?.trim() ?? '';
+      final fullName = ('$firstName $lastName').trim();
+      if (fullName.isNotEmpty && (user.displayName ?? '').trim().isEmpty) {
+        await user.updateDisplayName(fullName);
+      }
+
+      _mode = AuthMode.apple;
+      _displayName = (user.displayName ?? '').trim().isNotEmpty
+          ? user.displayName
+          : (fullName.isNotEmpty ? fullName : (user.email?.split('@').first ?? 'Player'));
+      _email = user.email;
+      _avatarUrl = user.photoURL;
+
+      await _upsertUserFromAuth(user, provider: 'apple');
+      await _persist();
+      notifyListeners();
+      return null;
+    } on SignInWithAppleAuthorizationException catch (e, st) {
+      debugPrint('TRACE apple sign in ERROR: ${e.code} ${e.message}');
+      debugPrint('TRACE apple sign in STACK: $st');
+      if (e.code == AuthorizationErrorCode.canceled) {
+        return 'Login cancelado';
+      }
+      return 'Apple login failed: ${e.message}';
+    } on FirebaseAuthException catch (e, st) {
+      debugPrint('TRACE apple sign in FirebaseAuthException: ${e.code} ${e.message}');
+      debugPrint('TRACE apple sign in STACK: $st');
+      return 'Apple login failed: ${e.message ?? e.code}';
+    } catch (e, st) {
+      debugPrint('TRACE apple sign in ERROR: $e');
+      debugPrint('TRACE apple sign in STACK: $st');
+      return 'Apple login failed: $e';
     }
   }
 
@@ -146,8 +233,8 @@ class AuthService extends ChangeNotifier {
         }
       }
     }
-    if (_mode == AuthMode.google) {
-      if (!kIsWeb) {
+    if (_mode == AuthMode.google || _mode == AuthMode.apple) {
+      if (!kIsWeb && _mode == AuthMode.google) {
         try {
           await _googleSignIn.signOut();
         } catch (_) {}
@@ -224,10 +311,16 @@ class AuthService extends ChangeNotifier {
       if (e.code == 'user-mismatch' || e.code == 'invalid-credential') {
         return 'No se pudo verificar tu sesion para eliminar la cuenta.';
       }
+      if (e.code == 'user-cancelled') {
+        return 'Operacion cancelada';
+      }
       return 'No se pudo eliminar la cuenta: ${e.message ?? e.code}';
     } on FirebaseException catch (e, st) {
       debugPrint('TRACE delete account FirebaseException: ${e.code} ${e.message}');
       debugPrint('TRACE delete account stack: $st');
+      if (_isFirestoreInternalAssertion(e)) {
+        return 'Error interno temporal de Firestore Web. Recarga la app y vuelve a intentarlo.';
+      }
       if (e.code == 'permission-denied') {
         return 'Firestore rechazo el borrado de datos. Revisa las reglas.';
       }
@@ -235,6 +328,9 @@ class AuthService extends ChangeNotifier {
     } catch (e, st) {
       debugPrint('TRACE delete account ERROR: $e');
       debugPrint('TRACE delete account stack: $st');
+      if (_isFirestoreInternalAssertion(e)) {
+        return 'Error interno temporal de Firestore Web. Recarga la app y vuelve a intentarlo.';
+      }
       return 'No se pudo eliminar la cuenta: $e';
     }
   }
@@ -248,6 +344,25 @@ class AuthService extends ChangeNotifier {
     }
 
     final providers = user.providerData.map((p) => p.providerId).toSet();
+
+    if (providers.contains('apple.com')) {
+      final rawNonce = _generateNonce();
+      final nonce = _sha256ofString(rawNonce);
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: <AppleIDAuthorizationScopes>[
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: nonce,
+      );
+      final oauthCredential = OAuthProvider('apple.com').credential(
+        idToken: appleCredential.identityToken,
+        rawNonce: rawNonce,
+      );
+      await user.reauthenticateWithCredential(oauthCredential);
+      return;
+    }
+
     if (!providers.contains('google.com')) {
       return;
     }
@@ -294,10 +409,28 @@ class AuthService extends ChangeNotifier {
     ];
 
     for (final path in subcollections) {
-      await _deleteCollection(userRef.collection(path));
+      try {
+        await _deleteCollection(userRef.collection(path));
+      } catch (e, st) {
+        if (kDebugMode) {
+          debugPrint('[delete-account] subcollection cleanup failed path=$path error=$e');
+          debugPrint('$st');
+        }
+        // Best-effort cleanup: do not block account deletion for secondary data.
+      }
     }
 
-    await userRef.delete();
+    try {
+      await userRef.delete();
+    } catch (e, st) {
+      if (kDebugMode) {
+        debugPrint('[delete-account] root user doc delete failed error=$e');
+        debugPrint('$st');
+      }
+      if (!_isFirestoreInternalAssertion(e)) {
+        rethrow;
+      }
+    }
   }
 
   Future<void> _deleteCollection(
@@ -321,7 +454,14 @@ class AuthService extends ChangeNotifier {
   }) async {
     final username = (userData['username'] as String?)?.trim().toLowerCase();
     if (username != null && username.isNotEmpty) {
-      await db.collection('usernames').doc(username).delete();
+      try {
+        await db.collection('usernames').doc(username).delete();
+      } catch (e, st) {
+        if (kDebugMode) {
+          debugPrint('[delete-account] username index delete failed key=$username error=$e');
+          debugPrint('$st');
+        }
+      }
     }
 
     final emailCandidates = <String>{
@@ -329,7 +469,14 @@ class AuthService extends ChangeNotifier {
       (authUser.email ?? '').trim().toLowerCase(),
     }..removeWhere((e) => e.isEmpty);
     for (final email in emailCandidates) {
-      await db.collection('emails').doc(email).delete();
+      try {
+        await db.collection('emails').doc(email).delete();
+      } catch (e, st) {
+        if (kDebugMode) {
+          debugPrint('[delete-account] email index delete failed key=$email error=$e');
+          debugPrint('$st');
+        }
+      }
     }
   }
 
@@ -338,6 +485,7 @@ class AuthService extends ChangeNotifier {
       AuthMode.none => 'none',
       AuthMode.guest => 'guest',
       AuthMode.google => 'google',
+      AuthMode.apple => 'apple',
     };
     await _prefs.setString(_modeKey, modeText);
     if (_displayName == null) {
@@ -355,5 +503,63 @@ class AuthService extends ChangeNotifier {
     } else {
       await _prefs.setString(_avatarKey, _avatarUrl!);
     }
+  }
+
+  Future<void> _upsertUserFromAuth(User user, {required String provider}) async {
+    final uid = user.uid.trim();
+    if (uid.isEmpty) return;
+
+    final db = AppFirestore.instance();
+    final userRef = db.collection('users').doc(uid);
+    final snap = await userRef.get();
+
+    final display = (user.displayName ?? '').trim();
+    final email = (user.email ?? '').trim();
+
+    final payload = <String, dynamic>{
+      'uid': uid,
+      'playerName': display.isNotEmpty
+          ? display
+          : (email.isNotEmpty ? email.split('@').first : 'Player'),
+      'email': email,
+      'photoUrl': user.photoURL,
+      'authProvider': provider,
+      'lastLoginAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+      'isOnline': true,
+      'lastSeenAt': FieldValue.serverTimestamp(),
+    };
+
+    if (!snap.exists) {
+      payload['createdAt'] = FieldValue.serverTimestamp();
+      payload['coins'] = 0;
+      payload['lifetimeCoinsEarned'] = 0;
+      payload['username'] = '';
+      payload['usernameLowercase'] = '';
+      payload['usernameChangeCount'] = 0;
+    }
+
+    await userRef.set(payload, SetOptions(merge: true));
+  }
+
+  String _generateNonce([int length = 32]) {
+    const charset =
+        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List<String>.generate(
+      length,
+      (_) => charset[random.nextInt(charset.length)],
+    ).join();
+  }
+
+  String _sha256ofString(String input) {
+    final bytes = utf8.encode(input);
+    return sha256.convert(bytes).toString();
+  }
+
+  bool _isFirestoreInternalAssertion(Object error) {
+    final raw = error.toString().toUpperCase();
+    return raw.contains('FIRESTORE') &&
+        raw.contains('INTERNAL ASSERTION FAILED');
   }
 }

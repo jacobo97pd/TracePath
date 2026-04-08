@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 bool _didShowStartupSplash = false;
 final ValueNotifier<bool> startupSplashVisible =
@@ -19,28 +21,124 @@ class StartupSplashGate extends StatefulWidget {
 }
 
 class _StartupSplashGateState extends State<StartupSplashGate> {
+  static const Duration _minVisibleDuration = Duration(milliseconds: 2200);
   bool _showSplash = !_didShowStartupSplash;
-  Timer? _timer;
+  bool _videoReady = false;
+  bool _dismissed = false;
+  DateTime? _shownAt;
+
+  VideoPlayerController? _videoController;
+  Timer? _fallbackTimer;
 
   @override
   void initState() {
     super.initState();
     startupSplashVisible.value = _showSplash;
     if (_showSplash) {
-      _timer = Timer(const Duration(milliseconds: 1300), () {
-        if (!mounted) return;
-        _didShowStartupSplash = true;
-        setState(() {
-          _showSplash = false;
-        });
-        startupSplashVisible.value = false;
-      });
+      _initSplashVideo();
     }
+  }
+
+  Future<void> _initSplashVideo() async {
+    // Safety timeout so splash never blocks startup.
+    _fallbackTimer = Timer(const Duration(seconds: 12), _dismissSplash);
+    _shownAt = DateTime.now();
+
+    try {
+      final controller = VideoPlayerController.asset(
+        'assets/branding/splash_video_trace_path.mp4',
+      );
+      _videoController = controller;
+      await controller.initialize();
+      if (!mounted || _dismissed) return;
+
+      controller
+        ..setLooping(false)
+        ..setVolume(0);
+      controller.addListener(_onVideoTick);
+
+      // Show the first frame as soon as initialization is done.
+      setState(() {
+        _videoReady = true;
+      });
+
+      // Do not fail the whole splash flow if speed is not supported on device.
+      try {
+        await controller.setPlaybackSpeed(1.5);
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('[splash] setPlaybackSpeed failed, fallback to 1.0: $e');
+        }
+        try {
+          await controller.setPlaybackSpeed(1.0);
+        } catch (_) {}
+      }
+
+      await controller.play();
+    } catch (_) {
+      // Keep startup flow alive with a short black fallback if video fails.
+      if (kDebugMode) {
+        debugPrint('[splash] video init failed, using black fallback.');
+      }
+      _fallbackTimer?.cancel();
+      _fallbackTimer = Timer(const Duration(milliseconds: 1500), _dismissSplash);
+    }
+  }
+
+  void _onVideoTick() {
+    final controller = _videoController;
+    if (controller == null) return;
+    if (!controller.value.isInitialized) return;
+    if (!controller.value.isPlaying) return;
+
+    final duration = controller.value.duration;
+    final position = controller.value.position;
+    if (duration.inMilliseconds <= 0) return;
+    if (position <= Duration.zero) return;
+
+    if (position >= duration - const Duration(milliseconds: 80)) {
+      _dismissSplash();
+    }
+  }
+
+  void _dismissSplash() {
+    if (_dismissed || !mounted) return;
+
+    final shownAt = _shownAt;
+    if (shownAt != null) {
+      final elapsed = DateTime.now().difference(shownAt);
+      if (elapsed < _minVisibleDuration) {
+        final wait = _minVisibleDuration - elapsed;
+        Future<void>.delayed(wait, () {
+          if (mounted) _dismissSplash();
+        });
+        return;
+      }
+    }
+
+    _dismissed = true;
+    _didShowStartupSplash = true;
+
+    final controller = _videoController;
+    if (controller != null) {
+      controller.removeListener(_onVideoTick);
+      unawaited(controller.pause());
+    }
+
+    setState(() {
+      _showSplash = false;
+    });
+    startupSplashVisible.value = false;
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _fallbackTimer?.cancel();
+    final controller = _videoController;
+    if (controller != null) {
+      controller.removeListener(_onVideoTick);
+      controller.dispose();
+    }
     startupSplashVisible.value = false;
     super.dispose();
   }
@@ -50,82 +148,39 @@ class _StartupSplashGateState extends State<StartupSplashGate> {
     if (!_showSplash) {
       return widget.child;
     }
+
+    final controller = _videoController;
+    final hasVideo = _videoReady && controller != null && controller.value.isInitialized;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
-      body: TweenAnimationBuilder<double>(
-        tween: Tween<double>(begin: 0, end: 1),
-        duration: const Duration(milliseconds: 1100),
-        builder: (context, t, _) {
-          return Stack(
-            children: [
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      center: const Alignment(0, -0.25),
-                      radius: 0.95,
-                      colors: [
-                        const Color(0xFF1A2C4D).withOpacity(0.55),
-                        const Color(0xFF0F172A),
-                      ],
-                    ),
-                  ),
-                ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (hasVideo)
+            FittedBox(
+              fit: BoxFit.cover,
+              child: SizedBox(
+                width: controller.value.size.width,
+                height: controller.value.size.height,
+                child: VideoPlayer(controller),
               ),
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(26),
-                        child: Container(
-                          width: 114,
-                          height: 114,
-                          color: const Color(0xFF0A1323),
-                          child: OverflowBox(
-                            maxWidth: 146,
-                            maxHeight: 146,
-                            child: Image.asset(
-                              'assets/branding/logo_tracePath.png',
-                              width: 146,
-                              height: 146,
-                              fit: BoxFit.cover,
-                              filterQuality: FilterQuality.medium,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      const Text(
-                        'TracePath',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 34,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.7,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: 200,
-                        child: LinearProgressIndicator(
-                          value: t,
-                          minHeight: 4,
-                          backgroundColor: const Color(0xFF1A2233),
-                          valueColor: const AlwaysStoppedAnimation(
-                            Color(0xFF3D79FF),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+            )
+          else
+            const ColoredBox(color: Colors.black),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withOpacity(0.1),
+                  Colors.black.withOpacity(0.28),
+                ],
               ),
-            ],
-          );
-        },
+            ),
+          ),
+        ],
       ),
     );
   }

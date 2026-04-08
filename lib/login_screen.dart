@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import 'auth_service.dart';
 import 'l10n/l10n.dart';
@@ -17,6 +19,35 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _busy = false;
+  bool _appleAvailable = false;
+  bool get _isApplePlatform =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+
+  @override
+  void initState() {
+    super.initState();
+    _appleAvailable = _isApplePlatform;
+    _loadAppleAvailability();
+  }
+
+  Future<void> _loadAppleAvailability() async {
+    if (!_isApplePlatform) {
+      return;
+    }
+    try {
+      final available = await SignInWithApple.isAvailable();
+      if (!mounted) return;
+      setState(() {
+        _appleAvailable = available;
+      });
+    } catch (_) {
+      // Keep the button visible on iOS even if the availability probe fails.
+      if (!mounted) return;
+      setState(() {
+        _appleAvailable = true;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,6 +141,13 @@ class _LoginScreenState extends State<LoginScreen> {
             busy: _busy,
             onTap: _onGoogleTap,
           ),
+          if (_isApplePlatform) ...[
+            const SizedBox(height: 10),
+            _AppleButton(
+              busy: _busy,
+              onTap: _onAppleTap,
+            ),
+          ],
           const SizedBox(height: 10),
           OutlinedButton.icon(
             onPressed: _busy
@@ -173,6 +211,30 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     }
   }
+
+  Future<void> _onAppleTap() async {
+    if (!_appleAvailable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Sign in with Apple no disponible en este dispositivo.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+    setState(() => _busy = true);
+    final error = await widget.authService.signInWithApple();
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
 }
 
 class _GoogleButton extends StatelessWidget {
@@ -221,6 +283,58 @@ class _GoogleButton extends StatelessWidget {
           busy
               ? context.l10n.loginConnecting
               : context.l10n.loginContinueGoogle,
+          style: const TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 16,
+            letterSpacing: 0.2,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AppleButton extends StatelessWidget {
+  const _AppleButton({
+    required this.busy,
+    required this.onTap,
+  });
+
+  final bool busy;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: const Color(0xFF2D6CFF).withOpacity(0.12),
+            blurRadius: 14,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ElevatedButton.icon(
+        onPressed: busy ? null : onTap,
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size(double.infinity, 56),
+          backgroundColor: const Color(0xFF111827),
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        icon: busy
+            ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const Icon(Icons.apple_rounded, size: 22),
+        label: Text(
+          busy ? context.l10n.loginConnecting : 'Continuar con Apple',
           style: const TextStyle(
             fontWeight: FontWeight.w800,
             fontSize: 16,
