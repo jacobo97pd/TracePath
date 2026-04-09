@@ -121,12 +121,6 @@ class ShopScreen extends StatefulWidget {
       name: 'GlitchPrintTrail',
       costCoins: 1490,
     ),
-    CoinTrailDef(id: 'trail_web', name: 'WebTrail', costCoins: 950),
-    CoinTrailDef(
-      id: 'trail_web_legendary',
-      name: 'WebTrailLegendary',
-      costCoins: 1850,
-    ),
     CoinTrailDef(id: 'trail_ink_brush', name: 'InkBrushTrail', costCoins: 1000),
     CoinTrailDef(
       id: 'trail_ink_brush_crimson',
@@ -144,6 +138,13 @@ class ShopScreen extends StatefulWidget {
     CoinTrailDef(id: 'trail_upside', name: 'UpsideTrail', costCoins: 1500),
     CoinTrailDef(
         id: 'trail_binary_rain', name: 'BinaryRainTrail', costCoins: 1580),
+    // Re-added explicitly to ensure they behave exactly like the rest in shop.
+    CoinTrailDef(id: 'trail_web', name: 'Web Trail', costCoins: 950),
+    CoinTrailDef(
+      id: 'trail_web_legendary',
+      name: 'Web Trail Legendary',
+      costCoins: 1850,
+    ),
   ];
 
   static const Map<String, String> _trailDescriptions = <String, String>{
@@ -201,6 +202,20 @@ class ShopScreen extends StatefulWidget {
 }
 
 class _ShopScreenState extends State<ShopScreen> {
+  static const Map<String, ({String name, int coins, String description})>
+      _trailShopOverrides = {
+    'trail_web': (
+      name: 'Web Trail',
+      coins: 950,
+      description: 'Silk-thread web trail with subtle depth.',
+    ),
+    'trail_web_legendary': (
+      name: 'Web Trail Legendary',
+      coins: 1850,
+      description: 'Legendary web with premium VFX layers.',
+    ),
+  };
+
   static const Map<String, String> _coinPackAssetById = <String, String>{
     'coins_500': 'assets/shop/coin_packs/saco_pequeno.webp',
     'coins_1200': 'assets/shop/coin_packs/saco_mediano.webp',
@@ -930,20 +945,25 @@ class _ShopScreenState extends State<ShopScreen> {
       seen.add(id);
       final catalogEntry = catalogById[id];
       final preview = catalogEntry ?? TrailCatalog.resolveByTrailId(id);
+      final override = _trailShopOverrides[id];
       final configuredName = configured.name.trim();
       final catalogName = preview.name.trim();
-      final displayName = configuredName.isNotEmpty
-          ? configuredName
-          : (catalogName.isNotEmpty ? catalogName : _humanizeTrailId(id));
-      final description = _resolveTrailDescription(id, context);
-      final hasPrice =
-          configured.costCoins != null && configured.costCoins! >= 0;
+      final rawName = (override?.name.trim().isNotEmpty ?? false)
+          ? override!.name.trim()
+          : configuredName.isNotEmpty
+              ? configuredName
+              : (catalogName.isNotEmpty ? catalogName : _humanizeTrailId(id));
+      final displayName = _formatTrailDisplayName(rawName);
+      final description =
+          override?.description ?? _resolveTrailDescription(id, context);
+      final resolvedCost = override?.coins ?? configured.costCoins;
+      final hasPrice = resolvedCost != null && resolvedCost >= 0;
       out.add(
         _TrailShopMeta(
           id: id,
           displayName: displayName,
           description: description,
-          costCoins: configured.costCoins,
+          costCoins: resolvedCost,
           availableInShop: hasPrice,
           presentInCatalog: catalogEntry != null,
           preview: preview,
@@ -958,9 +978,11 @@ class _ShopScreenState extends State<ShopScreen> {
       out.add(
         _TrailShopMeta(
           id: id,
-          displayName: catalog.name.trim().isNotEmpty
-              ? catalog.name.trim()
-              : _humanizeTrailId(id),
+          displayName: _formatTrailDisplayName(
+            catalog.name.trim().isNotEmpty
+                ? catalog.name.trim()
+                : _humanizeTrailId(id),
+          ),
           description: _resolveTrailDescription(id, context),
           costCoins: null,
           availableInShop: false,
@@ -986,6 +1008,18 @@ class _ShopScreenState extends State<ShopScreen> {
     return words
         .map((w) => '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
         .join(' ');
+  }
+
+  String _formatTrailDisplayName(String raw) {
+    final base = raw.trim();
+    if (base.isEmpty) return 'Trail';
+    final spaced = base
+        .replaceAllMapped(RegExp(r'(?<=[a-z])(?=[A-Z])'), (_) => ' ')
+        .replaceAllMapped(RegExp(r'(?<=\D)(?=\d)'), (_) => ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+    if (spaced.isEmpty) return 'Trail';
+    return spaced;
   }
 
   Future<void> _showTrailUnlockBanner({
@@ -2965,6 +2999,7 @@ class _TrailShopCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final normalizedId = trailId.trim().toLowerCase();
     final resolvedName =
         trailName.trim().isNotEmpty ? trailName.trim() : preview.name.trim();
     final safeTrailName =
@@ -2972,13 +3007,21 @@ class _TrailShopCard extends StatelessWidget {
     final safeDescription = trailDescription.trim().isNotEmpty
         ? trailDescription.trim()
         : _missingDescriptionLabel(context);
-    final hasValidPrice = cost != null && cost! >= 0;
+    final effectiveCost = cost ?? -1;
+    final hasValidPrice = effectiveCost >= 0;
+    final effectiveAvailableInShop = availableInShop && hasValidPrice;
+    final isLegendary = normalizedId.contains('legendary') ||
+        safeTrailName.toLowerCase().contains('legendary');
     final statusText = owned
         ? context.l10n.shopOwned
-        : (availableInShop && hasValidPrice)
-            ? context.l10n.shopCoinsAmount(cost ?? 0)
+        : (effectiveAvailableInShop && hasValidPrice)
+            ? context.l10n.shopCoinsAmount(effectiveCost)
             : _missingPriceLabel(context);
-
+    final statusColor = owned
+        ? const Color(0xFF6EE7B7)
+        : (effectiveAvailableInShop && hasValidPrice)
+            ? const Color(0xFFFFD166)
+            : const Color(0xFFFFB4A9);
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
@@ -3002,58 +3045,33 @@ class _TrailShopCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 10),
-          Text(
-            safeTrailName,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-              fontSize: 15,
+          _TrailDetailsFooter(
+            trailId: trailId,
+            trailName: safeTrailName,
+            description: safeDescription,
+            statusText: statusText,
+            statusColor: statusColor,
+            isLegendary: isLegendary,
+            owned: owned,
+            effectiveAvailableInShop: effectiveAvailableInShop,
+            hasValidPrice: hasValidPrice,
+            effectiveCost: effectiveCost,
+            actionButton: _buildActionButton(
+              context,
+              effectiveAvailableInShop: effectiveAvailableInShop,
+              effectiveCost: effectiveCost,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 2),
-          Text(
-            safeDescription,
-            style: const TextStyle(
-              color: Color(0xFFB5C4E3),
-              fontSize: 12,
-              height: 1.2,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 9),
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 10,
-            runSpacing: 8,
-            children: [
-              SizedBox(
-                width: 140,
-                child: Text(
-                  statusText,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color(0xFFB5C4E3),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    height: 1.2,
-                  ),
-                ),
-              ),
-              _buildActionButton(context),
-            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildActionButton(BuildContext context) {
+  Widget _buildActionButton(
+    BuildContext context, {
+    required bool effectiveAvailableInShop,
+    required int effectiveCost,
+  }) {
     if (selected) {
       return Chip(
         visualDensity: VisualDensity.compact,
@@ -3063,20 +3081,22 @@ class _TrailShopCard extends StatelessWidget {
     return FilledButton.tonal(
       style: FilledButton.styleFrom(
         visualDensity: VisualDensity.compact,
-        minimumSize: const Size(84, 34),
-        disabledForegroundColor: const Color(0xFFC7D5EE),
-        disabledBackgroundColor: const Color(0xFF2A354B),
+        minimumSize: const Size(120, 36),
+        foregroundColor: const Color(0xFFEAF2FF),
+        disabledForegroundColor: const Color(0xFFD3E1FA),
+        disabledBackgroundColor: const Color(0xFF32425E),
+        backgroundColor: const Color(0xFF2E5D97),
       ),
       onPressed: owned
           ? onEquip
-          : (availableInShop && canBuy)
+          : (effectiveAvailableInShop && canBuy)
               ? () => unawaited(onBuy())
               : null,
       child: Text(
         owned
             ? context.l10n.shopEquip
-            : availableInShop
-                ? context.l10n.shopBuyCoins(cost ?? 0)
+            : effectiveAvailableInShop
+                ? context.l10n.shopBuyCoins(effectiveCost)
                 : _unavailableButtonLabel(context),
       ),
     );
@@ -3107,6 +3127,117 @@ class _TrailShopCard extends StatelessWidget {
     return words
         .map((w) => '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
         .join(' ');
+  }
+}
+
+class _TrailDetailsFooter extends StatelessWidget {
+  const _TrailDetailsFooter({
+    required this.trailId,
+    required this.trailName,
+    required this.description,
+    required this.statusText,
+    required this.statusColor,
+    required this.isLegendary,
+    required this.owned,
+    required this.effectiveAvailableInShop,
+    required this.hasValidPrice,
+    required this.effectiveCost,
+    required this.actionButton,
+  });
+
+  final String trailId;
+  final String trailName;
+  final String description;
+  final String statusText;
+  final Color statusColor;
+  final bool isLegendary;
+  final bool owned;
+  final bool effectiveAvailableInShop;
+  final bool hasValidPrice;
+  final int effectiveCost;
+  final Widget actionButton;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          margin: const EdgeInsets.only(top: 10),
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+          decoration: BoxDecoration(
+            color: const Color(0xFF132440),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFF35517A),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      trailName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  if (isLegendary) ...[
+                    const SizedBox(width: 6),
+                    const Text(
+                      'LEGENDARY',
+                      style: TextStyle(
+                        color: Color(0xFFFFD166),
+                        fontWeight: FontWeight.w900,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                description,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Color(0xFFE4EEFF),
+                  fontSize: 12.5,
+                  height: 1.2,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      statusText,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: statusColor,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  actionButton,
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -3251,7 +3382,7 @@ class _TrailPreviewPainter extends CustomPainter {
   }
 
   Offset? _sample(Path path, Size size, double t) {
-    final metrics = path.computeMetrics();
+    final metrics = path.computeMetrics().toList(growable: false);
     if (metrics.isEmpty) return null;
     final metric = metrics.first;
     final tan = metric.getTangentForOffset(metric.length * t.clamp(0.0, 1.0));

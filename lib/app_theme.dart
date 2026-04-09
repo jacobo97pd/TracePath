@@ -54,7 +54,7 @@ class AppTheme {
         foregroundColor: AppColors.textPrimary,
         titleTextStyle: AppTextStyles.title.copyWith(fontSize: 19),
       ),
-      cardTheme: CardThemeData(
+      cardTheme: CardTheme(
         color: AppColors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -127,7 +127,7 @@ class AppTheme {
         foregroundColor: AppColors.textPrimary,
         titleTextStyle: AppTextStyles.title.copyWith(fontSize: 20),
       ),
-      cardTheme: CardThemeData(
+      cardTheme: CardTheme(
         color: AppColors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(

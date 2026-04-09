@@ -1818,9 +1818,16 @@ class _GameScreenState extends State<GameScreen>
 
   void _handleEnergyChanged() {
     if (!mounted || !_usesEnergySystem) return;
+    final wasLocked = _energyGateLocked;
+    final nextLocked =
+        !_attemptEnergyConsumed && widget.energyService.snapshot.current <= 0;
     setState(() {
-      _energyGateLocked =
-          !_attemptEnergyConsumed && widget.energyService.snapshot.current <= 0;
+      _energyGateLocked = nextLocked;
+      if (wasLocked && !nextLocked && !_attemptEnergyConsumed) {
+        // User recovered energy (daily reset / battery): do not count locked time.
+        _runStartedAt = DateTime.now();
+        _ghostPlaybackStartedAt = _runStartedAt;
+      }
     });
   }
 
@@ -2014,6 +2021,8 @@ class _GameScreenState extends State<GameScreen>
                   }
                   setState(() {
                     _energyGateLocked = false;
+                    _runStartedAt = DateTime.now();
+                    _ghostPlaybackStartedAt = _runStartedAt;
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -2057,6 +2066,8 @@ class _GameScreenState extends State<GameScreen>
                   if (refill.success) {
                     setState(() {
                       _energyGateLocked = false;
+                      _runStartedAt = DateTime.now();
+                      _ghostPlaybackStartedAt = _runStartedAt;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -2933,6 +2944,9 @@ class _GameScreenState extends State<GameScreen>
     final solvedElapsed = _elapsedAtSolve;
     if (solvedElapsed != null) {
       return solvedElapsed;
+    }
+    if (_usesEnergySystem && !_attemptEnergyConsumed && _energyGateLocked) {
+      return Duration.zero;
     }
     final startedAt = _runStartedAt;
     if (startedAt == null) {
