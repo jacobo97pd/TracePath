@@ -327,6 +327,14 @@ class TrailRenderer {
       _paintInkBase(ctx);
       return;
     }
+    if (skin.renderType == TrailRenderType.symbioteInk) {
+      _paintSymbioteInkBase(ctx);
+      return;
+    }
+    if (skin.renderType == TrailRenderType.voidRift) {
+      _paintVoidRiftBase(ctx);
+      return;
+    }
     if (skin.renderType == TrailRenderType.magma) {
       _paintMagmaBase(ctx);
       return;
@@ -432,6 +440,12 @@ class TrailRenderer {
         return;
       case TrailRenderType.ink:
         _paintInkTrail(ctx);
+        return;
+      case TrailRenderType.symbioteInk:
+        _paintSymbioteInkTrail(ctx);
+        return;
+      case TrailRenderType.voidRift:
+        _paintVoidRiftTrail(ctx);
         return;
       case TrailRenderType.magma:
         _paintMagmaTrail(ctx);
@@ -2570,6 +2584,208 @@ class TrailRenderer {
     ctx.canvas.restore();
   }
 
+  static void _paintSymbioteInkBase(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.symbioteInk;
+    final points = ctx.pathPoints;
+    final base = ctx.baseStrokeWidth * ctx.trailSkin.thickness * cfg.coreWidth;
+    final pulsePhase = ctx.nowSeconds * cfg.widthPulseSpeed * pi * 2;
+    final lastSeg = points.last - points[points.length - 2];
+    final speedNormGlobal =
+        (lastSeg.distance / (ctx.cellSize * 0.62)).clamp(0.6, 2.2);
+    final flowSpeed = 0.65 + speedNormGlobal * 0.7;
+
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+
+    // Layered afterglow to avoid flat fading.
+    final lagPoints = <Offset>[points.first];
+    for (var i = 1; i < points.length; i++) {
+      lagPoints.add(Offset.lerp(points[i], points[i - 1], 0.34)!);
+    }
+    if (lagPoints.length >= 2) {
+      ctx.canvas.drawPath(
+        _buildSmoothPath(lagPoints),
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..isAntiAlias = true
+          ..strokeWidth = base * 0.92
+          ..color = const Color(0xFF2B2E53).withOpacity(0.18),
+      );
+    }
+
+    final underPath = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize * cfg.edgeRipples * 0.34,
+      phaseMultiplier: 0.42,
+    );
+    ctx.canvas.drawPath(
+      underPath,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..isAntiAlias = true
+        ..strokeWidth = base * cfg.edgeWidth
+        ..color = const Color(0xFF04050A).withOpacity(0.92),
+    );
+
+    for (var i = 1; i < points.length; i++) {
+      final a = points[i - 1];
+      final b = points[i];
+      final seg = b - a;
+      final segLen = seg.distance;
+      if (segLen <= 0.0001) continue;
+
+      final speedNorm = (segLen / (ctx.cellSize * 0.62)).clamp(0.6, 2.0);
+      var turnNorm = 0.0;
+      if (i >= 2) {
+        final prev = points[i - 1] - points[i - 2];
+        final prevLen = prev.distance;
+        if (prevLen > 0.0001) {
+          final d0 = prev / prevLen;
+          final d1 = seg / segLen;
+          final turn =
+              acos((d0.dx * d1.dx + d0.dy * d1.dy).clamp(-1.0, 1.0)) / pi;
+          turnNorm = turn.clamp(0.0, 1.0);
+        }
+      }
+
+      final pulse = sin(pulsePhase + i * 0.61 + ctx.phase * pi * 2) * 0.5 + 0.5;
+      final speedSlim = ((speedNorm - 1.0).clamp(0.0, 1.0)) * cfg.slimAtSpeed;
+      final turnCompress = turnNorm * cfg.compressOnTurn;
+      final widthFactor = (1.0 +
+              cfg.widthPulseStrength * (pulse - 0.5) * 2 -
+              speedSlim +
+              turnCompress)
+          .clamp(0.66, 1.8);
+      final w = base * widthFactor;
+      final n = _segmentNormal(a, b);
+
+      final coreColor = Color.lerp(
+        const Color(0xFF1A1730),
+        const Color(0xFF2A2A56),
+        0.36 + pulse * 0.34,
+      )!
+          .withOpacity(0.95);
+      final sheenColor = Color.lerp(
+        const Color(0xFF191B26),
+        const Color(0xFF2A2D3C),
+        0.34 + pulse * 0.42,
+      )!
+          .withOpacity(0.44 + pulse * 0.18);
+
+      final core = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..isAntiAlias = true
+        ..strokeWidth = w * 0.72
+        ..color = coreColor;
+      ctx.canvas.drawLine(a, b, core);
+
+      final rippleOffset = w * (0.15 + cfg.edgeRipples * 0.24);
+      final rippleA = a + n * rippleOffset;
+      final rippleB = b + n * rippleOffset;
+      final rippleA2 = a - n * rippleOffset * 0.85;
+      final rippleB2 = b - n * rippleOffset * 0.85;
+      final edge = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..isAntiAlias = true
+        ..strokeWidth = max(0.8, w * 0.22)
+        ..color = const Color(0xFF10131D)
+            .withOpacity(0.34 + pulse * 0.2 + (turnNorm > 0.2 ? 0.1 : 0.0));
+      ctx.canvas.drawLine(rippleA, rippleB, edge);
+      ctx.canvas.drawLine(rippleA2, rippleB2, edge);
+
+      final vein = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..isAntiAlias = true
+        ..strokeWidth = max(0.9, w * cfg.innerVeinWidth)
+        ..shader = LinearGradient(
+          colors: <Color>[
+            const Color(0xFF4E3F96).withOpacity(0.22 + pulse * 0.2),
+            const Color(0xFF5B46C8)
+                .withOpacity(cfg.innerVeinOpacity + pulse * 0.12),
+            const Color(0xFF53CBFF).withOpacity(0.24 + pulse * 0.24),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ).createShader(Rect.fromPoints(a, b));
+      final veinOffset = n *
+          (w *
+              0.08 *
+              sin(ctx.nowSeconds * cfg.innerFlowSpeed * flowSpeed + i * 0.93));
+      ctx.canvas.drawLine(a + veinOffset, b + veinOffset, vein);
+
+      final wet = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..isAntiAlias = true
+        ..strokeWidth = max(0.9, w * 0.16)
+        ..color = sheenColor;
+      ctx.canvas.drawLine(
+        a + n * (w * 0.08) - (seg / segLen) * (w * 0.05),
+        b + n * (w * 0.08),
+        wet,
+      );
+
+      if (turnNorm > 0.24) {
+        final center = Offset.lerp(a, b, 0.5)!;
+        final curvePulse = (sin(ctx.nowSeconds * 11.0 + i * 1.9) * 0.5 + 0.5);
+        final radius = w * (0.22 + turnNorm * 0.26 + curvePulse * 0.09);
+        ctx.canvas.drawCircle(
+          center,
+          radius,
+          Paint()
+            ..shader = RadialGradient(
+              colors: <Color>[
+                const Color(0xFF75D7FF)
+                    .withOpacity(0.05 + turnNorm * 0.12 + curvePulse * 0.12),
+                const Color(0xFF5E56C4).withOpacity(0.06 + turnNorm * 0.1),
+                Colors.transparent,
+              ],
+            ).createShader(Rect.fromCircle(center: center, radius: radius)),
+        );
+      }
+    }
+
+    // Longitudinal inner flow pulses.
+    final pulseNodes = max(4, min(10, (points.length / 2).round()));
+    for (var i = 0; i < pulseNodes; i++) {
+      final t = ((ctx.nowSeconds * 0.22 * flowSpeed) + i * 0.17) % 1.0;
+      final p = _samplePoint(points, t);
+      final tan = _sampleTangent(points, t);
+      if (p == null || tan == null) continue;
+      final life = (sin(ctx.nowSeconds * 6.8 + i * 2.1) * 0.5 + 0.5);
+      final radius = base * (0.09 + life * 0.08);
+      final streakEnd = p + tan * (ctx.cellSize * (0.03 + life * 0.05));
+      ctx.canvas.drawCircle(
+        p,
+        radius,
+        Paint()
+          ..color = const Color(0xFF7AD6FF).withOpacity(0.18 + life * 0.22),
+      );
+      ctx.canvas.drawLine(
+        p,
+        streakEnd,
+        Paint()
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = max(0.9, base * 0.08)
+          ..color = const Color(0xFFBCEEFF).withOpacity(0.2 + life * 0.28),
+      );
+    }
+
+    ctx.canvas.restore();
+  }
+
   static void _paintMagmaBase(TrailRenderContext ctx) {
     if (ctx.pathPoints.length < 2) return;
     final cfg = ctx.trailSkin.magma;
@@ -3221,6 +3437,472 @@ class TrailRenderer {
         Paint()..color = cfg.coreColor.withOpacity((1 - fall) * 0.34),
       );
     }
+    ctx.canvas.restore();
+  }
+
+  static void _paintSymbioteInkTrail(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.symbioteInk;
+    final points = ctx.pathPoints;
+
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+
+    final head = ctx.headPosition ?? points.last;
+    final tailDir = _sampleTangent(points, 1.0) ?? const Offset(1, 0);
+    final n = Offset(-tailDir.dy, tailDir.dx);
+    final speedNorm = ((points.last - points[points.length - 2]).distance /
+            (ctx.cellSize * 0.62))
+        .clamp(0.6, 2.2);
+
+    // Stronger head: directional, brighter and premium.
+    final headBloom = (0.22 + (speedNorm - 0.6) * 0.2).clamp(0.2, 0.42);
+    _paintHeadGlow(ctx, scale: cfg.headBloomScale * 1.15, alpha: headBloom);
+    final headRadius = ctx.baseStrokeWidth * (0.18 + speedNorm * 0.1);
+    ctx.canvas.drawCircle(
+      head,
+      headRadius * 1.45,
+      Paint()
+        ..shader = RadialGradient(
+          colors: <Color>[
+            const Color(0xFF90EAFF).withOpacity(0.34),
+            const Color(0xFF5A6EFF).withOpacity(0.2),
+            Colors.transparent,
+          ],
+        ).createShader(
+            Rect.fromCircle(center: head, radius: headRadius * 1.45)),
+    );
+    ctx.canvas.drawCircle(
+      head,
+      headRadius * 0.58,
+      Paint()..color = const Color(0xFFDFF8FF).withOpacity(0.86),
+    );
+    ctx.canvas.drawLine(
+      head - tailDir * (ctx.cellSize * 0.03),
+      head + tailDir * (ctx.cellSize * 0.08),
+      Paint()
+        ..strokeCap = StrokeCap.round
+        ..strokeWidth = max(1.0, ctx.baseStrokeWidth * 0.09)
+        ..color = const Color(0xFFEAFDFF).withOpacity(0.74),
+    );
+
+    final headStretch = (1.0 + (speedNorm - 1.0) * 0.25).clamp(0.9, 1.35);
+    final tentacleBase = ctx.cellSize * cfg.headTentacleLength * headStretch;
+    final tentacles = cfg.headTentacleCount.clamp(3, 8);
+    for (var i = 0; i < tentacles; i++) {
+      final p = (ctx.phase + i * 0.137) % 1.0;
+      final side = i.isEven ? 1.0 : -1.0;
+      final splay = (i / max(1, tentacles - 1)) * 2 - 1;
+      final len = tentacleBase * (0.72 + _rand(7000 + i, 0.0, 0.52));
+      final ctrl = head -
+          tailDir * (len * 0.35) +
+          n * (splay * ctx.cellSize * 0.15 + side * ctx.cellSize * 0.04);
+      final end = head -
+          tailDir * len +
+          n *
+              (splay * ctx.cellSize * 0.32 +
+                  sin(p * pi * 2) * ctx.cellSize * 0.05);
+      final tendril = Path()
+        ..moveTo(head.dx, head.dy)
+        ..quadraticBezierTo(ctrl.dx, ctrl.dy, end.dx, end.dy);
+      ctx.canvas.drawPath(
+        tendril,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = max(
+              1.0, ctx.baseStrokeWidth * 0.18 * (1.0 - (i / tentacles) * 0.5))
+          ..color = const Color(0xFF111420)
+              .withOpacity(cfg.headTentacleOpacity * (0.86 - p * 0.4)),
+      );
+    }
+
+    // Micro spark near the tip (subtle and cheap).
+    final sparkPhase = (ctx.nowSeconds * 10.0 + ctx.phase * pi * 2) % 1.0;
+    if (sparkPhase > 0.66) {
+      final spark = head +
+          n * (ctx.cellSize * 0.03) -
+          tailDir * (ctx.cellSize * 0.02 * sparkPhase);
+      ctx.canvas.drawCircle(
+        spark,
+        ctx.cellSize * 0.015,
+        Paint()..color = const Color(0xFFE7FEFF).withOpacity(0.5),
+      );
+    }
+
+    for (var i = 2; i < points.length - 1; i++) {
+      final prev = points[i - 1] - points[i - 2];
+      final next = points[i] - points[i - 1];
+      final prevLen = prev.distance;
+      final nextLen = next.distance;
+      if (prevLen <= 0.0001 || nextLen <= 0.0001) continue;
+      final d0 = prev / prevLen;
+      final d1 = next / nextLen;
+      final turn = acos((d0.dx * d1.dx + d0.dy * d1.dy).clamp(-1.0, 1.0));
+      final turnNorm = (turn / pi).clamp(0.0, 1.0);
+      if (turnNorm < cfg.turnWhipThreshold) continue;
+      final center = points[i - 1];
+      final tn = Offset(-d1.dy, d1.dx);
+      final side = i.isEven ? 1.0 : -1.0;
+      final whipLen = ctx.cellSize *
+          cfg.turnWhipLength *
+          (0.74 + turnNorm * 0.9 + _rand(7300 + i, 0.0, 0.32));
+      final whipEnd = center + tn * side * whipLen - d1 * whipLen * 0.45;
+      ctx.canvas.drawLine(
+        center,
+        whipEnd,
+        Paint()
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = max(0.9, ctx.baseStrokeWidth * 0.15)
+          ..color = const Color(0xFF141828).withOpacity(
+            cfg.turnWhipOpacity * (0.7 + turnNorm * 0.6),
+          ),
+      );
+
+      final burst = (sin(ctx.nowSeconds * 9.5 + i * 1.37) * 0.5 + 0.5);
+      final burstRadius = ctx.baseStrokeWidth * (0.18 + turnNorm * 0.22);
+      ctx.canvas.drawCircle(
+        center,
+        burstRadius,
+        Paint()
+          ..shader = RadialGradient(
+            colors: <Color>[
+              const Color(0xFF8ADFFF)
+                  .withOpacity(0.08 + turnNorm * 0.12 + burst * 0.1),
+              const Color(0xFF6F5BFF).withOpacity(0.06 + turnNorm * 0.1),
+              Colors.transparent,
+            ],
+          ).createShader(Rect.fromCircle(center: center, radius: burstRadius)),
+      );
+    }
+
+    // Short translucent tail echo for richer afterglow.
+    final tailEcho = <Offset>[points.first];
+    for (var i = 1; i < points.length; i++) {
+      tailEcho.add(Offset.lerp(points[i], points[i - 1], 0.52)!);
+    }
+    if (tailEcho.length >= 2) {
+      ctx.canvas.drawPath(
+        _buildSmoothPath(tailEcho),
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..isAntiAlias = true
+          ..strokeWidth = ctx.baseStrokeWidth * 0.18
+          ..color = const Color(0xFF6A7CFF).withOpacity(0.16),
+      );
+    }
+
+    final drops = max(7, min(26, (points.length * cfg.dripRate * 1.7).round()));
+    for (var i = 0; i < drops; i++) {
+      final life = ((ctx.nowSeconds / cfg.dripLifeSeconds) + i * 0.173) % 1.0;
+      final alpha = (1.0 - life).clamp(0.0, 1.0);
+      if (alpha < 0.05) continue;
+      final t = ((ctx.phase * 0.8) + i * 0.089) % 1.0;
+      final p = _samplePoint(points, t);
+      final tan = _sampleTangent(points, t);
+      if (p == null || tan == null) continue;
+      final normal = Offset(-tan.dy, tan.dx);
+      final radius = ctx.cellSize *
+          _rand(7600 + i, cfg.dripSizeMin, cfg.dripSizeMax) *
+          (0.85 + alpha * 0.6);
+      final drift = normal * _rand(7700 + i, -0.22, 0.22) * ctx.cellSize +
+          tan * _rand(7800 + i, -0.08, 0.08) * ctx.cellSize;
+      final dropCenter = p + drift + Offset(0, life * ctx.cellSize * 0.06);
+      ctx.canvas.drawCircle(
+        dropCenter,
+        radius,
+        Paint()..color = const Color(0xFF0A0B10).withOpacity(alpha * 0.32),
+      );
+      ctx.canvas.drawCircle(
+        dropCenter + normal * (radius * 0.22),
+        radius * 0.46,
+        Paint()..color = const Color(0xFF3D39A0).withOpacity(alpha * 0.24),
+      );
+    }
+
+    if (ctx.solved) {
+      // Short legendary pulse (about 200–400ms active window per cycle).
+      final gate = (ctx.nowSeconds * (0.9 + cfg.finishPulseSpeed * 0.22)) % 1.0;
+      final burst = (1.0 - ((gate - 0.18).abs() / 0.18)).clamp(0.0, 1.0);
+      final pulse =
+          ((sin(ctx.nowSeconds * cfg.finishPulseSpeed * pi * 2) * 0.5) + 0.5) *
+              burst;
+      final travelT = (ctx.nowSeconds * 0.85) % 1.0;
+      final anchor = _samplePoint(points, travelT);
+      if (anchor != null && burst > 0.01) {
+        final radius =
+            ctx.cellSize * (0.26 + cfg.finishPulseStrength * 0.65 * pulse);
+        ctx.canvas.drawCircle(
+          anchor,
+          radius,
+          Paint()
+            ..shader = RadialGradient(
+              colors: <Color>[
+                const Color(0xFF6F52FF).withOpacity(0.22 + pulse * 0.16),
+                const Color(0xFF4CC7FF).withOpacity(0.14 + pulse * 0.12),
+                Colors.transparent,
+              ],
+            ).createShader(Rect.fromCircle(center: anchor, radius: radius)),
+        );
+      }
+      if (burst > 0.01) {
+        final solvedPath = _buildSmoothPath(points);
+        final solvedOverlay = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..strokeWidth = ctx.baseStrokeWidth *
+              (0.22 + cfg.finishPulseStrength * (0.32 + pulse * 0.52))
+          ..shader = const LinearGradient(
+            colors: <Color>[
+              Color(0xFF2F2B48),
+              Color(0xFF5F4BDE),
+              Color(0xFF3DB7FF),
+            ],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ).createShader(ctx.boardRect);
+        ctx.canvas.drawPath(solvedPath, solvedOverlay);
+      }
+    }
+
+    ctx.canvas.restore();
+  }
+
+  static void _paintVoidRiftBase(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.voidRift;
+    final points = ctx.pathPoints;
+    final base = ctx.baseStrokeWidth * ctx.trailSkin.thickness * cfg.coreWidth;
+    final lastSeg = points.last - points[points.length - 2];
+    final speedNorm =
+        (lastSeg.distance / (ctx.cellSize * 0.62)).clamp(0.6, 2.2);
+    final vibrate =
+        sin(ctx.nowSeconds * cfg.edgeVibrationSpeed * pi * 2) * 0.5 + 0.5;
+
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+
+    final riftPath = _animatedJitterPath(
+      ctx,
+      amount: ctx.cellSize *
+          cfg.edgeJitter *
+          (0.48 + vibrate * 0.5 + (speedNorm - 1.0) * cfg.speedVibrationBoost),
+      phaseMultiplier: 0.74 + speedNorm * 0.16,
+    );
+
+    final edgeW = base * cfg.edgeWidth;
+    final innerW = base * 0.7;
+
+    // Slight space distortion around the rift.
+    final distort = Offset(
+      sin(ctx.nowSeconds * 2.2 + ctx.phase * 6.0) *
+          ctx.cellSize *
+          cfg.distortionOffset,
+      cos(ctx.nowSeconds * 1.8 + ctx.phase * 5.1) *
+          ctx.cellSize *
+          cfg.distortionOffset *
+          0.72,
+    );
+    ctx.canvas.drawPath(
+      riftPath.shift(distort),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..isAntiAlias = true
+        ..strokeWidth = edgeW * 1.1
+        ..color = const Color(0xFF2A1245).withOpacity(cfg.distortionOpacity),
+    );
+
+    // Border (electric violet), irregular and alive.
+    final edgePulse = 0.76 + vibrate * cfg.edgePulseStrength;
+    ctx.canvas.drawPath(
+      riftPath,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..isAntiAlias = true
+        ..strokeWidth = edgeW
+        ..shader = LinearGradient(
+          colors: <Color>[
+            const Color(0xFF2E0F4A).withOpacity(0.94 * edgePulse),
+            const Color(0xFF7428C8).withOpacity(0.98 * edgePulse),
+            const Color(0xFF9B51FF).withOpacity(0.84 * edgePulse),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ).createShader(ctx.boardRect),
+    );
+
+    // Core void: matte, nearly absent light.
+    ctx.canvas.drawPath(
+      riftPath,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..isAntiAlias = true
+        ..strokeWidth = innerW
+        ..color = const Color(0xFF010103).withOpacity(0.98),
+    );
+
+    // Inner collapse hint to avoid normal fade look.
+    final collapsePoints = <Offset>[points.first];
+    for (var i = 1; i < points.length; i++) {
+      collapsePoints
+          .add(Offset.lerp(points[i], points[i - 1], cfg.tailCollapseAmount)!);
+    }
+    if (collapsePoints.length >= 2) {
+      ctx.canvas.drawPath(
+        _buildSmoothPath(collapsePoints),
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..isAntiAlias = true
+          ..strokeWidth = base * 0.34
+          ..color = const Color(0xFF0C0815).withOpacity(0.58),
+      );
+    }
+
+    ctx.canvas.restore();
+  }
+
+  static void _paintVoidRiftTrail(TrailRenderContext ctx) {
+    if (ctx.pathPoints.length < 2) return;
+    final cfg = ctx.trailSkin.voidRift;
+    final points = ctx.pathPoints;
+
+    ctx.canvas.save();
+    ctx.canvas.clipPath(ctx.clipPath);
+
+    final head = ctx.headPosition ?? points.last;
+    final tan = _sampleTangent(points, 1.0) ?? const Offset(1, 0);
+    final normal = Offset(-tan.dy, tan.dx);
+    final speedNorm = ((points.last - points[points.length - 2]).distance /
+            (ctx.cellSize * 0.62))
+        .clamp(0.6, 2.2);
+
+    // Reactive edge intensity on curves + speed.
+    for (var i = 2; i < points.length - 1; i++) {
+      final prev = points[i - 1] - points[i - 2];
+      final next = points[i] - points[i - 1];
+      final prevLen = prev.distance;
+      final nextLen = next.distance;
+      if (prevLen <= 0.0001 || nextLen <= 0.0001) continue;
+      final d0 = prev / prevLen;
+      final d1 = next / nextLen;
+      final turnNorm =
+          (acos((d0.dx * d1.dx + d0.dy * d1.dy).clamp(-1.0, 1.0)) / pi)
+              .clamp(0.0, 1.0);
+      if (turnNorm < 0.14) continue;
+      final c = points[i - 1];
+      final radius = ctx.baseStrokeWidth * (0.16 + turnNorm * cfg.curveBoost);
+      ctx.canvas.drawCircle(
+        c,
+        radius,
+        Paint()
+          ..shader = RadialGradient(
+            colors: <Color>[
+              const Color(0xFFA16BFF).withOpacity(0.12 + turnNorm * 0.16),
+              const Color(0xFF4E1D8A).withOpacity(0.08 + turnNorm * 0.12),
+              Colors.transparent,
+            ],
+          ).createShader(Rect.fromCircle(center: c, radius: radius)),
+      );
+    }
+
+    // Inverse particles: attracted toward the core.
+    final count = max(8, min(28, cfg.absorptionParticleCount));
+    for (var i = 0; i < count; i++) {
+      final t =
+          ((ctx.nowSeconds * 0.18 * cfg.absorptionSpeed) + i * 0.117) % 1.0;
+      final p = _samplePoint(points, t);
+      final tng = _sampleTangent(points, t);
+      if (p == null || tng == null) continue;
+      final n = Offset(-tng.dy, tng.dx);
+      final side = i.isEven ? 1.0 : -1.0;
+      final shell =
+          ctx.cellSize * _rand(9000 + i, 0.08, 0.24) * (0.9 + speedNorm * 0.2);
+      final phase =
+          ((ctx.nowSeconds * (1.5 + speedNorm * 0.5)) + i * 0.31) % 1.0;
+      final outer = p + n * side * shell;
+      final inner = Offset.lerp(outer, p, phase)!;
+      ctx.canvas.drawLine(
+        outer,
+        inner,
+        Paint()
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = max(0.8, ctx.baseStrokeWidth * 0.06)
+          ..color = const Color(0xFF7C4BE8)
+              .withOpacity(cfg.absorptionOpacity * (1.0 - phase)),
+      );
+      ctx.canvas.drawCircle(
+        inner,
+        ctx.cellSize * _rand(9300 + i, 0.005, 0.014),
+        Paint()
+          ..color =
+              const Color(0xFFB78EFF).withOpacity(0.16 + (1.0 - phase) * 0.2),
+      );
+    }
+
+    // Head instability without normal glow.
+    final headFlick =
+        (sin(ctx.nowSeconds * (8.0 + speedNorm * 2.0)) * 0.5 + 0.5);
+    final headRadius = ctx.baseStrokeWidth * (0.18 + speedNorm * 0.1);
+    ctx.canvas.drawCircle(
+      head + normal * (ctx.cellSize * 0.02 * sin(ctx.nowSeconds * 7.2)),
+      headRadius * (1.1 + headFlick * 0.2),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = max(1.0, ctx.baseStrokeWidth * 0.08)
+        ..color = const Color(0xFF9D62FF).withOpacity(0.34 + headFlick * 0.2),
+    );
+
+    if (ctx.solved) {
+      final gate = (ctx.nowSeconds * (0.9 + cfg.finishPulseSpeed * 0.2)) % 1.0;
+      final burst = (1.0 - ((gate - 0.18).abs() / 0.18)).clamp(0.0, 1.0);
+      if (burst > 0.01) {
+        final solvedPath = _buildSmoothPath(points);
+        final pulse = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..strokeWidth = ctx.baseStrokeWidth *
+              (0.22 + cfg.finishPulseStrength * (0.26 + burst * 0.5))
+          ..shader = const LinearGradient(
+            colors: <Color>[
+              Color(0xFF34105C),
+              Color(0xFF8A48FF),
+              Color(0xFFB383FF),
+            ],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ).createShader(ctx.boardRect);
+        ctx.canvas.drawPath(solvedPath, pulse);
+
+        // Micro collapse inward moment.
+        final collapse = <Offset>[points.first];
+        for (var i = 1; i < points.length; i++) {
+          collapse
+              .add(Offset.lerp(points[i], points[i - 1], 0.62 + burst * 0.2)!);
+        }
+        ctx.canvas.drawPath(
+          _buildSmoothPath(collapse),
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeCap = StrokeCap.round
+            ..strokeJoin = StrokeJoin.round
+            ..strokeWidth = ctx.baseStrokeWidth * 0.18
+            ..color = const Color(0xFF0A0710).withOpacity(0.64),
+        );
+      }
+    }
+
     ctx.canvas.restore();
   }
 

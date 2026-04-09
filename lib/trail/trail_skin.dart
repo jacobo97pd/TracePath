@@ -34,6 +34,8 @@ enum TrailRenderType {
   holidaySpark,
   upside,
   binaryRain,
+  symbioteInk,
+  voidRift,
 }
 
 class TrailParticleConfig {
@@ -95,6 +97,8 @@ class TrailSkinConfig {
     this.holidaySpark = const HolidaySparkTrailConfig(),
     this.upside = const UpsideTrailConfig(),
     this.binaryRain = const BinaryRainTrailConfig(),
+    this.symbioteInk = const SymbioteInkTrailConfig(),
+    this.voidRift = const VoidRiftTrailConfig(),
     this.punkRiff = const PunkRiffTrailConfig(),
     this.graffiti = const GraffitiTrailConfig(),
     this.urbanGraffiti = const UrbanGraffitiTrailConfig(),
@@ -138,6 +142,8 @@ class TrailSkinConfig {
   final HolidaySparkTrailConfig holidaySpark;
   final UpsideTrailConfig upside;
   final BinaryRainTrailConfig binaryRain;
+  final SymbioteInkTrailConfig symbioteInk;
+  final VoidRiftTrailConfig voidRift;
   final PunkRiffTrailConfig punkRiff;
   final GraffitiTrailConfig graffiti;
   final UrbanGraffitiTrailConfig urbanGraffiti;
@@ -1021,4 +1027,92 @@ class BinaryRainTrailConfig {
   final Color coreColor;
   final Color glowColor;
   final Color binaryColor;
+}
+
+class SymbioteInkTrailConfig {
+  const SymbioteInkTrailConfig({
+    this.coreWidth = 1.08,
+    this.edgeWidth = 1.28,
+    this.widthPulseStrength = 0.18,
+    this.widthPulseSpeed = 1.9,
+    this.slimAtSpeed = 0.16,
+    this.compressOnTurn = 0.24,
+    this.innerVeinWidth = 0.28,
+    this.innerVeinOpacity = 0.44,
+    this.innerFlowSpeed = 0.9,
+    this.edgeRipples = 0.16,
+    this.headBloomScale = 0.34,
+    this.headTentacleCount = 5,
+    this.headTentacleLength = 0.24,
+    this.headTentacleOpacity = 0.36,
+    this.turnWhipThreshold = 0.22,
+    this.turnWhipLength = 0.18,
+    this.turnWhipOpacity = 0.26,
+    this.dripRate = 0.22,
+    this.dripSizeMin = 0.012,
+    this.dripSizeMax = 0.04,
+    this.dripLifeSeconds = 1.0,
+    this.finishPulseStrength = 0.42,
+    this.finishPulseSpeed = 2.1,
+  });
+
+  final double coreWidth;
+  final double edgeWidth;
+  final double widthPulseStrength;
+  final double widthPulseSpeed;
+  final double slimAtSpeed;
+  final double compressOnTurn;
+  final double innerVeinWidth;
+  final double innerVeinOpacity;
+  final double innerFlowSpeed;
+  final double edgeRipples;
+  final double headBloomScale;
+  final int headTentacleCount;
+  final double headTentacleLength;
+  final double headTentacleOpacity;
+  final double turnWhipThreshold;
+  final double turnWhipLength;
+  final double turnWhipOpacity;
+  final double dripRate;
+  final double dripSizeMin;
+  final double dripSizeMax;
+  final double dripLifeSeconds;
+  final double finishPulseStrength;
+  final double finishPulseSpeed;
+}
+
+class VoidRiftTrailConfig {
+  const VoidRiftTrailConfig({
+    this.coreWidth = 1.0,
+    this.edgeWidth = 1.22,
+    this.edgeJitter = 0.16,
+    this.edgeVibrationSpeed = 2.4,
+    this.edgePulseStrength = 0.2,
+    this.speedVibrationBoost = 0.2,
+    this.curveBoost = 0.24,
+    this.distortionOffset = 0.05,
+    this.distortionOpacity = 0.14,
+    this.absorptionParticleCount = 14,
+    this.absorptionSpeed = 1.0,
+    this.absorptionOpacity = 0.26,
+    this.tailCollapseAmount = 0.46,
+    this.finishPulseStrength = 0.54,
+    this.finishPulseSpeed = 2.7,
+  });
+
+  final double coreWidth;
+  final double edgeWidth;
+  final double edgeJitter;
+  final double edgeVibrationSpeed;
+  final double edgePulseStrength;
+  final double speedVibrationBoost;
+  final double curveBoost;
+  final double distortionOffset;
+  final double distortionOpacity;
+  final int absorptionParticleCount;
+  final double absorptionSpeed;
+  final double absorptionOpacity;
+  final double tailCollapseAmount;
+  final double finishPulseStrength;
+  final double finishPulseSpeed;
 }

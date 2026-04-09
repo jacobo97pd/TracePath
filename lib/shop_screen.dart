@@ -138,6 +138,16 @@ class ShopScreen extends StatefulWidget {
     CoinTrailDef(id: 'trail_upside', name: 'UpsideTrail', costCoins: 1500),
     CoinTrailDef(
         id: 'trail_binary_rain', name: 'BinaryRainTrail', costCoins: 1580),
+    CoinTrailDef(
+      id: 'trail_symbiote_ink',
+      name: 'SymbioteInkTrail',
+      costCoins: 1980,
+    ),
+    CoinTrailDef(
+      id: 'trail_void_rift',
+      name: 'VoidRiftTrail',
+      costCoins: 2250,
+    ),
     // Re-added explicitly to ensure they behave exactly like the rest in shop.
     CoinTrailDef(id: 'trail_web', name: 'Web Trail', costCoins: 950),
     CoinTrailDef(
@@ -195,6 +205,10 @@ class ShopScreen extends StatefulWidget {
     'trail_holiday_spark': 'Festive sparkle line with seasonal tones.',
     'trail_upside': 'Dark upside-style trace with eerie pulse.',
     'trail_binary_rain': 'Data stream look with digital cadence.',
+    'trail_symbiote_ink':
+        'Living alien ink with organic pulses and predatory flow.',
+    'trail_void_rift':
+        'Legendary space-time rift with collapsing void edges and absorption.',
   };
 
   @override
