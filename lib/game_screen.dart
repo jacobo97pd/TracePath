@@ -115,6 +115,7 @@ class _GameScreenState extends State<GameScreen>
   Color? _pathColorFrom;
   Color? _pathColorTo;
   bool _completionHandled = false;
+  bool _completionFlowInFlight = false;
   bool _showCelebration = false;
   HintDirection _hintDirection = HintDirection.none;
   bool _hintVisible = false;
@@ -2190,11 +2191,40 @@ class _GameScreenState extends State<GameScreen>
       }
       _completionHandled = true;
       HapticFeedback.heavyImpact();
+      unawaited(_runCompletionFlowSafe());
+    }
+  }
+
+  Future<void> _runCompletionFlowSafe() async {
+    if (_completionFlowInFlight) return;
+    _completionFlowInFlight = true;
+    try {
       if (_isLiveDuelMode) {
-        unawaited(_showCompletionDialog());
+        await _showCompletionDialog();
       } else {
-        _startCelebrationAndShowDialog();
+        await _startCelebrationAndShowDialog();
       }
+    } catch (e, st) {
+      debugPrint('[game][complete] fatal completion flow error: $e');
+      if (kDebugMode) {
+        debugPrintStack(stackTrace: st);
+      }
+      if (!mounted) return;
+      setState(() {
+        _showCelebration = false;
+        _completionHandled = false;
+      });
+      unawaited(
+        GameToast.show(
+          context,
+          type: GameToastType.info,
+          title: context.l10n.gameLevelUnavailable,
+          message: context.l10n.gameTryAgainMoment,
+          duration: const Duration(milliseconds: 1800),
+        ),
+      );
+    } finally {
+      _completionFlowInFlight = false;
     }
   }
 

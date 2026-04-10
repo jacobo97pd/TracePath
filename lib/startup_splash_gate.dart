@@ -81,7 +81,8 @@ class _StartupSplashGateState extends State<StartupSplashGate> {
         debugPrint('[splash] video init failed, using black fallback.');
       }
       _fallbackTimer?.cancel();
-      _fallbackTimer = Timer(const Duration(milliseconds: 1500), _dismissSplash);
+      _fallbackTimer =
+          Timer(const Duration(milliseconds: 1500), _dismissSplash);
     }
   }
 
@@ -150,20 +151,30 @@ class _StartupSplashGateState extends State<StartupSplashGate> {
     }
 
     final controller = _videoController;
-    final hasVideo = _videoReady && controller != null && controller.value.isInitialized;
+    final hasVideo =
+        _videoReady && controller != null && controller.value.isInitialized;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: Colors.black,
       body: Stack(
         fit: StackFit.expand,
         children: [
           if (hasVideo)
-            FittedBox(
-              fit: BoxFit.cover,
-              child: SizedBox(
-                width: controller.value.size.width,
-                height: controller.value.size.height,
-                child: VideoPlayer(controller),
+            ColoredBox(
+              color: Colors.black,
+              child: Center(
+                child: FractionallySizedBox(
+                  widthFactor: 0.58,
+                  heightFactor: 0.58,
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: SizedBox(
+                      width: controller.value.size.width,
+                      height: controller.value.size.height,
+                      child: VideoPlayer(controller),
+                    ),
+                  ),
+                ),
               ),
             )
           else
