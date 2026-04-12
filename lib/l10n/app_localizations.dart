@@ -2255,8 +2255,14 @@ abstract class AppLocalizations {
   /// No description provided for @socialRemoveFriendBody.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to remove this friend\''**
+  /// **'Are you sure you want to remove this friend?'**
   String get socialRemoveFriendBody;
+
+  /// No description provided for @socialRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get socialRemove;
 
   /// No description provided for @socialUsernameTitle.
   ///
@@ -2341,6 +2347,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Go Home'**
   String get socialGoHome;
+
+  /// No description provided for @socialPlayerFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Player'**
+  String get socialPlayerFallback;
 
   /// No description provided for @socialSkinTrail.
   ///

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
+import 'l10n/l10n.dart';
 import 'models/friend_profile.dart';
 import 'models/leaderboard_entry.dart';
 import 'services/friends_service.dart';
@@ -70,11 +71,12 @@ class _SocialScreenState extends State<SocialScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
         backgroundColor: const Color(0xFF0F172A),
-        title: const Text('Social'),
+        title: Text(l10n.socialTitle),
       ),
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
@@ -98,6 +100,7 @@ class _SocialScreenState extends State<SocialScreen> {
   }
 
   Widget _buildHero() {
+    final l10n = context.l10n;
     return StreamBuilder<List<FriendProfile>>(
       stream: _friendsService.watchFriends(),
       builder: (context, friendSnapshot) {
@@ -154,8 +157,8 @@ class _SocialScreenState extends State<SocialScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Social Hub',
+                          Text(
+                            l10n.socialHubTitle,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 26,
@@ -163,8 +166,8 @@ class _SocialScreenState extends State<SocialScreen> {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          const Text(
-                            'Friends, rankings and challenges',
+                          Text(
+                            l10n.socialHubSubtitle,
                             style: TextStyle(
                               color: Color(0xFFAEC2E8),
                               fontSize: 13,
@@ -177,7 +180,7 @@ class _SocialScreenState extends State<SocialScreen> {
                               Expanded(
                                 child: _HeroChip(
                                   icon: Icons.groups_rounded,
-                                  label: 'Friends',
+                                  label: l10n.socialFriendsLabel,
                                   value: '$friendCount',
                                 ),
                               ),
@@ -185,7 +188,7 @@ class _SocialScreenState extends State<SocialScreen> {
                               Expanded(
                                 child: _HeroChip(
                                   icon: Icons.workspace_premium_rounded,
-                                  label: 'Best Rank',
+                                  label: l10n.socialBestRankLabel,
                                   value: myRank != null ? '#$myRank' : '--',
                                 ),
                               ),
@@ -193,7 +196,7 @@ class _SocialScreenState extends State<SocialScreen> {
                               Expanded(
                                 child: _HeroChip(
                                   icon: Icons.bolt_rounded,
-                                  label: 'Top Time',
+                                  label: l10n.socialTopTimeLabel,
                                   value: myBestTime,
                                 ),
                               ),
@@ -202,7 +205,7 @@ class _SocialScreenState extends State<SocialScreen> {
                           const SizedBox(height: 10),
                           _HeroChip(
                             icon: Icons.auto_awesome_rounded,
-                            label: 'Global Tier',
+                            label: l10n.socialGlobalTierLabel,
                             value: globalTier,
                           ),
                         ],
@@ -219,27 +222,28 @@ class _SocialScreenState extends State<SocialScreen> {
   }
 
   Widget _buildFriendActions() {
+    final l10n = context.l10n;
     return GameCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionTitle(
-            title: 'Friend Actions',
-            subtitle: 'Set your handle and add friends by username or UID',
+          _SectionTitle(
+            title: l10n.socialFriendActionsTitle,
+            subtitle: l10n.socialFriendActionsSubtitle,
           ),
           const SizedBox(height: 10),
           _InputActionRow(
             controller: _usernameCtrl,
-            hint: 'Set your username',
-            buttonLabel: 'Save',
+            hint: l10n.socialSetUsernameHint,
+            buttonLabel: l10n.socialSave,
             icon: Icons.badge_rounded,
             onTap: _setUsername,
           ),
           const SizedBox(height: 10),
           _InputActionRow(
             controller: _friendIdCtrl,
-            hint: 'Friend username, email or UID',
-            buttonLabel: 'Add',
+            hint: l10n.socialFriendLookupHint,
+            buttonLabel: l10n.socialAdd,
             icon: Icons.person_add_alt_1_rounded,
             onTap: _addFriend,
           ),
@@ -249,6 +253,7 @@ class _SocialScreenState extends State<SocialScreen> {
   }
 
   Widget _buildFriends() {
+    final l10n = context.l10n;
     return StreamBuilder<List<FriendProfile>>(
       stream: _friendsService.watchFriends(),
       builder: (context, snapshot) {
@@ -256,9 +261,9 @@ class _SocialScreenState extends State<SocialScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _SectionTitle(
-              title: 'Friends',
-              subtitle: 'Your rivals and teammates',
+            _SectionTitle(
+              title: l10n.socialFriendsSectionTitle,
+              subtitle: l10n.socialFriendsSectionSubtitle,
             ),
             const SizedBox(height: 10),
             Container(
@@ -290,7 +295,9 @@ class _SocialScreenState extends State<SocialScreen> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                count == null ? 'Friends' : 'Friends ($count)',
+                                count == null
+                                    ? l10n.socialFriendsSectionTitle
+                                    : l10n.socialFriendsWithCount(count),
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 15,
@@ -333,16 +340,17 @@ class _SocialScreenState extends State<SocialScreen> {
   }
 
   Widget _buildFriendsListContent(List<FriendProfile>? friends) {
+    final l10n = context.l10n;
     if (friends == null) {
       return FutureBuilder<List<FriendProfile>>(
         future: _friendsFuture,
         builder: (context, fs) {
           final items = fs.data ?? const <FriendProfile>[];
           if (items.isEmpty) {
-            return const _EmptyHint(
+            return _EmptyHint(
               icon: Icons.people_outline_rounded,
-              title: 'No friends added yet',
-              text: 'Add friends to compete on rankings and send challenges.',
+              title: l10n.socialNoFriendsTitle,
+              text: l10n.socialNoFriendsSubtitle,
             );
           }
           return Column(
@@ -362,10 +370,10 @@ class _SocialScreenState extends State<SocialScreen> {
       );
     }
     if (friends.isEmpty) {
-      return const _EmptyHint(
+      return _EmptyHint(
         icon: Icons.people_outline_rounded,
-        title: 'No friends added yet',
-        text: 'Add friends to compete on rankings and send challenges.',
+        title: l10n.socialNoFriendsTitle,
+        text: l10n.socialNoFriendsSubtitle,
       );
     }
     return Column(
@@ -384,12 +392,13 @@ class _SocialScreenState extends State<SocialScreen> {
   }
 
   Widget _buildRanking() {
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _SectionTitle(
-          title: 'Global Top 10',
-          subtitle: 'Best players in the world',
+        _SectionTitle(
+          title: l10n.socialGlobalTop10Title,
+          subtitle: l10n.socialGlobalTop10Subtitle,
         ),
         const SizedBox(height: 10),
         StreamBuilder<List<LeaderboardEntry>>(
@@ -402,10 +411,10 @@ class _SocialScreenState extends State<SocialScreen> {
                 builder: (context, fs) {
                   final items = fs.data ?? const <LeaderboardEntry>[];
                   if (items.isEmpty) {
-                    return const _EmptyHint(
+                    return _EmptyHint(
                       icon: Icons.bar_chart_rounded,
-                      title: 'No global scores yet',
-                      text: 'Complete levels to appear in the world ranking.',
+                      title: l10n.socialNoGlobalScoresTitle,
+                      text: l10n.socialNoGlobalScoresSubtitle,
                     );
                   }
                   return _buildLeaderboardCard(items);
@@ -413,10 +422,10 @@ class _SocialScreenState extends State<SocialScreen> {
               );
             }
             if (entries.isEmpty) {
-              return const _EmptyHint(
+              return _EmptyHint(
                 icon: Icons.bar_chart_rounded,
-                title: 'No global scores yet',
-                text: 'Complete levels to appear in the world ranking.',
+                title: l10n.socialNoGlobalScoresTitle,
+                text: l10n.socialNoGlobalScoresSubtitle,
               );
             }
             return _buildLeaderboardCard(entries);
@@ -470,12 +479,13 @@ class _SocialScreenState extends State<SocialScreen> {
   }
 
   Widget _buildCtas() {
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _SectionTitle(
-          title: 'Challenges',
-          subtitle: 'Invite or challenge your friends now',
+        _SectionTitle(
+          title: l10n.socialChallengesTitle,
+          subtitle: l10n.socialChallengesSubtitle,
         ),
         const SizedBox(height: 10),
         Container(
@@ -492,7 +502,7 @@ class _SocialScreenState extends State<SocialScreen> {
           child: Column(
             children: [
               GameButton(
-                label: 'Challenge Friend',
+                label: l10n.socialChallengeFriend,
                 icon: Icons.sports_esports_rounded,
                 expanded: true,
                 prominent: true,
@@ -500,7 +510,7 @@ class _SocialScreenState extends State<SocialScreen> {
               ),
               const SizedBox(height: 10),
               GameButton(
-                label: 'Invite Friend',
+                label: l10n.socialInviteFriend,
                 icon: Icons.share_rounded,
                 expanded: true,
                 outlined: true,
@@ -514,6 +524,7 @@ class _SocialScreenState extends State<SocialScreen> {
   }
 
   Future<void> _addFriend() async {
+    final l10n = context.l10n;
     final value = _friendIdCtrl.text.trim();
     if (value.isEmpty) return;
     try {
@@ -525,11 +536,11 @@ class _SocialScreenState extends State<SocialScreen> {
       _friendIdCtrl.clear();
       if (!mounted) return;
       unawaited(
-        GameToast.show(
-          context,
-          type: GameToastType.social,
-          title: 'Friend Request',
-          message: 'Friend request sent',
+          GameToast.show(
+            context,
+            type: GameToastType.social,
+            title: l10n.socialFriendRequestTitle,
+            message: l10n.socialFriendRequestSent,
           duration: const Duration(milliseconds: 1500),
         ),
       );
@@ -549,11 +560,11 @@ class _SocialScreenState extends State<SocialScreen> {
           _friendIdCtrl.clear();
           if (!mounted) return;
           unawaited(
-            GameToast.show(
-              context,
-              type: GameToastType.social,
-              title: 'Friend Request',
-              message: 'Friend request sent',
+              GameToast.show(
+                context,
+                type: GameToastType.social,
+                title: l10n.socialFriendRequestTitle,
+                message: l10n.socialFriendRequestSent,
               duration: const Duration(milliseconds: 1500),
             ),
           );
@@ -561,34 +572,34 @@ class _SocialScreenState extends State<SocialScreen> {
         } catch (e2) {
           if (!mounted) return;
           final combined = '${e.toString()} ${e2.toString()}'.toUpperCase();
-          var message = 'Could not send friend request';
+          var message = l10n.socialCouldNotSendRequest;
           if (combined.contains('SELF_ADD') ||
               combined.contains('INVALID_FRIEND_UID')) {
-            message = "You can't add yourself";
+            message = l10n.socialCannotAddSelf;
           } else if (combined.contains('FRIEND_EMAIL_INVALID')) {
-            message = 'Invalid email format';
+            message = l10n.socialInvalidEmail;
           } else if (combined.contains('FRIEND_USERNAME_NOT_FOUND') ||
               combined.contains('FRIEND_EMAIL_NOT_FOUND') ||
               combined.contains('FRIEND_NOT_FOUND')) {
-            message = 'User not found';
+            message = l10n.socialUserNotFound;
           } else if (combined.contains('ALREADY_FRIENDS')) {
-            message = 'You are already friends';
+            message = l10n.socialAlreadyFriends;
           } else if (combined.contains('REQUEST_ALREADY_SENT')) {
-            message = 'Friend request already sent';
+            message = l10n.socialRequestAlreadySent;
           } else if (combined.contains('REQUEST_ALREADY_RECEIVED')) {
-            message = 'This user already sent you a request';
+            message = l10n.socialRequestAlreadyReceived;
           } else if (combined.contains('AUTH_REQUIRED')) {
-            message = 'You need to be signed in';
+            message = l10n.socialNeedSignIn;
           } else if ((e is FirebaseException &&
                   e.code == 'permission-denied') ||
               (e2 is FirebaseException && e2.code == 'permission-denied')) {
-            message = 'Firestore rules blocked this action';
+            message = l10n.socialRulesBlockedAction;
           }
           unawaited(
             GameToast.show(
               context,
               type: GameToastType.info,
-              title: 'Social',
+              title: l10n.socialTitle,
               message: message,
               duration: const Duration(milliseconds: 1700),
             ),
@@ -598,32 +609,32 @@ class _SocialScreenState extends State<SocialScreen> {
       }
 
       if (!mounted) return;
-      var message = 'Could not send friend request';
+      var message = l10n.socialCouldNotSendRequest;
       if (primary.contains('SELF_ADD') ||
           primary.contains('INVALID_FRIEND_UID')) {
-        message = "You can't add yourself";
+        message = l10n.socialCannotAddSelf;
       } else if (primary.contains('FRIEND_EMAIL_INVALID')) {
-        message = 'Invalid email format';
+        message = l10n.socialInvalidEmail;
       } else if (primary.contains('ALREADY_FRIENDS')) {
-        message = 'You are already friends';
+        message = l10n.socialAlreadyFriends;
       } else if (primary.contains('REQUEST_ALREADY_SENT')) {
-        message = 'Friend request already sent';
+        message = l10n.socialRequestAlreadySent;
       } else if (primary.contains('REQUEST_ALREADY_RECEIVED')) {
-        message = 'This user already sent you a request';
+        message = l10n.socialRequestAlreadyReceived;
       } else if (primary.contains('AUTH_REQUIRED')) {
-        message = 'You need to be signed in';
+        message = l10n.socialNeedSignIn;
       } else if (e is FirebaseException && e.code == 'permission-denied') {
-        message = 'Firestore rules blocked this action';
+        message = l10n.socialRulesBlockedAction;
       } else if (primary.contains('FRIEND_USERNAME_NOT_FOUND') ||
           primary.contains('FRIEND_EMAIL_NOT_FOUND') ||
           primary.contains('FRIEND_NOT_FOUND')) {
-        message = 'User not found';
+        message = l10n.socialUserNotFound;
       }
       unawaited(
         GameToast.show(
           context,
           type: GameToastType.info,
-          title: 'Social',
+          title: l10n.socialTitle,
           message: message,
           duration: const Duration(milliseconds: 1700),
         ),
@@ -632,6 +643,7 @@ class _SocialScreenState extends State<SocialScreen> {
   }
 
   Future<void> _challengeFriendInGame() async {
+    final l10n = context.l10n;
     List<FriendProfile> friends = const <FriendProfile>[];
     try {
       friends = await _friendsService.getFriends();
@@ -649,8 +661,8 @@ class _SocialScreenState extends State<SocialScreen> {
         GameToast.show(
           context,
           type: GameToastType.social,
-          title: 'Challenges',
-          message: 'Add friends first to send challenges.',
+          title: l10n.socialChallengesTitle,
+          message: l10n.socialAddFriendsFirstForChallenges,
           duration: const Duration(milliseconds: 1500),
         ),
       );
@@ -686,8 +698,8 @@ class _SocialScreenState extends State<SocialScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'Challenge a friend',
+                Text(
+                  l10n.socialChallengeFriendSheetTitle,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -695,8 +707,8 @@ class _SocialScreenState extends State<SocialScreen> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  'Send a real-time live duel invite',
+                Text(
+                  l10n.socialChallengeFriendSheetSubtitle,
                   style: TextStyle(color: Color(0xFF9EB0D2), fontSize: 12),
                 ),
                 const SizedBox(height: 10),
@@ -764,8 +776,8 @@ class _SocialScreenState extends State<SocialScreen> {
                                       ),
                                       Text(
                                         f.isOnline
-                                            ? 'Invite to a live 1v1 duel - Online'
-                                            : 'Invite to a live 1v1 duel - Offline',
+                                            ? l10n.socialLiveInviteOnline
+                                            : l10n.socialLiveInviteOffline,
                                         style: TextStyle(
                                           color: const Color(0xFF9EB0D2),
                                           fontSize: 12,
@@ -804,11 +816,11 @@ class _SocialScreenState extends State<SocialScreen> {
       );
       if (!mounted) return;
       unawaited(
-        GameToast.show(
-          context,
-          type: GameToastType.social,
-          title: 'Live duel invite sent',
-          message: 'Waiting for ${friend.displayName} to accept.',
+          GameToast.show(
+            context,
+            type: GameToastType.social,
+            title: l10n.socialLiveInviteSentTitle,
+            message: l10n.socialLiveInviteSentBody(friend.displayName),
           duration: const Duration(milliseconds: 1700),
         ),
       );
@@ -819,24 +831,24 @@ class _SocialScreenState extends State<SocialScreen> {
             '[social] send live duel invite failed toUid=${friend.uid} error=$e');
       }
       if (!mounted) return;
-      var message = 'Could not send challenge right now.';
+      var message = l10n.socialCouldNotSendChallenge;
       if (e is FirebaseException && e.code == 'permission-denied') {
-        message = 'Challenge blocked by Firestore rules.';
+        message = l10n.socialChallengeBlockedByRules;
       } else if (e is FirebaseException && e.code == 'failed-precondition') {
-        message = 'Challenge setup is not ready yet. Try again in a moment.';
+        message = l10n.socialChallengeSetupNotReady;
       } else if (e.toString().contains('ALREADY_IN_ACTIVE_DUEL')) {
-        message = 'Finish your current live duel first.';
+        message = l10n.socialFinishCurrentLiveDuelFirst;
       } else if (e.toString().contains('TARGET_IN_ACTIVE_DUEL')) {
-        message = '${friend.displayName} is already in another live duel.';
+        message = l10n.socialFriendAlreadyInLiveDuel(friend.displayName);
       } else if (e.toString().contains('NO_PUZZLES_AVAILABLE')) {
-        message = 'No puzzles available for live duel.';
+        message = l10n.socialNoPuzzlesForLiveDuel;
       }
       unawaited(
-        GameToast.show(
-          context,
-          type: GameToastType.info,
-          title: 'Challenges',
-          message: message,
+          GameToast.show(
+            context,
+            type: GameToastType.info,
+            title: l10n.socialChallengesTitle,
+            message: message,
           duration: const Duration(milliseconds: 1600),
         ),
       );
@@ -844,26 +856,27 @@ class _SocialScreenState extends State<SocialScreen> {
   }
 
   Future<void> _removeFriend(String uid) async {
+    final l10n = context.l10n;
     final shouldRemove = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
             backgroundColor: const Color(0xFF111827),
-            title: const Text(
-              'Remove friend',
+            title: Text(
+              l10n.socialRemoveFriendTitle,
               style: TextStyle(color: Colors.white),
             ),
-            content: const Text(
-              'Are you sure you want to remove this friend?',
+            content: Text(
+              l10n.socialRemoveFriendBody,
               style: TextStyle(color: Color(0xFFB6C2DA)),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancel'),
+                child: Text(l10n.profileCancel),
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Remove'),
+                child: Text(l10n.socialRemove),
               ),
             ],
           ),
@@ -878,6 +891,7 @@ class _SocialScreenState extends State<SocialScreen> {
   }
 
   Future<void> _setUsername() async {
+    final l10n = context.l10n;
     final value = _usernameCtrl.text.trim();
     if (value.isEmpty) return;
     try {
@@ -888,8 +902,8 @@ class _SocialScreenState extends State<SocialScreen> {
           GameToast.show(
             context,
             type: GameToastType.info,
-            title: 'Username',
-            message: 'Username not available',
+            title: l10n.socialUsernameTitle,
+            message: l10n.socialUsernameNotAvailable,
             duration: const Duration(milliseconds: 1600),
           ),
         );
@@ -899,34 +913,34 @@ class _SocialScreenState extends State<SocialScreen> {
       _usernameCtrl.clear();
       if (!mounted) return;
       unawaited(
-        GameToast.show(
-          context,
-          type: GameToastType.social,
-          title: 'Profile',
-          message: 'Username updated',
+          GameToast.show(
+            context,
+            type: GameToastType.social,
+            title: l10n.tabProfile,
+            message: l10n.socialUsernameUpdated,
           duration: const Duration(milliseconds: 1500),
         ),
       );
     } catch (e) {
       String message;
       if (e.toString().contains('USERNAME_TAKEN')) {
-        message = 'Username already in use';
+        message = l10n.socialUsernameAlreadyUsed;
       } else if (e.toString().contains('INVALID_USERNAME')) {
-        message = 'Invalid username (3-20, letters/numbers/._)';
+        message = l10n.socialUsernameInvalid;
       } else if (e.toString().contains('AUTH_REQUIRED')) {
-        message = 'You need to be signed in';
+        message = l10n.socialNeedSignIn;
       } else if (e is FirebaseException && e.code == 'permission-denied') {
-        message = 'Firestore rules blocked username write';
+        message = l10n.socialRulesBlockedUsernameWrite;
       } else {
-        message = 'Could not save username';
+        message = l10n.socialCouldNotSaveUsername;
       }
       if (!mounted) return;
       unawaited(
-        GameToast.show(
-          context,
-          type: GameToastType.info,
-          title: 'Profile',
-          message: message,
+          GameToast.show(
+            context,
+            type: GameToastType.info,
+            title: l10n.tabProfile,
+            message: message,
           duration: const Duration(milliseconds: 1700),
         ),
       );
@@ -934,6 +948,7 @@ class _SocialScreenState extends State<SocialScreen> {
   }
 
   Future<void> _inviteFriend() async {
+    final l10n = context.l10n;
     const inviteText =
         "Join me on TracePath! Let's compete on the leaderboard. "
         'https://tracepath.app/invite';
@@ -943,8 +958,8 @@ class _SocialScreenState extends State<SocialScreen> {
       GameToast.show(
         context,
         type: GameToastType.social,
-        title: 'Invite Ready',
-        message: 'Invite copied. Share it on WhatsApp or email.',
+        title: l10n.socialInviteReadyTitle,
+        message: l10n.socialInviteReadyBody,
         duration: const Duration(milliseconds: 1800),
       ),
     );
@@ -967,6 +982,7 @@ class _SocialScreenState extends State<SocialScreen> {
   Future<_LeaderboardPresentationData> _buildPresentation(
     LeaderboardEntry entry,
   ) async {
+    final l10n = context.l10n;
     final profile = await _getLeaderboardUserProfile(entry.uid);
     final username = entry.username.trim().isNotEmpty
         ? entry.username.trim()
@@ -1005,7 +1021,7 @@ class _SocialScreenState extends State<SocialScreen> {
       displayName = playerName;
       nameSource = 'playerName';
     } else {
-      displayName = 'Player';
+      displayName = l10n.socialPlayerFallback;
       nameSource = 'fallback';
     }
 
@@ -1016,8 +1032,8 @@ class _SocialScreenState extends State<SocialScreen> {
       secondaryText = playerName;
     } else if (entry.moves > 0 || entry.stars > 0) {
       final parts = <String>[
-        if (entry.moves > 0) '${entry.moves} moves',
-        if (entry.stars > 0) '${entry.stars} stars',
+        if (entry.moves > 0) l10n.socialMovesShort(entry.moves),
+        if (entry.stars > 0) l10n.socialStarsShort(entry.stars),
       ];
       secondaryText = parts.isEmpty ? null : parts.join(' - ');
     }
@@ -1263,11 +1279,12 @@ class SocialGuestLockedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
         backgroundColor: const Color(0xFF0F172A),
-        title: const Text('Social'),
+        title: Text(l10n.socialTitle),
       ),
       body: Center(
         child: Padding(
@@ -1282,8 +1299,8 @@ class SocialGuestLockedScreen extends StatelessWidget {
                   color: Color(0xFF8AA8FF),
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'Social is locked in Guest mode',
+                Text(
+                  l10n.socialGuestLockedTitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
@@ -1292,8 +1309,8 @@ class SocialGuestLockedScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Sign in with Google from Home to challenge friends and view rankings.',
+                Text(
+                  l10n.socialGuestLockedSubtitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Color(0xFF9EB0D2),
@@ -1302,7 +1319,7 @@ class SocialGuestLockedScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 14),
                 GameButton(
-                  label: 'Go Home',
+                  label: l10n.socialGoHome,
                   icon: Icons.home_rounded,
                   onTap: () => context.go('/home'),
                   expanded: true,
@@ -1467,6 +1484,7 @@ class _FriendCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return GameCard(
       child: Column(
         children: [
@@ -1512,7 +1530,10 @@ class _FriendCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Skin: ${friend.equippedSkinId} - Trail: ${friend.equippedTrailId}',
+                      l10n.socialSkinTrail(
+                        friend.equippedSkinId,
+                        friend.equippedTrailId,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -1523,7 +1544,9 @@ class _FriendCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      friend.isOnline ? 'En linea' : 'Desconectado',
+                      friend.isOnline
+                          ? l10n.socialOnline
+                          : l10n.socialOffline,
                       style: TextStyle(
                         color: friend.isOnline
                             ? const Color(0xFF6EE7A0)
@@ -1537,7 +1560,7 @@ class _FriendCard extends StatelessWidget {
               ),
               IconButton(
                 onPressed: onRemove,
-                tooltip: 'Remove friend',
+                tooltip: l10n.socialRemoveFriendTitle,
                 icon: const Icon(
                   Icons.person_remove_alt_1_rounded,
                   color: Color(0xFF9AB6E0),
@@ -1553,17 +1576,19 @@ class _FriendCard extends StatelessWidget {
             children: [
               _TinyInfoChip(
                 icon: Icons.flag_rounded,
-                label: 'Status',
-                value: friend.isOnline ? 'Online' : 'Offline',
+                label: l10n.socialStatusLabel,
+                value: friend.isOnline
+                    ? l10n.socialOnline
+                    : l10n.socialOffline,
               ),
               _TinyInfoChip(
                 icon: Icons.auto_awesome_rounded,
-                label: 'Skin',
+                label: l10n.socialSkinLabel,
                 value: friend.equippedSkinId,
               ),
               _TinyInfoChip(
                 icon: Icons.timeline_rounded,
-                label: 'Trail',
+                label: l10n.socialTrailLabel,
                 value: friend.equippedTrailId,
               ),
             ],
@@ -1640,13 +1665,14 @@ class _RankRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final medal = _medalForIndex(rank);
     return FutureBuilder<_LeaderboardPresentationData>(
       future: presentationFuture,
       builder: (context, snapshot) {
         final data = snapshot.data ??
             const _LeaderboardPresentationData(
-              displayName: 'Player',
+              displayName: '',
               secondaryText: null,
               photoUrl: '',
               skinPreviewUrl: '',
@@ -1707,7 +1733,7 @@ class _RankRow extends StatelessWidget {
                     Text(
                       (data.secondaryText ?? '').isNotEmpty
                           ? data.secondaryText!
-                          : 'Ready to compete',
+                          : l10n.socialReadyToCompete,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -1734,8 +1760,8 @@ class _RankRow extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     [
-                      if (moves > 0) '${moves}m',
-                      if (stars > 0) '$stars stars',
+                      if (moves > 0) l10n.socialMovesShort(moves),
+                      if (stars > 0) l10n.socialStarsShort(stars),
                     ].join(' - '),
                     style: const TextStyle(
                       color: Color(0xFF8FA6CF),

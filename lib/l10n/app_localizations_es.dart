@@ -1217,7 +1217,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get socialRemoveFriendBody =>
-      'Seguro que quieres eliminar a este amigo\'';
+      'Seguro que quieres eliminar a este amigo?';
+
+  @override
+  String get socialRemove => 'Eliminar';
 
   @override
   String get socialUsernameTitle => 'Username';
@@ -1268,6 +1271,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get socialGoHome => 'Ir a Home';
+
+  @override
+  String get socialPlayerFallback => 'Jugador';
 
   @override
   String socialSkinTrail(Object skin, Object trail) {

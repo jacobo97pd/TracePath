@@ -277,7 +277,8 @@ class _CollectibleCardBack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rarityLabel = _rarityText(rarity);
+    final l10n = context.l10n;
+    final rarityLabel = _rarityText(rarity, l10n);
     final rarityColor = _rarityTone(rarity);
     final assetPath = _backAssetByRarity(rarity);
     return Container(
@@ -379,16 +380,16 @@ class _CollectibleCardBack extends StatelessWidget {
     }
   }
 
-  static String _rarityText(ZipCardRarity rarity) {
+  static String _rarityText(ZipCardRarity rarity, dynamic l10n) {
     switch (rarity) {
       case ZipCardRarity.common:
-        return 'COMMON';
+        return l10n.cardsRarityCommon;
       case ZipCardRarity.rare:
-        return 'RARE';
+        return l10n.cardsRarityRare;
       case ZipCardRarity.epic:
-        return 'EPIC';
+        return l10n.cardsRarityEpic;
       case ZipCardRarity.legendary:
-        return 'LEGENDARY';
+        return l10n.cardsRarityLegendary;
     }
   }
 

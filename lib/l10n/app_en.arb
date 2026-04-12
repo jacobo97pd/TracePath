@@ -631,7 +631,8 @@
   },
   "socialNoPuzzlesForLiveDuel": "No puzzles available for live duel.",
   "socialRemoveFriendTitle": "Remove friend",
-  "socialRemoveFriendBody": "Are you sure you want to remove this friend'",
+  "socialRemoveFriendBody": "Are you sure you want to remove this friend?",
+  "socialRemove": "Remove",
   "socialUsernameTitle": "Username",
   "socialUsernameNotAvailable": "Username not available",
   "socialUsernameUpdated": "Username updated",
@@ -660,6 +661,7 @@
   "socialGuestLockedTitle": "Social is locked in Guest mode",
   "socialGuestLockedSubtitle": "Sign in with Google from Home to challenge friends and view rankings.",
   "socialGoHome": "Go Home",
+  "socialPlayerFallback": "Player",
   "socialSkinTrail": "Skin: {skin} - Trail: {trail}",
   "@socialSkinTrail": {
     "placeholders": {

@@ -417,7 +417,7 @@ class _PlayLevelsScreenState extends State<PlayLevelsScreen>
       ),
     );
     if (!mounted) return;
-    context.go('/play/${widget.packId}/$_selectedLevelIndex');
+    context.push('/play/${widget.packId}/$_selectedLevelIndex');
   }
 
   Future<void> _showOutOfEnergyDialog() async {
