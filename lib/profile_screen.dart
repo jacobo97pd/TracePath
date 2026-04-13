@@ -178,6 +178,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 : l10n.homePlayerName);
                     final username =
                         (data['username'] as String?)?.trim() ?? '';
+                    final uidForHandle =
+                        ((data['uid'] as String?)?.trim().isNotEmpty == true)
+                            ? (data['uid'] as String).trim()
+                            : (authUser?.uid.trim() ?? '');
+                    final publicHandle = username.isNotEmpty
+                        ? '@$username'
+                        : _fallbackHandleFromUid(uidForHandle);
                     final highestLevelReached =
                         _readInt(data['highestLevelReached'], fallback: 1);
                     final currentStreak = _readInt(
@@ -276,9 +283,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
-                                        username.isNotEmpty
-                                            ? '@$username'
-                                            : '@player',
+                                        publicHandle,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
@@ -1389,6 +1394,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         duration: Duration(milliseconds: 900),
       ),
     );
+  }
+
+  String _fallbackHandleFromUid(String uid) {
+    final clean = uid.trim();
+    if (clean.isEmpty) return '@player';
+    final suffixLength = clean.length >= 6 ? 6 : clean.length;
+    final suffix = clean.substring(0, suffixLength).toLowerCase();
+    return '@player_$suffix';
   }
 
   Future<void> _onDeleteAccountPressed() async {
