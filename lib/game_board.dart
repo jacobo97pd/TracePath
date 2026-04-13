@@ -2646,9 +2646,23 @@ class _HintOverlayPainter extends CustomPainter {
     }
 
     final end = center + vector;
+
+    final glowPaint = Paint()
+      ..color = hintColor.withOpacity(0.20 * hintOpacity)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+    canvas.drawCircle(center, cellSize * 0.28, glowPaint);
+    canvas.drawCircle(end, cellSize * 0.22, glowPaint);
+
+    final shaftOutline = Paint()
+      ..color = Colors.black.withOpacity(0.55 * hintOpacity)
+      ..strokeWidth = max(4, cellSize * 0.12)
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(center, end, shaftOutline);
+
     final arrowPaint = Paint()
-      ..color = hintColor.withOpacity(hintOpacity)
-      ..strokeWidth = max(2, cellSize * 0.07)
+      ..color = Colors.white.withOpacity(0.95 * hintOpacity)
+      ..strokeWidth = max(2.4, cellSize * 0.08)
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
     canvas.drawLine(center, end, arrowPaint);
@@ -2664,8 +2678,15 @@ class _HintOverlayPainter extends CustomPainter {
       end.dx - ux * headSize + uy * headSize * 0.7,
       end.dy - uy * headSize - ux * headSize * 0.7,
     );
+    canvas.drawLine(end, left, shaftOutline);
+    canvas.drawLine(end, right, shaftOutline);
     canvas.drawLine(end, left, arrowPaint);
     canvas.drawLine(end, right, arrowPaint);
+
+    final tipPaint = Paint()
+      ..color = hintColor.withOpacity(0.98 * hintOpacity)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(end, cellSize * 0.055, tipPaint);
   }
 
   @override

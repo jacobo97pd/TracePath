@@ -1873,23 +1873,79 @@ class _GameScreenState extends State<GameScreen>
     final direction = computeHintDirection(level, _status.path);
     if (direction == HintDirection.none) {
       HapticFeedback.selectionClick();
+      unawaited(
+        GameToast.show(
+          context,
+          type: GameToastType.info,
+          title: context.l10n.gameHintTitle,
+          message: _localizedHintUnavailableMessage(),
+          duration: const Duration(milliseconds: 1400),
+        ),
+      );
       return;
     }
 
-    HapticFeedback.selectionClick();
+    HapticFeedback.mediumImpact();
     setState(() {
       _hintsUsed++;
       _hintDirection = direction;
       _hintVisible = true;
     });
+    unawaited(
+      GameToast.show(
+        context,
+        type: GameToastType.info,
+        title: context.l10n.gameHintTitle,
+        message: _localizedHintAppliedMessage(direction),
+        duration: const Duration(milliseconds: 1400),
+      ),
+    );
     _persistInProgressLevel(_status.path);
     _hintTimer?.cancel();
-    _hintTimer = Timer(const Duration(seconds: 2), () {
+    _hintTimer = Timer(const Duration(milliseconds: 2400), () {
       if (!mounted) return;
       setState(() {
         _hintVisible = false;
       });
     });
+  }
+
+  String _localizedHintUnavailableMessage() {
+    final languageCode = Localizations.localeOf(context).languageCode;
+    if (languageCode == 'es') {
+      return 'No hay pista disponible ahora mismo. Vuelve al punto correcto.';
+    }
+    return 'No hint is available right now. Return to the correct point.';
+  }
+
+  String _localizedHintAppliedMessage(HintDirection direction) {
+    final languageCode = Localizations.localeOf(context).languageCode;
+    if (languageCode == 'es') {
+      switch (direction) {
+        case HintDirection.up:
+          return 'Pista aplicada: sigue hacia arriba.';
+        case HintDirection.down:
+          return 'Pista aplicada: sigue hacia abajo.';
+        case HintDirection.left:
+          return 'Pista aplicada: sigue hacia la izquierda.';
+        case HintDirection.right:
+          return 'Pista aplicada: sigue hacia la derecha.';
+        case HintDirection.none:
+          return 'Pista aplicada.';
+      }
+    }
+    switch (direction) {
+      case HintDirection.up:
+        return 'Hint applied: move up.';
+      case HintDirection.down:
+        return 'Hint applied: move down.';
+      case HintDirection.left:
+        return 'Hint applied: move left.';
+      case HintDirection.right:
+        return 'Hint applied: move right.';
+      case HintDirection.none:
+        return 'Hint applied.';
+    }
   }
 
   void _handleBoardChange(GameBoardChange change) {
