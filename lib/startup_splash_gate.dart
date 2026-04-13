@@ -20,7 +20,8 @@ class StartupSplashGate extends StatefulWidget {
   State<StartupSplashGate> createState() => _StartupSplashGateState();
 }
 
-class _StartupSplashGateState extends State<StartupSplashGate> {
+class _StartupSplashGateState extends State<StartupSplashGate>
+    with WidgetsBindingObserver {
   static const Duration _minVisibleDuration = Duration(milliseconds: 2200);
   bool _showSplash = !_didShowStartupSplash;
   bool _videoReady = false;
@@ -33,6 +34,7 @@ class _StartupSplashGateState extends State<StartupSplashGate> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     startupSplashVisible.value = _showSplash;
     if (_showSplash) {
       _initSplashVideo();
@@ -101,16 +103,16 @@ class _StartupSplashGateState extends State<StartupSplashGate> {
     }
   }
 
-  void _dismissSplash() {
+  void _dismissSplash({bool enforceMinDuration = true}) {
     if (_dismissed || !mounted) return;
 
     final shownAt = _shownAt;
-    if (shownAt != null) {
+    if (enforceMinDuration && shownAt != null) {
       final elapsed = DateTime.now().difference(shownAt);
       if (elapsed < _minVisibleDuration) {
         final wait = _minVisibleDuration - elapsed;
         Future<void>.delayed(wait, () {
-          if (mounted) _dismissSplash();
+          if (mounted) _dismissSplash(enforceMinDuration: true);
         });
         return;
       }
@@ -132,7 +134,25 @@ class _StartupSplashGateState extends State<StartupSplashGate> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!_showSplash || _dismissed) return;
+    switch (state) {
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.detached:
+        // If app goes to background during intro, mark splash as consumed
+        // so it never replays on resume.
+        _dismissSplash(enforceMinDuration: false);
+        break;
+      case AppLifecycleState.resumed:
+        break;
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _fallbackTimer?.cancel();
     final controller = _videoController;
     if (controller != null) {
