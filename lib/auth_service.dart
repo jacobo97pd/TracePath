@@ -550,16 +550,63 @@ class AuthService extends ChangeNotifier {
       'lastSeenAt': FieldValue.serverTimestamp(),
     };
 
+    final existing = snap.data() ?? const <String, dynamic>{};
+    final existingUsername = (existing['username'] as String?)?.trim() ?? '';
+    final existingUsernameLower =
+        (existing['usernameLowercase'] as String?)?.trim() ?? '';
+    final defaultUsername = _defaultUsernameForUid(uid);
+    final resolvedUsername =
+        existingUsername.isNotEmpty ? existingUsername : defaultUsername;
+    final resolvedUsernameLower = existingUsernameLower.isNotEmpty
+        ? existingUsernameLower
+        : resolvedUsername.toLowerCase();
+
     if (!snap.exists) {
       payload['createdAt'] = FieldValue.serverTimestamp();
       payload['coins'] = 0;
       payload['lifetimeCoinsEarned'] = 0;
-      payload['username'] = '';
-      payload['usernameLowercase'] = '';
+      payload['username'] = resolvedUsername;
+      payload['usernameLowercase'] = resolvedUsernameLower;
       payload['usernameChangeCount'] = 0;
+    } else {
+      if (existingUsername.isEmpty) {
+        payload['username'] = resolvedUsername;
+      }
+      if (existingUsernameLower.isEmpty) {
+        payload['usernameLowercase'] = resolvedUsernameLower;
+      }
+      if (!existing.containsKey('usernameChangeCount') ||
+          existing['usernameChangeCount'] == null) {
+        payload['usernameChangeCount'] = 0;
+      }
     }
 
     await userRef.set(payload, SetOptions(merge: true));
+    if (resolvedUsernameLower.isNotEmpty) {
+      try {
+        await db.collection('usernames').doc(resolvedUsernameLower).set(
+          <String, dynamic>{
+            'uid': uid,
+            'username': resolvedUsername,
+            'updatedAt': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint(
+              '[auth] username index sync skipped usernames/$resolvedUsernameLower: $e');
+        }
+      }
+    }
+  }
+
+  String _defaultUsernameForUid(String uid) {
+    final clean = uid.trim();
+    if (clean.isEmpty) return 'player';
+    final suffixLength = clean.length >= 6 ? 6 : clean.length;
+    final suffix = clean.substring(0, suffixLength).toLowerCase();
+    return 'player_$suffix';
   }
 
   String _generateNonce([int length = 32]) {
