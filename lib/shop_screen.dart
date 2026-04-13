@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:async';
+import 'dart:ui' show PathMetric;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -3054,8 +3055,10 @@ class _TrailShopCard extends StatelessWidget {
               width: double.infinity,
               height: 92,
               color: const Color(0xFF0B1222),
-              child: CustomPaint(
-                painter: _TrailPreviewPainter(skin: preview),
+              child: RepaintBoundary(
+                child: CustomPaint(
+                  painter: _TrailPreviewPainter(skin: preview),
+                ),
               ),
             ),
           ),
@@ -3302,6 +3305,8 @@ class _TrailPreviewPainter extends CustomPainter {
       );
 
     final width = max(3.0, size.height * 0.13 * skin.thickness);
+    final metricIterator = path.computeMetrics().iterator;
+    final metric = metricIterator.moveNext() ? metricIterator.current : null;
     if (skin.glow) {
       canvas.drawPath(
         path,
@@ -3360,7 +3365,7 @@ class _TrailPreviewPainter extends CustomPainter {
         skin.renderType == TrailRenderType.webLegendary) {
       for (var i = 0; i < 6; i++) {
         final t = i / 5.0;
-        final p = _sample(path, size, t);
+        final p = _sample(metric, t);
         if (p == null) continue;
         final tint = skin.renderType == TrailRenderType.webLegendary
             ? (i.isEven ? const Color(0xFFFF5BBE) : const Color(0xFF6EE7FF))
@@ -3384,7 +3389,7 @@ class _TrailPreviewPainter extends CustomPainter {
       const dots = 7;
       for (var i = 0; i < dots; i++) {
         final t = (i + 1) / (dots + 1);
-        final p = _sample(path, size, t);
+        final p = _sample(metric, t);
         if (p == null) continue;
         canvas.drawCircle(
           p + Offset(0, (i.isEven ? 1 : -1) * size.height * 0.08),
@@ -3395,10 +3400,8 @@ class _TrailPreviewPainter extends CustomPainter {
     }
   }
 
-  Offset? _sample(Path path, Size size, double t) {
-    final metrics = path.computeMetrics().toList(growable: false);
-    if (metrics.isEmpty) return null;
-    final metric = metrics.first;
+  Offset? _sample(PathMetric? metric, double t) {
+    if (metric == null) return null;
     final tan = metric.getTangentForOffset(metric.length * t.clamp(0.0, 1.0));
     return tan?.position;
   }

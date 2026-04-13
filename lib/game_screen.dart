@@ -182,6 +182,7 @@ class _GameScreenState extends State<GameScreen>
   bool _attemptEnergyConsumed = false;
   bool _energyConsumeInFlight = false;
   bool _energyGateLocked = false;
+  int _lastSelectionHapticAtMs = 0;
 
   @override
   void initState() {
@@ -766,55 +767,56 @@ class _GameScreenState extends State<GameScreen>
                                       final pathColor =
                                           _currentPathColor(brightness) ??
                                               gameTheme.pathColor;
-                                      return Stack(
-                                        fit: StackFit.expand,
-                                        children: [
-                                          GameBoard(
-                                            controller: _boardController,
-                                            level: level,
-                                            initialPath: _initialPath,
-                                            gameTheme: gameTheme,
-                                            pathColorOverride: pathColor,
-                                            trailSkin: _activeTrailSkin,
-                                            pointerAssetPath: widget
-                                                .coinsService
-                                                .selectedSkinAssetPath,
-                                            hintDirection: _hintDirection,
-                                            hintVisible: _hintVisible,
-                                            onStatusChanged:
-                                                _handleStatusChanged,
-                                            onChange: _handleBoardChange,
-                                            opponentPath: _isLiveDuelMode
-                                                ? _duelOpponentPath
-                                                : const <int>[],
-                                            opponentTrailColor:
-                                                const Color(0xFFE2538A),
-                                            isInteractionLocked:
-                                                (_isLiveDuelMode &&
-                                                        _liveInteractionLocked) ||
-                                                    energyControlsLocked,
-                                            onInvalidMove: (_) {
-                                              setState(() {
+                                      return RepaintBoundary(
+                                        child: Stack(
+                                          fit: StackFit.expand,
+                                          children: [
+                                            GameBoard(
+                                              controller: _boardController,
+                                              level: level,
+                                              initialPath: _initialPath,
+                                              gameTheme: gameTheme,
+                                              pathColorOverride: pathColor,
+                                              trailSkin: _activeTrailSkin,
+                                              pointerAssetPath: widget
+                                                  .coinsService
+                                                  .selectedSkinAssetPath,
+                                              hintDirection: _hintDirection,
+                                              hintVisible: _hintVisible,
+                                              onStatusChanged:
+                                                  _handleStatusChanged,
+                                              onChange: _handleBoardChange,
+                                              opponentPath: _isLiveDuelMode
+                                                  ? _duelOpponentPath
+                                                  : const <int>[],
+                                              opponentTrailColor:
+                                                  const Color(0xFFE2538A),
+                                              isInteractionLocked:
+                                                  (_isLiveDuelMode &&
+                                                          _liveInteractionLocked) ||
+                                                      energyControlsLocked,
+                                              onInvalidMove: (_) {
                                                 _mistakesUsed++;
-                                              });
-                                              _clearHint();
-                                              HapticFeedback.mediumImpact();
-                                            },
-                                          ),
-                                          if (_ghostRun != null &&
-                                              _ghostPlaybackStartedAt != null &&
-                                              _ghostEnabled &&
-                                              _isGhostEnabledForLevel(
-                                                _currentLevelId,
-                                              ))
-                                            Positioned.fill(
-                                              child: GhostReplayOverlay(
-                                                run: _ghostRun!,
-                                                startedAt:
-                                                    _ghostPlaybackStartedAt!,
-                                              ),
+                                                _clearHint();
+                                                HapticFeedback.mediumImpact();
+                                              },
                                             ),
-                                        ],
+                                            if (_ghostRun != null &&
+                                                _ghostPlaybackStartedAt !=
+                                                    null &&
+                                                _ghostEnabled &&
+                                                _isGhostEnabledForLevel(
+                                                  _currentLevelId,
+                                                ))
+                                              Positioned.fill(
+                                                child: GhostReplayOverlay(
+                                                  run: _ghostRun!,
+                                                  startedAt:
+                                                      _ghostPlaybackStartedAt!,
+                                                ),
+                                              ),
+                                          ],
+                                        ),
                                       );
                                     },
                                   ),
@@ -1907,7 +1909,7 @@ class _GameScreenState extends State<GameScreen>
     }
     switch (change.type) {
       case GameBoardChangeType.add:
-        HapticFeedback.selectionClick();
+        _triggerSelectionHaptic();
         if (_usesEnergySystem && !_attemptEnergyConsumed) {
           unawaited(_consumeEnergyForAttempt(change.path));
         }
@@ -1915,10 +1917,8 @@ class _GameScreenState extends State<GameScreen>
       case GameBoardChangeType.backtrack:
       case GameBoardChangeType.rewind:
       case GameBoardChangeType.undo:
-        setState(() {
-          _rewindsUsed++;
-        });
-        HapticFeedback.selectionClick();
+        _rewindsUsed++;
+        _triggerSelectionHaptic();
         break;
       case GameBoardChangeType.reset:
         break;
@@ -1927,6 +1927,13 @@ class _GameScreenState extends State<GameScreen>
       change.path,
       state: _completionHandled ? 'finished' : 'drawing',
     );
+  }
+
+  void _triggerSelectionHaptic({int minIntervalMs = 35}) {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    if ((now - _lastSelectionHapticAtMs) < minIntervalMs) return;
+    _lastSelectionHapticAtMs = now;
+    HapticFeedback.selectionClick();
   }
 
   Future<void> _syncEnergyGateAfterLoad() async {
@@ -2141,18 +2148,16 @@ class _GameScreenState extends State<GameScreen>
   }
 
   void _handleStatusChanged(GameBoardStatus status) {
-    final becameSolved = !_status.solved && status.solved;
+    final wasSolved = _status.solved;
+    final becameSolved = !wasSolved && status.solved;
+    _status = status;
 
-    setState(() {
-      _status = status;
-      if (becameSolved) {
-        _elapsedAtSolve = _currentElapsedDuration;
-      }
-      if (!status.solved) {
-        _completionHandled = false;
-        _elapsedAtSolve = null;
-      }
-    });
+    if (becameSolved) {
+      _elapsedAtSolve = _currentElapsedDuration;
+    } else if (wasSolved && !status.solved) {
+      _completionHandled = false;
+      _elapsedAtSolve = null;
+    }
 
     if (status.solved) {
       unawaited(
