@@ -17,6 +17,7 @@ import 'game_theme.dart';
 import 'progress_service.dart';
 import 'score_calculator.dart';
 import 'services/daily_puzzle_service.dart';
+import 'services/gameplay_music_service.dart';
 import 'stats_service.dart';
 import 'victory_screen.dart';
 import 'l10n/l10n.dart';
@@ -70,6 +71,7 @@ class _DailyScreenState extends State<DailyScreen> {
   @override
   void initState() {
     super.initState();
+    unawaited(GameplayMusicService.instance.attachGameplay());
     _dailyDateKey = DailyPuzzleService.currentDailyKey();
     _themeSeed = hashString('daily-theme-$_dailyDateKey');
     _loadDailyLevel();
@@ -77,6 +79,7 @@ class _DailyScreenState extends State<DailyScreen> {
 
   @override
   void dispose() {
+    unawaited(GameplayMusicService.instance.detachGameplay());
     _clockTimer?.cancel();
     _boardController.dispose();
     super.dispose();

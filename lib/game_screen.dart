@@ -36,6 +36,7 @@ import 'services/friend_challenge_service.dart';
 import 'services/level_report_service.dart';
 import 'services/streak_service.dart';
 import 'services/energy_service.dart';
+import 'services/gameplay_music_service.dart';
 import 'services/onboarding_service.dart';
 import 'trail/trail_catalog.dart';
 import 'trail/trail_skin.dart';
@@ -187,6 +188,7 @@ class _GameScreenState extends State<GameScreen>
   @override
   void initState() {
     super.initState();
+    unawaited(GameplayMusicService.instance.attachGameplay());
     _pathColorController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 420),
@@ -222,6 +224,7 @@ class _GameScreenState extends State<GameScreen>
 
   @override
   void dispose() {
+    unawaited(GameplayMusicService.instance.detachGameplay());
     widget.energyService.removeListener(_handleEnergyChanged);
     _hintTimer?.cancel();
     _clockTimer?.cancel();
