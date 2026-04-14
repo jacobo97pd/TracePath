@@ -61,6 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final LiveDuelService _liveDuelService = LiveDuelService();
   final UserProfileService _userProfileService = UserProfileService();
   static const String _firestoreDatabaseId = 'tracepath-database';
+  final Set<String> _usernameRecoveryInFlight = <String>{};
 
   @override
   Widget build(BuildContext context) {
@@ -184,6 +185,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ((data['uid'] as String?)?.trim().isNotEmpty == true)
                             ? (data['uid'] as String).trim()
                             : (authUser?.uid.trim() ?? '');
+                    if (username.isEmpty && uidForHandle.isNotEmpty) {
+                      unawaited(
+                        _recoverUsernameFromIndexIfMissing(uidForHandle),
+                      );
+                    }
                     final publicHandle = username.isNotEmpty
                         ? '@$username'
                         : _fallbackHandleFromUid(uidForHandle);
@@ -1384,6 +1390,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _recoverUsernameFromIndexIfMissing(String uid) async {
+    final cleanUid = uid.trim();
+    if (cleanUid.isEmpty) return;
+    if (_usernameRecoveryInFlight.contains(cleanUid)) return;
+    _usernameRecoveryInFlight.add(cleanUid);
+    try {
+      final db = (() {
+        try {
+          return FirebaseFirestore.instanceFor(
+            app: Firebase.app(),
+            databaseId: _firestoreDatabaseId,
+          );
+        } catch (_) {
+          return FirebaseFirestore.instance;
+        }
+      })();
+
+      final userRef = db.collection('users').doc(cleanUid);
+      final userSnap = await userRef.get();
+      final userData = userSnap.data() ?? const <String, dynamic>{};
+      final existing = (userData['username'] as String?)?.trim() ?? '';
+      if (existing.isNotEmpty) return;
+
+      final usernameIndex = await db
+          .collection('usernames')
+          .where('uid', isEqualTo: cleanUid)
+          .limit(1)
+          .get();
+      if (usernameIndex.docs.isEmpty) return;
+
+      final indexData = usernameIndex.docs.first.data();
+      final indexUsername = (indexData['username'] as String?)?.trim();
+      final indexLower = usernameIndex.docs.first.id.trim().toLowerCase();
+      final resolved = (indexUsername != null && indexUsername.isNotEmpty)
+          ? indexUsername
+          : indexLower;
+      if (resolved.isEmpty) return;
+
+      await userRef.set(
+        <String, dynamic>{
+          'username': resolved,
+          'usernameLowercase': resolved.toLowerCase(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+    } catch (_) {
+      // Best-effort healing only.
+    } finally {
+      _usernameRecoveryInFlight.remove(cleanUid);
+    }
+  }
+
   Future<void> _onLogoutPressed() async {
     final l10n = context.l10n;
     final shouldLogout = await showDialog<bool>(
@@ -1446,63 +1505,102 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
-    final nameController = TextEditingController(text: initialPlayerName);
+    var resolvedInitialPlayerName = initialPlayerName;
+    var resolvedInitialUsername = initialUsername;
+    try {
+      final data = await _readCurrentUserSocialProfile();
+      final latestName = (data['playerName'] as String?)?.trim() ?? '';
+      final latestUsername = (data['username'] as String?)?.trim() ?? '';
+      if (latestName.isNotEmpty) {
+        resolvedInitialPlayerName = latestName;
+      }
+      if (latestUsername.isNotEmpty) {
+        resolvedInitialUsername = latestUsername;
+      }
+    } catch (_) {
+      // Fallback to current UI values.
+    }
+
+    final nameController =
+        TextEditingController(text: resolvedInitialPlayerName);
     final usernameController =
-        TextEditingController(text: initialUsername.toLowerCase());
+        TextEditingController(text: resolvedInitialUsername.toLowerCase());
     var submitting = false;
     String? inlineError;
 
     final result = await showDialog<bool>(
       context: context,
-      barrierDismissible: !submitting,
+      barrierDismissible: false,
       builder: (dialogContext) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
+            void safeSetDialogState(VoidCallback fn) {
+              if (!dialogContext.mounted) return;
+              setDialogState(fn);
+            }
+
             Future<void> submit() async {
+              if (submitting) return;
               final rawName = nameController.text.trim();
-              final rawUser =
-                  usernameController.text.trim().toLowerCase().replaceAll('@', '');
+              final rawUser = usernameController.text
+                  .trim()
+                  .toLowerCase()
+                  .replaceAll('@', '');
+              final oldLower = resolvedInitialUsername
+                  .trim()
+                  .toLowerCase()
+                  .replaceAll('@', '');
+
+              if (rawName == resolvedInitialPlayerName.trim() &&
+                  rawUser == oldLower) {
+                if (dialogContext.mounted) {
+                  Navigator.of(dialogContext).pop(true);
+                }
+                return;
+              }
 
               final nameError = _validateDisplayName(rawName);
               if (nameError != null) {
-                setDialogState(() => inlineError = nameError);
+                safeSetDialogState(() => inlineError = nameError);
                 return;
               }
               final usernameError = _validateUsername(rawUser);
               if (usernameError != null) {
-                setDialogState(() => inlineError = usernameError);
+                safeSetDialogState(() => inlineError = usernameError);
                 return;
               }
 
-              setDialogState(() {
+              safeSetDialogState(() {
                 submitting = true;
                 inlineError = null;
               });
 
               try {
-                if (rawName != initialPlayerName.trim()) {
+                if (rawName != resolvedInitialPlayerName.trim()) {
                   await _userProfileService.updatePublicProfile(
                     playerName: rawName,
                   );
+                  if (!dialogContext.mounted) return;
                 }
-                final oldLower = initialUsername.trim().toLowerCase();
                 if (rawUser != oldLower) {
                   final isAvailable =
                       await _userProfileService.isUsernameAvailable(rawUser);
+                  if (!dialogContext.mounted) return;
                   if (!isAvailable) {
-                    setDialogState(() {
+                    safeSetDialogState(() {
                       submitting = false;
                       inlineError = _usernameTakenMessage(context);
                     });
                     return;
                   }
                   await _userProfileService.setUsername(rawUser);
+                  if (!dialogContext.mounted) return;
                 }
                 if (dialogContext.mounted) {
                   Navigator.of(dialogContext).pop(true);
                 }
               } catch (e) {
-                setDialogState(() {
+                safeSetDialogState(() {
                   submitting = false;
                   inlineError = _mapProfileEditError(context, e);
                 });
@@ -1534,7 +1632,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       enabled: !submitting,
                       maxLength: 20,
                       textInputAction: TextInputAction.done,
-                      onSubmitted: (_) => unawaited(submit()),
+                      onSubmitted: (_) {
+                        // On web this callback can race with dialog teardown.
+                        // Keep Enter harmless and use explicit "Guardar".
+                        FocusManager.instance.primaryFocus?.unfocus();
+                      },
                       decoration: InputDecoration(
                         labelText: _usernameLabel(context),
                         hintText: _usernameHint(context),
@@ -1579,8 +1681,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
     );
 
-    nameController.dispose();
-    usernameController.dispose();
+    // Controllers are dialog-scoped locals; avoid manual dispose races on web.
 
     if (result == true && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1612,8 +1713,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (raw.contains('USERNAME_CHANGE_LIMIT_REACHED')) {
       return _usernameChangeLimitMessage(context);
     }
-    if (raw.contains('INVALID_USERNAME')) return context.l10n.socialUsernameInvalid;
+    if (raw.contains('INVALID_USERNAME'))
+      return context.l10n.socialUsernameInvalid;
     if (raw.contains('AUTH_REQUIRED')) return _authRequiredMessage(context);
+    if (raw.contains('permission-denied') ||
+        raw.contains('insufficient permissions')) {
+      return _profileSavePermissionMessage(context);
+    }
     return _genericSaveErrorMessage(context);
   }
 
@@ -1630,32 +1736,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _isSpanish(context) ? 'Como quieres aparecer' : 'How you appear';
   String _usernameLabel(BuildContext context) =>
       _isSpanish(context) ? 'Username' : 'Username';
-  String _usernameHint(BuildContext context) =>
-      _isSpanish(context) ? 'min. 3, max. 20, a-z 0-9 _' : 'min 3, max 20, a-z 0-9 _';
-  String _saveLabel(BuildContext context) => _isSpanish(context) ? 'Guardar' : 'Save';
-  String _profileSavedMessage(BuildContext context) =>
-      _isSpanish(context) ? 'Perfil actualizado correctamente' : 'Profile updated successfully';
+  String _usernameHint(BuildContext context) => _isSpanish(context)
+      ? 'min. 3, max. 20, a-z 0-9 _'
+      : 'min 3, max 20, a-z 0-9 _';
+  String _saveLabel(BuildContext context) =>
+      _isSpanish(context) ? 'Guardar' : 'Save';
+  String _profileSavedMessage(BuildContext context) => _isSpanish(context)
+      ? 'Perfil actualizado correctamente'
+      : 'Profile updated successfully';
   String _visibleNameRequiredMessage(BuildContext context) =>
-      _isSpanish(context) ? 'El nombre visible es obligatorio' : 'Visible name is required';
+      _isSpanish(context)
+          ? 'El nombre visible es obligatorio'
+          : 'Visible name is required';
   String _visibleNameMinMessage(BuildContext context) =>
       _isSpanish(context) ? 'Minimo 2 caracteres' : 'Minimum 2 characters';
   String _visibleNameMaxMessage(BuildContext context) =>
       _isSpanish(context) ? 'Maximo 24 caracteres' : 'Maximum 24 characters';
-  String _usernameRequiredMessage(BuildContext context) =>
-      _isSpanish(context) ? 'El username es obligatorio' : 'Username is required';
-  String _usernameTakenMessage(BuildContext context) =>
-      _isSpanish(context) ? 'Ese username ya esta en uso' : 'That username is already taken';
-  String _usernameChangeLimitMessage(BuildContext context) => _isSpanish(context)
-      ? 'Has alcanzado el limite de cambios de username'
-      : 'You reached the username change limit';
+  String _usernameRequiredMessage(BuildContext context) => _isSpanish(context)
+      ? 'El username es obligatorio'
+      : 'Username is required';
+  String _usernameTakenMessage(BuildContext context) => _isSpanish(context)
+      ? 'Ese username ya esta en uso'
+      : 'That username is already taken';
+  String _usernameChangeLimitMessage(BuildContext context) =>
+      _isSpanish(context)
+          ? 'Has alcanzado el limite de cambios de username'
+          : 'You reached the username change limit';
   String _guestCannotEditMessage(BuildContext context) => _isSpanish(context)
       ? 'Inicia sesion para editar tu perfil'
       : 'Sign in to edit your profile';
   String _authRequiredMessage(BuildContext context) => _isSpanish(context)
       ? 'Necesitas iniciar sesion de nuevo'
       : 'You need to sign in again';
-  String _genericSaveErrorMessage(BuildContext context) =>
-      _isSpanish(context) ? 'No se pudo guardar el perfil' : 'Could not save profile';
+  String _profileSavePermissionMessage(BuildContext context) => _isSpanish(
+          context)
+      ? 'No tienes permisos para cambiar este username. Prueba otro.'
+      : 'You do not have permission to change this username. Try another one.';
+  String _genericSaveErrorMessage(BuildContext context) => _isSpanish(context)
+      ? 'No se pudo guardar el perfil'
+      : 'Could not save profile';
 
   Future<void> _onDeleteAccountPressed() async {
     if (widget.authService.isGuest) {

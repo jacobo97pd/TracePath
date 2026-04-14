@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -392,6 +392,11 @@ class OnboardingService extends ChangeNotifier {
     }
   }
 
+  Future<void> skipTutorial() async {
+    if (!isActive) return;
+    await _advanceTo(OnboardingStep.completed);
+  }
+
   void _onProgressChanged() {
     if (_step == OnboardingStep.playTutorialLevel &&
         (_progressService?.totalCampaignSolved ?? 0) > 0) {
@@ -413,4 +418,3 @@ class OnboardingService extends ChangeNotifier {
   static bool _matches(String path, String route) =>
       path == route || path.startsWith('$route/');
 }
-

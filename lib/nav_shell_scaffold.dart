@@ -241,6 +241,19 @@ class _OnboardingCoachBanner extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 10),
+                      TextButton(
+                        onPressed: () => _confirmSkipTutorial(context),
+                        style: TextButton.styleFrom(
+                          foregroundColor: const Color(0xFF9DC0FF),
+                          textStyle: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          visualDensity: VisualDensity.compact,
+                        ),
+                        child: Text(_skipLabel(context)),
+                      ),
+                      const SizedBox(width: 6),
                       SizedBox(
                         height: 34,
                         child: ElevatedButton(
@@ -280,6 +293,45 @@ class _OnboardingCoachBanner extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _confirmSkipTutorial(BuildContext context) async {
+    final onboarding = OnboardingService.instance;
+    if (!onboarding.isActive) return;
+    final isEs = Localizations.localeOf(context).languageCode == 'es';
+    final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            backgroundColor: const Color(0xFF13233E),
+            title: Text(isEs ? 'Saltar tutorial' : 'Skip tutorial'),
+            content: Text(
+              isEs
+                  ? 'Perderas la guia inicial. Podras jugar igualmente.'
+                  : 'You will skip the guided walkthrough. You can still play normally.',
+              style: const TextStyle(color: Color(0xFFD0E1FF)),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: Text(isEs ? 'Cancelar' : 'Cancel'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                child: Text(isEs ? 'Saltar' : 'Skip'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+    if (!confirmed || !context.mounted) return;
+    await onboarding.skipTutorial();
+    if (!context.mounted) return;
+    context.go('/home');
+  }
+
+  String _skipLabel(BuildContext context) =>
+      Localizations.localeOf(context).languageCode == 'es'
+          ? 'Saltar tutorial'
+          : 'Skip tutorial';
 }
 
 class _OnboardingSpotlightLayer extends StatefulWidget {

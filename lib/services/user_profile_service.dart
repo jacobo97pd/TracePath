@@ -159,7 +159,16 @@ class UserProfileService {
       }
 
       if (currentLower.isNotEmpty && currentLower != normalized) {
-        tx.delete(_db().collection('usernames').doc(currentLower));
+        final previousUsernameRef =
+            _db().collection('usernames').doc(currentLower);
+        final previousUsernameSnap = await tx.get(previousUsernameRef);
+        if (previousUsernameSnap.exists) {
+          final previousOwner =
+              (previousUsernameSnap.data()?['uid'] as String?)?.trim() ?? '';
+          if (previousOwner == uid) {
+            tx.delete(previousUsernameRef);
+          }
+        }
       }
 
       tx.set(
@@ -338,7 +347,7 @@ class UserProfileService {
   }
 
   String? _normalizeUsername(String raw) {
-    final value = raw.trim();
+    final value = raw.trim().replaceAll('@', '');
     if (!_usernameRegExp.hasMatch(value)) return null;
     return value.toLowerCase();
   }

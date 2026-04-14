@@ -185,6 +185,9 @@ class _GameScreenState extends State<GameScreen>
   bool _energyGateLocked = false;
   int _lastSelectionHapticAtMs = 0;
 
+  bool get _isEnergyActuallyDepleted =>
+      widget.energyService.snapshot.current <= 0;
+
   @override
   void initState() {
     super.initState();
@@ -626,8 +629,9 @@ class _GameScreenState extends State<GameScreen>
     );
     final isDark = brightness == Brightness.dark;
     final duelControlsLocked = _isLiveDuelMode && _liveInteractionLocked;
-    final energyControlsLocked =
-        _usesEnergySystem && (_energyGateLocked || _energyConsumeInFlight);
+    final energyControlsLocked = _usesEnergySystem &&
+        ((_energyGateLocked && _isEnergyActuallyDepleted) ||
+            _energyConsumeInFlight);
     final controlsLocked = duelControlsLocked || energyControlsLocked;
 
     return Scaffold(
@@ -730,7 +734,8 @@ class _GameScreenState extends State<GameScreen>
                       ],
                       if (_usesEnergySystem &&
                           !_attemptEnergyConsumed &&
-                          _energyGateLocked) ...[
+                          _energyGateLocked &&
+                          _isEnergyActuallyDepleted) ...[
                         _EnergyLockedBanner(
                           remainingText: _formatDurationShort(
                             widget.energyService.snapshot.timeUntilReset(),
@@ -2134,11 +2139,34 @@ class _GameScreenState extends State<GameScreen>
     }
     setState(() {
       _energyConsumeInFlight = false;
-      _energyGateLocked = true;
+      _energyGateLocked =
+          result.failureReason == EnergyConsumeFailureReason.noEnergy ||
+              result.snapshot.current <= 0;
     });
-    _boardController.reset();
-    _persistInProgressLevel(const <int>[]);
-    unawaited(_showEnergyDepletedDialog());
+    if (_energyGateLocked) {
+      _boardController.reset();
+      _persistInProgressLevel(const <int>[]);
+      unawaited(_showEnergyDepletedDialog());
+      return;
+    }
+    // If consume failed due to a transient backend/network issue but the user
+    // still has energy, keep gameplay responsive for this attempt.
+    setState(() {
+      _attemptEnergyConsumed = true;
+    });
+    if (mounted) {
+      final isEs = Localizations.localeOf(context).languageCode == 'es';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isEs
+                ? 'No se pudo sincronizar el consumo de energia. Puedes continuar esta partida.'
+                : 'Could not sync energy consumption. You can continue this run.',
+          ),
+          duration: const Duration(milliseconds: 1800),
+        ),
+      );
+    }
   }
 
   Future<void> _showEnergyDepletedDialog() async {
