@@ -1544,6 +1544,9 @@ class _GameScreenState extends State<GameScreen>
       return;
     }
 
+    final selectedCategory = await _selectReportCategory();
+    if (selectedCategory == null || !mounted) return;
+
     final shouldReport = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
@@ -1614,7 +1617,8 @@ class _GameScreenState extends State<GameScreen>
         levelId: levelId,
         nextLevelId: nextLevelId,
         nextLevelIndex: nextLevel,
-        reason: 'unsolvable_or_bugged',
+        category: selectedCategory.backendValue,
+        reason: selectedCategory.reasonValue,
       );
 
       if (kDebugMode) {
@@ -1703,6 +1707,107 @@ class _GameScreenState extends State<GameScreen>
       if (mounted) {
         setState(() => _reportSubmitting = false);
       }
+    }
+  }
+
+  Future<_LevelReportCategory?> _selectReportCategory() async {
+    var selected = _LevelReportCategory.bug;
+    return showDialog<_LevelReportCategory>(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setLocalState) {
+            return AlertDialog(
+              backgroundColor: const Color(0xFF111827),
+              title: Text(
+                _isSpanishLocale(context)
+                    ? 'Selecciona categoria'
+                    : 'Select category',
+                style: const TextStyle(color: Colors.white),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: _LevelReportCategory.values.map((category) {
+                  return RadioListTile<_LevelReportCategory>(
+                    value: category,
+                    groupValue: selected,
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setLocalState(() => selected = value);
+                    },
+                    dense: true,
+                    activeColor: const Color(0xFF4F9DFF),
+                    title: Text(
+                      _reportCategoryLabel(context, category),
+                      style: const TextStyle(
+                        color: Color(0xFFD7E4FF),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    subtitle: Text(
+                      _reportCategorySubtitle(context, category),
+                      style: const TextStyle(
+                        color: Color(0xFF8FA6CC),
+                        fontSize: 12,
+                      ),
+                    ),
+                  );
+                }).toList(growable: false),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(context.l10n.commonCancel),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.of(context).pop(selected),
+                  child: Text(
+                    _isSpanishLocale(context) ? 'Continuar' : 'Continue',
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  bool _isSpanishLocale(BuildContext context) =>
+      Localizations.localeOf(context).languageCode == 'es';
+
+  String _reportCategoryLabel(
+    BuildContext context,
+    _LevelReportCategory category,
+  ) {
+    switch (category) {
+      case _LevelReportCategory.bug:
+        return _isSpanishLocale(context) ? 'Bug' : 'Bug';
+      case _LevelReportCategory.cheating:
+        return _isSpanishLocale(context) ? 'Cheating' : 'Cheating';
+      case _LevelReportCategory.levelIssue:
+        return _isSpanishLocale(context) ? 'Level issue' : 'Level issue';
+    }
+  }
+
+  String _reportCategorySubtitle(
+    BuildContext context,
+    _LevelReportCategory category,
+  ) {
+    final isEs = _isSpanishLocale(context);
+    switch (category) {
+      case _LevelReportCategory.bug:
+        return isEs
+            ? 'Error tecnico o comportamiento inesperado'
+            : 'Technical error or unexpected behavior';
+      case _LevelReportCategory.cheating:
+        return isEs
+            ? 'Posible nivel manipulado o injusto'
+            : 'Potentially manipulated or unfair level';
+      case _LevelReportCategory.levelIssue:
+        return isEs
+            ? 'Problema de diseno o dificultad del nivel'
+            : 'Level design or difficulty issue';
     }
   }
 
@@ -4359,6 +4464,36 @@ HintDirection _directionBetweenCells(int width, int from, int to) {
   if (toCol == fromCol - 1 && toRow == fromRow) return HintDirection.left;
   if (toCol == fromCol + 1 && toRow == fromRow) return HintDirection.right;
   return HintDirection.none;
+}
+
+enum _LevelReportCategory {
+  bug,
+  cheating,
+  levelIssue,
+}
+
+extension on _LevelReportCategory {
+  String get backendValue {
+    switch (this) {
+      case _LevelReportCategory.bug:
+        return 'bug';
+      case _LevelReportCategory.cheating:
+        return 'cheating';
+      case _LevelReportCategory.levelIssue:
+        return 'level_issue';
+    }
+  }
+
+  String get reasonValue {
+    switch (this) {
+      case _LevelReportCategory.bug:
+        return 'bug_reported';
+      case _LevelReportCategory.cheating:
+        return 'cheating_suspected';
+      case _LevelReportCategory.levelIssue:
+        return 'level_issue_reported';
+    }
+  }
 }
 
 class _GlassBoardShell extends StatelessWidget {

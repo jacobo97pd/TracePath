@@ -34,6 +34,7 @@ class LevelReportService {
     required String levelId,
     required String nextLevelId,
     String reason = 'Nivel reportado como imposible',
+    String? category,
     int? nextLevelIndex,
   }) async {
     final normalizedLevelId = levelId.trim();
@@ -53,6 +54,8 @@ class LevelReportService {
         'levelId': normalizedLevelId,
         'nextLevelId': normalizedNextLevelId,
         'reason': reason,
+        if (category != null && category.trim().isNotEmpty)
+          'category': category.trim(),
         'nextLevelIndex': nextLevelIndex,
         'platform': _platformTag(),
         'appVersion': '${packageInfo.version}+${packageInfo.buildNumber}',
