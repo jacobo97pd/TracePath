@@ -212,6 +212,10 @@ class AuthService extends ChangeNotifier {
       if (user == null) {
         return 'Apple login failed';
       }
+      final resolvedEmail = _resolveAuthEmail(
+        preferredEmail: (appleCredential.email ?? '').trim(),
+        authEmail: (user.email ?? '').trim(),
+      );
 
       final firstName = appleCredential.givenName?.trim() ?? '';
       final lastName = appleCredential.familyName?.trim() ?? '';
@@ -225,15 +229,15 @@ class AuthService extends ChangeNotifier {
           ? user.displayName
           : (fullName.isNotEmpty
               ? fullName
-              : (user.email?.split('@').first ?? 'Player'));
-      _email = user.email;
+              : (resolvedEmail.isNotEmpty ? resolvedEmail.split('@').first : 'Player'));
+      _email = resolvedEmail.isNotEmpty ? resolvedEmail : null;
       _avatarUrl = user.photoURL;
 
       await _upsertUserFromAuth(
         user,
         provider: 'apple',
         preferredDisplayName: fullName,
-        preferredEmail: (appleCredential.email ?? '').trim(),
+        preferredEmail: resolvedEmail,
       );
       await _persist();
       notifyListeners();
@@ -577,11 +581,16 @@ class AuthService extends ChangeNotifier {
     final db = AppFirestore.instance();
     final userRef = db.collection('users').doc(uid);
     final snap = await userRef.get();
+    final existing = snap.data() ?? const <String, dynamic>{};
 
     final display = (user.displayName ?? '').trim();
     final preferredName = (preferredDisplayName ?? '').trim();
-    final email = (preferredEmail ?? user.email ?? '').trim();
-    final existing = snap.data() ?? const <String, dynamic>{};
+    final existingEmail = (existing['email'] as String?)?.trim() ?? '';
+    final email = _resolveAuthEmail(
+      preferredEmail: (preferredEmail ?? '').trim(),
+      authEmail: (user.email ?? '').trim(),
+      existingEmail: existingEmail,
+    );
     final existingPlayerName = (existing['playerName'] as String?)?.trim() ?? '';
     final resolvedPlayerName = _resolvePlayerName(
       preferredName: preferredName,
@@ -593,8 +602,6 @@ class AuthService extends ChangeNotifier {
     final payload = <String, dynamic>{
       'uid': uid,
       'playerName': resolvedPlayerName,
-      'email': email,
-      'emailLowercase': email.toLowerCase(),
       'photoUrl': user.photoURL,
       'authProvider': provider,
       'lastLoginAt': FieldValue.serverTimestamp(),
@@ -602,6 +609,10 @@ class AuthService extends ChangeNotifier {
       'isOnline': true,
       'lastSeenAt': FieldValue.serverTimestamp(),
     };
+    if (email.isNotEmpty) {
+      payload['email'] = email;
+      payload['emailLowercase'] = email.toLowerCase();
+    }
 
     final existingUsername = (existing['username'] as String?)?.trim() ?? '';
     final existingUsernameLower =
@@ -670,6 +681,19 @@ class AuthService extends ChangeNotifier {
       return emailPrefix;
     }
     return 'Player';
+  }
+
+  String _resolveAuthEmail({
+    required String preferredEmail,
+    required String authEmail,
+    String existingEmail = '',
+  }) {
+    // Apple Hide My Email returns a relay address that we should persist and
+    // display as-is; the app must never try to infer a "real" email.
+    if (preferredEmail.isNotEmpty) return preferredEmail;
+    if (authEmail.isNotEmpty) return authEmail;
+    if (existingEmail.isNotEmpty) return existingEmail;
+    return '';
   }
 
   String _defaultUsernameForUid(String uid) {

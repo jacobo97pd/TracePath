@@ -93,9 +93,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             (authUser?.displayName ?? widget.authService.displayName).trim();
         final authEmail =
             (authUser?.email ?? widget.authService.email ?? '').trim();
-        final profileSubtitle = widget.authService.isGuest
-            ? l10n.profileGuestMode
-            : (authEmail.isNotEmpty ? authEmail : l10n.profileGoogleAccount);
         final ownedSkins = widget.skinCatalogService.items
             .where((e) => widget.coinsService.ownsSkin(e.id))
             .toList(growable: false);
@@ -179,6 +176,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             : (authName.isNotEmpty
                                 ? authName
                                 : l10n.homePlayerName);
+                    final persistedEmail =
+                        (data['email'] as String?)?.trim() ?? '';
+                    final profileSubtitle = widget.authService.isGuest
+                        ? l10n.profileGuestMode
+                        : (persistedEmail.isNotEmpty
+                            ? persistedEmail
+                            : (authEmail.isNotEmpty
+                                ? authEmail
+                                : l10n.profileGoogleAccount));
                     final username =
                         (data['username'] as String?)?.trim() ?? '';
                     final uidForHandle =
