@@ -46,7 +46,7 @@ class SkinEditorScreen extends StatelessWidget {
                       child: FilledButton.icon(
                         onPressed: () async {
                           if (kIsWeb) {
-                            final picked = await FilePicker.platform.pickFiles(
+                            final picked = await FilePicker.pickFiles(
                               dialogTitle: 'Select skins',
                               allowMultiple: true,
                               withData: true,
@@ -72,7 +72,7 @@ class SkinEditorScreen extends StatelessWidget {
                             );
                             return;
                           }
-                          final folder = await FilePicker.platform.getDirectoryPath(
+                          final folder = await FilePicker.getDirectoryPath(
                             dialogTitle: 'Select skins folder',
                             initialDirectory:
                                 'C:\\Users\\jacob\\Downloads\\SKINS TRACE PATH',
@@ -96,7 +96,7 @@ class SkinEditorScreen extends StatelessWidget {
                       child: OutlinedButton.icon(
                         onPressed: () async {
                           if (kIsWeb) {
-                            final picked = await FilePicker.platform.pickFiles(
+                            final picked = await FilePicker.pickFiles(
                               dialogTitle: 'Select one skin image',
                               allowMultiple: false,
                               withData: true,
@@ -124,7 +124,7 @@ class SkinEditorScreen extends StatelessWidget {
                             );
                             return;
                           }
-                          final result = await FilePicker.platform.pickFiles(
+                          final result = await FilePicker.pickFiles(
                             dialogTitle: 'Select one skin image',
                             type: FileType.custom,
                             allowMultiple: false,

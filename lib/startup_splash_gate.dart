@@ -4,6 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+import 'services/startup_diagnostics.dart';
+
+// Diagnostics: set to true to skip the splash and go straight to the app.
+// Revert to false before shipping.
+const bool kSkipSplashForDiagnostics = false;
+
 bool _didShowStartupSplash = false;
 final ValueNotifier<bool> startupSplashVisible =
     ValueNotifier<bool>(!_didShowStartupSplash);
@@ -22,8 +28,11 @@ class StartupSplashGate extends StatefulWidget {
 
 class _StartupSplashGateState extends State<StartupSplashGate>
     with WidgetsBindingObserver {
-  static const Duration _minVisibleDuration = Duration(milliseconds: 2200);
-  bool _showSplash = !_didShowStartupSplash;
+  static const Duration _minVisibleDuration = Duration(milliseconds: 1800);
+  // Hard cap: splash never blocks the app for more than this, regardless of cause.
+  static const Duration _hardTimeout = Duration(seconds: 5);
+
+  bool _showSplash = !_didShowStartupSplash && !kSkipSplashForDiagnostics;
   bool _videoReady = false;
   bool _dismissed = false;
   DateTime? _shownAt;
@@ -34,7 +43,14 @@ class _StartupSplashGateState extends State<StartupSplashGate>
   @override
   void initState() {
     super.initState();
+    slog('SplashGate.initState skip=$kSkipSplashForDiagnostics');
     WidgetsBinding.instance.addObserver(this);
+    if (kSkipSplashForDiagnostics) {
+      _didShowStartupSplash = true;
+      startupSplashVisible.value = false;
+      slog('SplashGate: skipped (diag flag)');
+      return;
+    }
     startupSplashVisible.value = _showSplash;
     if (_showSplash) {
       _initSplashVideo();
@@ -42,16 +58,25 @@ class _StartupSplashGateState extends State<StartupSplashGate>
   }
 
   Future<void> _initSplashVideo() async {
-    // Safety timeout so splash never blocks startup.
-    _fallbackTimer = Timer(const Duration(seconds: 12), _dismissSplash);
+    slog('SplashGate._initSplashVideo release=$kReleaseMode');
     _shownAt = DateTime.now();
+
+    if (kReleaseMode) {
+      _fallbackTimer = Timer(_hardTimeout, _forceDismiss);
+      _scheduleMinDurationDismiss();
+      return;
+    }
+
+    _fallbackTimer = Timer(_hardTimeout, _forceDismiss);
 
     try {
       final controller = VideoPlayerController.asset(
         'assets/branding/splash_video_trace_path.mp4',
       );
       _videoController = controller;
-      await controller.initialize();
+      slog('SplashGate: video controller.initialize...');
+      await controller.initialize().timeout(const Duration(seconds: 4));
+      slog('SplashGate: video initialized');
       if (!mounted || _dismissed) return;
 
       controller
@@ -59,32 +84,35 @@ class _StartupSplashGateState extends State<StartupSplashGate>
         ..setVolume(0);
       controller.addListener(_onVideoTick);
 
-      // Show the first frame as soon as initialization is done.
       setState(() {
         _videoReady = true;
       });
 
-      // Do not fail the whole splash flow if speed is not supported on device.
       try {
         await controller.setPlaybackSpeed(1.5);
       } catch (e) {
-        if (kDebugMode) {
-          debugPrint('[splash] setPlaybackSpeed failed, fallback to 1.0: $e');
-        }
         try {
           await controller.setPlaybackSpeed(1.0);
         } catch (_) {}
       }
 
       await controller.play();
-    } catch (_) {
-      // Keep startup flow alive with a short black fallback if video fails.
-      if (kDebugMode) {
-        debugPrint('[splash] video init failed, using black fallback.');
-      }
+      slog('SplashGate: video playing');
+    } catch (e) {
+      slog('SplashGate: video FAIL $e');
       _fallbackTimer?.cancel();
-      _fallbackTimer = Timer(const Duration(milliseconds: 1500), _dismissSplash);
+      _fallbackTimer = null;
+      _scheduleMinDurationDismiss();
     }
+  }
+
+  void _scheduleMinDurationDismiss() {
+    final shownAt = _shownAt ?? DateTime.now();
+    final elapsed = DateTime.now().difference(shownAt);
+    final wait = elapsed < _minVisibleDuration
+        ? _minVisibleDuration - elapsed
+        : Duration.zero;
+    Future<void>.delayed(wait, _forceDismiss);
   }
 
   void _onVideoTick() {
@@ -99,25 +127,13 @@ class _StartupSplashGateState extends State<StartupSplashGate>
     if (position <= Duration.zero) return;
 
     if (position >= duration - const Duration(milliseconds: 80)) {
-      _dismissSplash();
+      _scheduleMinDurationDismiss();
     }
   }
 
-  void _dismissSplash({bool enforceMinDuration = true}) {
+  void _forceDismiss() {
+    slog('SplashGate._forceDismiss dismissed=$_dismissed mounted=$mounted');
     if (_dismissed || !mounted) return;
-
-    final shownAt = _shownAt;
-    if (enforceMinDuration && shownAt != null) {
-      final elapsed = DateTime.now().difference(shownAt);
-      if (elapsed < _minVisibleDuration) {
-        final wait = _minVisibleDuration - elapsed;
-        Future<void>.delayed(wait, () {
-          if (mounted) _dismissSplash(enforceMinDuration: true);
-        });
-        return;
-      }
-    }
-
     _dismissed = true;
     _didShowStartupSplash = true;
 
@@ -131,6 +147,7 @@ class _StartupSplashGateState extends State<StartupSplashGate>
       _showSplash = false;
     });
     startupSplashVisible.value = false;
+    slog('SplashGate: dismissed OK');
   }
 
   @override
@@ -143,7 +160,7 @@ class _StartupSplashGateState extends State<StartupSplashGate>
       case AppLifecycleState.detached:
         // If app goes to background during intro, mark splash as consumed
         // so it never replays on resume.
-        _dismissSplash(enforceMinDuration: false);
+        _forceDismiss();
         break;
       case AppLifecycleState.resumed:
         break;

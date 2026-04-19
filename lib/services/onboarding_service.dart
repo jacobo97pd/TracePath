@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -108,8 +109,11 @@ class OnboardingService extends ChangeNotifier {
     _prefs = prefs;
     _progressService = progressService;
     _progressService?.addListener(_onProgressChanged);
-    _authSub = FirebaseAuth.instance.authStateChanges().listen(_onAuthChanged);
-    await _loadStepForUid(FirebaseAuth.instance.currentUser?.uid ?? '');
+    final auth = _firebaseAuthOrNull;
+    if (auth != null) {
+      _authSub = auth.authStateChanges().listen(_onAuthChanged);
+    }
+    await _loadStepForUid(auth?.currentUser?.uid ?? '');
     _onProgressChanged();
   }
 
@@ -123,6 +127,15 @@ class OnboardingService extends ChangeNotifier {
   Future<void> _onAuthChanged(User? user) async {
     await _loadStepForUid(user?.uid ?? '');
     _onProgressChanged();
+  }
+
+  FirebaseAuth? get _firebaseAuthOrNull {
+    try {
+      if (Firebase.apps.isEmpty) return null;
+      return FirebaseAuth.instance;
+    } catch (_) {
+      return null;
+    }
   }
 
   String _storageKeyForUid(String uid) {

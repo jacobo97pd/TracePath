@@ -6,7 +6,9 @@
   "liveDuelInviteBody": "{from} challenged you to a live duel.\nDo you want to accept",
   "@liveDuelInviteBody": {
     "placeholders": {
-      "from": {}
+      "from": {
+        "type": "Object"
+      }
     }
   },
   "decline": "Decline",
@@ -110,13 +112,17 @@
   "duelAcceptError": "Could not accept duel invite: {error}",
   "@duelAcceptError": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "Object"
+      }
     }
   },
   "duelDeclineError": "Could not decline duel invite: {error}",
   "@duelDeclineError": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "Object"
+      }
     }
   },
   "duelAccept": "Accept",
@@ -130,14 +136,20 @@
   "duelVersusOpponent": "VS {name}",
   "@duelVersusOpponent": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "Object"
+      }
     }
   },
   "duelLevelAndStatus": "Level: {level} {status}",
   "@duelLevelAndStatus": {
     "placeholders": {
-      "level": {},
-      "status": {}
+      "level": {
+        "type": "Object"
+      },
+      "status": {
+        "type": "Object"
+      }
     }
   },
   "duelErrorFinishCurrentFirst": "Finish your current live duel first.",
@@ -154,7 +166,9 @@
   "duelRemoveError": "Could not remove match: {error}",
   "@duelRemoveError": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "Object"
+      }
     }
   },
   "friendChallengeTitle": "Friendly Challenge",
@@ -162,13 +176,17 @@
   "friendChallengePuzzle": "Puzzle: {puzzleId}",
   "@friendChallengePuzzle": {
     "placeholders": {
-      "puzzleId": {}
+      "puzzleId": {
+        "type": "Object"
+      }
     }
   },
   "friendChallengeMode": "Mode: {mode}",
   "@friendChallengeMode": {
     "placeholders": {
-      "mode": {}
+      "mode": {
+        "type": "Object"
+      }
     }
   },
   "friendChallengePlayButton": "Play Friendly Challenge",
@@ -234,7 +252,9 @@
   "profileEquippedSkin": "Equipped Skin: {name}",
   "@profileEquippedSkin": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "Object"
+      }
     }
   },
   "profileStatsTitle": "Stats",
@@ -317,20 +337,26 @@
   "profileAchievementCompleted": "Completed{datePart}",
   "@profileAchievementCompleted": {
     "placeholders": {
-      "datePart": {}
+      "datePart": {
+        "type": "Object"
+      }
     }
   },
   "profileAchievementLocked": "Locked",
   "profileAchievementUnlocked": "Unlocked{datePart}",
   "@profileAchievementUnlocked": {
     "placeholders": {
-      "datePart": {}
+      "datePart": {
+        "type": "Object"
+      }
     }
   },
   "profileAchievementOnDate": "on {date}",
   "@profileAchievementOnDate": {
     "placeholders": {
-      "date": {}
+      "date": {
+        "type": "Object"
+      }
     }
   },
   "profileInboxOpen": "Open",
@@ -379,7 +405,9 @@
       "level": {
         "type": "int"
       },
-      "packId": {}
+      "packId": {
+        "type": "Object"
+      }
     }
   },
   "leaderboardNoFriendsScores": "No friends scores yet for this level.",
@@ -392,7 +420,9 @@
   "dailyNextPuzzleIn": "Next puzzle in {countdown}",
   "@dailyNextPuzzleIn": {
     "placeholders": {
-      "countdown": {}
+      "countdown": {
+        "type": "Object"
+      }
     }
   },
   "dailyRewardLabel": "Reward",
@@ -414,7 +444,9 @@
       "attempts": {
         "type": "int"
       },
-      "bestScore": {}
+      "bestScore": {
+        "type": "Object"
+      }
     }
   },
   "dailyNewPersonalBestToday": "New personal best today",
@@ -434,7 +466,9 @@
   "dailyShareText": "Daily complete in {time}.",
   "@dailyShareText": {
     "placeholders": {
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "dailyCopyText": "Zip #{day} - {time} - Streak {streak} ",
@@ -443,7 +477,9 @@
       "day": {
         "type": "int"
       },
-      "time": {},
+      "time": {
+        "type": "Object"
+      },
       "streak": {
         "type": "int"
       }
@@ -457,7 +493,9 @@
   "liveDuelReacted": "{sender} reacted",
   "@liveDuelReacted": {
     "placeholders": {
-      "sender": {}
+      "sender": {
+        "type": "Object"
+      }
     }
   },
   "liveDuelUnavailableNow": "Live duel unavailable right now.",
@@ -484,7 +522,9 @@
   "liveDuelStartingIn": "Starting in {value}...",
   "@liveDuelStartingIn": {
     "placeholders": {
-      "value": {}
+      "value": {
+        "type": "Object"
+      }
     }
   },
   "liveDuelStartingMatch": "Starting match...",
@@ -536,7 +576,9 @@
   "victoryFriendAlreadyInDuel": "{name} is already in another duel",
   "@victoryFriendAlreadyInDuel": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "Object"
+      }
     }
   },
   "victoryNoPuzzlesForDuel": "No puzzles available for duel",
@@ -616,7 +658,9 @@
   "socialLiveInviteSentBody": "Waiting for {name} to accept.",
   "@socialLiveInviteSentBody": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "Object"
+      }
     }
   },
   "socialCouldNotSendChallenge": "Could not send challenge right now.",
@@ -626,7 +670,9 @@
   "socialFriendAlreadyInLiveDuel": "{name} is already in another live duel.",
   "@socialFriendAlreadyInLiveDuel": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "Object"
+      }
     }
   },
   "socialNoPuzzlesForLiveDuel": "No puzzles available for live duel.",
@@ -665,8 +711,12 @@
   "socialSkinTrail": "Skin: {skin} - Trail: {trail}",
   "@socialSkinTrail": {
     "placeholders": {
-      "skin": {},
-      "trail": {}
+      "skin": {
+        "type": "Object"
+      },
+      "trail": {
+        "type": "Object"
+      }
     }
   },
   "socialOnline": "Online",
@@ -679,13 +729,17 @@
   "energyOutWithBattery": "You are out of energy. Wait {reset} for reset, or use a battery now.",
   "@energyOutWithBattery": {
     "placeholders": {
-      "reset": {}
+      "reset": {
+        "type": "Object"
+      }
     }
   },
   "energyOutWithoutBattery": "You are out of energy. Wait {reset} for reset, or buy a battery.",
   "@energyOutWithoutBattery": {
     "placeholders": {
-      "reset": {}
+      "reset": {
+        "type": "Object"
+      }
     }
   },
   "energyCouldNotUseBattery": "Could not use battery right now.",
@@ -776,7 +830,9 @@
   "gameVariantExample": "Example: {example}",
   "@gameVariantExample": {
     "placeholders": {
-      "example": {}
+      "example": {
+        "type": "Object"
+      }
     }
   },
   "gamePackNotFound": "Pack not found",
@@ -797,7 +853,9 @@
   "gameEnergyResetIn": "Reset {time}",
   "@gameEnergyResetIn": {
     "placeholders": {
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "gameDuelFinishedBoardLocked": "Duel finished. Board locked.",
@@ -821,13 +879,17 @@
   "gameNextAdIn": "Next ad in {time}",
   "@gameNextAdIn": {
     "placeholders": {
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "gameLevelCompleteReward": "LEVEL COMPLETE! {reward}",
   "@gameLevelCompleteReward": {
     "placeholders": {
-      "reward": {}
+      "reward": {
+        "type": "Object"
+      }
     }
   },
   "gameRankingUnavailable": "Ranking unavailable",
@@ -876,7 +938,9 @@
   "gameAlmostThereBody": "Finish on {label} to complete the level.",
   "@gameAlmostThereBody": {
     "placeholders": {
-      "label": {}
+      "label": {
+        "type": "Object"
+      }
     }
   },
   "gameTimeTitle": "Time!",
@@ -905,8 +969,12 @@
   "gameRewardedAdStatusBody": "Loaded: {loaded}\nLoading: {loading}",
   "@gameRewardedAdStatusBody": {
     "placeholders": {
-      "loaded": {},
-      "loading": {}
+      "loaded": {
+        "type": "Object"
+      },
+      "loading": {
+        "type": "Object"
+      }
     }
   },
   "gameAdReloadRequestedTitle": "Ad reload requested",
@@ -918,7 +986,9 @@
   "gameLiveDuelFinishedWaiting": "Finished in {time}. Waiting result...",
   "@gameLiveDuelFinishedWaiting": {
     "placeholders": {
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "gameLiveDuelResultTitle": "Live duel result",
@@ -936,14 +1006,18 @@
   "gameEnergyEmptyResetIn": "Energy empty. Reset in {time}.",
   "@gameEnergyEmptyResetIn": {
     "placeholders": {
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "gameBatteries": "Batteries",
   "gameGhostBest": "Ghost best: {time}",
   "@gameGhostBest": {
     "placeholders": {
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "gameGhostOn": "Ghost: ON",
@@ -968,7 +1042,9 @@
       "count": {
         "type": "int"
       },
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "shopUseOneBatteryNow": "Use 1 battery now",
@@ -989,7 +1065,9 @@
   "shopConfirmPurchaseBody": "Do you want to buy \"{name}\" for {coins} coins'",
   "@shopConfirmPurchaseBody": {
     "placeholders": {
-      "name": {},
+      "name": {
+        "type": "Object"
+      },
       "coins": {
         "type": "int"
       }
@@ -1019,8 +1097,12 @@
   "duelHistoryTimes": "You {youTime} Opp {opponentTime}",
   "@duelHistoryTimes": {
     "placeholders": {
-      "youTime": {},
-      "opponentTime": {}
+      "youTime": {
+        "type": "Object"
+      },
+      "opponentTime": {
+        "type": "Object"
+      }
     }
   },
   "duelStatusVictory": "Victory",
@@ -1035,7 +1117,9 @@
       "max": {
         "type": "int"
       },
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "playLevelsWorldProgressSummary": "{total} levels - {completed} completed",
@@ -1058,7 +1142,9 @@
       "max": {
         "type": "int"
       },
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "playLevelsSelectedLevel": "Selected Level",
@@ -1068,7 +1154,9 @@
       "level": {
         "type": "int"
       },
-      "variant": {}
+      "variant": {
+        "type": "Object"
+      }
     }
   },
   "playLevelsPlay": "Play",
@@ -1101,13 +1189,17 @@
   "gameFriendlyChallengeShare": "Friendly challenge done in {time}.",
   "@gameFriendlyChallengeShare": {
     "placeholders": {
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "gameFriendlyChallengeCopy": "Friendly challenge | {time}",
   "@gameFriendlyChallengeCopy": {
     "placeholders": {
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "gameContinueTutorial": "Continue Tutorial",
@@ -1117,7 +1209,9 @@
       "level": {
         "type": "int"
       },
-      "time": {},
+      "time": {
+        "type": "Object"
+      },
       "score": {
         "type": "int"
       }
@@ -1129,7 +1223,9 @@
       "level": {
         "type": "int"
       },
-      "time": {},
+      "time": {
+        "type": "Object"
+      },
       "streak": {
         "type": "int"
       }
@@ -1138,7 +1234,9 @@
   "gameReacted": "{name} reacted",
   "@gameReacted": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "Object"
+      }
     }
   },
   "victoryHeadlineFire": "You're on fire!",
@@ -1173,7 +1271,9 @@
       "index": {
         "type": "int"
       },
-      "avg": {}
+      "avg": {
+        "type": "Object"
+      }
     }
   },
   "endlessCouldNotLoadPuzzle": "Could not load endless puzzle.",
@@ -1195,7 +1295,9 @@
       "index": {
         "type": "int"
       },
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "endlessCopyText": "Zip #{index} - {time} - Streak {streak} ",
@@ -1204,7 +1306,9 @@
       "index": {
         "type": "int"
       },
-      "time": {},
+      "time": {
+        "type": "Object"
+      },
       "streak": {
         "type": "int"
       }
@@ -1213,20 +1317,26 @@
   "levelsPackTitle": "{pack} levels",
   "@levelsPackTitle": {
     "placeholders": {
-      "pack": {}
+      "pack": {
+        "type": "Object"
+      }
     }
   },
   "gameClear": "Clear",
   "gameNext": "Next {value}",
   "@gameNext": {
     "placeholders": {
-      "value": {}
+      "value": {
+        "type": "Object"
+      }
     }
   },
   "gameStars": "Stars {value}",
   "@gameStars": {
     "placeholders": {
-      "value": {}
+      "value": {
+        "type": "Object"
+      }
     }
   },
   "victoryPrimaryNextLevel": "Next Level",

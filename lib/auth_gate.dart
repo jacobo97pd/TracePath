@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'auth_service.dart';
 import 'login_screen.dart';
+import 'services/startup_diagnostics.dart';
 
 final ValueNotifier<bool> authScreenVisible = ValueNotifier<bool>(false);
 
@@ -21,6 +22,7 @@ class AuthGate extends StatelessWidget {
       animation: authService,
       builder: (context, _) {
         if (!authService.isReady) {
+          slog('AuthGate: NOT ready yet');
           _setAuthScreenVisible(true);
           return const Scaffold(
             backgroundColor: Color(0xFF0F172A),
@@ -28,10 +30,13 @@ class AuthGate extends StatelessWidget {
           );
         }
         final showAuth = !authService.isAuthenticated;
+        slog('AuthGate: ready isAuthenticated=${authService.isAuthenticated} mode=${authService.mode}');
         _setAuthScreenVisible(showAuth);
         if (showAuth) {
+          slog('AuthGate: showing LoginScreen');
           return LoginScreen(authService: authService);
         }
+        slog('AuthGate: showing child (HomeScreen)');
         return child;
       },
     );

@@ -428,7 +428,7 @@ class _EndlessGameScreenState extends State<EndlessGameScreen> {
       '/victory',
       extra: VictoryScreenArgs(
         zipNumber: widget.index,
-        headline: defaultVictoryHeadline(breakdown.finalScore),
+        headline: defaultVictoryHeadline(context, breakdown.finalScore),
         timeText: _formatMs(_currentElapsedDuration.inMilliseconds),
         averageText: _formatMs(average),
         streak: widget.progressService.getDailyStreak(),

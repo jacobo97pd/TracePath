@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +10,7 @@ import 'auth_gate.dart';
 import 'l10n/l10n.dart';
 import 'services/inbox_service.dart';
 import 'services/onboarding_service.dart';
+import 'services/startup_diagnostics.dart';
 import 'startup_splash_gate.dart';
 import 'ui/components/app_bottom_navbar.dart';
 
@@ -26,7 +28,8 @@ class NavShellScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
+    slog('NavShellScaffold.build path=${state.uri.path}');
+    final uid = _firebaseAuthOrNull?.currentUser?.uid.trim() ?? '';
     final unreadStream = uid.isEmpty
         ? Stream<int>.value(0)
         : _inboxService.watchUnreadCount(uid: uid);
@@ -135,6 +138,15 @@ class NavShellScaffold extends StatelessWidget {
 
   static bool _matches(String path, String route) =>
       path == route || path.startsWith('$route/');
+
+  FirebaseAuth? get _firebaseAuthOrNull {
+    try {
+      if (Firebase.apps.isEmpty) return null;
+      return FirebaseAuth.instance;
+    } catch (_) {
+      return null;
+    }
+  }
 }
 
 class _OnboardingCoachBanner extends StatelessWidget {

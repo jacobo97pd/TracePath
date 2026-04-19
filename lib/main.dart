@@ -9,6 +9,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'dart:async';
 import 'dart:io';
 
+import 'services/startup_diagnostics.dart';
 import 'adaptive_difficulty_service.dart';
 import 'achievements_service.dart';
 import 'app_theme.dart';
@@ -59,18 +60,25 @@ import 'l10n/app_localizations.dart';
 
 // Temporary diagnostics switch:
 // Set to true to skip notification initialization and isolate startup issues in release.
-const bool kDisableNotificationsForReleaseDiagnostics = true;
+const bool kDisableNotificationsForReleaseDiagnostics = false;
+
+// Diagnostics: shows a plain red screen as the very first thing Flutter renders.
+// If you see RED  → Flutter is rendering fine, bug is in Dart code.
+// If still BLACK  → bug is at the iOS native / engine level.
+// Set back to false before shipping.
+const bool kShowRedDiagnosticScreen = false;
 
 Future<void> main() async {
-  debugPrint('[Startup] main start');
+  slog('main() start');
   WidgetsFlutterBinding.ensureInitialized();
+  slog('binding ready');
   try {
-    await MobileAds.instance.initialize();
-    debugPrint('[ADS] MobileAds initialized');
-    unawaited(AdsService.instance.loadRewardedAd());
-  } catch (e, st) {
-    debugPrint('[ADS] MobileAds init failed: $e');
-    debugPrintStack(stackTrace: st);
+    await MobileAds.instance
+        .initialize()
+        .timeout(const Duration(seconds: 6));
+    slog('MobileAds OK');
+  } catch (e) {
+    slog('MobileAds FAIL: $e');
   }
   if (kIsWeb) {
     await Firebase.initializeApp(
@@ -84,16 +92,18 @@ Future<void> main() async {
         measurementId: 'G-PE5TF47PDE',
       ),
     );
+    slog('Firebase web OK');
   } else {
     try {
-      await Firebase.initializeApp();
-    } catch (e, st) {
-      // Keep app startup alive in local-only mode when native Firebase files are missing.
-      debugPrint('[Firebase] initializeApp failed on native platform: $e');
-      debugPrintStack(stackTrace: st);
+      await Firebase.initializeApp().timeout(const Duration(seconds: 8));
+      slog('Firebase iOS OK');
+    } catch (e) {
+      slog('Firebase iOS FAIL: $e');
     }
   }
+  slog('SharedPrefs loading...');
   final prefs = await SharedPreferences.getInstance();
+  slog('SharedPrefs OK');
   final progressService = ProgressService(prefs);
   final coinsService = CoinsService(prefs);
   final energyService = EnergyService(prefs);
@@ -103,31 +113,8 @@ Future<void> main() async {
   final adaptiveDifficultyService = AdaptiveDifficultyService(prefs);
   final leaderboardService = LeaderboardService(prefs);
   final notificationService = NotificationService(prefs);
-  await OnboardingService.instance.initialize(
-    prefs: prefs,
-    progressService: progressService,
-  );
-  await LevelFingerprintStore.instance.initialize();
-  final exportBasePath = await resolveExportBasePath();
-  await LevelExportRegistry.instance.initialize(basePath: exportBasePath);
-  await PackLevelRepository.instance.loadPack('all');
-
-  const shouldSkipNotifications = kDisableNotificationsForReleaseDiagnostics;
-  if (shouldSkipNotifications) {
-    debugPrint(
-      '[Startup] Notifications temporarily disabled for release diagnostics',
-    );
-  } else {
-    debugPrint('[Startup] NotificationService.initialize start');
-    try {
-      await notificationService.initialize(progressService: progressService);
-      debugPrint('[Startup] NotificationService.initialize ok');
-    } catch (e, st) {
-      debugPrint('[Startup] NotificationService.initialize failed: $e');
-      debugPrintStack(stackTrace: st);
-    }
-  }
-  debugPrint('[Startup] runApp()');
+  slog('services created');
+  slog('calling runApp...');
   runApp(
     MyApp(
       progressService: progressService,
@@ -146,6 +133,70 @@ Future<void> main() async {
       ),
     ),
   );
+  slog('runApp() returned');
+  unawaited(
+    _runPostStartupBootstrap(
+      prefs: prefs,
+      progressService: progressService,
+      notificationService: notificationService,
+    ),
+  );
+  unawaited(AdsService.instance.loadRewardedAd());
+}
+
+Future<void> _runPostStartupBootstrap({
+  required SharedPreferences prefs,
+  required ProgressService progressService,
+  required NotificationService notificationService,
+}) async {
+  try {
+    await OnboardingService.instance.initialize(
+      prefs: prefs,
+      progressService: progressService,
+    );
+  } catch (e, st) {
+    debugPrint('[Startup] Onboarding initialize failed: $e');
+    debugPrintStack(stackTrace: st);
+  }
+
+  try {
+    await LevelFingerprintStore.instance.initialize();
+  } catch (e, st) {
+    debugPrint('[Startup] LevelFingerprintStore initialize failed: $e');
+    debugPrintStack(stackTrace: st);
+  }
+
+  try {
+    final exportBasePath = await resolveExportBasePath();
+    await LevelExportRegistry.instance.initialize(basePath: exportBasePath);
+  } catch (e, st) {
+    debugPrint('[Startup] LevelExportRegistry initialize failed: $e');
+    debugPrintStack(stackTrace: st);
+  }
+
+  try {
+    await PackLevelRepository.instance.loadPack('all');
+  } catch (e, st) {
+    debugPrint('[Startup] Pack preload failed: $e');
+    debugPrintStack(stackTrace: st);
+  }
+
+  const shouldSkipNotifications = kDisableNotificationsForReleaseDiagnostics;
+  if (shouldSkipNotifications) {
+    debugPrint(
+      '[Startup] Notifications temporarily disabled for release diagnostics',
+    );
+    return;
+  }
+
+  debugPrint('[Startup] NotificationService.initialize start');
+  try {
+    await notificationService.initialize(progressService: progressService);
+    debugPrint('[Startup] NotificationService.initialize ok');
+  } catch (e, st) {
+    debugPrint('[Startup] NotificationService.initialize failed: $e');
+    debugPrintStack(stackTrace: st);
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -393,6 +444,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    slog('MyApp.initState');
     _presenceService.start();
     widget.skinCatalogService.addListener(_queueShopImageWarmup);
     _queueShopImageWarmup();
@@ -548,6 +600,7 @@ class _MyAppState extends State<MyApp> {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       builder: (context, child) {
+        slog('MaterialApp.builder child=${child.runtimeType}');
         final content = Stack(
           fit: StackFit.expand,
           children: [
@@ -557,11 +610,12 @@ class _MyAppState extends State<MyApp> {
             const CoinRewardOverlay(),
           ],
         );
-        return _GlobalLiveInvitePopupHost(
+        final wrapped = _GlobalLiveInvitePopupHost(
           router: _router,
           navigatorKey: _rootNavigatorKey,
           child: content,
         );
+        return DiagnosticsOverlay(child: wrapped);
       },
     );
   }
@@ -601,11 +655,14 @@ class _GlobalLiveInvitePopupHostState
   @override
   void initState() {
     super.initState();
-    _authSub = FirebaseAuth.instance.authStateChanges().listen((user) {
-      final uid = user?.uid.trim() ?? '';
-      _bindInbox(uid);
-    });
-    _bindInbox(FirebaseAuth.instance.currentUser?.uid.trim() ?? '');
+    final auth = _firebaseAuthOrNull;
+    if (auth != null) {
+      _authSub = auth.authStateChanges().listen((user) {
+        final uid = user?.uid.trim() ?? '';
+        _bindInbox(uid);
+      });
+    }
+    _bindInbox(auth?.currentUser?.uid.trim() ?? '');
   }
 
   @override
@@ -625,6 +682,15 @@ class _GlobalLiveInvitePopupHostState
           _handleInboxItems,
           onError: (_) {},
         );
+  }
+
+  FirebaseAuth? get _firebaseAuthOrNull {
+    try {
+      if (Firebase.apps.isEmpty) return null;
+      return FirebaseAuth.instance;
+    } catch (_) {
+      return null;
+    }
   }
 
   void _handleInboxItems(List<InboxItem> items) {

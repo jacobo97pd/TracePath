@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
@@ -19,8 +20,11 @@ class PresenceService with WidgetsBindingObserver {
     if (_started) return;
     _started = true;
     WidgetsBinding.instance.addObserver(this);
-    _activeUid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
-    _authSub = FirebaseAuth.instance.authStateChanges().listen(_onAuthChanged);
+    final auth = _firebaseAuthOrNull;
+    _activeUid = auth?.currentUser?.uid.trim() ?? '';
+    if (auth != null) {
+      _authSub = auth.authStateChanges().listen(_onAuthChanged);
+    }
     unawaited(_syncPresence(force: true));
   }
 
@@ -68,7 +72,7 @@ class PresenceService with WidgetsBindingObserver {
     bool force = false,
     bool? explicitOnline,
   }) async {
-    final uid = FirebaseAuth.instance.currentUser?.uid.trim() ?? '';
+    final uid = _firebaseAuthOrNull?.currentUser?.uid.trim() ?? '';
     if (uid.isEmpty) return;
     final shouldBeOnline = explicitOnline ?? _isForeground;
     final now = DateTime.now();
@@ -99,5 +103,13 @@ class PresenceService with WidgetsBindingObserver {
       }
     }
   }
-}
 
+  FirebaseAuth? get _firebaseAuthOrNull {
+    try {
+      if (Firebase.apps.isEmpty) return null;
+      return FirebaseAuth.instance;
+    } catch (_) {
+      return null;
+    }
+  }
+}

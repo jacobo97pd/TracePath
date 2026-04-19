@@ -20,9 +20,8 @@ class AuthService extends ChangeNotifier {
   }
 
   final SharedPreferences _prefs;
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: <String>['email', 'profile'],
-  );
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  static Future<void>? _googleInitialization;
 
   FirebaseAuth? get _firebaseAuthOrNull {
     try {
@@ -52,6 +51,19 @@ class AuthService extends ChangeNotifier {
       _displayName ?? (_mode == AuthMode.guest ? 'Guest' : 'Player');
   String? get email => _email;
   String? get avatarUrl => _avatarUrl;
+
+  Future<void> _ensureGoogleInitialized() {
+    return _googleInitialization ??= _googleSignIn.initialize();
+  }
+
+  FirebaseAuth? _configuredFirebaseAuth() {
+    final firebaseAuth = _firebaseAuthOrNull;
+    if (firebaseAuth == null || kIsWeb) {
+      return firebaseAuth;
+    }
+    firebaseAuth.customAuthDomain = 'tracepath-e2e90.firebaseapp.com';
+    return firebaseAuth;
+  }
 
   Future<void> _load() async {
     final raw = _prefs.getString(_modeKey);
@@ -88,7 +100,7 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<String?> signInWithGoogle() async {
-    final firebaseAuth = _firebaseAuthOrNull;
+    final firebaseAuth = _configuredFirebaseAuth();
     if (firebaseAuth == null) {
       return 'Firebase no configurado en este dispositivo. Anade GoogleService-Info.plist (iOS) y google-services.json (Android).';
     }
@@ -100,23 +112,19 @@ class AuthService extends ChangeNotifier {
         final credential = await firebaseAuth.signInWithPopup(provider);
         final user = credential.user;
         debugPrint('TRACE web popup user: ${user?.uid}');
-        if (user == null) return 'Google login failed';
+      if (user == null) return 'Google login failed';
         _displayName =
             user.displayName ?? user.email?.split('@').first ?? 'Player';
         _email = user.email;
         _avatarUrl = user.photoURL;
       } else {
-        final account = await _googleSignIn.signIn();
+        await _ensureGoogleInitialized();
+        final account = await _googleSignIn.authenticate();
         debugPrint('TRACE googleUser: $account');
-        if (account == null) {
-          debugPrint('TRACE google sign in cancelled by user');
-          return 'Login canceled';
-        }
-        final googleAuth = await account.authentication;
-        debugPrint('TRACE accessToken: ${googleAuth.accessToken != null}');
+        final googleAuth = account.authentication;
+        debugPrint('TRACE accessToken: false');
         debugPrint('TRACE idToken: ${googleAuth.idToken != null}');
         final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
         final result = await firebaseAuth.signInWithCredential(credential);
@@ -146,7 +154,7 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<String?> signInWithApple() async {
-    final firebaseAuth = _firebaseAuthOrNull;
+    final firebaseAuth = _configuredFirebaseAuth();
     if (firebaseAuth == null) {
       return 'Firebase no configurado en este dispositivo.';
     }
@@ -178,9 +186,25 @@ class AuthService extends ChangeNotifier {
         nonce: nonce,
       );
 
-      final oauthCredential = OAuthProvider('apple.com').credential(
-        idToken: appleCredential.identityToken,
-        rawNonce: rawNonce,
+      final identityToken = appleCredential.identityToken;
+      if (identityToken == null || identityToken.isEmpty) {
+        debugPrint(
+          'TRACE apple sign in missing identityToken. authorizationCode present: '
+          '${appleCredential.authorizationCode.isNotEmpty}',
+        );
+        return 'Apple login failed: Apple no devolvio un identity token valido.';
+      }
+      debugPrint(
+        'TRACE apple token claims: ${_describeJwtClaims(identityToken)}',
+      );
+
+      final oauthCredential = AppleAuthProvider.credentialWithIDToken(
+        identityToken,
+        rawNonce,
+        AppleFullPersonName(
+          givenName: appleCredential.givenName,
+          familyName: appleCredential.familyName,
+        ),
       );
 
       final result = await firebaseAuth.signInWithCredential(oauthCredential);
@@ -205,7 +229,12 @@ class AuthService extends ChangeNotifier {
       _email = user.email;
       _avatarUrl = user.photoURL;
 
-      await _upsertUserFromAuth(user, provider: 'apple');
+      await _upsertUserFromAuth(
+        user,
+        provider: 'apple',
+        preferredDisplayName: fullName,
+        preferredEmail: (appleCredential.email ?? '').trim(),
+      );
       await _persist();
       notifyListeners();
       return null;
@@ -225,6 +254,23 @@ class AuthService extends ChangeNotifier {
       debugPrint('TRACE apple sign in ERROR: $e');
       debugPrint('TRACE apple sign in STACK: $st');
       return 'Apple login failed: $e';
+    }
+  }
+
+  String _describeJwtClaims(String jwt) {
+    try {
+      final parts = jwt.split('.');
+      if (parts.length < 2) return 'invalid-jwt-format';
+      final payload = utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
+      final decoded = jsonDecode(payload);
+      if (decoded is! Map<String, dynamic>) return 'unexpected-jwt-payload';
+      final aud = decoded['aud'];
+      final iss = decoded['iss'];
+      final nonce = decoded['nonce'];
+      final sub = decoded['sub'];
+      return 'iss=$iss aud=$aud nonce=${nonce != null} sub=$sub';
+    } catch (e) {
+      return 'jwt-decode-failed: $e';
     }
   }
 
@@ -383,22 +429,17 @@ class AuthService extends ChangeNotifier {
       return;
     }
 
+    await _ensureGoogleInitialized();
+
     GoogleSignInAccount? account;
     try {
-      account = await _googleSignIn.signInSilently();
+      account = await _googleSignIn.attemptLightweightAuthentication();
     } catch (_) {
       account = null;
     }
-    account ??= await _googleSignIn.signIn();
-    if (account == null) {
-      throw FirebaseAuthException(
-        code: 'user-cancelled',
-        message: 'Cancelado por el usuario',
-      );
-    }
-    final googleAuth = await account.authentication;
+    final signedInAccount = account ?? await _googleSignIn.authenticate();
+    final googleAuth = signedInAccount.authentication;
     final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
     await user.reauthenticateWithCredential(credential);
@@ -524,8 +565,12 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  Future<void> _upsertUserFromAuth(User user,
-      {required String provider}) async {
+  Future<void> _upsertUserFromAuth(
+    User user, {
+    required String provider,
+    String? preferredDisplayName,
+    String? preferredEmail,
+  }) async {
     final uid = user.uid.trim();
     if (uid.isEmpty) return;
 
@@ -534,14 +579,22 @@ class AuthService extends ChangeNotifier {
     final snap = await userRef.get();
 
     final display = (user.displayName ?? '').trim();
-    final email = (user.email ?? '').trim();
+    final preferredName = (preferredDisplayName ?? '').trim();
+    final email = (preferredEmail ?? user.email ?? '').trim();
+    final existing = snap.data() ?? const <String, dynamic>{};
+    final existingPlayerName = (existing['playerName'] as String?)?.trim() ?? '';
+    final resolvedPlayerName = _resolvePlayerName(
+      preferredName: preferredName,
+      authDisplayName: display,
+      email: email,
+      existingPlayerName: existingPlayerName,
+    );
 
     final payload = <String, dynamic>{
       'uid': uid,
-      'playerName': display.isNotEmpty
-          ? display
-          : (email.isNotEmpty ? email.split('@').first : 'Player'),
+      'playerName': resolvedPlayerName,
       'email': email,
+      'emailLowercase': email.toLowerCase(),
       'photoUrl': user.photoURL,
       'authProvider': provider,
       'lastLoginAt': FieldValue.serverTimestamp(),
@@ -550,7 +603,6 @@ class AuthService extends ChangeNotifier {
       'lastSeenAt': FieldValue.serverTimestamp(),
     };
 
-    final existing = snap.data() ?? const <String, dynamic>{};
     final existingUsername = (existing['username'] as String?)?.trim() ?? '';
     final existingUsernameLower =
         (existing['usernameLowercase'] as String?)?.trim() ?? '';
@@ -599,6 +651,25 @@ class AuthService extends ChangeNotifier {
         }
       }
     }
+  }
+
+  String _resolvePlayerName({
+    required String preferredName,
+    required String authDisplayName,
+    required String email,
+    required String existingPlayerName,
+  }) {
+    if (preferredName.isNotEmpty) return preferredName;
+    if (authDisplayName.isNotEmpty) return authDisplayName;
+    if (existingPlayerName.isNotEmpty && existingPlayerName != 'Player') {
+      return existingPlayerName;
+    }
+    final emailPrefix = email.isNotEmpty ? email.split('@').first.trim() : '';
+    if (emailPrefix.isNotEmpty &&
+        !email.toLowerCase().contains('privaterelay.appleid.com')) {
+      return emailPrefix;
+    }
+    return 'Player';
   }
 
   String _defaultUsernameForUid(String uid) {

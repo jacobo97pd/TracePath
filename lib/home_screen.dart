@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +12,7 @@ import 'coins_service.dart';
 import 'l10n/l10n.dart';
 import 'progress_service.dart';
 import 'services/onboarding_service.dart';
+import 'services/startup_diagnostics.dart';
 import 'theme/app_colors.dart';
 import 'ui/avatar_utils.dart';
 import 'ui/components/coin_display.dart';
@@ -30,6 +32,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    slog('HomeScreen.build');
     return AnimatedBuilder(
       animation: Listenable.merge([progressService, coinsService]),
       builder: (context, _) {
@@ -155,7 +158,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   String _resolveGoogleAvatarUrl() {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _firebaseAuthOrNull?.currentUser;
     final candidates = <String>[
       (user?.photoURL ?? '').trim(),
       if (user != null)
@@ -180,6 +183,15 @@ class HomeScreen extends StatelessWidget {
       return value;
     }
     return '';
+  }
+
+  FirebaseAuth? get _firebaseAuthOrNull {
+    try {
+      if (Firebase.apps.isEmpty) return null;
+      return FirebaseAuth.instance;
+    } catch (_) {
+      return null;
+    }
   }
 }
 

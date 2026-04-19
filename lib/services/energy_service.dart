@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -145,9 +146,12 @@ class EnergySnapshot {
 
 class EnergyService extends ChangeNotifier {
   EnergyService(this._prefs) {
-    _authSub = FirebaseAuth.instance.authStateChanges().listen((_) {
-      unawaited(refresh());
-    });
+    final auth = _firebaseAuthOrNull;
+    if (auth != null) {
+      _authSub = auth.authStateChanges().listen((_) {
+        unawaited(refresh());
+      });
+    }
     _snapshot = _loadCachedSnapshot();
   }
 
@@ -179,6 +183,15 @@ class EnergyService extends ChangeNotifier {
   StreamSubscription<User?>? _authSub;
   EnergySnapshot _snapshot = EnergySnapshot.initial();
   bool _refreshing = false;
+
+  FirebaseAuth? get _firebaseAuthOrNull {
+    try {
+      if (Firebase.apps.isEmpty) return null;
+      return FirebaseAuth.instance;
+    } catch (_) {
+      return null;
+    }
+  }
 
   EnergySnapshot get snapshot => _snapshot;
 

@@ -272,7 +272,7 @@ class _EditorNuevosPageState extends State<EditorNuevosPage> {
 
   Future<void> _pickAndImportJsonFile() async {
     try {
-      final picked = await FilePicker.platform.pickFiles(
+      final picked = await FilePicker.pickFiles(
         type: FileType.custom,
         allowMultiple: false,
         withData: true,

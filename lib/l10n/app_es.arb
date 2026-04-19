@@ -6,7 +6,9 @@
   "liveDuelInviteBody": "{from} te desafio a un duelo en vivo.\nQuieres aceptar",
   "@liveDuelInviteBody": {
     "placeholders": {
-      "from": {}
+      "from": {
+        "type": "Object"
+      }
     }
   },
   "decline": "Rechazar",
@@ -110,13 +112,17 @@
   "duelAcceptError": "No se pudo aceptar la invitacion: {error}",
   "@duelAcceptError": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "Object"
+      }
     }
   },
   "duelDeclineError": "No se pudo rechazar la invitacion: {error}",
   "@duelDeclineError": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "Object"
+      }
     }
   },
   "duelAccept": "Aceptar",
@@ -130,14 +136,20 @@
   "duelVersusOpponent": "VS {name}",
   "@duelVersusOpponent": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "Object"
+      }
     }
   },
   "duelLevelAndStatus": "Nivel: {level} {status}",
   "@duelLevelAndStatus": {
     "placeholders": {
-      "level": {},
-      "status": {}
+      "level": {
+        "type": "Object"
+      },
+      "status": {
+        "type": "Object"
+      }
     }
   },
   "duelErrorFinishCurrentFirst": "Termina primero tu duelo en curso.",
@@ -154,7 +166,9 @@
   "duelRemoveError": "No se pudo eliminar la partida: {error}",
   "@duelRemoveError": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "Object"
+      }
     }
   },
   "friendChallengeTitle": "Desafio amistoso",
@@ -162,13 +176,17 @@
   "friendChallengePuzzle": "Puzzle: {puzzleId}",
   "@friendChallengePuzzle": {
     "placeholders": {
-      "puzzleId": {}
+      "puzzleId": {
+        "type": "Object"
+      }
     }
   },
   "friendChallengeMode": "Modo: {mode}",
   "@friendChallengeMode": {
     "placeholders": {
-      "mode": {}
+      "mode": {
+        "type": "Object"
+      }
     }
   },
   "friendChallengePlayButton": "Jugar desafio amistoso",
@@ -234,7 +252,9 @@
   "profileEquippedSkin": "Skin equipada: {name}",
   "@profileEquippedSkin": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "Object"
+      }
     }
   },
   "profileStatsTitle": "Estadisticas",
@@ -317,20 +337,26 @@
   "profileAchievementCompleted": "Completado{datePart}",
   "@profileAchievementCompleted": {
     "placeholders": {
-      "datePart": {}
+      "datePart": {
+        "type": "Object"
+      }
     }
   },
   "profileAchievementLocked": "Bloqueado",
   "profileAchievementUnlocked": "Desbloqueado{datePart}",
   "@profileAchievementUnlocked": {
     "placeholders": {
-      "datePart": {}
+      "datePart": {
+        "type": "Object"
+      }
     }
   },
   "profileAchievementOnDate": "el {date}",
   "@profileAchievementOnDate": {
     "placeholders": {
-      "date": {}
+      "date": {
+        "type": "Object"
+      }
     }
   },
   "profileInboxOpen": "Abrir",
@@ -379,7 +405,9 @@
       "level": {
         "type": "int"
       },
-      "packId": {}
+      "packId": {
+        "type": "Object"
+      }
     }
   },
   "leaderboardNoFriendsScores": "Aun no hay tiempos de amigos en este nivel.",
@@ -392,7 +420,9 @@
   "dailyNextPuzzleIn": "Siguiente puzzle en {countdown}",
   "@dailyNextPuzzleIn": {
     "placeholders": {
-      "countdown": {}
+      "countdown": {
+        "type": "Object"
+      }
     }
   },
   "dailyRewardLabel": "Recompensa",
@@ -414,7 +444,9 @@
       "attempts": {
         "type": "int"
       },
-      "bestScore": {}
+      "bestScore": {
+        "type": "Object"
+      }
     }
   },
   "dailyNewPersonalBestToday": "Nuevo record personal de hoy",
@@ -434,7 +466,9 @@
   "dailyShareText": "Diario completado en {time}.",
   "@dailyShareText": {
     "placeholders": {
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "dailyCopyText": "Zip #{day} - {time} - Racha {streak} Y",
@@ -443,7 +477,9 @@
       "day": {
         "type": "int"
       },
-      "time": {},
+      "time": {
+        "type": "Object"
+      },
       "streak": {
         "type": "int"
       }
@@ -457,7 +493,9 @@
   "liveDuelReacted": "{sender} reacciono",
   "@liveDuelReacted": {
     "placeholders": {
-      "sender": {}
+      "sender": {
+        "type": "Object"
+      }
     }
   },
   "liveDuelUnavailableNow": "Duelo en vivo no disponible ahora.",
@@ -484,7 +522,9 @@
   "liveDuelStartingIn": "Empieza en {value}...",
   "@liveDuelStartingIn": {
     "placeholders": {
-      "value": {}
+      "value": {
+        "type": "Object"
+      }
     }
   },
   "liveDuelStartingMatch": "Iniciando partida...",
@@ -536,7 +576,9 @@
   "victoryFriendAlreadyInDuel": "{name} ya esta en otro duelo",
   "@victoryFriendAlreadyInDuel": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "Object"
+      }
     }
   },
   "victoryNoPuzzlesForDuel": "No hay puzzles disponibles para duelo",
@@ -616,7 +658,9 @@
   "socialLiveInviteSentBody": "Esperando a que {name} acepte.",
   "@socialLiveInviteSentBody": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "Object"
+      }
     }
   },
   "socialCouldNotSendChallenge": "No se pudo enviar el desafio ahora.",
@@ -626,7 +670,9 @@
   "socialFriendAlreadyInLiveDuel": "{name} ya esta en otro duelo en vivo.",
   "@socialFriendAlreadyInLiveDuel": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "Object"
+      }
     }
   },
   "socialNoPuzzlesForLiveDuel": "No hay puzzles disponibles para duelo en vivo.",
@@ -665,8 +711,12 @@
   "socialSkinTrail": "Skin: {skin} - Estela: {trail}",
   "@socialSkinTrail": {
     "placeholders": {
-      "skin": {},
-      "trail": {}
+      "skin": {
+        "type": "Object"
+      },
+      "trail": {
+        "type": "Object"
+      }
     }
   },
   "socialOnline": "En linea",
@@ -679,13 +729,17 @@
   "energyOutWithBattery": "No te queda energia. Espera {reset} al reset, o usa una bateria ahora.",
   "@energyOutWithBattery": {
     "placeholders": {
-      "reset": {}
+      "reset": {
+        "type": "Object"
+      }
     }
   },
   "energyOutWithoutBattery": "No te queda energia. Espera {reset} al reset, o compra una bateria.",
   "@energyOutWithoutBattery": {
     "placeholders": {
-      "reset": {}
+      "reset": {
+        "type": "Object"
+      }
     }
   },
   "energyCouldNotUseBattery": "No se pudo usar la bateria ahora.",
@@ -776,7 +830,9 @@
   "gameVariantExample": "Ejemplo: {example}",
   "@gameVariantExample": {
     "placeholders": {
-      "example": {}
+      "example": {
+        "type": "Object"
+      }
     }
   },
   "gamePackNotFound": "Pack no encontrado",
@@ -797,7 +853,9 @@
   "gameEnergyResetIn": "Reset en {time}",
   "@gameEnergyResetIn": {
     "placeholders": {
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "gameDuelFinishedBoardLocked": "Duelo finalizado. Tablero bloqueado.",
@@ -821,13 +879,17 @@
   "gameNextAdIn": "Siguiente anuncio en {time}",
   "@gameNextAdIn": {
     "placeholders": {
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "gameLevelCompleteReward": "NIVEL COMPLETADO! {reward}",
   "@gameLevelCompleteReward": {
     "placeholders": {
-      "reward": {}
+      "reward": {
+        "type": "Object"
+      }
     }
   },
   "gameRankingUnavailable": "Ranking no disponible",
@@ -876,7 +938,9 @@
   "gameAlmostThereBody": "Termina en {label} para completar el nivel.",
   "@gameAlmostThereBody": {
     "placeholders": {
-      "label": {}
+      "label": {
+        "type": "Object"
+      }
     }
   },
   "gameTimeTitle": "Tiempo!",
@@ -905,8 +969,12 @@
   "gameRewardedAdStatusBody": "Cargado: {loaded}\nCargando: {loading}",
   "@gameRewardedAdStatusBody": {
     "placeholders": {
-      "loaded": {},
-      "loading": {}
+      "loaded": {
+        "type": "Object"
+      },
+      "loading": {
+        "type": "Object"
+      }
     }
   },
   "gameAdReloadRequestedTitle": "Recarga de anuncio solicitada",
@@ -918,7 +986,9 @@
   "gameLiveDuelFinishedWaiting": "Terminado en {time}. Esperando resultado...",
   "@gameLiveDuelFinishedWaiting": {
     "placeholders": {
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "gameLiveDuelResultTitle": "Resultado del duelo",
@@ -936,14 +1006,18 @@
   "gameEnergyEmptyResetIn": "Energia vacia. Reset en {time}.",
   "@gameEnergyEmptyResetIn": {
     "placeholders": {
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "gameBatteries": "Baterias",
   "gameGhostBest": "Mejor fantasma: {time}",
   "@gameGhostBest": {
     "placeholders": {
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "gameGhostOn": "Fantasma: ON",
@@ -968,7 +1042,9 @@
       "count": {
         "type": "int"
       },
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "shopUseOneBatteryNow": "Usar 1 bateria ahora",
@@ -989,7 +1065,9 @@
   "shopConfirmPurchaseBody": "Quieres comprar \"{name}\" por {coins} monedas'",
   "@shopConfirmPurchaseBody": {
     "placeholders": {
-      "name": {},
+      "name": {
+        "type": "Object"
+      },
       "coins": {
         "type": "int"
       }
@@ -1019,8 +1097,12 @@
   "duelHistoryTimes": "Tu {youTime} Rival {opponentTime}",
   "@duelHistoryTimes": {
     "placeholders": {
-      "youTime": {},
-      "opponentTime": {}
+      "youTime": {
+        "type": "Object"
+      },
+      "opponentTime": {
+        "type": "Object"
+      }
     }
   },
   "duelStatusVictory": "Victoria",
@@ -1035,7 +1117,9 @@
       "max": {
         "type": "int"
       },
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "playLevelsWorldProgressSummary": "{total} niveles - {completed} completados",
@@ -1058,7 +1142,9 @@
       "max": {
         "type": "int"
       },
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "playLevelsSelectedLevel": "Nivel seleccionado",
@@ -1068,7 +1154,9 @@
       "level": {
         "type": "int"
       },
-      "variant": {}
+      "variant": {
+        "type": "Object"
+      }
     }
   },
   "playLevelsPlay": "Jugar",
@@ -1101,13 +1189,17 @@
   "gameFriendlyChallengeShare": "Reto amistoso completado en {time}.",
   "@gameFriendlyChallengeShare": {
     "placeholders": {
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "gameFriendlyChallengeCopy": "Reto amistoso | {time}",
   "@gameFriendlyChallengeCopy": {
     "placeholders": {
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "gameContinueTutorial": "Continuar tutorial",
@@ -1117,7 +1209,9 @@
       "level": {
         "type": "int"
       },
-      "time": {},
+      "time": {
+        "type": "Object"
+      },
       "score": {
         "type": "int"
       }
@@ -1129,7 +1223,9 @@
       "level": {
         "type": "int"
       },
-      "time": {},
+      "time": {
+        "type": "Object"
+      },
       "streak": {
         "type": "int"
       }
@@ -1138,7 +1234,9 @@
   "gameReacted": "{name} reacciono",
   "@gameReacted": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "Object"
+      }
     }
   },
   "victoryHeadlineFire": "Estas que ardes!",
@@ -1173,7 +1271,9 @@
       "index": {
         "type": "int"
       },
-      "avg": {}
+      "avg": {
+        "type": "Object"
+      }
     }
   },
   "endlessCouldNotLoadPuzzle": "No se pudo cargar el puzzle infinito.",
@@ -1195,7 +1295,9 @@
       "index": {
         "type": "int"
       },
-      "time": {}
+      "time": {
+        "type": "Object"
+      }
     }
   },
   "endlessCopyText": "Zip #{index} - {time} - Racha {streak} Y",
@@ -1204,7 +1306,9 @@
       "index": {
         "type": "int"
       },
-      "time": {},
+      "time": {
+        "type": "Object"
+      },
       "streak": {
         "type": "int"
       }
@@ -1213,20 +1317,26 @@
   "levelsPackTitle": "Niveles de {pack}",
   "@levelsPackTitle": {
     "placeholders": {
-      "pack": {}
+      "pack": {
+        "type": "Object"
+      }
     }
   },
   "gameClear": "Limpiar",
   "gameNext": "Siguiente {value}",
   "@gameNext": {
     "placeholders": {
-      "value": {}
+      "value": {
+        "type": "Object"
+      }
     }
   },
   "gameStars": "Estrellas {value}",
   "@gameStars": {
     "placeholders": {
-      "value": {}
+      "value": {
+        "type": "Object"
+      }
     }
   },
   "victoryPrimaryNextLevel": "Siguiente nivel",

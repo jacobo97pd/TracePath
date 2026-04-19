@@ -70,7 +70,7 @@ class _CurateBatchScreenState extends State<CurateBatchScreen> {
   Future<void> _importScreenshots() async {
     setState(() => _busy = true);
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.pickFiles(
         allowMultiple: true,
         type: FileType.image,
         withData: true,
